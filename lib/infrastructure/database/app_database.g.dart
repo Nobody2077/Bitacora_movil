@@ -1,0 +1,21026 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'app_database.dart';
+
+// ignore_for_file: type=lint
+class LifeAreas extends Table with TableInfo<LifeAreas, LifeArea> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  LifeAreas(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _iconKeyMeta = const VerificationMeta(
+    'iconKey',
+  );
+  late final GeneratedColumn<String> iconKey = GeneratedColumn<String>(
+    'icon_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _colorHexMeta = const VerificationMeta(
+    'colorHex',
+  );
+  late final GeneratedColumn<String> colorHex = GeneratedColumn<String>(
+    'color_hex',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (color_hex GLOB \'#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]\')',
+  );
+  static const VerificationMeta _isDefaultMeta = const VerificationMeta(
+    'isDefault',
+  );
+  late final GeneratedColumn<int> isDefault = GeneratedColumn<int>(
+    'is_default',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (is_default IN (0, 1))',
+  );
+  static const VerificationMeta _isVisibleMeta = const VerificationMeta(
+    'isVisible',
+  );
+  late final GeneratedColumn<int> isVisible = GeneratedColumn<int>(
+    'is_visible',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 1 CHECK (is_visible IN (0, 1))',
+    defaultValue: const CustomExpression('1'),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (sort_order >= 0)',
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    iconKey,
+    colorHex,
+    isDefault,
+    isVisible,
+    sortOrder,
+    archivedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'life_areas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LifeArea> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('icon_key')) {
+      context.handle(
+        _iconKeyMeta,
+        iconKey.isAcceptableOrUnknown(data['icon_key']!, _iconKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_iconKeyMeta);
+    }
+    if (data.containsKey('color_hex')) {
+      context.handle(
+        _colorHexMeta,
+        colorHex.isAcceptableOrUnknown(data['color_hex']!, _colorHexMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_colorHexMeta);
+    }
+    if (data.containsKey('is_default')) {
+      context.handle(
+        _isDefaultMeta,
+        isDefault.isAcceptableOrUnknown(data['is_default']!, _isDefaultMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isDefaultMeta);
+    }
+    if (data.containsKey('is_visible')) {
+      context.handle(
+        _isVisibleMeta,
+        isVisible.isAcceptableOrUnknown(data['is_visible']!, _isVisibleMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LifeArea map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LifeArea(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      iconKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon_key'],
+      )!,
+      colorHex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_hex'],
+      )!,
+      isDefault: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_default'],
+      )!,
+      isVisible: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_visible'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+    );
+  }
+
+  @override
+  LifeAreas createAlias(String alias) {
+    return LifeAreas(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class LifeArea extends DataClass implements Insertable<LifeArea> {
+  final String id;
+  final String name;
+  final String iconKey;
+  final String colorHex;
+  final int isDefault;
+  final int isVisible;
+  final int sortOrder;
+  final int? archivedAt;
+  const LifeArea({
+    required this.id,
+    required this.name,
+    required this.iconKey,
+    required this.colorHex,
+    required this.isDefault,
+    required this.isVisible,
+    required this.sortOrder,
+    this.archivedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['icon_key'] = Variable<String>(iconKey);
+    map['color_hex'] = Variable<String>(colorHex);
+    map['is_default'] = Variable<int>(isDefault);
+    map['is_visible'] = Variable<int>(isVisible);
+    map['sort_order'] = Variable<int>(sortOrder);
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    return map;
+  }
+
+  LifeAreasCompanion toCompanion(bool nullToAbsent) {
+    return LifeAreasCompanion(
+      id: Value(id),
+      name: Value(name),
+      iconKey: Value(iconKey),
+      colorHex: Value(colorHex),
+      isDefault: Value(isDefault),
+      isVisible: Value(isVisible),
+      sortOrder: Value(sortOrder),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+    );
+  }
+
+  factory LifeArea.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LifeArea(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      iconKey: serializer.fromJson<String>(json['icon_key']),
+      colorHex: serializer.fromJson<String>(json['color_hex']),
+      isDefault: serializer.fromJson<int>(json['is_default']),
+      isVisible: serializer.fromJson<int>(json['is_visible']),
+      sortOrder: serializer.fromJson<int>(json['sort_order']),
+      archivedAt: serializer.fromJson<int?>(json['archived_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'icon_key': serializer.toJson<String>(iconKey),
+      'color_hex': serializer.toJson<String>(colorHex),
+      'is_default': serializer.toJson<int>(isDefault),
+      'is_visible': serializer.toJson<int>(isVisible),
+      'sort_order': serializer.toJson<int>(sortOrder),
+      'archived_at': serializer.toJson<int?>(archivedAt),
+    };
+  }
+
+  LifeArea copyWith({
+    String? id,
+    String? name,
+    String? iconKey,
+    String? colorHex,
+    int? isDefault,
+    int? isVisible,
+    int? sortOrder,
+    Value<int?> archivedAt = const Value.absent(),
+  }) => LifeArea(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    iconKey: iconKey ?? this.iconKey,
+    colorHex: colorHex ?? this.colorHex,
+    isDefault: isDefault ?? this.isDefault,
+    isVisible: isVisible ?? this.isVisible,
+    sortOrder: sortOrder ?? this.sortOrder,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+  );
+  LifeArea copyWithCompanion(LifeAreasCompanion data) {
+    return LifeArea(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      iconKey: data.iconKey.present ? data.iconKey.value : this.iconKey,
+      colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
+      isDefault: data.isDefault.present ? data.isDefault.value : this.isDefault,
+      isVisible: data.isVisible.present ? data.isVisible.value : this.isVisible,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LifeArea(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('iconKey: $iconKey, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('isDefault: $isDefault, ')
+          ..write('isVisible: $isVisible, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('archivedAt: $archivedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    iconKey,
+    colorHex,
+    isDefault,
+    isVisible,
+    sortOrder,
+    archivedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LifeArea &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.iconKey == this.iconKey &&
+          other.colorHex == this.colorHex &&
+          other.isDefault == this.isDefault &&
+          other.isVisible == this.isVisible &&
+          other.sortOrder == this.sortOrder &&
+          other.archivedAt == this.archivedAt);
+}
+
+class LifeAreasCompanion extends UpdateCompanion<LifeArea> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> iconKey;
+  final Value<String> colorHex;
+  final Value<int> isDefault;
+  final Value<int> isVisible;
+  final Value<int> sortOrder;
+  final Value<int?> archivedAt;
+  final Value<int> rowid;
+  const LifeAreasCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.iconKey = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.isDefault = const Value.absent(),
+    this.isVisible = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LifeAreasCompanion.insert({
+    required String id,
+    required String name,
+    required String iconKey,
+    required String colorHex,
+    required int isDefault,
+    this.isVisible = const Value.absent(),
+    required int sortOrder,
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       iconKey = Value(iconKey),
+       colorHex = Value(colorHex),
+       isDefault = Value(isDefault),
+       sortOrder = Value(sortOrder);
+  static Insertable<LifeArea> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? iconKey,
+    Expression<String>? colorHex,
+    Expression<int>? isDefault,
+    Expression<int>? isVisible,
+    Expression<int>? sortOrder,
+    Expression<int>? archivedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (iconKey != null) 'icon_key': iconKey,
+      if (colorHex != null) 'color_hex': colorHex,
+      if (isDefault != null) 'is_default': isDefault,
+      if (isVisible != null) 'is_visible': isVisible,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LifeAreasCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? iconKey,
+    Value<String>? colorHex,
+    Value<int>? isDefault,
+    Value<int>? isVisible,
+    Value<int>? sortOrder,
+    Value<int?>? archivedAt,
+    Value<int>? rowid,
+  }) {
+    return LifeAreasCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      iconKey: iconKey ?? this.iconKey,
+      colorHex: colorHex ?? this.colorHex,
+      isDefault: isDefault ?? this.isDefault,
+      isVisible: isVisible ?? this.isVisible,
+      sortOrder: sortOrder ?? this.sortOrder,
+      archivedAt: archivedAt ?? this.archivedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (iconKey.present) {
+      map['icon_key'] = Variable<String>(iconKey.value);
+    }
+    if (colorHex.present) {
+      map['color_hex'] = Variable<String>(colorHex.value);
+    }
+    if (isDefault.present) {
+      map['is_default'] = Variable<int>(isDefault.value);
+    }
+    if (isVisible.present) {
+      map['is_visible'] = Variable<int>(isVisible.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LifeAreasCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('iconKey: $iconKey, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('isDefault: $isDefault, ')
+          ..write('isVisible: $isVisible, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class MissionTemplates extends Table
+    with TableInfo<MissionTemplates, MissionTemplate> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  MissionTemplates(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES life_areas(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160)',
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _missionTypeMeta = const VerificationMeta(
+    'missionType',
+  );
+  late final GeneratedColumn<String> missionType = GeneratedColumn<String>(
+    'mission_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (mission_type IN (\'PRIMARY\', \'SECONDARY\', \'ERRAND\', \'DAILY\', \'RECURRING\', \'EVENT\', \'CHALLENGE\', \'CUSTOM\'))',
+  );
+  static const VerificationMeta _importanceMeta = const VerificationMeta(
+    'importance',
+  );
+  late final GeneratedColumn<String> importance = GeneratedColumn<String>(
+    'importance',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT \'NORMAL\' CHECK (importance IN (\'MINOR\', \'NORMAL\', \'IMPORTANT\', \'VERY_IMPORTANT\', \'CRITICAL\'))',
+    defaultValue: const CustomExpression('\'NORMAL\''),
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  late final GeneratedColumn<String> priority = GeneratedColumn<String>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT \'NORMAL\' CHECK (priority IN (\'LOW\', \'NORMAL\', \'HIGH\', \'URGENT\'))',
+    defaultValue: const CustomExpression('\'NORMAL\''),
+  );
+  static const VerificationMeta _difficultyMeta = const VerificationMeta(
+    'difficulty',
+  );
+  late final GeneratedColumn<String> difficulty = GeneratedColumn<String>(
+    'difficulty',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (difficulty IS NULL OR difficulty IN (\'EASY\', \'MEDIUM\', \'HARD\'))',
+  );
+  static const VerificationMeta _isRequiredMeta = const VerificationMeta(
+    'isRequired',
+  );
+  late final GeneratedColumn<int> isRequired = GeneratedColumn<int>(
+    'is_required',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (is_required IN (0, 1))',
+  );
+  static const VerificationMeta _xpRewardMeta = const VerificationMeta(
+    'xpReward',
+  );
+  late final GeneratedColumn<int> xpReward = GeneratedColumn<int>(
+    'xp_reward',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (xp_reward >= 0)',
+  );
+  static const VerificationMeta _estimatedMinutesMeta = const VerificationMeta(
+    'estimatedMinutes',
+  );
+  late final GeneratedColumn<int> estimatedMinutes = GeneratedColumn<int>(
+    'estimated_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (estimated_minutes IS NULL OR estimated_minutes > 0)',
+  );
+  static const VerificationMeta _budgetMinorMeta = const VerificationMeta(
+    'budgetMinor',
+  );
+  late final GeneratedColumn<int> budgetMinor = GeneratedColumn<int>(
+    'budget_minor',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'CHECK (budget_minor IS NULL OR budget_minor >= 0)',
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  late final GeneratedColumn<int> isActive = GeneratedColumn<int>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (is_active IN (0, 1))',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    areaId,
+    title,
+    description,
+    missionType,
+    importance,
+    priority,
+    difficulty,
+    isRequired,
+    xpReward,
+    estimatedMinutes,
+    budgetMinor,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mission_templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MissionTemplate> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mission_type')) {
+      context.handle(
+        _missionTypeMeta,
+        missionType.isAcceptableOrUnknown(
+          data['mission_type']!,
+          _missionTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_missionTypeMeta);
+    }
+    if (data.containsKey('importance')) {
+      context.handle(
+        _importanceMeta,
+        importance.isAcceptableOrUnknown(data['importance']!, _importanceMeta),
+      );
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
+    if (data.containsKey('difficulty')) {
+      context.handle(
+        _difficultyMeta,
+        difficulty.isAcceptableOrUnknown(data['difficulty']!, _difficultyMeta),
+      );
+    }
+    if (data.containsKey('is_required')) {
+      context.handle(
+        _isRequiredMeta,
+        isRequired.isAcceptableOrUnknown(data['is_required']!, _isRequiredMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isRequiredMeta);
+    }
+    if (data.containsKey('xp_reward')) {
+      context.handle(
+        _xpRewardMeta,
+        xpReward.isAcceptableOrUnknown(data['xp_reward']!, _xpRewardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_xpRewardMeta);
+    }
+    if (data.containsKey('estimated_minutes')) {
+      context.handle(
+        _estimatedMinutesMeta,
+        estimatedMinutes.isAcceptableOrUnknown(
+          data['estimated_minutes']!,
+          _estimatedMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('budget_minor')) {
+      context.handle(
+        _budgetMinorMeta,
+        budgetMinor.isAcceptableOrUnknown(
+          data['budget_minor']!,
+          _budgetMinorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isActiveMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MissionTemplate map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MissionTemplate(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      missionType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_type'],
+      )!,
+      importance: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}importance'],
+      )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}priority'],
+      )!,
+      difficulty: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}difficulty'],
+      ),
+      isRequired: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_required'],
+      )!,
+      xpReward: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}xp_reward'],
+      )!,
+      estimatedMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}estimated_minutes'],
+      ),
+      budgetMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}budget_minor'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  MissionTemplates createAlias(String alias) {
+    return MissionTemplates(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
+  final String id;
+  final String areaId;
+  final String title;
+  final String? description;
+  final String missionType;
+  final String importance;
+  final String priority;
+  final String? difficulty;
+  final int isRequired;
+  final int xpReward;
+  final int? estimatedMinutes;
+  final int? budgetMinor;
+  final int isActive;
+  const MissionTemplate({
+    required this.id,
+    required this.areaId,
+    required this.title,
+    this.description,
+    required this.missionType,
+    required this.importance,
+    required this.priority,
+    this.difficulty,
+    required this.isRequired,
+    required this.xpReward,
+    this.estimatedMinutes,
+    this.budgetMinor,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['area_id'] = Variable<String>(areaId);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['mission_type'] = Variable<String>(missionType);
+    map['importance'] = Variable<String>(importance);
+    map['priority'] = Variable<String>(priority);
+    if (!nullToAbsent || difficulty != null) {
+      map['difficulty'] = Variable<String>(difficulty);
+    }
+    map['is_required'] = Variable<int>(isRequired);
+    map['xp_reward'] = Variable<int>(xpReward);
+    if (!nullToAbsent || estimatedMinutes != null) {
+      map['estimated_minutes'] = Variable<int>(estimatedMinutes);
+    }
+    if (!nullToAbsent || budgetMinor != null) {
+      map['budget_minor'] = Variable<int>(budgetMinor);
+    }
+    map['is_active'] = Variable<int>(isActive);
+    return map;
+  }
+
+  MissionTemplatesCompanion toCompanion(bool nullToAbsent) {
+    return MissionTemplatesCompanion(
+      id: Value(id),
+      areaId: Value(areaId),
+      title: Value(title),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      missionType: Value(missionType),
+      importance: Value(importance),
+      priority: Value(priority),
+      difficulty: difficulty == null && nullToAbsent
+          ? const Value.absent()
+          : Value(difficulty),
+      isRequired: Value(isRequired),
+      xpReward: Value(xpReward),
+      estimatedMinutes: estimatedMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(estimatedMinutes),
+      budgetMinor: budgetMinor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(budgetMinor),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory MissionTemplate.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MissionTemplate(
+      id: serializer.fromJson<String>(json['id']),
+      areaId: serializer.fromJson<String>(json['area_id']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String?>(json['description']),
+      missionType: serializer.fromJson<String>(json['mission_type']),
+      importance: serializer.fromJson<String>(json['importance']),
+      priority: serializer.fromJson<String>(json['priority']),
+      difficulty: serializer.fromJson<String?>(json['difficulty']),
+      isRequired: serializer.fromJson<int>(json['is_required']),
+      xpReward: serializer.fromJson<int>(json['xp_reward']),
+      estimatedMinutes: serializer.fromJson<int?>(json['estimated_minutes']),
+      budgetMinor: serializer.fromJson<int?>(json['budget_minor']),
+      isActive: serializer.fromJson<int>(json['is_active']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'area_id': serializer.toJson<String>(areaId),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String?>(description),
+      'mission_type': serializer.toJson<String>(missionType),
+      'importance': serializer.toJson<String>(importance),
+      'priority': serializer.toJson<String>(priority),
+      'difficulty': serializer.toJson<String?>(difficulty),
+      'is_required': serializer.toJson<int>(isRequired),
+      'xp_reward': serializer.toJson<int>(xpReward),
+      'estimated_minutes': serializer.toJson<int?>(estimatedMinutes),
+      'budget_minor': serializer.toJson<int?>(budgetMinor),
+      'is_active': serializer.toJson<int>(isActive),
+    };
+  }
+
+  MissionTemplate copyWith({
+    String? id,
+    String? areaId,
+    String? title,
+    Value<String?> description = const Value.absent(),
+    String? missionType,
+    String? importance,
+    String? priority,
+    Value<String?> difficulty = const Value.absent(),
+    int? isRequired,
+    int? xpReward,
+    Value<int?> estimatedMinutes = const Value.absent(),
+    Value<int?> budgetMinor = const Value.absent(),
+    int? isActive,
+  }) => MissionTemplate(
+    id: id ?? this.id,
+    areaId: areaId ?? this.areaId,
+    title: title ?? this.title,
+    description: description.present ? description.value : this.description,
+    missionType: missionType ?? this.missionType,
+    importance: importance ?? this.importance,
+    priority: priority ?? this.priority,
+    difficulty: difficulty.present ? difficulty.value : this.difficulty,
+    isRequired: isRequired ?? this.isRequired,
+    xpReward: xpReward ?? this.xpReward,
+    estimatedMinutes: estimatedMinutes.present
+        ? estimatedMinutes.value
+        : this.estimatedMinutes,
+    budgetMinor: budgetMinor.present ? budgetMinor.value : this.budgetMinor,
+    isActive: isActive ?? this.isActive,
+  );
+  MissionTemplate copyWithCompanion(MissionTemplatesCompanion data) {
+    return MissionTemplate(
+      id: data.id.present ? data.id.value : this.id,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      missionType: data.missionType.present
+          ? data.missionType.value
+          : this.missionType,
+      importance: data.importance.present
+          ? data.importance.value
+          : this.importance,
+      priority: data.priority.present ? data.priority.value : this.priority,
+      difficulty: data.difficulty.present
+          ? data.difficulty.value
+          : this.difficulty,
+      isRequired: data.isRequired.present
+          ? data.isRequired.value
+          : this.isRequired,
+      xpReward: data.xpReward.present ? data.xpReward.value : this.xpReward,
+      estimatedMinutes: data.estimatedMinutes.present
+          ? data.estimatedMinutes.value
+          : this.estimatedMinutes,
+      budgetMinor: data.budgetMinor.present
+          ? data.budgetMinor.value
+          : this.budgetMinor,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionTemplate(')
+          ..write('id: $id, ')
+          ..write('areaId: $areaId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('missionType: $missionType, ')
+          ..write('importance: $importance, ')
+          ..write('priority: $priority, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('isRequired: $isRequired, ')
+          ..write('xpReward: $xpReward, ')
+          ..write('estimatedMinutes: $estimatedMinutes, ')
+          ..write('budgetMinor: $budgetMinor, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    areaId,
+    title,
+    description,
+    missionType,
+    importance,
+    priority,
+    difficulty,
+    isRequired,
+    xpReward,
+    estimatedMinutes,
+    budgetMinor,
+    isActive,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MissionTemplate &&
+          other.id == this.id &&
+          other.areaId == this.areaId &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.missionType == this.missionType &&
+          other.importance == this.importance &&
+          other.priority == this.priority &&
+          other.difficulty == this.difficulty &&
+          other.isRequired == this.isRequired &&
+          other.xpReward == this.xpReward &&
+          other.estimatedMinutes == this.estimatedMinutes &&
+          other.budgetMinor == this.budgetMinor &&
+          other.isActive == this.isActive);
+}
+
+class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
+  final Value<String> id;
+  final Value<String> areaId;
+  final Value<String> title;
+  final Value<String?> description;
+  final Value<String> missionType;
+  final Value<String> importance;
+  final Value<String> priority;
+  final Value<String?> difficulty;
+  final Value<int> isRequired;
+  final Value<int> xpReward;
+  final Value<int?> estimatedMinutes;
+  final Value<int?> budgetMinor;
+  final Value<int> isActive;
+  final Value<int> rowid;
+  const MissionTemplatesCompanion({
+    this.id = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.missionType = const Value.absent(),
+    this.importance = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    this.isRequired = const Value.absent(),
+    this.xpReward = const Value.absent(),
+    this.estimatedMinutes = const Value.absent(),
+    this.budgetMinor = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MissionTemplatesCompanion.insert({
+    required String id,
+    required String areaId,
+    required String title,
+    this.description = const Value.absent(),
+    required String missionType,
+    this.importance = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    required int isRequired,
+    required int xpReward,
+    this.estimatedMinutes = const Value.absent(),
+    this.budgetMinor = const Value.absent(),
+    required int isActive,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       areaId = Value(areaId),
+       title = Value(title),
+       missionType = Value(missionType),
+       isRequired = Value(isRequired),
+       xpReward = Value(xpReward),
+       isActive = Value(isActive);
+  static Insertable<MissionTemplate> custom({
+    Expression<String>? id,
+    Expression<String>? areaId,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<String>? missionType,
+    Expression<String>? importance,
+    Expression<String>? priority,
+    Expression<String>? difficulty,
+    Expression<int>? isRequired,
+    Expression<int>? xpReward,
+    Expression<int>? estimatedMinutes,
+    Expression<int>? budgetMinor,
+    Expression<int>? isActive,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (areaId != null) 'area_id': areaId,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (missionType != null) 'mission_type': missionType,
+      if (importance != null) 'importance': importance,
+      if (priority != null) 'priority': priority,
+      if (difficulty != null) 'difficulty': difficulty,
+      if (isRequired != null) 'is_required': isRequired,
+      if (xpReward != null) 'xp_reward': xpReward,
+      if (estimatedMinutes != null) 'estimated_minutes': estimatedMinutes,
+      if (budgetMinor != null) 'budget_minor': budgetMinor,
+      if (isActive != null) 'is_active': isActive,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MissionTemplatesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? areaId,
+    Value<String>? title,
+    Value<String?>? description,
+    Value<String>? missionType,
+    Value<String>? importance,
+    Value<String>? priority,
+    Value<String?>? difficulty,
+    Value<int>? isRequired,
+    Value<int>? xpReward,
+    Value<int?>? estimatedMinutes,
+    Value<int?>? budgetMinor,
+    Value<int>? isActive,
+    Value<int>? rowid,
+  }) {
+    return MissionTemplatesCompanion(
+      id: id ?? this.id,
+      areaId: areaId ?? this.areaId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      missionType: missionType ?? this.missionType,
+      importance: importance ?? this.importance,
+      priority: priority ?? this.priority,
+      difficulty: difficulty ?? this.difficulty,
+      isRequired: isRequired ?? this.isRequired,
+      xpReward: xpReward ?? this.xpReward,
+      estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
+      budgetMinor: budgetMinor ?? this.budgetMinor,
+      isActive: isActive ?? this.isActive,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (missionType.present) {
+      map['mission_type'] = Variable<String>(missionType.value);
+    }
+    if (importance.present) {
+      map['importance'] = Variable<String>(importance.value);
+    }
+    if (priority.present) {
+      map['priority'] = Variable<String>(priority.value);
+    }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<String>(difficulty.value);
+    }
+    if (isRequired.present) {
+      map['is_required'] = Variable<int>(isRequired.value);
+    }
+    if (xpReward.present) {
+      map['xp_reward'] = Variable<int>(xpReward.value);
+    }
+    if (estimatedMinutes.present) {
+      map['estimated_minutes'] = Variable<int>(estimatedMinutes.value);
+    }
+    if (budgetMinor.present) {
+      map['budget_minor'] = Variable<int>(budgetMinor.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<int>(isActive.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionTemplatesCompanion(')
+          ..write('id: $id, ')
+          ..write('areaId: $areaId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('missionType: $missionType, ')
+          ..write('importance: $importance, ')
+          ..write('priority: $priority, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('isRequired: $isRequired, ')
+          ..write('xpReward: $xpReward, ')
+          ..write('estimatedMinutes: $estimatedMinutes, ')
+          ..write('budgetMinor: $budgetMinor, ')
+          ..write('isActive: $isActive, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class MissionTemplateObjectives extends Table
+    with TableInfo<MissionTemplateObjectives, MissionTemplateObjective> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  MissionTemplateObjectives(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL REFERENCES mission_templates(id)ON DELETE CASCADE',
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(trim(description)) BETWEEN 1 AND 240)',
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (position >= 0)',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _rowVersionMeta = const VerificationMeta(
+    'rowVersion',
+  );
+  late final GeneratedColumn<int> rowVersion = GeneratedColumn<int>(
+    'row_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 1 CHECK (row_version >= 1)',
+    defaultValue: const CustomExpression('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    templateId,
+    description,
+    position,
+    createdAt,
+    updatedAt,
+    rowVersion,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mission_template_objectives';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MissionTemplateObjective> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('row_version')) {
+      context.handle(
+        _rowVersionMeta,
+        rowVersion.isAcceptableOrUnknown(data['row_version']!, _rowVersionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {templateId, position},
+  ];
+  @override
+  MissionTemplateObjective map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MissionTemplateObjective(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      rowVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}row_version'],
+      )!,
+    );
+  }
+
+  @override
+  MissionTemplateObjectives createAlias(String alias) {
+    return MissionTemplateObjectives(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const ['UNIQUE(template_id, position)'];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class MissionTemplateObjective extends DataClass
+    implements Insertable<MissionTemplateObjective> {
+  final String id;
+  final String templateId;
+  final String description;
+  final int position;
+  final int createdAt;
+  final int updatedAt;
+  final int rowVersion;
+  const MissionTemplateObjective({
+    required this.id,
+    required this.templateId,
+    required this.description,
+    required this.position,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.rowVersion,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['template_id'] = Variable<String>(templateId);
+    map['description'] = Variable<String>(description);
+    map['position'] = Variable<int>(position);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    map['row_version'] = Variable<int>(rowVersion);
+    return map;
+  }
+
+  MissionTemplateObjectivesCompanion toCompanion(bool nullToAbsent) {
+    return MissionTemplateObjectivesCompanion(
+      id: Value(id),
+      templateId: Value(templateId),
+      description: Value(description),
+      position: Value(position),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      rowVersion: Value(rowVersion),
+    );
+  }
+
+  factory MissionTemplateObjective.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MissionTemplateObjective(
+      id: serializer.fromJson<String>(json['id']),
+      templateId: serializer.fromJson<String>(json['template_id']),
+      description: serializer.fromJson<String>(json['description']),
+      position: serializer.fromJson<int>(json['position']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+      rowVersion: serializer.fromJson<int>(json['row_version']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'template_id': serializer.toJson<String>(templateId),
+      'description': serializer.toJson<String>(description),
+      'position': serializer.toJson<int>(position),
+      'created_at': serializer.toJson<int>(createdAt),
+      'updated_at': serializer.toJson<int>(updatedAt),
+      'row_version': serializer.toJson<int>(rowVersion),
+    };
+  }
+
+  MissionTemplateObjective copyWith({
+    String? id,
+    String? templateId,
+    String? description,
+    int? position,
+    int? createdAt,
+    int? updatedAt,
+    int? rowVersion,
+  }) => MissionTemplateObjective(
+    id: id ?? this.id,
+    templateId: templateId ?? this.templateId,
+    description: description ?? this.description,
+    position: position ?? this.position,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    rowVersion: rowVersion ?? this.rowVersion,
+  );
+  MissionTemplateObjective copyWithCompanion(
+    MissionTemplateObjectivesCompanion data,
+  ) {
+    return MissionTemplateObjective(
+      id: data.id.present ? data.id.value : this.id,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      position: data.position.present ? data.position.value : this.position,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      rowVersion: data.rowVersion.present
+          ? data.rowVersion.value
+          : this.rowVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionTemplateObjective(')
+          ..write('id: $id, ')
+          ..write('templateId: $templateId, ')
+          ..write('description: $description, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowVersion: $rowVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    templateId,
+    description,
+    position,
+    createdAt,
+    updatedAt,
+    rowVersion,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MissionTemplateObjective &&
+          other.id == this.id &&
+          other.templateId == this.templateId &&
+          other.description == this.description &&
+          other.position == this.position &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.rowVersion == this.rowVersion);
+}
+
+class MissionTemplateObjectivesCompanion
+    extends UpdateCompanion<MissionTemplateObjective> {
+  final Value<String> id;
+  final Value<String> templateId;
+  final Value<String> description;
+  final Value<int> position;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowVersion;
+  final Value<int> rowid;
+  const MissionTemplateObjectivesCompanion({
+    this.id = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.description = const Value.absent(),
+    this.position = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MissionTemplateObjectivesCompanion.insert({
+    required String id,
+    required String templateId,
+    required String description,
+    required int position,
+    required int createdAt,
+    required int updatedAt,
+    this.rowVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       templateId = Value(templateId),
+       description = Value(description),
+       position = Value(position),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<MissionTemplateObjective> custom({
+    Expression<String>? id,
+    Expression<String>? templateId,
+    Expression<String>? description,
+    Expression<int>? position,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (templateId != null) 'template_id': templateId,
+      if (description != null) 'description': description,
+      if (position != null) 'position': position,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowVersion != null) 'row_version': rowVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MissionTemplateObjectivesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? templateId,
+    Value<String>? description,
+    Value<int>? position,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowVersion,
+    Value<int>? rowid,
+  }) {
+    return MissionTemplateObjectivesCompanion(
+      id: id ?? this.id,
+      templateId: templateId ?? this.templateId,
+      description: description ?? this.description,
+      position: position ?? this.position,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowVersion: rowVersion ?? this.rowVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowVersion.present) {
+      map['row_version'] = Variable<int>(rowVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionTemplateObjectivesCompanion(')
+          ..write('id: $id, ')
+          ..write('templateId: $templateId, ')
+          ..write('description: $description, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowVersion: $rowVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class RecurrenceRules extends Table
+    with TableInfo<RecurrenceRules, RecurrenceRule> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  RecurrenceRules(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL UNIQUE REFERENCES mission_templates(id)ON DELETE CASCADE',
+  );
+  static const VerificationMeta _frequencyMeta = const VerificationMeta(
+    'frequency',
+  );
+  late final GeneratedColumn<String> frequency = GeneratedColumn<String>(
+    'frequency',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (frequency IN (\'DAILY\', \'WEEKLY\', \'SPECIFIC_DAYS\', \'EVERY_N_DAYS\'))',
+  );
+  static const VerificationMeta _intervalValueMeta = const VerificationMeta(
+    'intervalValue',
+  );
+  late final GeneratedColumn<int> intervalValue = GeneratedColumn<int>(
+    'interval_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (interval_value >= 1)',
+  );
+  static const VerificationMeta _weekdaysMaskMeta = const VerificationMeta(
+    'weekdaysMask',
+  );
+  late final GeneratedColumn<int> weekdaysMask = GeneratedColumn<int>(
+    'weekdays_mask',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _localTimeMinutesMeta = const VerificationMeta(
+    'localTimeMinutes',
+  );
+  late final GeneratedColumn<int> localTimeMinutes = GeneratedColumn<int>(
+    'local_time_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (local_time_minutes IS NULL OR local_time_minutes BETWEEN 0 AND 1439)',
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  late final GeneratedColumn<String> startDate = GeneratedColumn<String>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(start_date) = 10 AND start_date GLOB \'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\' AND date(start_date) IS NOT NULL AND date(start_date) = start_date)',
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  late final GeneratedColumn<String> endDate = GeneratedColumn<String>(
+    'end_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (end_date IS NULL OR(length(end_date) = 10 AND end_date GLOB \'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\' AND date(end_date) IS NOT NULL AND date(end_date) = end_date AND end_date >= start_date))',
+  );
+  static const VerificationMeta _timezoneIdMeta = const VerificationMeta(
+    'timezoneId',
+  );
+  late final GeneratedColumn<String> timezoneId = GeneratedColumn<String>(
+    'timezone_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _lastGeneratedOnMeta = const VerificationMeta(
+    'lastGeneratedOn',
+  );
+  late final GeneratedColumn<String> lastGeneratedOn = GeneratedColumn<String>(
+    'last_generated_on',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (last_generated_on IS NULL OR(length(last_generated_on) = 10 AND last_generated_on GLOB \'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\' AND date(last_generated_on) IS NOT NULL AND date(last_generated_on) = last_generated_on))',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    templateId,
+    frequency,
+    intervalValue,
+    weekdaysMask,
+    localTimeMinutes,
+    startDate,
+    endDate,
+    timezoneId,
+    lastGeneratedOn,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'recurrence_rules';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RecurrenceRule> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_templateIdMeta);
+    }
+    if (data.containsKey('frequency')) {
+      context.handle(
+        _frequencyMeta,
+        frequency.isAcceptableOrUnknown(data['frequency']!, _frequencyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_frequencyMeta);
+    }
+    if (data.containsKey('interval_value')) {
+      context.handle(
+        _intervalValueMeta,
+        intervalValue.isAcceptableOrUnknown(
+          data['interval_value']!,
+          _intervalValueMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_intervalValueMeta);
+    }
+    if (data.containsKey('weekdays_mask')) {
+      context.handle(
+        _weekdaysMaskMeta,
+        weekdaysMask.isAcceptableOrUnknown(
+          data['weekdays_mask']!,
+          _weekdaysMaskMeta,
+        ),
+      );
+    }
+    if (data.containsKey('local_time_minutes')) {
+      context.handle(
+        _localTimeMinutesMeta,
+        localTimeMinutes.isAcceptableOrUnknown(
+          data['local_time_minutes']!,
+          _localTimeMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    }
+    if (data.containsKey('timezone_id')) {
+      context.handle(
+        _timezoneIdMeta,
+        timezoneId.isAcceptableOrUnknown(data['timezone_id']!, _timezoneIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneIdMeta);
+    }
+    if (data.containsKey('last_generated_on')) {
+      context.handle(
+        _lastGeneratedOnMeta,
+        lastGeneratedOn.isAcceptableOrUnknown(
+          data['last_generated_on']!,
+          _lastGeneratedOnMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RecurrenceRule map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RecurrenceRule(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      )!,
+      frequency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}frequency'],
+      )!,
+      intervalValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}interval_value'],
+      )!,
+      weekdaysMask: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}weekdays_mask'],
+      ),
+      localTimeMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}local_time_minutes'],
+      ),
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}end_date'],
+      ),
+      timezoneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone_id'],
+      )!,
+      lastGeneratedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_generated_on'],
+      ),
+    );
+  }
+
+  @override
+  RecurrenceRules createAlias(String alias) {
+    return RecurrenceRules(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'CHECK((frequency = \'SPECIFIC_DAYS\' AND weekdays_mask BETWEEN 1 AND 127)OR(frequency <> \'SPECIFIC_DAYS\' AND weekdays_mask IS NULL))',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class RecurrenceRule extends DataClass implements Insertable<RecurrenceRule> {
+  final String id;
+  final String templateId;
+  final String frequency;
+  final int intervalValue;
+  final int? weekdaysMask;
+  final int? localTimeMinutes;
+  final String startDate;
+  final String? endDate;
+  final String timezoneId;
+  final String? lastGeneratedOn;
+  const RecurrenceRule({
+    required this.id,
+    required this.templateId,
+    required this.frequency,
+    required this.intervalValue,
+    this.weekdaysMask,
+    this.localTimeMinutes,
+    required this.startDate,
+    this.endDate,
+    required this.timezoneId,
+    this.lastGeneratedOn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['template_id'] = Variable<String>(templateId);
+    map['frequency'] = Variable<String>(frequency);
+    map['interval_value'] = Variable<int>(intervalValue);
+    if (!nullToAbsent || weekdaysMask != null) {
+      map['weekdays_mask'] = Variable<int>(weekdaysMask);
+    }
+    if (!nullToAbsent || localTimeMinutes != null) {
+      map['local_time_minutes'] = Variable<int>(localTimeMinutes);
+    }
+    map['start_date'] = Variable<String>(startDate);
+    if (!nullToAbsent || endDate != null) {
+      map['end_date'] = Variable<String>(endDate);
+    }
+    map['timezone_id'] = Variable<String>(timezoneId);
+    if (!nullToAbsent || lastGeneratedOn != null) {
+      map['last_generated_on'] = Variable<String>(lastGeneratedOn);
+    }
+    return map;
+  }
+
+  RecurrenceRulesCompanion toCompanion(bool nullToAbsent) {
+    return RecurrenceRulesCompanion(
+      id: Value(id),
+      templateId: Value(templateId),
+      frequency: Value(frequency),
+      intervalValue: Value(intervalValue),
+      weekdaysMask: weekdaysMask == null && nullToAbsent
+          ? const Value.absent()
+          : Value(weekdaysMask),
+      localTimeMinutes: localTimeMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localTimeMinutes),
+      startDate: Value(startDate),
+      endDate: endDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endDate),
+      timezoneId: Value(timezoneId),
+      lastGeneratedOn: lastGeneratedOn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastGeneratedOn),
+    );
+  }
+
+  factory RecurrenceRule.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RecurrenceRule(
+      id: serializer.fromJson<String>(json['id']),
+      templateId: serializer.fromJson<String>(json['template_id']),
+      frequency: serializer.fromJson<String>(json['frequency']),
+      intervalValue: serializer.fromJson<int>(json['interval_value']),
+      weekdaysMask: serializer.fromJson<int?>(json['weekdays_mask']),
+      localTimeMinutes: serializer.fromJson<int?>(json['local_time_minutes']),
+      startDate: serializer.fromJson<String>(json['start_date']),
+      endDate: serializer.fromJson<String?>(json['end_date']),
+      timezoneId: serializer.fromJson<String>(json['timezone_id']),
+      lastGeneratedOn: serializer.fromJson<String?>(json['last_generated_on']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'template_id': serializer.toJson<String>(templateId),
+      'frequency': serializer.toJson<String>(frequency),
+      'interval_value': serializer.toJson<int>(intervalValue),
+      'weekdays_mask': serializer.toJson<int?>(weekdaysMask),
+      'local_time_minutes': serializer.toJson<int?>(localTimeMinutes),
+      'start_date': serializer.toJson<String>(startDate),
+      'end_date': serializer.toJson<String?>(endDate),
+      'timezone_id': serializer.toJson<String>(timezoneId),
+      'last_generated_on': serializer.toJson<String?>(lastGeneratedOn),
+    };
+  }
+
+  RecurrenceRule copyWith({
+    String? id,
+    String? templateId,
+    String? frequency,
+    int? intervalValue,
+    Value<int?> weekdaysMask = const Value.absent(),
+    Value<int?> localTimeMinutes = const Value.absent(),
+    String? startDate,
+    Value<String?> endDate = const Value.absent(),
+    String? timezoneId,
+    Value<String?> lastGeneratedOn = const Value.absent(),
+  }) => RecurrenceRule(
+    id: id ?? this.id,
+    templateId: templateId ?? this.templateId,
+    frequency: frequency ?? this.frequency,
+    intervalValue: intervalValue ?? this.intervalValue,
+    weekdaysMask: weekdaysMask.present ? weekdaysMask.value : this.weekdaysMask,
+    localTimeMinutes: localTimeMinutes.present
+        ? localTimeMinutes.value
+        : this.localTimeMinutes,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate.present ? endDate.value : this.endDate,
+    timezoneId: timezoneId ?? this.timezoneId,
+    lastGeneratedOn: lastGeneratedOn.present
+        ? lastGeneratedOn.value
+        : this.lastGeneratedOn,
+  );
+  RecurrenceRule copyWithCompanion(RecurrenceRulesCompanion data) {
+    return RecurrenceRule(
+      id: data.id.present ? data.id.value : this.id,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      frequency: data.frequency.present ? data.frequency.value : this.frequency,
+      intervalValue: data.intervalValue.present
+          ? data.intervalValue.value
+          : this.intervalValue,
+      weekdaysMask: data.weekdaysMask.present
+          ? data.weekdaysMask.value
+          : this.weekdaysMask,
+      localTimeMinutes: data.localTimeMinutes.present
+          ? data.localTimeMinutes.value
+          : this.localTimeMinutes,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      timezoneId: data.timezoneId.present
+          ? data.timezoneId.value
+          : this.timezoneId,
+      lastGeneratedOn: data.lastGeneratedOn.present
+          ? data.lastGeneratedOn.value
+          : this.lastGeneratedOn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecurrenceRule(')
+          ..write('id: $id, ')
+          ..write('templateId: $templateId, ')
+          ..write('frequency: $frequency, ')
+          ..write('intervalValue: $intervalValue, ')
+          ..write('weekdaysMask: $weekdaysMask, ')
+          ..write('localTimeMinutes: $localTimeMinutes, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('timezoneId: $timezoneId, ')
+          ..write('lastGeneratedOn: $lastGeneratedOn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    templateId,
+    frequency,
+    intervalValue,
+    weekdaysMask,
+    localTimeMinutes,
+    startDate,
+    endDate,
+    timezoneId,
+    lastGeneratedOn,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RecurrenceRule &&
+          other.id == this.id &&
+          other.templateId == this.templateId &&
+          other.frequency == this.frequency &&
+          other.intervalValue == this.intervalValue &&
+          other.weekdaysMask == this.weekdaysMask &&
+          other.localTimeMinutes == this.localTimeMinutes &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.timezoneId == this.timezoneId &&
+          other.lastGeneratedOn == this.lastGeneratedOn);
+}
+
+class RecurrenceRulesCompanion extends UpdateCompanion<RecurrenceRule> {
+  final Value<String> id;
+  final Value<String> templateId;
+  final Value<String> frequency;
+  final Value<int> intervalValue;
+  final Value<int?> weekdaysMask;
+  final Value<int?> localTimeMinutes;
+  final Value<String> startDate;
+  final Value<String?> endDate;
+  final Value<String> timezoneId;
+  final Value<String?> lastGeneratedOn;
+  final Value<int> rowid;
+  const RecurrenceRulesCompanion({
+    this.id = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.frequency = const Value.absent(),
+    this.intervalValue = const Value.absent(),
+    this.weekdaysMask = const Value.absent(),
+    this.localTimeMinutes = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.timezoneId = const Value.absent(),
+    this.lastGeneratedOn = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RecurrenceRulesCompanion.insert({
+    required String id,
+    required String templateId,
+    required String frequency,
+    required int intervalValue,
+    this.weekdaysMask = const Value.absent(),
+    this.localTimeMinutes = const Value.absent(),
+    required String startDate,
+    this.endDate = const Value.absent(),
+    required String timezoneId,
+    this.lastGeneratedOn = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       templateId = Value(templateId),
+       frequency = Value(frequency),
+       intervalValue = Value(intervalValue),
+       startDate = Value(startDate),
+       timezoneId = Value(timezoneId);
+  static Insertable<RecurrenceRule> custom({
+    Expression<String>? id,
+    Expression<String>? templateId,
+    Expression<String>? frequency,
+    Expression<int>? intervalValue,
+    Expression<int>? weekdaysMask,
+    Expression<int>? localTimeMinutes,
+    Expression<String>? startDate,
+    Expression<String>? endDate,
+    Expression<String>? timezoneId,
+    Expression<String>? lastGeneratedOn,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (templateId != null) 'template_id': templateId,
+      if (frequency != null) 'frequency': frequency,
+      if (intervalValue != null) 'interval_value': intervalValue,
+      if (weekdaysMask != null) 'weekdays_mask': weekdaysMask,
+      if (localTimeMinutes != null) 'local_time_minutes': localTimeMinutes,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (timezoneId != null) 'timezone_id': timezoneId,
+      if (lastGeneratedOn != null) 'last_generated_on': lastGeneratedOn,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RecurrenceRulesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? templateId,
+    Value<String>? frequency,
+    Value<int>? intervalValue,
+    Value<int?>? weekdaysMask,
+    Value<int?>? localTimeMinutes,
+    Value<String>? startDate,
+    Value<String?>? endDate,
+    Value<String>? timezoneId,
+    Value<String?>? lastGeneratedOn,
+    Value<int>? rowid,
+  }) {
+    return RecurrenceRulesCompanion(
+      id: id ?? this.id,
+      templateId: templateId ?? this.templateId,
+      frequency: frequency ?? this.frequency,
+      intervalValue: intervalValue ?? this.intervalValue,
+      weekdaysMask: weekdaysMask ?? this.weekdaysMask,
+      localTimeMinutes: localTimeMinutes ?? this.localTimeMinutes,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      timezoneId: timezoneId ?? this.timezoneId,
+      lastGeneratedOn: lastGeneratedOn ?? this.lastGeneratedOn,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (frequency.present) {
+      map['frequency'] = Variable<String>(frequency.value);
+    }
+    if (intervalValue.present) {
+      map['interval_value'] = Variable<int>(intervalValue.value);
+    }
+    if (weekdaysMask.present) {
+      map['weekdays_mask'] = Variable<int>(weekdaysMask.value);
+    }
+    if (localTimeMinutes.present) {
+      map['local_time_minutes'] = Variable<int>(localTimeMinutes.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<String>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<String>(endDate.value);
+    }
+    if (timezoneId.present) {
+      map['timezone_id'] = Variable<String>(timezoneId.value);
+    }
+    if (lastGeneratedOn.present) {
+      map['last_generated_on'] = Variable<String>(lastGeneratedOn.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecurrenceRulesCompanion(')
+          ..write('id: $id, ')
+          ..write('templateId: $templateId, ')
+          ..write('frequency: $frequency, ')
+          ..write('intervalValue: $intervalValue, ')
+          ..write('weekdaysMask: $weekdaysMask, ')
+          ..write('localTimeMinutes: $localTimeMinutes, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('timezoneId: $timezoneId, ')
+          ..write('lastGeneratedOn: $lastGeneratedOn, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class Missions extends Table with TableInfo<Missions, Mission> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Missions(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _templateIdMeta = const VerificationMeta(
+    'templateId',
+  );
+  late final GeneratedColumn<String> templateId = GeneratedColumn<String>(
+    'template_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES mission_templates(id)ON DELETE SET NULL',
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES life_areas(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160)',
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _missionTypeMeta = const VerificationMeta(
+    'missionType',
+  );
+  late final GeneratedColumn<String> missionType = GeneratedColumn<String>(
+    'mission_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (mission_type IN (\'PRIMARY\', \'SECONDARY\', \'ERRAND\', \'DAILY\', \'RECURRING\', \'EVENT\', \'CHALLENGE\', \'CUSTOM\'))',
+  );
+  static const VerificationMeta _importanceMeta = const VerificationMeta(
+    'importance',
+  );
+  late final GeneratedColumn<String> importance = GeneratedColumn<String>(
+    'importance',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT \'NORMAL\' CHECK (importance IN (\'MINOR\', \'NORMAL\', \'IMPORTANT\', \'VERY_IMPORTANT\', \'CRITICAL\'))',
+    defaultValue: const CustomExpression('\'NORMAL\''),
+  );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  late final GeneratedColumn<String> priority = GeneratedColumn<String>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT \'NORMAL\' CHECK (priority IN (\'LOW\', \'NORMAL\', \'HIGH\', \'URGENT\'))',
+    defaultValue: const CustomExpression('\'NORMAL\''),
+  );
+  static const VerificationMeta _difficultyMeta = const VerificationMeta(
+    'difficulty',
+  );
+  late final GeneratedColumn<String> difficulty = GeneratedColumn<String>(
+    'difficulty',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (difficulty IS NULL OR difficulty IN (\'EASY\', \'MEDIUM\', \'HARD\'))',
+  );
+  static const VerificationMeta _isRequiredMeta = const VerificationMeta(
+    'isRequired',
+  );
+  late final GeneratedColumn<int> isRequired = GeneratedColumn<int>(
+    'is_required',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (is_required IN (0, 1))',
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (status IN (\'DRAFT\', \'SCHEDULED\', \'AVAILABLE\', \'ACTIVE\', \'PAUSED\', \'RESCHEDULED\', \'EXPIRED\', \'ABANDONED\', \'CANCELLED\', \'PARTIAL\', \'COMPLETED\'))',
+  );
+  static const VerificationMeta _scheduledAtMeta = const VerificationMeta(
+    'scheduledAt',
+  );
+  late final GeneratedColumn<int> scheduledAt = GeneratedColumn<int>(
+    'scheduled_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _availableFromMeta = const VerificationMeta(
+    'availableFrom',
+  );
+  late final GeneratedColumn<int> availableFrom = GeneratedColumn<int>(
+    'available_from',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _expiresAtMeta = const VerificationMeta(
+    'expiresAt',
+  );
+  late final GeneratedColumn<int> expiresAt = GeneratedColumn<int>(
+    'expires_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _estimatedMinutesMeta = const VerificationMeta(
+    'estimatedMinutes',
+  );
+  late final GeneratedColumn<int> estimatedMinutes = GeneratedColumn<int>(
+    'estimated_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (estimated_minutes IS NULL OR estimated_minutes > 0)',
+  );
+  static const VerificationMeta _budgetMinorMeta = const VerificationMeta(
+    'budgetMinor',
+  );
+  late final GeneratedColumn<int> budgetMinor = GeneratedColumn<int>(
+    'budget_minor',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'CHECK (budget_minor IS NULL OR budget_minor >= 0)',
+  );
+  static const VerificationMeta _xpPlannedMeta = const VerificationMeta(
+    'xpPlanned',
+  );
+  late final GeneratedColumn<int> xpPlanned = GeneratedColumn<int>(
+    'xp_planned',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (xp_planned >= 0)',
+  );
+  static const VerificationMeta _actualResultMeta = const VerificationMeta(
+    'actualResult',
+  );
+  late final GeneratedColumn<String> actualResult = GeneratedColumn<String>(
+    'actual_result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _convenienceRatingMeta = const VerificationMeta(
+    'convenienceRating',
+  );
+  late final GeneratedColumn<String>
+  convenienceRating = GeneratedColumn<String>(
+    'convenience_rating',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (convenience_rating IS NULL OR convenience_rating IN (\'TOTALLY_WORTH_IT\', \'WORTH_IT_BUT_COSTLY\', \'PARTIALLY_WORTH_IT\', \'BARELY_WORTH_IT\', \'WOULD_NOT_REPEAT\'))',
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  late final GeneratedColumn<int> completedAt = GeneratedColumn<int>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _rowVersionMeta = const VerificationMeta(
+    'rowVersion',
+  );
+  late final GeneratedColumn<int> rowVersion = GeneratedColumn<int>(
+    'row_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 1 CHECK (row_version >= 1)',
+    defaultValue: const CustomExpression('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    templateId,
+    areaId,
+    title,
+    description,
+    missionType,
+    importance,
+    priority,
+    difficulty,
+    isRequired,
+    status,
+    scheduledAt,
+    availableFrom,
+    expiresAt,
+    estimatedMinutes,
+    budgetMinor,
+    xpPlanned,
+    actualResult,
+    convenienceRating,
+    completedAt,
+    archivedAt,
+    rowVersion,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'missions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Mission> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('template_id')) {
+      context.handle(
+        _templateIdMeta,
+        templateId.isAcceptableOrUnknown(data['template_id']!, _templateIdMeta),
+      );
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('mission_type')) {
+      context.handle(
+        _missionTypeMeta,
+        missionType.isAcceptableOrUnknown(
+          data['mission_type']!,
+          _missionTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_missionTypeMeta);
+    }
+    if (data.containsKey('importance')) {
+      context.handle(
+        _importanceMeta,
+        importance.isAcceptableOrUnknown(data['importance']!, _importanceMeta),
+      );
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
+    }
+    if (data.containsKey('difficulty')) {
+      context.handle(
+        _difficultyMeta,
+        difficulty.isAcceptableOrUnknown(data['difficulty']!, _difficultyMeta),
+      );
+    }
+    if (data.containsKey('is_required')) {
+      context.handle(
+        _isRequiredMeta,
+        isRequired.isAcceptableOrUnknown(data['is_required']!, _isRequiredMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isRequiredMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('scheduled_at')) {
+      context.handle(
+        _scheduledAtMeta,
+        scheduledAt.isAcceptableOrUnknown(
+          data['scheduled_at']!,
+          _scheduledAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('available_from')) {
+      context.handle(
+        _availableFromMeta,
+        availableFrom.isAcceptableOrUnknown(
+          data['available_from']!,
+          _availableFromMeta,
+        ),
+      );
+    }
+    if (data.containsKey('expires_at')) {
+      context.handle(
+        _expiresAtMeta,
+        expiresAt.isAcceptableOrUnknown(data['expires_at']!, _expiresAtMeta),
+      );
+    }
+    if (data.containsKey('estimated_minutes')) {
+      context.handle(
+        _estimatedMinutesMeta,
+        estimatedMinutes.isAcceptableOrUnknown(
+          data['estimated_minutes']!,
+          _estimatedMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('budget_minor')) {
+      context.handle(
+        _budgetMinorMeta,
+        budgetMinor.isAcceptableOrUnknown(
+          data['budget_minor']!,
+          _budgetMinorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('xp_planned')) {
+      context.handle(
+        _xpPlannedMeta,
+        xpPlanned.isAcceptableOrUnknown(data['xp_planned']!, _xpPlannedMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_xpPlannedMeta);
+    }
+    if (data.containsKey('actual_result')) {
+      context.handle(
+        _actualResultMeta,
+        actualResult.isAcceptableOrUnknown(
+          data['actual_result']!,
+          _actualResultMeta,
+        ),
+      );
+    }
+    if (data.containsKey('convenience_rating')) {
+      context.handle(
+        _convenienceRatingMeta,
+        convenienceRating.isAcceptableOrUnknown(
+          data['convenience_rating']!,
+          _convenienceRatingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    if (data.containsKey('row_version')) {
+      context.handle(
+        _rowVersionMeta,
+        rowVersion.isAcceptableOrUnknown(data['row_version']!, _rowVersionMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Mission map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Mission(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      templateId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_id'],
+      ),
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      missionType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_type'],
+      )!,
+      importance: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}importance'],
+      )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}priority'],
+      )!,
+      difficulty: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}difficulty'],
+      ),
+      isRequired: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_required'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      scheduledAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}scheduled_at'],
+      ),
+      availableFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}available_from'],
+      ),
+      expiresAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expires_at'],
+      ),
+      estimatedMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}estimated_minutes'],
+      ),
+      budgetMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}budget_minor'],
+      ),
+      xpPlanned: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}xp_planned'],
+      )!,
+      actualResult: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}actual_result'],
+      ),
+      convenienceRating: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}convenience_rating'],
+      ),
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed_at'],
+      ),
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+      rowVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}row_version'],
+      )!,
+    );
+  }
+
+  @override
+  Missions createAlias(String alias) {
+    return Missions(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'CHECK((status IN (\'COMPLETED\', \'PARTIAL\') AND completed_at IS NOT NULL)OR(status NOT IN (\'COMPLETED\', \'PARTIAL\') AND completed_at IS NULL))',
+    'CHECK(available_from IS NULL OR scheduled_at IS NULL OR available_from <= scheduled_at)',
+    'CHECK(scheduled_at IS NULL OR expires_at IS NULL OR scheduled_at <= expires_at)',
+    'CHECK(available_from IS NULL OR expires_at IS NULL OR available_from <= expires_at)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class Mission extends DataClass implements Insertable<Mission> {
+  final String id;
+  final String? templateId;
+  final String areaId;
+  final String title;
+  final String? description;
+  final String missionType;
+  final String importance;
+  final String priority;
+  final String? difficulty;
+  final int isRequired;
+  final String status;
+  final int? scheduledAt;
+  final int? availableFrom;
+  final int? expiresAt;
+  final int? estimatedMinutes;
+  final int? budgetMinor;
+  final int xpPlanned;
+  final String? actualResult;
+  final String? convenienceRating;
+  final int? completedAt;
+  final int? archivedAt;
+  final int rowVersion;
+  const Mission({
+    required this.id,
+    this.templateId,
+    required this.areaId,
+    required this.title,
+    this.description,
+    required this.missionType,
+    required this.importance,
+    required this.priority,
+    this.difficulty,
+    required this.isRequired,
+    required this.status,
+    this.scheduledAt,
+    this.availableFrom,
+    this.expiresAt,
+    this.estimatedMinutes,
+    this.budgetMinor,
+    required this.xpPlanned,
+    this.actualResult,
+    this.convenienceRating,
+    this.completedAt,
+    this.archivedAt,
+    required this.rowVersion,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || templateId != null) {
+      map['template_id'] = Variable<String>(templateId);
+    }
+    map['area_id'] = Variable<String>(areaId);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['mission_type'] = Variable<String>(missionType);
+    map['importance'] = Variable<String>(importance);
+    map['priority'] = Variable<String>(priority);
+    if (!nullToAbsent || difficulty != null) {
+      map['difficulty'] = Variable<String>(difficulty);
+    }
+    map['is_required'] = Variable<int>(isRequired);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || scheduledAt != null) {
+      map['scheduled_at'] = Variable<int>(scheduledAt);
+    }
+    if (!nullToAbsent || availableFrom != null) {
+      map['available_from'] = Variable<int>(availableFrom);
+    }
+    if (!nullToAbsent || expiresAt != null) {
+      map['expires_at'] = Variable<int>(expiresAt);
+    }
+    if (!nullToAbsent || estimatedMinutes != null) {
+      map['estimated_minutes'] = Variable<int>(estimatedMinutes);
+    }
+    if (!nullToAbsent || budgetMinor != null) {
+      map['budget_minor'] = Variable<int>(budgetMinor);
+    }
+    map['xp_planned'] = Variable<int>(xpPlanned);
+    if (!nullToAbsent || actualResult != null) {
+      map['actual_result'] = Variable<String>(actualResult);
+    }
+    if (!nullToAbsent || convenienceRating != null) {
+      map['convenience_rating'] = Variable<String>(convenienceRating);
+    }
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<int>(completedAt);
+    }
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    map['row_version'] = Variable<int>(rowVersion);
+    return map;
+  }
+
+  MissionsCompanion toCompanion(bool nullToAbsent) {
+    return MissionsCompanion(
+      id: Value(id),
+      templateId: templateId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(templateId),
+      areaId: Value(areaId),
+      title: Value(title),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      missionType: Value(missionType),
+      importance: Value(importance),
+      priority: Value(priority),
+      difficulty: difficulty == null && nullToAbsent
+          ? const Value.absent()
+          : Value(difficulty),
+      isRequired: Value(isRequired),
+      status: Value(status),
+      scheduledAt: scheduledAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(scheduledAt),
+      availableFrom: availableFrom == null && nullToAbsent
+          ? const Value.absent()
+          : Value(availableFrom),
+      expiresAt: expiresAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiresAt),
+      estimatedMinutes: estimatedMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(estimatedMinutes),
+      budgetMinor: budgetMinor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(budgetMinor),
+      xpPlanned: Value(xpPlanned),
+      actualResult: actualResult == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actualResult),
+      convenienceRating: convenienceRating == null && nullToAbsent
+          ? const Value.absent()
+          : Value(convenienceRating),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+      rowVersion: Value(rowVersion),
+    );
+  }
+
+  factory Mission.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Mission(
+      id: serializer.fromJson<String>(json['id']),
+      templateId: serializer.fromJson<String?>(json['template_id']),
+      areaId: serializer.fromJson<String>(json['area_id']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String?>(json['description']),
+      missionType: serializer.fromJson<String>(json['mission_type']),
+      importance: serializer.fromJson<String>(json['importance']),
+      priority: serializer.fromJson<String>(json['priority']),
+      difficulty: serializer.fromJson<String?>(json['difficulty']),
+      isRequired: serializer.fromJson<int>(json['is_required']),
+      status: serializer.fromJson<String>(json['status']),
+      scheduledAt: serializer.fromJson<int?>(json['scheduled_at']),
+      availableFrom: serializer.fromJson<int?>(json['available_from']),
+      expiresAt: serializer.fromJson<int?>(json['expires_at']),
+      estimatedMinutes: serializer.fromJson<int?>(json['estimated_minutes']),
+      budgetMinor: serializer.fromJson<int?>(json['budget_minor']),
+      xpPlanned: serializer.fromJson<int>(json['xp_planned']),
+      actualResult: serializer.fromJson<String?>(json['actual_result']),
+      convenienceRating: serializer.fromJson<String?>(
+        json['convenience_rating'],
+      ),
+      completedAt: serializer.fromJson<int?>(json['completed_at']),
+      archivedAt: serializer.fromJson<int?>(json['archived_at']),
+      rowVersion: serializer.fromJson<int>(json['row_version']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'template_id': serializer.toJson<String?>(templateId),
+      'area_id': serializer.toJson<String>(areaId),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String?>(description),
+      'mission_type': serializer.toJson<String>(missionType),
+      'importance': serializer.toJson<String>(importance),
+      'priority': serializer.toJson<String>(priority),
+      'difficulty': serializer.toJson<String?>(difficulty),
+      'is_required': serializer.toJson<int>(isRequired),
+      'status': serializer.toJson<String>(status),
+      'scheduled_at': serializer.toJson<int?>(scheduledAt),
+      'available_from': serializer.toJson<int?>(availableFrom),
+      'expires_at': serializer.toJson<int?>(expiresAt),
+      'estimated_minutes': serializer.toJson<int?>(estimatedMinutes),
+      'budget_minor': serializer.toJson<int?>(budgetMinor),
+      'xp_planned': serializer.toJson<int>(xpPlanned),
+      'actual_result': serializer.toJson<String?>(actualResult),
+      'convenience_rating': serializer.toJson<String?>(convenienceRating),
+      'completed_at': serializer.toJson<int?>(completedAt),
+      'archived_at': serializer.toJson<int?>(archivedAt),
+      'row_version': serializer.toJson<int>(rowVersion),
+    };
+  }
+
+  Mission copyWith({
+    String? id,
+    Value<String?> templateId = const Value.absent(),
+    String? areaId,
+    String? title,
+    Value<String?> description = const Value.absent(),
+    String? missionType,
+    String? importance,
+    String? priority,
+    Value<String?> difficulty = const Value.absent(),
+    int? isRequired,
+    String? status,
+    Value<int?> scheduledAt = const Value.absent(),
+    Value<int?> availableFrom = const Value.absent(),
+    Value<int?> expiresAt = const Value.absent(),
+    Value<int?> estimatedMinutes = const Value.absent(),
+    Value<int?> budgetMinor = const Value.absent(),
+    int? xpPlanned,
+    Value<String?> actualResult = const Value.absent(),
+    Value<String?> convenienceRating = const Value.absent(),
+    Value<int?> completedAt = const Value.absent(),
+    Value<int?> archivedAt = const Value.absent(),
+    int? rowVersion,
+  }) => Mission(
+    id: id ?? this.id,
+    templateId: templateId.present ? templateId.value : this.templateId,
+    areaId: areaId ?? this.areaId,
+    title: title ?? this.title,
+    description: description.present ? description.value : this.description,
+    missionType: missionType ?? this.missionType,
+    importance: importance ?? this.importance,
+    priority: priority ?? this.priority,
+    difficulty: difficulty.present ? difficulty.value : this.difficulty,
+    isRequired: isRequired ?? this.isRequired,
+    status: status ?? this.status,
+    scheduledAt: scheduledAt.present ? scheduledAt.value : this.scheduledAt,
+    availableFrom: availableFrom.present
+        ? availableFrom.value
+        : this.availableFrom,
+    expiresAt: expiresAt.present ? expiresAt.value : this.expiresAt,
+    estimatedMinutes: estimatedMinutes.present
+        ? estimatedMinutes.value
+        : this.estimatedMinutes,
+    budgetMinor: budgetMinor.present ? budgetMinor.value : this.budgetMinor,
+    xpPlanned: xpPlanned ?? this.xpPlanned,
+    actualResult: actualResult.present ? actualResult.value : this.actualResult,
+    convenienceRating: convenienceRating.present
+        ? convenienceRating.value
+        : this.convenienceRating,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+    rowVersion: rowVersion ?? this.rowVersion,
+  );
+  Mission copyWithCompanion(MissionsCompanion data) {
+    return Mission(
+      id: data.id.present ? data.id.value : this.id,
+      templateId: data.templateId.present
+          ? data.templateId.value
+          : this.templateId,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      missionType: data.missionType.present
+          ? data.missionType.value
+          : this.missionType,
+      importance: data.importance.present
+          ? data.importance.value
+          : this.importance,
+      priority: data.priority.present ? data.priority.value : this.priority,
+      difficulty: data.difficulty.present
+          ? data.difficulty.value
+          : this.difficulty,
+      isRequired: data.isRequired.present
+          ? data.isRequired.value
+          : this.isRequired,
+      status: data.status.present ? data.status.value : this.status,
+      scheduledAt: data.scheduledAt.present
+          ? data.scheduledAt.value
+          : this.scheduledAt,
+      availableFrom: data.availableFrom.present
+          ? data.availableFrom.value
+          : this.availableFrom,
+      expiresAt: data.expiresAt.present ? data.expiresAt.value : this.expiresAt,
+      estimatedMinutes: data.estimatedMinutes.present
+          ? data.estimatedMinutes.value
+          : this.estimatedMinutes,
+      budgetMinor: data.budgetMinor.present
+          ? data.budgetMinor.value
+          : this.budgetMinor,
+      xpPlanned: data.xpPlanned.present ? data.xpPlanned.value : this.xpPlanned,
+      actualResult: data.actualResult.present
+          ? data.actualResult.value
+          : this.actualResult,
+      convenienceRating: data.convenienceRating.present
+          ? data.convenienceRating.value
+          : this.convenienceRating,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+      rowVersion: data.rowVersion.present
+          ? data.rowVersion.value
+          : this.rowVersion,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Mission(')
+          ..write('id: $id, ')
+          ..write('templateId: $templateId, ')
+          ..write('areaId: $areaId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('missionType: $missionType, ')
+          ..write('importance: $importance, ')
+          ..write('priority: $priority, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('isRequired: $isRequired, ')
+          ..write('status: $status, ')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('availableFrom: $availableFrom, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('estimatedMinutes: $estimatedMinutes, ')
+          ..write('budgetMinor: $budgetMinor, ')
+          ..write('xpPlanned: $xpPlanned, ')
+          ..write('actualResult: $actualResult, ')
+          ..write('convenienceRating: $convenienceRating, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowVersion: $rowVersion')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    templateId,
+    areaId,
+    title,
+    description,
+    missionType,
+    importance,
+    priority,
+    difficulty,
+    isRequired,
+    status,
+    scheduledAt,
+    availableFrom,
+    expiresAt,
+    estimatedMinutes,
+    budgetMinor,
+    xpPlanned,
+    actualResult,
+    convenienceRating,
+    completedAt,
+    archivedAt,
+    rowVersion,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Mission &&
+          other.id == this.id &&
+          other.templateId == this.templateId &&
+          other.areaId == this.areaId &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.missionType == this.missionType &&
+          other.importance == this.importance &&
+          other.priority == this.priority &&
+          other.difficulty == this.difficulty &&
+          other.isRequired == this.isRequired &&
+          other.status == this.status &&
+          other.scheduledAt == this.scheduledAt &&
+          other.availableFrom == this.availableFrom &&
+          other.expiresAt == this.expiresAt &&
+          other.estimatedMinutes == this.estimatedMinutes &&
+          other.budgetMinor == this.budgetMinor &&
+          other.xpPlanned == this.xpPlanned &&
+          other.actualResult == this.actualResult &&
+          other.convenienceRating == this.convenienceRating &&
+          other.completedAt == this.completedAt &&
+          other.archivedAt == this.archivedAt &&
+          other.rowVersion == this.rowVersion);
+}
+
+class MissionsCompanion extends UpdateCompanion<Mission> {
+  final Value<String> id;
+  final Value<String?> templateId;
+  final Value<String> areaId;
+  final Value<String> title;
+  final Value<String?> description;
+  final Value<String> missionType;
+  final Value<String> importance;
+  final Value<String> priority;
+  final Value<String?> difficulty;
+  final Value<int> isRequired;
+  final Value<String> status;
+  final Value<int?> scheduledAt;
+  final Value<int?> availableFrom;
+  final Value<int?> expiresAt;
+  final Value<int?> estimatedMinutes;
+  final Value<int?> budgetMinor;
+  final Value<int> xpPlanned;
+  final Value<String?> actualResult;
+  final Value<String?> convenienceRating;
+  final Value<int?> completedAt;
+  final Value<int?> archivedAt;
+  final Value<int> rowVersion;
+  final Value<int> rowid;
+  const MissionsCompanion({
+    this.id = const Value.absent(),
+    this.templateId = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.missionType = const Value.absent(),
+    this.importance = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    this.isRequired = const Value.absent(),
+    this.status = const Value.absent(),
+    this.scheduledAt = const Value.absent(),
+    this.availableFrom = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.estimatedMinutes = const Value.absent(),
+    this.budgetMinor = const Value.absent(),
+    this.xpPlanned = const Value.absent(),
+    this.actualResult = const Value.absent(),
+    this.convenienceRating = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MissionsCompanion.insert({
+    required String id,
+    this.templateId = const Value.absent(),
+    required String areaId,
+    required String title,
+    this.description = const Value.absent(),
+    required String missionType,
+    this.importance = const Value.absent(),
+    this.priority = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    required int isRequired,
+    required String status,
+    this.scheduledAt = const Value.absent(),
+    this.availableFrom = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.estimatedMinutes = const Value.absent(),
+    this.budgetMinor = const Value.absent(),
+    required int xpPlanned,
+    this.actualResult = const Value.absent(),
+    this.convenienceRating = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowVersion = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       areaId = Value(areaId),
+       title = Value(title),
+       missionType = Value(missionType),
+       isRequired = Value(isRequired),
+       status = Value(status),
+       xpPlanned = Value(xpPlanned);
+  static Insertable<Mission> custom({
+    Expression<String>? id,
+    Expression<String>? templateId,
+    Expression<String>? areaId,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<String>? missionType,
+    Expression<String>? importance,
+    Expression<String>? priority,
+    Expression<String>? difficulty,
+    Expression<int>? isRequired,
+    Expression<String>? status,
+    Expression<int>? scheduledAt,
+    Expression<int>? availableFrom,
+    Expression<int>? expiresAt,
+    Expression<int>? estimatedMinutes,
+    Expression<int>? budgetMinor,
+    Expression<int>? xpPlanned,
+    Expression<String>? actualResult,
+    Expression<String>? convenienceRating,
+    Expression<int>? completedAt,
+    Expression<int>? archivedAt,
+    Expression<int>? rowVersion,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (templateId != null) 'template_id': templateId,
+      if (areaId != null) 'area_id': areaId,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (missionType != null) 'mission_type': missionType,
+      if (importance != null) 'importance': importance,
+      if (priority != null) 'priority': priority,
+      if (difficulty != null) 'difficulty': difficulty,
+      if (isRequired != null) 'is_required': isRequired,
+      if (status != null) 'status': status,
+      if (scheduledAt != null) 'scheduled_at': scheduledAt,
+      if (availableFrom != null) 'available_from': availableFrom,
+      if (expiresAt != null) 'expires_at': expiresAt,
+      if (estimatedMinutes != null) 'estimated_minutes': estimatedMinutes,
+      if (budgetMinor != null) 'budget_minor': budgetMinor,
+      if (xpPlanned != null) 'xp_planned': xpPlanned,
+      if (actualResult != null) 'actual_result': actualResult,
+      if (convenienceRating != null) 'convenience_rating': convenienceRating,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (rowVersion != null) 'row_version': rowVersion,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MissionsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? templateId,
+    Value<String>? areaId,
+    Value<String>? title,
+    Value<String?>? description,
+    Value<String>? missionType,
+    Value<String>? importance,
+    Value<String>? priority,
+    Value<String?>? difficulty,
+    Value<int>? isRequired,
+    Value<String>? status,
+    Value<int?>? scheduledAt,
+    Value<int?>? availableFrom,
+    Value<int?>? expiresAt,
+    Value<int?>? estimatedMinutes,
+    Value<int?>? budgetMinor,
+    Value<int>? xpPlanned,
+    Value<String?>? actualResult,
+    Value<String?>? convenienceRating,
+    Value<int?>? completedAt,
+    Value<int?>? archivedAt,
+    Value<int>? rowVersion,
+    Value<int>? rowid,
+  }) {
+    return MissionsCompanion(
+      id: id ?? this.id,
+      templateId: templateId ?? this.templateId,
+      areaId: areaId ?? this.areaId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      missionType: missionType ?? this.missionType,
+      importance: importance ?? this.importance,
+      priority: priority ?? this.priority,
+      difficulty: difficulty ?? this.difficulty,
+      isRequired: isRequired ?? this.isRequired,
+      status: status ?? this.status,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      availableFrom: availableFrom ?? this.availableFrom,
+      expiresAt: expiresAt ?? this.expiresAt,
+      estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
+      budgetMinor: budgetMinor ?? this.budgetMinor,
+      xpPlanned: xpPlanned ?? this.xpPlanned,
+      actualResult: actualResult ?? this.actualResult,
+      convenienceRating: convenienceRating ?? this.convenienceRating,
+      completedAt: completedAt ?? this.completedAt,
+      archivedAt: archivedAt ?? this.archivedAt,
+      rowVersion: rowVersion ?? this.rowVersion,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (templateId.present) {
+      map['template_id'] = Variable<String>(templateId.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (missionType.present) {
+      map['mission_type'] = Variable<String>(missionType.value);
+    }
+    if (importance.present) {
+      map['importance'] = Variable<String>(importance.value);
+    }
+    if (priority.present) {
+      map['priority'] = Variable<String>(priority.value);
+    }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<String>(difficulty.value);
+    }
+    if (isRequired.present) {
+      map['is_required'] = Variable<int>(isRequired.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (scheduledAt.present) {
+      map['scheduled_at'] = Variable<int>(scheduledAt.value);
+    }
+    if (availableFrom.present) {
+      map['available_from'] = Variable<int>(availableFrom.value);
+    }
+    if (expiresAt.present) {
+      map['expires_at'] = Variable<int>(expiresAt.value);
+    }
+    if (estimatedMinutes.present) {
+      map['estimated_minutes'] = Variable<int>(estimatedMinutes.value);
+    }
+    if (budgetMinor.present) {
+      map['budget_minor'] = Variable<int>(budgetMinor.value);
+    }
+    if (xpPlanned.present) {
+      map['xp_planned'] = Variable<int>(xpPlanned.value);
+    }
+    if (actualResult.present) {
+      map['actual_result'] = Variable<String>(actualResult.value);
+    }
+    if (convenienceRating.present) {
+      map['convenience_rating'] = Variable<String>(convenienceRating.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<int>(completedAt.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (rowVersion.present) {
+      map['row_version'] = Variable<int>(rowVersion.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionsCompanion(')
+          ..write('id: $id, ')
+          ..write('templateId: $templateId, ')
+          ..write('areaId: $areaId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('missionType: $missionType, ')
+          ..write('importance: $importance, ')
+          ..write('priority: $priority, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('isRequired: $isRequired, ')
+          ..write('status: $status, ')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('availableFrom: $availableFrom, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('estimatedMinutes: $estimatedMinutes, ')
+          ..write('budgetMinor: $budgetMinor, ')
+          ..write('xpPlanned: $xpPlanned, ')
+          ..write('actualResult: $actualResult, ')
+          ..write('convenienceRating: $convenienceRating, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowVersion: $rowVersion, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class MissionObjectives extends Table
+    with TableInfo<MissionObjectives, MissionObjective> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  MissionObjectives(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES missions(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(trim(description)) BETWEEN 1 AND 240)',
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (position >= 0)',
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  late final GeneratedColumn<int> completedAt = GeneratedColumn<int>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    missionId,
+    description,
+    position,
+    completedAt,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mission_objectives';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MissionObjective> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_missionIdMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {missionId, position},
+  ];
+  @override
+  MissionObjective map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MissionObjective(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}completed_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  MissionObjectives createAlias(String alias) {
+    return MissionObjectives(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const ['UNIQUE(mission_id, position)'];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class MissionObjective extends DataClass
+    implements Insertable<MissionObjective> {
+  final String id;
+  final String missionId;
+  final String description;
+  final int position;
+  final int? completedAt;
+  final int createdAt;
+  const MissionObjective({
+    required this.id,
+    required this.missionId,
+    required this.description,
+    required this.position,
+    this.completedAt,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['mission_id'] = Variable<String>(missionId);
+    map['description'] = Variable<String>(description);
+    map['position'] = Variable<int>(position);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<int>(completedAt);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  MissionObjectivesCompanion toCompanion(bool nullToAbsent) {
+    return MissionObjectivesCompanion(
+      id: Value(id),
+      missionId: Value(missionId),
+      description: Value(description),
+      position: Value(position),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MissionObjective.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MissionObjective(
+      id: serializer.fromJson<String>(json['id']),
+      missionId: serializer.fromJson<String>(json['mission_id']),
+      description: serializer.fromJson<String>(json['description']),
+      position: serializer.fromJson<int>(json['position']),
+      completedAt: serializer.fromJson<int?>(json['completed_at']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'mission_id': serializer.toJson<String>(missionId),
+      'description': serializer.toJson<String>(description),
+      'position': serializer.toJson<int>(position),
+      'completed_at': serializer.toJson<int?>(completedAt),
+      'created_at': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  MissionObjective copyWith({
+    String? id,
+    String? missionId,
+    String? description,
+    int? position,
+    Value<int?> completedAt = const Value.absent(),
+    int? createdAt,
+  }) => MissionObjective(
+    id: id ?? this.id,
+    missionId: missionId ?? this.missionId,
+    description: description ?? this.description,
+    position: position ?? this.position,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MissionObjective copyWithCompanion(MissionObjectivesCompanion data) {
+    return MissionObjective(
+      id: data.id.present ? data.id.value : this.id,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      position: data.position.present ? data.position.value : this.position,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionObjective(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('description: $description, ')
+          ..write('position: $position, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, missionId, description, position, completedAt, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MissionObjective &&
+          other.id == this.id &&
+          other.missionId == this.missionId &&
+          other.description == this.description &&
+          other.position == this.position &&
+          other.completedAt == this.completedAt &&
+          other.createdAt == this.createdAt);
+}
+
+class MissionObjectivesCompanion extends UpdateCompanion<MissionObjective> {
+  final Value<String> id;
+  final Value<String> missionId;
+  final Value<String> description;
+  final Value<int> position;
+  final Value<int?> completedAt;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const MissionObjectivesCompanion({
+    this.id = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.description = const Value.absent(),
+    this.position = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MissionObjectivesCompanion.insert({
+    required String id,
+    required String missionId,
+    required String description,
+    required int position,
+    this.completedAt = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       missionId = Value(missionId),
+       description = Value(description),
+       position = Value(position),
+       createdAt = Value(createdAt);
+  static Insertable<MissionObjective> custom({
+    Expression<String>? id,
+    Expression<String>? missionId,
+    Expression<String>? description,
+    Expression<int>? position,
+    Expression<int>? completedAt,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (missionId != null) 'mission_id': missionId,
+      if (description != null) 'description': description,
+      if (position != null) 'position': position,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MissionObjectivesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? missionId,
+    Value<String>? description,
+    Value<int>? position,
+    Value<int?>? completedAt,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return MissionObjectivesCompanion(
+      id: id ?? this.id,
+      missionId: missionId ?? this.missionId,
+      description: description ?? this.description,
+      position: position ?? this.position,
+      completedAt: completedAt ?? this.completedAt,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<int>(completedAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionObjectivesCompanion(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('description: $description, ')
+          ..write('position: $position, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class TimeEntries extends Table with TableInfo<TimeEntries, TimeEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  TimeEntries(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES missions(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (source IN (\'TIMER\', \'MANUAL\'))',
+  );
+  static const VerificationMeta _segmentTypeMeta = const VerificationMeta(
+    'segmentType',
+  );
+  late final GeneratedColumn<String> segmentType = GeneratedColumn<String>(
+    'segment_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (segment_type IN (\'WORK\', \'BREAK\'))',
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _durationSecondsMeta = const VerificationMeta(
+    'durationSeconds',
+  );
+  late final GeneratedColumn<int> durationSeconds = GeneratedColumn<int>(
+    'duration_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (duration_seconds >= 0)',
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    missionId,
+    source,
+    segmentType,
+    startedAt,
+    endedAt,
+    durationSeconds,
+    note,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'time_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TimeEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_missionIdMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('segment_type')) {
+      context.handle(
+        _segmentTypeMeta,
+        segmentType.isAcceptableOrUnknown(
+          data['segment_type']!,
+          _segmentTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_segmentTypeMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('duration_seconds')) {
+      context.handle(
+        _durationSecondsMeta,
+        durationSeconds.isAcceptableOrUnknown(
+          data['duration_seconds']!,
+          _durationSecondsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_durationSecondsMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TimeEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TimeEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      segmentType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}segment_type'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      ),
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+      durationSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_seconds'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  TimeEntries createAlias(String alias) {
+    return TimeEntries(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'CHECK(ended_at IS NULL OR started_at IS NULL OR ended_at >= started_at)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class TimeEntry extends DataClass implements Insertable<TimeEntry> {
+  final String id;
+  final String missionId;
+  final String source;
+  final String segmentType;
+  final int? startedAt;
+  final int? endedAt;
+  final int durationSeconds;
+  final String? note;
+  final int createdAt;
+  const TimeEntry({
+    required this.id,
+    required this.missionId,
+    required this.source,
+    required this.segmentType,
+    this.startedAt,
+    this.endedAt,
+    required this.durationSeconds,
+    this.note,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['mission_id'] = Variable<String>(missionId);
+    map['source'] = Variable<String>(source);
+    map['segment_type'] = Variable<String>(segmentType);
+    if (!nullToAbsent || startedAt != null) {
+      map['started_at'] = Variable<int>(startedAt);
+    }
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    map['duration_seconds'] = Variable<int>(durationSeconds);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  TimeEntriesCompanion toCompanion(bool nullToAbsent) {
+    return TimeEntriesCompanion(
+      id: Value(id),
+      missionId: Value(missionId),
+      source: Value(source),
+      segmentType: Value(segmentType),
+      startedAt: startedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      durationSeconds: Value(durationSeconds),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory TimeEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TimeEntry(
+      id: serializer.fromJson<String>(json['id']),
+      missionId: serializer.fromJson<String>(json['mission_id']),
+      source: serializer.fromJson<String>(json['source']),
+      segmentType: serializer.fromJson<String>(json['segment_type']),
+      startedAt: serializer.fromJson<int?>(json['started_at']),
+      endedAt: serializer.fromJson<int?>(json['ended_at']),
+      durationSeconds: serializer.fromJson<int>(json['duration_seconds']),
+      note: serializer.fromJson<String?>(json['note']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'mission_id': serializer.toJson<String>(missionId),
+      'source': serializer.toJson<String>(source),
+      'segment_type': serializer.toJson<String>(segmentType),
+      'started_at': serializer.toJson<int?>(startedAt),
+      'ended_at': serializer.toJson<int?>(endedAt),
+      'duration_seconds': serializer.toJson<int>(durationSeconds),
+      'note': serializer.toJson<String?>(note),
+      'created_at': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  TimeEntry copyWith({
+    String? id,
+    String? missionId,
+    String? source,
+    String? segmentType,
+    Value<int?> startedAt = const Value.absent(),
+    Value<int?> endedAt = const Value.absent(),
+    int? durationSeconds,
+    Value<String?> note = const Value.absent(),
+    int? createdAt,
+  }) => TimeEntry(
+    id: id ?? this.id,
+    missionId: missionId ?? this.missionId,
+    source: source ?? this.source,
+    segmentType: segmentType ?? this.segmentType,
+    startedAt: startedAt.present ? startedAt.value : this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    durationSeconds: durationSeconds ?? this.durationSeconds,
+    note: note.present ? note.value : this.note,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  TimeEntry copyWithCompanion(TimeEntriesCompanion data) {
+    return TimeEntry(
+      id: data.id.present ? data.id.value : this.id,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      source: data.source.present ? data.source.value : this.source,
+      segmentType: data.segmentType.present
+          ? data.segmentType.value
+          : this.segmentType,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      durationSeconds: data.durationSeconds.present
+          ? data.durationSeconds.value
+          : this.durationSeconds,
+      note: data.note.present ? data.note.value : this.note,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimeEntry(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('source: $source, ')
+          ..write('segmentType: $segmentType, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    missionId,
+    source,
+    segmentType,
+    startedAt,
+    endedAt,
+    durationSeconds,
+    note,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TimeEntry &&
+          other.id == this.id &&
+          other.missionId == this.missionId &&
+          other.source == this.source &&
+          other.segmentType == this.segmentType &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.durationSeconds == this.durationSeconds &&
+          other.note == this.note &&
+          other.createdAt == this.createdAt);
+}
+
+class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
+  final Value<String> id;
+  final Value<String> missionId;
+  final Value<String> source;
+  final Value<String> segmentType;
+  final Value<int?> startedAt;
+  final Value<int?> endedAt;
+  final Value<int> durationSeconds;
+  final Value<String?> note;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const TimeEntriesCompanion({
+    this.id = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.source = const Value.absent(),
+    this.segmentType = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TimeEntriesCompanion.insert({
+    required String id,
+    required String missionId,
+    required String source,
+    required String segmentType,
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    required int durationSeconds,
+    this.note = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       missionId = Value(missionId),
+       source = Value(source),
+       segmentType = Value(segmentType),
+       durationSeconds = Value(durationSeconds),
+       createdAt = Value(createdAt);
+  static Insertable<TimeEntry> custom({
+    Expression<String>? id,
+    Expression<String>? missionId,
+    Expression<String>? source,
+    Expression<String>? segmentType,
+    Expression<int>? startedAt,
+    Expression<int>? endedAt,
+    Expression<int>? durationSeconds,
+    Expression<String>? note,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (missionId != null) 'mission_id': missionId,
+      if (source != null) 'source': source,
+      if (segmentType != null) 'segment_type': segmentType,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (durationSeconds != null) 'duration_seconds': durationSeconds,
+      if (note != null) 'note': note,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TimeEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? missionId,
+    Value<String>? source,
+    Value<String>? segmentType,
+    Value<int?>? startedAt,
+    Value<int?>? endedAt,
+    Value<int>? durationSeconds,
+    Value<String?>? note,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return TimeEntriesCompanion(
+      id: id ?? this.id,
+      missionId: missionId ?? this.missionId,
+      source: source ?? this.source,
+      segmentType: segmentType ?? this.segmentType,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (segmentType.present) {
+      map['segment_type'] = Variable<String>(segmentType.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    if (durationSeconds.present) {
+      map['duration_seconds'] = Variable<int>(durationSeconds.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimeEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('source: $source, ')
+          ..write('segmentType: $segmentType, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class MissionEvents extends Table with TableInfo<MissionEvents, MissionEvent> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  MissionEvents(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES missions(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _eventTypeMeta = const VerificationMeta(
+    'eventType',
+  );
+  late final GeneratedColumn<String> eventType = GeneratedColumn<String>(
+    'event_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (event_type IN (\'CREATED\', \'UPDATED\', \'AVAILABLE\', \'STARTED\', \'PAUSED\', \'RESUMED\', \'RESCHEDULED\', \'EXPIRED\', \'ABANDONED\', \'CANCELLED\', \'PARTIALLY_COMPLETED\', \'COMPLETED\', \'CORRECTED\', \'ARCHIVED\'))',
+  );
+  static const VerificationMeta _fromStatusMeta = const VerificationMeta(
+    'fromStatus',
+  );
+  late final GeneratedColumn<String> fromStatus = GeneratedColumn<String>(
+    'from_status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (from_status IS NULL OR from_status IN (\'DRAFT\', \'SCHEDULED\', \'AVAILABLE\', \'ACTIVE\', \'PAUSED\', \'RESCHEDULED\', \'EXPIRED\', \'ABANDONED\', \'CANCELLED\', \'PARTIAL\', \'COMPLETED\'))',
+  );
+  static const VerificationMeta _toStatusMeta = const VerificationMeta(
+    'toStatus',
+  );
+  late final GeneratedColumn<String> toStatus = GeneratedColumn<String>(
+    'to_status',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (to_status IS NULL OR to_status IN (\'DRAFT\', \'SCHEDULED\', \'AVAILABLE\', \'ACTIVE\', \'PAUSED\', \'RESCHEDULED\', \'EXPIRED\', \'ABANDONED\', \'CANCELLED\', \'PARTIAL\', \'COMPLETED\'))',
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _snapshotJsonMeta = const VerificationMeta(
+    'snapshotJson',
+  );
+  late final GeneratedColumn<String> snapshotJson = GeneratedColumn<String>(
+    'snapshot_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  late final GeneratedColumn<int> occurredAt = GeneratedColumn<int>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    missionId,
+    eventType,
+    fromStatus,
+    toStatus,
+    reason,
+    snapshotJson,
+    occurredAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mission_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MissionEvent> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_missionIdMeta);
+    }
+    if (data.containsKey('event_type')) {
+      context.handle(
+        _eventTypeMeta,
+        eventType.isAcceptableOrUnknown(data['event_type']!, _eventTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventTypeMeta);
+    }
+    if (data.containsKey('from_status')) {
+      context.handle(
+        _fromStatusMeta,
+        fromStatus.isAcceptableOrUnknown(data['from_status']!, _fromStatusMeta),
+      );
+    }
+    if (data.containsKey('to_status')) {
+      context.handle(
+        _toStatusMeta,
+        toStatus.isAcceptableOrUnknown(data['to_status']!, _toStatusMeta),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    }
+    if (data.containsKey('snapshot_json')) {
+      context.handle(
+        _snapshotJsonMeta,
+        snapshotJson.isAcceptableOrUnknown(
+          data['snapshot_json']!,
+          _snapshotJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MissionEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MissionEvent(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      )!,
+      eventType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_type'],
+      )!,
+      fromStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}from_status'],
+      ),
+      toStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_status'],
+      ),
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
+      snapshotJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snapshot_json'],
+      ),
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+    );
+  }
+
+  @override
+  MissionEvents createAlias(String alias) {
+    return MissionEvents(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class MissionEvent extends DataClass implements Insertable<MissionEvent> {
+  final String id;
+  final String missionId;
+  final String eventType;
+  final String? fromStatus;
+  final String? toStatus;
+  final String? reason;
+  final String? snapshotJson;
+  final int occurredAt;
+  const MissionEvent({
+    required this.id,
+    required this.missionId,
+    required this.eventType,
+    this.fromStatus,
+    this.toStatus,
+    this.reason,
+    this.snapshotJson,
+    required this.occurredAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['mission_id'] = Variable<String>(missionId);
+    map['event_type'] = Variable<String>(eventType);
+    if (!nullToAbsent || fromStatus != null) {
+      map['from_status'] = Variable<String>(fromStatus);
+    }
+    if (!nullToAbsent || toStatus != null) {
+      map['to_status'] = Variable<String>(toStatus);
+    }
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
+    if (!nullToAbsent || snapshotJson != null) {
+      map['snapshot_json'] = Variable<String>(snapshotJson);
+    }
+    map['occurred_at'] = Variable<int>(occurredAt);
+    return map;
+  }
+
+  MissionEventsCompanion toCompanion(bool nullToAbsent) {
+    return MissionEventsCompanion(
+      id: Value(id),
+      missionId: Value(missionId),
+      eventType: Value(eventType),
+      fromStatus: fromStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fromStatus),
+      toStatus: toStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(toStatus),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
+      snapshotJson: snapshotJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(snapshotJson),
+      occurredAt: Value(occurredAt),
+    );
+  }
+
+  factory MissionEvent.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MissionEvent(
+      id: serializer.fromJson<String>(json['id']),
+      missionId: serializer.fromJson<String>(json['mission_id']),
+      eventType: serializer.fromJson<String>(json['event_type']),
+      fromStatus: serializer.fromJson<String?>(json['from_status']),
+      toStatus: serializer.fromJson<String?>(json['to_status']),
+      reason: serializer.fromJson<String?>(json['reason']),
+      snapshotJson: serializer.fromJson<String?>(json['snapshot_json']),
+      occurredAt: serializer.fromJson<int>(json['occurred_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'mission_id': serializer.toJson<String>(missionId),
+      'event_type': serializer.toJson<String>(eventType),
+      'from_status': serializer.toJson<String?>(fromStatus),
+      'to_status': serializer.toJson<String?>(toStatus),
+      'reason': serializer.toJson<String?>(reason),
+      'snapshot_json': serializer.toJson<String?>(snapshotJson),
+      'occurred_at': serializer.toJson<int>(occurredAt),
+    };
+  }
+
+  MissionEvent copyWith({
+    String? id,
+    String? missionId,
+    String? eventType,
+    Value<String?> fromStatus = const Value.absent(),
+    Value<String?> toStatus = const Value.absent(),
+    Value<String?> reason = const Value.absent(),
+    Value<String?> snapshotJson = const Value.absent(),
+    int? occurredAt,
+  }) => MissionEvent(
+    id: id ?? this.id,
+    missionId: missionId ?? this.missionId,
+    eventType: eventType ?? this.eventType,
+    fromStatus: fromStatus.present ? fromStatus.value : this.fromStatus,
+    toStatus: toStatus.present ? toStatus.value : this.toStatus,
+    reason: reason.present ? reason.value : this.reason,
+    snapshotJson: snapshotJson.present ? snapshotJson.value : this.snapshotJson,
+    occurredAt: occurredAt ?? this.occurredAt,
+  );
+  MissionEvent copyWithCompanion(MissionEventsCompanion data) {
+    return MissionEvent(
+      id: data.id.present ? data.id.value : this.id,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      eventType: data.eventType.present ? data.eventType.value : this.eventType,
+      fromStatus: data.fromStatus.present
+          ? data.fromStatus.value
+          : this.fromStatus,
+      toStatus: data.toStatus.present ? data.toStatus.value : this.toStatus,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      snapshotJson: data.snapshotJson.present
+          ? data.snapshotJson.value
+          : this.snapshotJson,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionEvent(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('eventType: $eventType, ')
+          ..write('fromStatus: $fromStatus, ')
+          ..write('toStatus: $toStatus, ')
+          ..write('reason: $reason, ')
+          ..write('snapshotJson: $snapshotJson, ')
+          ..write('occurredAt: $occurredAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    missionId,
+    eventType,
+    fromStatus,
+    toStatus,
+    reason,
+    snapshotJson,
+    occurredAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MissionEvent &&
+          other.id == this.id &&
+          other.missionId == this.missionId &&
+          other.eventType == this.eventType &&
+          other.fromStatus == this.fromStatus &&
+          other.toStatus == this.toStatus &&
+          other.reason == this.reason &&
+          other.snapshotJson == this.snapshotJson &&
+          other.occurredAt == this.occurredAt);
+}
+
+class MissionEventsCompanion extends UpdateCompanion<MissionEvent> {
+  final Value<String> id;
+  final Value<String> missionId;
+  final Value<String> eventType;
+  final Value<String?> fromStatus;
+  final Value<String?> toStatus;
+  final Value<String?> reason;
+  final Value<String?> snapshotJson;
+  final Value<int> occurredAt;
+  final Value<int> rowid;
+  const MissionEventsCompanion({
+    this.id = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.eventType = const Value.absent(),
+    this.fromStatus = const Value.absent(),
+    this.toStatus = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.snapshotJson = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MissionEventsCompanion.insert({
+    required String id,
+    required String missionId,
+    required String eventType,
+    this.fromStatus = const Value.absent(),
+    this.toStatus = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.snapshotJson = const Value.absent(),
+    required int occurredAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       missionId = Value(missionId),
+       eventType = Value(eventType),
+       occurredAt = Value(occurredAt);
+  static Insertable<MissionEvent> custom({
+    Expression<String>? id,
+    Expression<String>? missionId,
+    Expression<String>? eventType,
+    Expression<String>? fromStatus,
+    Expression<String>? toStatus,
+    Expression<String>? reason,
+    Expression<String>? snapshotJson,
+    Expression<int>? occurredAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (missionId != null) 'mission_id': missionId,
+      if (eventType != null) 'event_type': eventType,
+      if (fromStatus != null) 'from_status': fromStatus,
+      if (toStatus != null) 'to_status': toStatus,
+      if (reason != null) 'reason': reason,
+      if (snapshotJson != null) 'snapshot_json': snapshotJson,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MissionEventsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? missionId,
+    Value<String>? eventType,
+    Value<String?>? fromStatus,
+    Value<String?>? toStatus,
+    Value<String?>? reason,
+    Value<String?>? snapshotJson,
+    Value<int>? occurredAt,
+    Value<int>? rowid,
+  }) {
+    return MissionEventsCompanion(
+      id: id ?? this.id,
+      missionId: missionId ?? this.missionId,
+      eventType: eventType ?? this.eventType,
+      fromStatus: fromStatus ?? this.fromStatus,
+      toStatus: toStatus ?? this.toStatus,
+      reason: reason ?? this.reason,
+      snapshotJson: snapshotJson ?? this.snapshotJson,
+      occurredAt: occurredAt ?? this.occurredAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (eventType.present) {
+      map['event_type'] = Variable<String>(eventType.value);
+    }
+    if (fromStatus.present) {
+      map['from_status'] = Variable<String>(fromStatus.value);
+    }
+    if (toStatus.present) {
+      map['to_status'] = Variable<String>(toStatus.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (snapshotJson.present) {
+      map['snapshot_json'] = Variable<String>(snapshotJson.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<int>(occurredAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MissionEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('eventType: $eventType, ')
+          ..write('fromStatus: $fromStatus, ')
+          ..write('toStatus: $toStatus, ')
+          ..write('reason: $reason, ')
+          ..write('snapshotJson: $snapshotJson, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class NotificationSchedules extends Table
+    with TableInfo<NotificationSchedules, NotificationSchedule> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  NotificationSchedules(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES missions(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _notificationTypeMeta = const VerificationMeta(
+    'notificationType',
+  );
+  late final GeneratedColumn<String> notificationType = GeneratedColumn<String>(
+    'notification_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (notification_type IN (\'EARLY\', \'PREPARATION\', \'START\', \'FOLLOW_UP\', \'CRITICAL\'))',
+  );
+  static const VerificationMeta _notifyAtMeta = const VerificationMeta(
+    'notifyAt',
+  );
+  late final GeneratedColumn<int> notifyAt = GeneratedColumn<int>(
+    'notify_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (status IN (\'PENDING\', \'SCHEDULED\', \'FIRED\', \'CANCELLED\', \'FAILED\'))',
+  );
+  static const VerificationMeta _systemNotificationIdMeta =
+      const VerificationMeta('systemNotificationId');
+  late final GeneratedColumn<int> systemNotificationId = GeneratedColumn<int>(
+    'system_notification_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    missionId,
+    notificationType,
+    notifyAt,
+    status,
+    systemNotificationId,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notification_schedules';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotificationSchedule> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_missionIdMeta);
+    }
+    if (data.containsKey('notification_type')) {
+      context.handle(
+        _notificationTypeMeta,
+        notificationType.isAcceptableOrUnknown(
+          data['notification_type']!,
+          _notificationTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_notificationTypeMeta);
+    }
+    if (data.containsKey('notify_at')) {
+      context.handle(
+        _notifyAtMeta,
+        notifyAt.isAcceptableOrUnknown(data['notify_at']!, _notifyAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_notifyAtMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('system_notification_id')) {
+      context.handle(
+        _systemNotificationIdMeta,
+        systemNotificationId.isAcceptableOrUnknown(
+          data['system_notification_id']!,
+          _systemNotificationIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {missionId, notificationType, notifyAt},
+  ];
+  @override
+  NotificationSchedule map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotificationSchedule(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      )!,
+      notificationType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notification_type'],
+      )!,
+      notifyAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}notify_at'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      systemNotificationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}system_notification_id'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  NotificationSchedules createAlias(String alias) {
+    return NotificationSchedules(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'UNIQUE(mission_id, notification_type, notify_at)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class NotificationSchedule extends DataClass
+    implements Insertable<NotificationSchedule> {
+  final String id;
+  final String missionId;
+  final String notificationType;
+  final int notifyAt;
+  final String status;
+  final int? systemNotificationId;
+  final int createdAt;
+  final int updatedAt;
+  const NotificationSchedule({
+    required this.id,
+    required this.missionId,
+    required this.notificationType,
+    required this.notifyAt,
+    required this.status,
+    this.systemNotificationId,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['mission_id'] = Variable<String>(missionId);
+    map['notification_type'] = Variable<String>(notificationType);
+    map['notify_at'] = Variable<int>(notifyAt);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || systemNotificationId != null) {
+      map['system_notification_id'] = Variable<int>(systemNotificationId);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  NotificationSchedulesCompanion toCompanion(bool nullToAbsent) {
+    return NotificationSchedulesCompanion(
+      id: Value(id),
+      missionId: Value(missionId),
+      notificationType: Value(notificationType),
+      notifyAt: Value(notifyAt),
+      status: Value(status),
+      systemNotificationId: systemNotificationId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(systemNotificationId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory NotificationSchedule.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotificationSchedule(
+      id: serializer.fromJson<String>(json['id']),
+      missionId: serializer.fromJson<String>(json['mission_id']),
+      notificationType: serializer.fromJson<String>(json['notification_type']),
+      notifyAt: serializer.fromJson<int>(json['notify_at']),
+      status: serializer.fromJson<String>(json['status']),
+      systemNotificationId: serializer.fromJson<int?>(
+        json['system_notification_id'],
+      ),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'mission_id': serializer.toJson<String>(missionId),
+      'notification_type': serializer.toJson<String>(notificationType),
+      'notify_at': serializer.toJson<int>(notifyAt),
+      'status': serializer.toJson<String>(status),
+      'system_notification_id': serializer.toJson<int?>(systemNotificationId),
+      'created_at': serializer.toJson<int>(createdAt),
+      'updated_at': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  NotificationSchedule copyWith({
+    String? id,
+    String? missionId,
+    String? notificationType,
+    int? notifyAt,
+    String? status,
+    Value<int?> systemNotificationId = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => NotificationSchedule(
+    id: id ?? this.id,
+    missionId: missionId ?? this.missionId,
+    notificationType: notificationType ?? this.notificationType,
+    notifyAt: notifyAt ?? this.notifyAt,
+    status: status ?? this.status,
+    systemNotificationId: systemNotificationId.present
+        ? systemNotificationId.value
+        : this.systemNotificationId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  NotificationSchedule copyWithCompanion(NotificationSchedulesCompanion data) {
+    return NotificationSchedule(
+      id: data.id.present ? data.id.value : this.id,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      notificationType: data.notificationType.present
+          ? data.notificationType.value
+          : this.notificationType,
+      notifyAt: data.notifyAt.present ? data.notifyAt.value : this.notifyAt,
+      status: data.status.present ? data.status.value : this.status,
+      systemNotificationId: data.systemNotificationId.present
+          ? data.systemNotificationId.value
+          : this.systemNotificationId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationSchedule(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('notificationType: $notificationType, ')
+          ..write('notifyAt: $notifyAt, ')
+          ..write('status: $status, ')
+          ..write('systemNotificationId: $systemNotificationId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    missionId,
+    notificationType,
+    notifyAt,
+    status,
+    systemNotificationId,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotificationSchedule &&
+          other.id == this.id &&
+          other.missionId == this.missionId &&
+          other.notificationType == this.notificationType &&
+          other.notifyAt == this.notifyAt &&
+          other.status == this.status &&
+          other.systemNotificationId == this.systemNotificationId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class NotificationSchedulesCompanion
+    extends UpdateCompanion<NotificationSchedule> {
+  final Value<String> id;
+  final Value<String> missionId;
+  final Value<String> notificationType;
+  final Value<int> notifyAt;
+  final Value<String> status;
+  final Value<int?> systemNotificationId;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const NotificationSchedulesCompanion({
+    this.id = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.notificationType = const Value.absent(),
+    this.notifyAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.systemNotificationId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NotificationSchedulesCompanion.insert({
+    required String id,
+    required String missionId,
+    required String notificationType,
+    required int notifyAt,
+    required String status,
+    this.systemNotificationId = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       missionId = Value(missionId),
+       notificationType = Value(notificationType),
+       notifyAt = Value(notifyAt),
+       status = Value(status),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<NotificationSchedule> custom({
+    Expression<String>? id,
+    Expression<String>? missionId,
+    Expression<String>? notificationType,
+    Expression<int>? notifyAt,
+    Expression<String>? status,
+    Expression<int>? systemNotificationId,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (missionId != null) 'mission_id': missionId,
+      if (notificationType != null) 'notification_type': notificationType,
+      if (notifyAt != null) 'notify_at': notifyAt,
+      if (status != null) 'status': status,
+      if (systemNotificationId != null)
+        'system_notification_id': systemNotificationId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NotificationSchedulesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? missionId,
+    Value<String>? notificationType,
+    Value<int>? notifyAt,
+    Value<String>? status,
+    Value<int?>? systemNotificationId,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return NotificationSchedulesCompanion(
+      id: id ?? this.id,
+      missionId: missionId ?? this.missionId,
+      notificationType: notificationType ?? this.notificationType,
+      notifyAt: notifyAt ?? this.notifyAt,
+      status: status ?? this.status,
+      systemNotificationId: systemNotificationId ?? this.systemNotificationId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (notificationType.present) {
+      map['notification_type'] = Variable<String>(notificationType.value);
+    }
+    if (notifyAt.present) {
+      map['notify_at'] = Variable<int>(notifyAt.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (systemNotificationId.present) {
+      map['system_notification_id'] = Variable<int>(systemNotificationId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationSchedulesCompanion(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('notificationType: $notificationType, ')
+          ..write('notifyAt: $notifyAt, ')
+          ..write('status: $status, ')
+          ..write('systemNotificationId: $systemNotificationId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class Transactions extends Table with TableInfo<Transactions, Transaction> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Transactions(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _operationIdMeta = const VerificationMeta(
+    'operationId',
+  );
+  late final GeneratedColumn<String> operationId = GeneratedColumn<String>(
+    'operation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES missions(id)ON DELETE SET NULL',
+  );
+  static const VerificationMeta _relatedTransactionIdMeta =
+      const VerificationMeta('relatedTransactionId');
+  late final GeneratedColumn<String> relatedTransactionId =
+      GeneratedColumn<String>(
+        'related_transaction_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        $customConstraints: 'REFERENCES transactions(id)ON DELETE RESTRICT',
+      );
+  static const VerificationMeta _transactionTypeMeta = const VerificationMeta(
+    'transactionType',
+  );
+  late final GeneratedColumn<String> transactionType = GeneratedColumn<String>(
+    'transaction_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (transaction_type IN (\'INCOME\', \'EXPENSE\', \'REFUND\', \'ADJUSTMENT_CREDIT\', \'ADJUSTMENT_DEBIT\'))',
+  );
+  static const VerificationMeta _amountMinorMeta = const VerificationMeta(
+    'amountMinor',
+  );
+  late final GeneratedColumn<int> amountMinor = GeneratedColumn<int>(
+    'amount_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (amount_minor > 0)',
+  );
+  static const VerificationMeta _paymentMethodMeta = const VerificationMeta(
+    'paymentMethod',
+  );
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+    'payment_method',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (payment_method IS NULL OR payment_method IN (\'CASH\', \'BANK\', \'WALLET\'))',
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  late final GeneratedColumn<int> occurredAt = GeneratedColumn<int>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _reversedAtMeta = const VerificationMeta(
+    'reversedAt',
+  );
+  late final GeneratedColumn<int> reversedAt = GeneratedColumn<int>(
+    'reversed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (reversed_at IS NULL OR reversed_at >= occurred_at)',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    operationId,
+    missionId,
+    relatedTransactionId,
+    transactionType,
+    amountMinor,
+    paymentMethod,
+    category,
+    note,
+    occurredAt,
+    createdAt,
+    reversedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'transactions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Transaction> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('operation_id')) {
+      context.handle(
+        _operationIdMeta,
+        operationId.isAcceptableOrUnknown(
+          data['operation_id']!,
+          _operationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_operationIdMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    }
+    if (data.containsKey('related_transaction_id')) {
+      context.handle(
+        _relatedTransactionIdMeta,
+        relatedTransactionId.isAcceptableOrUnknown(
+          data['related_transaction_id']!,
+          _relatedTransactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('transaction_type')) {
+      context.handle(
+        _transactionTypeMeta,
+        transactionType.isAcceptableOrUnknown(
+          data['transaction_type']!,
+          _transactionTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_transactionTypeMeta);
+    }
+    if (data.containsKey('amount_minor')) {
+      context.handle(
+        _amountMinorMeta,
+        amountMinor.isAcceptableOrUnknown(
+          data['amount_minor']!,
+          _amountMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMinorMeta);
+    }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+        _paymentMethodMeta,
+        paymentMethod.isAcceptableOrUnknown(
+          data['payment_method']!,
+          _paymentMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('reversed_at')) {
+      context.handle(
+        _reversedAtMeta,
+        reversedAt.isAcceptableOrUnknown(data['reversed_at']!, _reversedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Transaction map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Transaction(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      operationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operation_id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      ),
+      relatedTransactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}related_transaction_id'],
+      ),
+      transactionType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transaction_type'],
+      )!,
+      amountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_minor'],
+      )!,
+      paymentMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_method'],
+      ),
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      reversedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reversed_at'],
+      ),
+    );
+  }
+
+  @override
+  Transactions createAlias(String alias) {
+    return Transactions(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class Transaction extends DataClass implements Insertable<Transaction> {
+  final String id;
+  final String operationId;
+  final String? missionId;
+  final String? relatedTransactionId;
+  final String transactionType;
+  final int amountMinor;
+  final String? paymentMethod;
+  final String? category;
+  final String? note;
+  final int occurredAt;
+  final int createdAt;
+  final int? reversedAt;
+  const Transaction({
+    required this.id,
+    required this.operationId,
+    this.missionId,
+    this.relatedTransactionId,
+    required this.transactionType,
+    required this.amountMinor,
+    this.paymentMethod,
+    this.category,
+    this.note,
+    required this.occurredAt,
+    required this.createdAt,
+    this.reversedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['operation_id'] = Variable<String>(operationId);
+    if (!nullToAbsent || missionId != null) {
+      map['mission_id'] = Variable<String>(missionId);
+    }
+    if (!nullToAbsent || relatedTransactionId != null) {
+      map['related_transaction_id'] = Variable<String>(relatedTransactionId);
+    }
+    map['transaction_type'] = Variable<String>(transactionType);
+    map['amount_minor'] = Variable<int>(amountMinor);
+    if (!nullToAbsent || paymentMethod != null) {
+      map['payment_method'] = Variable<String>(paymentMethod);
+    }
+    if (!nullToAbsent || category != null) {
+      map['category'] = Variable<String>(category);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['occurred_at'] = Variable<int>(occurredAt);
+    map['created_at'] = Variable<int>(createdAt);
+    if (!nullToAbsent || reversedAt != null) {
+      map['reversed_at'] = Variable<int>(reversedAt);
+    }
+    return map;
+  }
+
+  TransactionsCompanion toCompanion(bool nullToAbsent) {
+    return TransactionsCompanion(
+      id: Value(id),
+      operationId: Value(operationId),
+      missionId: missionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(missionId),
+      relatedTransactionId: relatedTransactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relatedTransactionId),
+      transactionType: Value(transactionType),
+      amountMinor: Value(amountMinor),
+      paymentMethod: paymentMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentMethod),
+      category: category == null && nullToAbsent
+          ? const Value.absent()
+          : Value(category),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      occurredAt: Value(occurredAt),
+      createdAt: Value(createdAt),
+      reversedAt: reversedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reversedAt),
+    );
+  }
+
+  factory Transaction.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Transaction(
+      id: serializer.fromJson<String>(json['id']),
+      operationId: serializer.fromJson<String>(json['operation_id']),
+      missionId: serializer.fromJson<String?>(json['mission_id']),
+      relatedTransactionId: serializer.fromJson<String?>(
+        json['related_transaction_id'],
+      ),
+      transactionType: serializer.fromJson<String>(json['transaction_type']),
+      amountMinor: serializer.fromJson<int>(json['amount_minor']),
+      paymentMethod: serializer.fromJson<String?>(json['payment_method']),
+      category: serializer.fromJson<String?>(json['category']),
+      note: serializer.fromJson<String?>(json['note']),
+      occurredAt: serializer.fromJson<int>(json['occurred_at']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      reversedAt: serializer.fromJson<int?>(json['reversed_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'operation_id': serializer.toJson<String>(operationId),
+      'mission_id': serializer.toJson<String?>(missionId),
+      'related_transaction_id': serializer.toJson<String?>(
+        relatedTransactionId,
+      ),
+      'transaction_type': serializer.toJson<String>(transactionType),
+      'amount_minor': serializer.toJson<int>(amountMinor),
+      'payment_method': serializer.toJson<String?>(paymentMethod),
+      'category': serializer.toJson<String?>(category),
+      'note': serializer.toJson<String?>(note),
+      'occurred_at': serializer.toJson<int>(occurredAt),
+      'created_at': serializer.toJson<int>(createdAt),
+      'reversed_at': serializer.toJson<int?>(reversedAt),
+    };
+  }
+
+  Transaction copyWith({
+    String? id,
+    String? operationId,
+    Value<String?> missionId = const Value.absent(),
+    Value<String?> relatedTransactionId = const Value.absent(),
+    String? transactionType,
+    int? amountMinor,
+    Value<String?> paymentMethod = const Value.absent(),
+    Value<String?> category = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    int? occurredAt,
+    int? createdAt,
+    Value<int?> reversedAt = const Value.absent(),
+  }) => Transaction(
+    id: id ?? this.id,
+    operationId: operationId ?? this.operationId,
+    missionId: missionId.present ? missionId.value : this.missionId,
+    relatedTransactionId: relatedTransactionId.present
+        ? relatedTransactionId.value
+        : this.relatedTransactionId,
+    transactionType: transactionType ?? this.transactionType,
+    amountMinor: amountMinor ?? this.amountMinor,
+    paymentMethod: paymentMethod.present
+        ? paymentMethod.value
+        : this.paymentMethod,
+    category: category.present ? category.value : this.category,
+    note: note.present ? note.value : this.note,
+    occurredAt: occurredAt ?? this.occurredAt,
+    createdAt: createdAt ?? this.createdAt,
+    reversedAt: reversedAt.present ? reversedAt.value : this.reversedAt,
+  );
+  Transaction copyWithCompanion(TransactionsCompanion data) {
+    return Transaction(
+      id: data.id.present ? data.id.value : this.id,
+      operationId: data.operationId.present
+          ? data.operationId.value
+          : this.operationId,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      relatedTransactionId: data.relatedTransactionId.present
+          ? data.relatedTransactionId.value
+          : this.relatedTransactionId,
+      transactionType: data.transactionType.present
+          ? data.transactionType.value
+          : this.transactionType,
+      amountMinor: data.amountMinor.present
+          ? data.amountMinor.value
+          : this.amountMinor,
+      paymentMethod: data.paymentMethod.present
+          ? data.paymentMethod.value
+          : this.paymentMethod,
+      category: data.category.present ? data.category.value : this.category,
+      note: data.note.present ? data.note.value : this.note,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      reversedAt: data.reversedAt.present
+          ? data.reversedAt.value
+          : this.reversedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Transaction(')
+          ..write('id: $id, ')
+          ..write('operationId: $operationId, ')
+          ..write('missionId: $missionId, ')
+          ..write('relatedTransactionId: $relatedTransactionId, ')
+          ..write('transactionType: $transactionType, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('category: $category, ')
+          ..write('note: $note, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('reversedAt: $reversedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    operationId,
+    missionId,
+    relatedTransactionId,
+    transactionType,
+    amountMinor,
+    paymentMethod,
+    category,
+    note,
+    occurredAt,
+    createdAt,
+    reversedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Transaction &&
+          other.id == this.id &&
+          other.operationId == this.operationId &&
+          other.missionId == this.missionId &&
+          other.relatedTransactionId == this.relatedTransactionId &&
+          other.transactionType == this.transactionType &&
+          other.amountMinor == this.amountMinor &&
+          other.paymentMethod == this.paymentMethod &&
+          other.category == this.category &&
+          other.note == this.note &&
+          other.occurredAt == this.occurredAt &&
+          other.createdAt == this.createdAt &&
+          other.reversedAt == this.reversedAt);
+}
+
+class TransactionsCompanion extends UpdateCompanion<Transaction> {
+  final Value<String> id;
+  final Value<String> operationId;
+  final Value<String?> missionId;
+  final Value<String?> relatedTransactionId;
+  final Value<String> transactionType;
+  final Value<int> amountMinor;
+  final Value<String?> paymentMethod;
+  final Value<String?> category;
+  final Value<String?> note;
+  final Value<int> occurredAt;
+  final Value<int> createdAt;
+  final Value<int?> reversedAt;
+  final Value<int> rowid;
+  const TransactionsCompanion({
+    this.id = const Value.absent(),
+    this.operationId = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.relatedTransactionId = const Value.absent(),
+    this.transactionType = const Value.absent(),
+    this.amountMinor = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.category = const Value.absent(),
+    this.note = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.reversedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TransactionsCompanion.insert({
+    required String id,
+    required String operationId,
+    this.missionId = const Value.absent(),
+    this.relatedTransactionId = const Value.absent(),
+    required String transactionType,
+    required int amountMinor,
+    this.paymentMethod = const Value.absent(),
+    this.category = const Value.absent(),
+    this.note = const Value.absent(),
+    required int occurredAt,
+    required int createdAt,
+    this.reversedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       operationId = Value(operationId),
+       transactionType = Value(transactionType),
+       amountMinor = Value(amountMinor),
+       occurredAt = Value(occurredAt),
+       createdAt = Value(createdAt);
+  static Insertable<Transaction> custom({
+    Expression<String>? id,
+    Expression<String>? operationId,
+    Expression<String>? missionId,
+    Expression<String>? relatedTransactionId,
+    Expression<String>? transactionType,
+    Expression<int>? amountMinor,
+    Expression<String>? paymentMethod,
+    Expression<String>? category,
+    Expression<String>? note,
+    Expression<int>? occurredAt,
+    Expression<int>? createdAt,
+    Expression<int>? reversedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (operationId != null) 'operation_id': operationId,
+      if (missionId != null) 'mission_id': missionId,
+      if (relatedTransactionId != null)
+        'related_transaction_id': relatedTransactionId,
+      if (transactionType != null) 'transaction_type': transactionType,
+      if (amountMinor != null) 'amount_minor': amountMinor,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
+      if (category != null) 'category': category,
+      if (note != null) 'note': note,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (reversedAt != null) 'reversed_at': reversedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TransactionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? operationId,
+    Value<String?>? missionId,
+    Value<String?>? relatedTransactionId,
+    Value<String>? transactionType,
+    Value<int>? amountMinor,
+    Value<String?>? paymentMethod,
+    Value<String?>? category,
+    Value<String?>? note,
+    Value<int>? occurredAt,
+    Value<int>? createdAt,
+    Value<int?>? reversedAt,
+    Value<int>? rowid,
+  }) {
+    return TransactionsCompanion(
+      id: id ?? this.id,
+      operationId: operationId ?? this.operationId,
+      missionId: missionId ?? this.missionId,
+      relatedTransactionId: relatedTransactionId ?? this.relatedTransactionId,
+      transactionType: transactionType ?? this.transactionType,
+      amountMinor: amountMinor ?? this.amountMinor,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      category: category ?? this.category,
+      note: note ?? this.note,
+      occurredAt: occurredAt ?? this.occurredAt,
+      createdAt: createdAt ?? this.createdAt,
+      reversedAt: reversedAt ?? this.reversedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (operationId.present) {
+      map['operation_id'] = Variable<String>(operationId.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (relatedTransactionId.present) {
+      map['related_transaction_id'] = Variable<String>(
+        relatedTransactionId.value,
+      );
+    }
+    if (transactionType.present) {
+      map['transaction_type'] = Variable<String>(transactionType.value);
+    }
+    if (amountMinor.present) {
+      map['amount_minor'] = Variable<int>(amountMinor.value);
+    }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<int>(occurredAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (reversedAt.present) {
+      map['reversed_at'] = Variable<int>(reversedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransactionsCompanion(')
+          ..write('id: $id, ')
+          ..write('operationId: $operationId, ')
+          ..write('missionId: $missionId, ')
+          ..write('relatedTransactionId: $relatedTransactionId, ')
+          ..write('transactionType: $transactionType, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('category: $category, ')
+          ..write('note: $note, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('reversedAt: $reversedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class SavingsGoals extends Table with TableInfo<SavingsGoals, SavingsGoal> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SavingsGoals(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160)',
+  );
+  static const VerificationMeta _targetMinorMeta = const VerificationMeta(
+    'targetMinor',
+  );
+  late final GeneratedColumn<int> targetMinor = GeneratedColumn<int>(
+    'target_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (target_minor > 0)',
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (status IN (\'ACTIVE\', \'ACHIEVED\', \'PAUSED\', \'ARCHIVED\'))',
+  );
+  static const VerificationMeta _dueDateMeta = const VerificationMeta(
+    'dueDate',
+  );
+  late final GeneratedColumn<String> dueDate = GeneratedColumn<String>(
+    'due_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (due_date IS NULL OR(length(due_date) = 10 AND due_date GLOB \'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\' AND date(due_date) IS NOT NULL AND date(due_date) = due_date))',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    targetMinor,
+    status,
+    dueDate,
+    createdAt,
+    archivedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'savings_goals';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SavingsGoal> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('target_minor')) {
+      context.handle(
+        _targetMinorMeta,
+        targetMinor.isAcceptableOrUnknown(
+          data['target_minor']!,
+          _targetMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetMinorMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('due_date')) {
+      context.handle(
+        _dueDateMeta,
+        dueDate.isAcceptableOrUnknown(data['due_date']!, _dueDateMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SavingsGoal map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SavingsGoal(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      targetMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_minor'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      dueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}due_date'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+    );
+  }
+
+  @override
+  SavingsGoals createAlias(String alias) {
+    return SavingsGoals(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class SavingsGoal extends DataClass implements Insertable<SavingsGoal> {
+  final String id;
+  final String title;
+  final int targetMinor;
+  final String status;
+  final String? dueDate;
+  final int createdAt;
+  final int? archivedAt;
+  const SavingsGoal({
+    required this.id,
+    required this.title,
+    required this.targetMinor,
+    required this.status,
+    this.dueDate,
+    required this.createdAt,
+    this.archivedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['target_minor'] = Variable<int>(targetMinor);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || dueDate != null) {
+      map['due_date'] = Variable<String>(dueDate);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    return map;
+  }
+
+  SavingsGoalsCompanion toCompanion(bool nullToAbsent) {
+    return SavingsGoalsCompanion(
+      id: Value(id),
+      title: Value(title),
+      targetMinor: Value(targetMinor),
+      status: Value(status),
+      dueDate: dueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dueDate),
+      createdAt: Value(createdAt),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+    );
+  }
+
+  factory SavingsGoal.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SavingsGoal(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      targetMinor: serializer.fromJson<int>(json['target_minor']),
+      status: serializer.fromJson<String>(json['status']),
+      dueDate: serializer.fromJson<String?>(json['due_date']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      archivedAt: serializer.fromJson<int?>(json['archived_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'target_minor': serializer.toJson<int>(targetMinor),
+      'status': serializer.toJson<String>(status),
+      'due_date': serializer.toJson<String?>(dueDate),
+      'created_at': serializer.toJson<int>(createdAt),
+      'archived_at': serializer.toJson<int?>(archivedAt),
+    };
+  }
+
+  SavingsGoal copyWith({
+    String? id,
+    String? title,
+    int? targetMinor,
+    String? status,
+    Value<String?> dueDate = const Value.absent(),
+    int? createdAt,
+    Value<int?> archivedAt = const Value.absent(),
+  }) => SavingsGoal(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    targetMinor: targetMinor ?? this.targetMinor,
+    status: status ?? this.status,
+    dueDate: dueDate.present ? dueDate.value : this.dueDate,
+    createdAt: createdAt ?? this.createdAt,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+  );
+  SavingsGoal copyWithCompanion(SavingsGoalsCompanion data) {
+    return SavingsGoal(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      targetMinor: data.targetMinor.present
+          ? data.targetMinor.value
+          : this.targetMinor,
+      status: data.status.present ? data.status.value : this.status,
+      dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SavingsGoal(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('targetMinor: $targetMinor, ')
+          ..write('status: $status, ')
+          ..write('dueDate: $dueDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('archivedAt: $archivedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    targetMinor,
+    status,
+    dueDate,
+    createdAt,
+    archivedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SavingsGoal &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.targetMinor == this.targetMinor &&
+          other.status == this.status &&
+          other.dueDate == this.dueDate &&
+          other.createdAt == this.createdAt &&
+          other.archivedAt == this.archivedAt);
+}
+
+class SavingsGoalsCompanion extends UpdateCompanion<SavingsGoal> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<int> targetMinor;
+  final Value<String> status;
+  final Value<String?> dueDate;
+  final Value<int> createdAt;
+  final Value<int?> archivedAt;
+  final Value<int> rowid;
+  const SavingsGoalsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.targetMinor = const Value.absent(),
+    this.status = const Value.absent(),
+    this.dueDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SavingsGoalsCompanion.insert({
+    required String id,
+    required String title,
+    required int targetMinor,
+    required String status,
+    this.dueDate = const Value.absent(),
+    required int createdAt,
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       targetMinor = Value(targetMinor),
+       status = Value(status),
+       createdAt = Value(createdAt);
+  static Insertable<SavingsGoal> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<int>? targetMinor,
+    Expression<String>? status,
+    Expression<String>? dueDate,
+    Expression<int>? createdAt,
+    Expression<int>? archivedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (targetMinor != null) 'target_minor': targetMinor,
+      if (status != null) 'status': status,
+      if (dueDate != null) 'due_date': dueDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SavingsGoalsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<int>? targetMinor,
+    Value<String>? status,
+    Value<String?>? dueDate,
+    Value<int>? createdAt,
+    Value<int?>? archivedAt,
+    Value<int>? rowid,
+  }) {
+    return SavingsGoalsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      targetMinor: targetMinor ?? this.targetMinor,
+      status: status ?? this.status,
+      dueDate: dueDate ?? this.dueDate,
+      createdAt: createdAt ?? this.createdAt,
+      archivedAt: archivedAt ?? this.archivedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (targetMinor.present) {
+      map['target_minor'] = Variable<int>(targetMinor.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (dueDate.present) {
+      map['due_date'] = Variable<String>(dueDate.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SavingsGoalsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('targetMinor: $targetMinor, ')
+          ..write('status: $status, ')
+          ..write('dueDate: $dueDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class GoalAllocations extends Table
+    with TableInfo<GoalAllocations, GoalAllocation> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  GoalAllocations(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _operationIdMeta = const VerificationMeta(
+    'operationId',
+  );
+  late final GeneratedColumn<String> operationId = GeneratedColumn<String>(
+    'operation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE',
+  );
+  static const VerificationMeta _goalIdMeta = const VerificationMeta('goalId');
+  late final GeneratedColumn<String> goalId = GeneratedColumn<String>(
+    'goal_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL REFERENCES savings_goals(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _directionMeta = const VerificationMeta(
+    'direction',
+  );
+  late final GeneratedColumn<String> direction = GeneratedColumn<String>(
+    'direction',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (direction IN (\'RESERVE\', \'RELEASE\'))',
+  );
+  static const VerificationMeta _amountMinorMeta = const VerificationMeta(
+    'amountMinor',
+  );
+  late final GeneratedColumn<int> amountMinor = GeneratedColumn<int>(
+    'amount_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (amount_minor > 0)',
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  late final GeneratedColumn<int> occurredAt = GeneratedColumn<int>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    operationId,
+    goalId,
+    direction,
+    amountMinor,
+    note,
+    occurredAt,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'goal_allocations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GoalAllocation> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('operation_id')) {
+      context.handle(
+        _operationIdMeta,
+        operationId.isAcceptableOrUnknown(
+          data['operation_id']!,
+          _operationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_operationIdMeta);
+    }
+    if (data.containsKey('goal_id')) {
+      context.handle(
+        _goalIdMeta,
+        goalId.isAcceptableOrUnknown(data['goal_id']!, _goalIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_goalIdMeta);
+    }
+    if (data.containsKey('direction')) {
+      context.handle(
+        _directionMeta,
+        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_directionMeta);
+    }
+    if (data.containsKey('amount_minor')) {
+      context.handle(
+        _amountMinorMeta,
+        amountMinor.isAcceptableOrUnknown(
+          data['amount_minor']!,
+          _amountMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMinorMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GoalAllocation map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GoalAllocation(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      operationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operation_id'],
+      )!,
+      goalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}goal_id'],
+      )!,
+      direction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}direction'],
+      )!,
+      amountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_minor'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  GoalAllocations createAlias(String alias) {
+    return GoalAllocations(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class GoalAllocation extends DataClass implements Insertable<GoalAllocation> {
+  final String id;
+  final String operationId;
+  final String goalId;
+  final String direction;
+  final int amountMinor;
+  final String? note;
+  final int occurredAt;
+  final int createdAt;
+  const GoalAllocation({
+    required this.id,
+    required this.operationId,
+    required this.goalId,
+    required this.direction,
+    required this.amountMinor,
+    this.note,
+    required this.occurredAt,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['operation_id'] = Variable<String>(operationId);
+    map['goal_id'] = Variable<String>(goalId);
+    map['direction'] = Variable<String>(direction);
+    map['amount_minor'] = Variable<int>(amountMinor);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['occurred_at'] = Variable<int>(occurredAt);
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  GoalAllocationsCompanion toCompanion(bool nullToAbsent) {
+    return GoalAllocationsCompanion(
+      id: Value(id),
+      operationId: Value(operationId),
+      goalId: Value(goalId),
+      direction: Value(direction),
+      amountMinor: Value(amountMinor),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      occurredAt: Value(occurredAt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory GoalAllocation.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GoalAllocation(
+      id: serializer.fromJson<String>(json['id']),
+      operationId: serializer.fromJson<String>(json['operation_id']),
+      goalId: serializer.fromJson<String>(json['goal_id']),
+      direction: serializer.fromJson<String>(json['direction']),
+      amountMinor: serializer.fromJson<int>(json['amount_minor']),
+      note: serializer.fromJson<String?>(json['note']),
+      occurredAt: serializer.fromJson<int>(json['occurred_at']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'operation_id': serializer.toJson<String>(operationId),
+      'goal_id': serializer.toJson<String>(goalId),
+      'direction': serializer.toJson<String>(direction),
+      'amount_minor': serializer.toJson<int>(amountMinor),
+      'note': serializer.toJson<String?>(note),
+      'occurred_at': serializer.toJson<int>(occurredAt),
+      'created_at': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  GoalAllocation copyWith({
+    String? id,
+    String? operationId,
+    String? goalId,
+    String? direction,
+    int? amountMinor,
+    Value<String?> note = const Value.absent(),
+    int? occurredAt,
+    int? createdAt,
+  }) => GoalAllocation(
+    id: id ?? this.id,
+    operationId: operationId ?? this.operationId,
+    goalId: goalId ?? this.goalId,
+    direction: direction ?? this.direction,
+    amountMinor: amountMinor ?? this.amountMinor,
+    note: note.present ? note.value : this.note,
+    occurredAt: occurredAt ?? this.occurredAt,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  GoalAllocation copyWithCompanion(GoalAllocationsCompanion data) {
+    return GoalAllocation(
+      id: data.id.present ? data.id.value : this.id,
+      operationId: data.operationId.present
+          ? data.operationId.value
+          : this.operationId,
+      goalId: data.goalId.present ? data.goalId.value : this.goalId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      amountMinor: data.amountMinor.present
+          ? data.amountMinor.value
+          : this.amountMinor,
+      note: data.note.present ? data.note.value : this.note,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoalAllocation(')
+          ..write('id: $id, ')
+          ..write('operationId: $operationId, ')
+          ..write('goalId: $goalId, ')
+          ..write('direction: $direction, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('note: $note, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    operationId,
+    goalId,
+    direction,
+    amountMinor,
+    note,
+    occurredAt,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GoalAllocation &&
+          other.id == this.id &&
+          other.operationId == this.operationId &&
+          other.goalId == this.goalId &&
+          other.direction == this.direction &&
+          other.amountMinor == this.amountMinor &&
+          other.note == this.note &&
+          other.occurredAt == this.occurredAt &&
+          other.createdAt == this.createdAt);
+}
+
+class GoalAllocationsCompanion extends UpdateCompanion<GoalAllocation> {
+  final Value<String> id;
+  final Value<String> operationId;
+  final Value<String> goalId;
+  final Value<String> direction;
+  final Value<int> amountMinor;
+  final Value<String?> note;
+  final Value<int> occurredAt;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const GoalAllocationsCompanion({
+    this.id = const Value.absent(),
+    this.operationId = const Value.absent(),
+    this.goalId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.amountMinor = const Value.absent(),
+    this.note = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GoalAllocationsCompanion.insert({
+    required String id,
+    required String operationId,
+    required String goalId,
+    required String direction,
+    required int amountMinor,
+    this.note = const Value.absent(),
+    required int occurredAt,
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       operationId = Value(operationId),
+       goalId = Value(goalId),
+       direction = Value(direction),
+       amountMinor = Value(amountMinor),
+       occurredAt = Value(occurredAt),
+       createdAt = Value(createdAt);
+  static Insertable<GoalAllocation> custom({
+    Expression<String>? id,
+    Expression<String>? operationId,
+    Expression<String>? goalId,
+    Expression<String>? direction,
+    Expression<int>? amountMinor,
+    Expression<String>? note,
+    Expression<int>? occurredAt,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (operationId != null) 'operation_id': operationId,
+      if (goalId != null) 'goal_id': goalId,
+      if (direction != null) 'direction': direction,
+      if (amountMinor != null) 'amount_minor': amountMinor,
+      if (note != null) 'note': note,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GoalAllocationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? operationId,
+    Value<String>? goalId,
+    Value<String>? direction,
+    Value<int>? amountMinor,
+    Value<String?>? note,
+    Value<int>? occurredAt,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return GoalAllocationsCompanion(
+      id: id ?? this.id,
+      operationId: operationId ?? this.operationId,
+      goalId: goalId ?? this.goalId,
+      direction: direction ?? this.direction,
+      amountMinor: amountMinor ?? this.amountMinor,
+      note: note ?? this.note,
+      occurredAt: occurredAt ?? this.occurredAt,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (operationId.present) {
+      map['operation_id'] = Variable<String>(operationId.value);
+    }
+    if (goalId.present) {
+      map['goal_id'] = Variable<String>(goalId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(direction.value);
+    }
+    if (amountMinor.present) {
+      map['amount_minor'] = Variable<int>(amountMinor.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<int>(occurredAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoalAllocationsCompanion(')
+          ..write('id: $id, ')
+          ..write('operationId: $operationId, ')
+          ..write('goalId: $goalId, ')
+          ..write('direction: $direction, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('note: $note, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class JournalEntries extends Table
+    with TableInfo<JournalEntries, JournalEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  JournalEntries(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _originTypeMeta = const VerificationMeta(
+    'originType',
+  );
+  late final GeneratedColumn<String> originType = GeneratedColumn<String>(
+    'origin_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (origin_type IN (\'MANUAL\', \'MISSION\', \'TRANSACTION\', \'SYSTEM\'))',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES missions(id)ON DELETE SET NULL',
+  );
+  static const VerificationMeta _transactionIdMeta = const VerificationMeta(
+    'transactionId',
+  );
+  late final GeneratedColumn<String> transactionId = GeneratedColumn<String>(
+    'transaction_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES transactions(id)ON DELETE SET NULL',
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160)',
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _moodMeta = const VerificationMeta('mood');
+  late final GeneratedColumn<String> mood = GeneratedColumn<String>(
+    'mood',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (mood IS NULL OR mood IN (\'FOCUSED\', \'NORMAL\', \'TIRED\'))',
+  );
+  static const VerificationMeta _isPrivateMeta = const VerificationMeta(
+    'isPrivate',
+  );
+  late final GeneratedColumn<int> isPrivate = GeneratedColumn<int>(
+    'is_private',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (is_private IN (0, 1))',
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  late final GeneratedColumn<int> occurredAt = GeneratedColumn<int>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    originType,
+    missionId,
+    transactionId,
+    title,
+    body,
+    mood,
+    isPrivate,
+    occurredAt,
+    createdAt,
+    updatedAt,
+    archivedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'journal_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JournalEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('origin_type')) {
+      context.handle(
+        _originTypeMeta,
+        originType.isAcceptableOrUnknown(data['origin_type']!, _originTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_originTypeMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    }
+    if (data.containsKey('transaction_id')) {
+      context.handle(
+        _transactionIdMeta,
+        transactionId.isAcceptableOrUnknown(
+          data['transaction_id']!,
+          _transactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    }
+    if (data.containsKey('mood')) {
+      context.handle(
+        _moodMeta,
+        mood.isAcceptableOrUnknown(data['mood']!, _moodMeta),
+      );
+    }
+    if (data.containsKey('is_private')) {
+      context.handle(
+        _isPrivateMeta,
+        isPrivate.isAcceptableOrUnknown(data['is_private']!, _isPrivateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isPrivateMeta);
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  JournalEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JournalEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      originType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}origin_type'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      ),
+      transactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transaction_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      ),
+      mood: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mood'],
+      ),
+      isPrivate: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_private'],
+      )!,
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+    );
+  }
+
+  @override
+  JournalEntries createAlias(String alias) {
+    return JournalEntries(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class JournalEntry extends DataClass implements Insertable<JournalEntry> {
+  final String id;
+  final String originType;
+  final String? missionId;
+  final String? transactionId;
+  final String title;
+  final String? body;
+  final String? mood;
+  final int isPrivate;
+  final int occurredAt;
+  final int createdAt;
+  final int updatedAt;
+  final int? archivedAt;
+  const JournalEntry({
+    required this.id,
+    required this.originType,
+    this.missionId,
+    this.transactionId,
+    required this.title,
+    this.body,
+    this.mood,
+    required this.isPrivate,
+    required this.occurredAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.archivedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['origin_type'] = Variable<String>(originType);
+    if (!nullToAbsent || missionId != null) {
+      map['mission_id'] = Variable<String>(missionId);
+    }
+    if (!nullToAbsent || transactionId != null) {
+      map['transaction_id'] = Variable<String>(transactionId);
+    }
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || body != null) {
+      map['body'] = Variable<String>(body);
+    }
+    if (!nullToAbsent || mood != null) {
+      map['mood'] = Variable<String>(mood);
+    }
+    map['is_private'] = Variable<int>(isPrivate);
+    map['occurred_at'] = Variable<int>(occurredAt);
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    return map;
+  }
+
+  JournalEntriesCompanion toCompanion(bool nullToAbsent) {
+    return JournalEntriesCompanion(
+      id: Value(id),
+      originType: Value(originType),
+      missionId: missionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(missionId),
+      transactionId: transactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transactionId),
+      title: Value(title),
+      body: body == null && nullToAbsent ? const Value.absent() : Value(body),
+      mood: mood == null && nullToAbsent ? const Value.absent() : Value(mood),
+      isPrivate: Value(isPrivate),
+      occurredAt: Value(occurredAt),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+    );
+  }
+
+  factory JournalEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JournalEntry(
+      id: serializer.fromJson<String>(json['id']),
+      originType: serializer.fromJson<String>(json['origin_type']),
+      missionId: serializer.fromJson<String?>(json['mission_id']),
+      transactionId: serializer.fromJson<String?>(json['transaction_id']),
+      title: serializer.fromJson<String>(json['title']),
+      body: serializer.fromJson<String?>(json['body']),
+      mood: serializer.fromJson<String?>(json['mood']),
+      isPrivate: serializer.fromJson<int>(json['is_private']),
+      occurredAt: serializer.fromJson<int>(json['occurred_at']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+      archivedAt: serializer.fromJson<int?>(json['archived_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'origin_type': serializer.toJson<String>(originType),
+      'mission_id': serializer.toJson<String?>(missionId),
+      'transaction_id': serializer.toJson<String?>(transactionId),
+      'title': serializer.toJson<String>(title),
+      'body': serializer.toJson<String?>(body),
+      'mood': serializer.toJson<String?>(mood),
+      'is_private': serializer.toJson<int>(isPrivate),
+      'occurred_at': serializer.toJson<int>(occurredAt),
+      'created_at': serializer.toJson<int>(createdAt),
+      'updated_at': serializer.toJson<int>(updatedAt),
+      'archived_at': serializer.toJson<int?>(archivedAt),
+    };
+  }
+
+  JournalEntry copyWith({
+    String? id,
+    String? originType,
+    Value<String?> missionId = const Value.absent(),
+    Value<String?> transactionId = const Value.absent(),
+    String? title,
+    Value<String?> body = const Value.absent(),
+    Value<String?> mood = const Value.absent(),
+    int? isPrivate,
+    int? occurredAt,
+    int? createdAt,
+    int? updatedAt,
+    Value<int?> archivedAt = const Value.absent(),
+  }) => JournalEntry(
+    id: id ?? this.id,
+    originType: originType ?? this.originType,
+    missionId: missionId.present ? missionId.value : this.missionId,
+    transactionId: transactionId.present
+        ? transactionId.value
+        : this.transactionId,
+    title: title ?? this.title,
+    body: body.present ? body.value : this.body,
+    mood: mood.present ? mood.value : this.mood,
+    isPrivate: isPrivate ?? this.isPrivate,
+    occurredAt: occurredAt ?? this.occurredAt,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+  );
+  JournalEntry copyWithCompanion(JournalEntriesCompanion data) {
+    return JournalEntry(
+      id: data.id.present ? data.id.value : this.id,
+      originType: data.originType.present
+          ? data.originType.value
+          : this.originType,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      transactionId: data.transactionId.present
+          ? data.transactionId.value
+          : this.transactionId,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+      mood: data.mood.present ? data.mood.value : this.mood,
+      isPrivate: data.isPrivate.present ? data.isPrivate.value : this.isPrivate,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalEntry(')
+          ..write('id: $id, ')
+          ..write('originType: $originType, ')
+          ..write('missionId: $missionId, ')
+          ..write('transactionId: $transactionId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('mood: $mood, ')
+          ..write('isPrivate: $isPrivate, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('archivedAt: $archivedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    originType,
+    missionId,
+    transactionId,
+    title,
+    body,
+    mood,
+    isPrivate,
+    occurredAt,
+    createdAt,
+    updatedAt,
+    archivedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JournalEntry &&
+          other.id == this.id &&
+          other.originType == this.originType &&
+          other.missionId == this.missionId &&
+          other.transactionId == this.transactionId &&
+          other.title == this.title &&
+          other.body == this.body &&
+          other.mood == this.mood &&
+          other.isPrivate == this.isPrivate &&
+          other.occurredAt == this.occurredAt &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.archivedAt == this.archivedAt);
+}
+
+class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
+  final Value<String> id;
+  final Value<String> originType;
+  final Value<String?> missionId;
+  final Value<String?> transactionId;
+  final Value<String> title;
+  final Value<String?> body;
+  final Value<String?> mood;
+  final Value<int> isPrivate;
+  final Value<int> occurredAt;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int?> archivedAt;
+  final Value<int> rowid;
+  const JournalEntriesCompanion({
+    this.id = const Value.absent(),
+    this.originType = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.transactionId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.mood = const Value.absent(),
+    this.isPrivate = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JournalEntriesCompanion.insert({
+    required String id,
+    required String originType,
+    this.missionId = const Value.absent(),
+    this.transactionId = const Value.absent(),
+    required String title,
+    this.body = const Value.absent(),
+    this.mood = const Value.absent(),
+    required int isPrivate,
+    required int occurredAt,
+    required int createdAt,
+    required int updatedAt,
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       originType = Value(originType),
+       title = Value(title),
+       isPrivate = Value(isPrivate),
+       occurredAt = Value(occurredAt),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<JournalEntry> custom({
+    Expression<String>? id,
+    Expression<String>? originType,
+    Expression<String>? missionId,
+    Expression<String>? transactionId,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<String>? mood,
+    Expression<int>? isPrivate,
+    Expression<int>? occurredAt,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? archivedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (originType != null) 'origin_type': originType,
+      if (missionId != null) 'mission_id': missionId,
+      if (transactionId != null) 'transaction_id': transactionId,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (mood != null) 'mood': mood,
+      if (isPrivate != null) 'is_private': isPrivate,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JournalEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? originType,
+    Value<String?>? missionId,
+    Value<String?>? transactionId,
+    Value<String>? title,
+    Value<String?>? body,
+    Value<String?>? mood,
+    Value<int>? isPrivate,
+    Value<int>? occurredAt,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int?>? archivedAt,
+    Value<int>? rowid,
+  }) {
+    return JournalEntriesCompanion(
+      id: id ?? this.id,
+      originType: originType ?? this.originType,
+      missionId: missionId ?? this.missionId,
+      transactionId: transactionId ?? this.transactionId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      mood: mood ?? this.mood,
+      isPrivate: isPrivate ?? this.isPrivate,
+      occurredAt: occurredAt ?? this.occurredAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      archivedAt: archivedAt ?? this.archivedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (originType.present) {
+      map['origin_type'] = Variable<String>(originType.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (transactionId.present) {
+      map['transaction_id'] = Variable<String>(transactionId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (mood.present) {
+      map['mood'] = Variable<String>(mood.value);
+    }
+    if (isPrivate.present) {
+      map['is_private'] = Variable<int>(isPrivate.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<int>(occurredAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('originType: $originType, ')
+          ..write('missionId: $missionId, ')
+          ..write('transactionId: $transactionId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('mood: $mood, ')
+          ..write('isPrivate: $isPrivate, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class JournalAttachments extends Table
+    with TableInfo<JournalAttachments, JournalAttachment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  JournalAttachments(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _journalEntryIdMeta = const VerificationMeta(
+    'journalEntryId',
+  );
+  late final GeneratedColumn<String> journalEntryId = GeneratedColumn<String>(
+    'journal_entry_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL REFERENCES journal_entries(id)ON DELETE CASCADE',
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (kind = \'PHOTO\')',
+  );
+  static const VerificationMeta _storageNameMeta = const VerificationMeta(
+    'storageName',
+  );
+  late final GeneratedColumn<String> storageName = GeneratedColumn<String>(
+    'storage_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE',
+  );
+  static const VerificationMeta _mimeTypeMeta = const VerificationMeta(
+    'mimeType',
+  );
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+    'mime_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (mime_type IN (\'image/jpeg\', \'image/png\', \'image/webp\'))',
+  );
+  static const VerificationMeta _byteLengthMeta = const VerificationMeta(
+    'byteLength',
+  );
+  late final GeneratedColumn<int> byteLength = GeneratedColumn<int>(
+    'byte_length',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (byte_length > 0)',
+  );
+  static const VerificationMeta _cipherSha256Meta = const VerificationMeta(
+    'cipherSha256',
+  );
+  late final GeneratedColumn<String> cipherSha256 = GeneratedColumn<String>(
+    'cipher_sha256',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (length(cipher_sha256) = 64 AND cipher_sha256 NOT GLOB \'*[^0-9a-f]*\')',
+  );
+  static const VerificationMeta _widthPxMeta = const VerificationMeta(
+    'widthPx',
+  );
+  late final GeneratedColumn<int> widthPx = GeneratedColumn<int>(
+    'width_px',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (width_px > 0)',
+  );
+  static const VerificationMeta _heightPxMeta = const VerificationMeta(
+    'heightPx',
+  );
+  late final GeneratedColumn<int> heightPx = GeneratedColumn<int>(
+    'height_px',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (height_px > 0)',
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (position >= 0)',
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  late final GeneratedColumn<int> archivedAt = GeneratedColumn<int>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    journalEntryId,
+    kind,
+    storageName,
+    mimeType,
+    byteLength,
+    cipherSha256,
+    widthPx,
+    heightPx,
+    position,
+    createdAt,
+    archivedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'journal_attachments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JournalAttachment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('journal_entry_id')) {
+      context.handle(
+        _journalEntryIdMeta,
+        journalEntryId.isAcceptableOrUnknown(
+          data['journal_entry_id']!,
+          _journalEntryIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_journalEntryIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('storage_name')) {
+      context.handle(
+        _storageNameMeta,
+        storageName.isAcceptableOrUnknown(
+          data['storage_name']!,
+          _storageNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_storageNameMeta);
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(
+        _mimeTypeMeta,
+        mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mimeTypeMeta);
+    }
+    if (data.containsKey('byte_length')) {
+      context.handle(
+        _byteLengthMeta,
+        byteLength.isAcceptableOrUnknown(data['byte_length']!, _byteLengthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_byteLengthMeta);
+    }
+    if (data.containsKey('cipher_sha256')) {
+      context.handle(
+        _cipherSha256Meta,
+        cipherSha256.isAcceptableOrUnknown(
+          data['cipher_sha256']!,
+          _cipherSha256Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_cipherSha256Meta);
+    }
+    if (data.containsKey('width_px')) {
+      context.handle(
+        _widthPxMeta,
+        widthPx.isAcceptableOrUnknown(data['width_px']!, _widthPxMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_widthPxMeta);
+    }
+    if (data.containsKey('height_px')) {
+      context.handle(
+        _heightPxMeta,
+        heightPx.isAcceptableOrUnknown(data['height_px']!, _heightPxMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_heightPxMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {journalEntryId, position},
+  ];
+  @override
+  JournalAttachment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JournalAttachment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      journalEntryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}journal_entry_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      storageName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}storage_name'],
+      )!,
+      mimeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_type'],
+      )!,
+      byteLength: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}byte_length'],
+      )!,
+      cipherSha256: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cipher_sha256'],
+      )!,
+      widthPx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}width_px'],
+      )!,
+      heightPx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}height_px'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at'],
+      ),
+    );
+  }
+
+  @override
+  JournalAttachments createAlias(String alias) {
+    return JournalAttachments(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'UNIQUE(journal_entry_id, position)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class JournalAttachment extends DataClass
+    implements Insertable<JournalAttachment> {
+  final String id;
+  final String journalEntryId;
+  final String kind;
+  final String storageName;
+  final String mimeType;
+  final int byteLength;
+  final String cipherSha256;
+  final int widthPx;
+  final int heightPx;
+  final int position;
+  final int createdAt;
+  final int? archivedAt;
+  const JournalAttachment({
+    required this.id,
+    required this.journalEntryId,
+    required this.kind,
+    required this.storageName,
+    required this.mimeType,
+    required this.byteLength,
+    required this.cipherSha256,
+    required this.widthPx,
+    required this.heightPx,
+    required this.position,
+    required this.createdAt,
+    this.archivedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['journal_entry_id'] = Variable<String>(journalEntryId);
+    map['kind'] = Variable<String>(kind);
+    map['storage_name'] = Variable<String>(storageName);
+    map['mime_type'] = Variable<String>(mimeType);
+    map['byte_length'] = Variable<int>(byteLength);
+    map['cipher_sha256'] = Variable<String>(cipherSha256);
+    map['width_px'] = Variable<int>(widthPx);
+    map['height_px'] = Variable<int>(heightPx);
+    map['position'] = Variable<int>(position);
+    map['created_at'] = Variable<int>(createdAt);
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<int>(archivedAt);
+    }
+    return map;
+  }
+
+  JournalAttachmentsCompanion toCompanion(bool nullToAbsent) {
+    return JournalAttachmentsCompanion(
+      id: Value(id),
+      journalEntryId: Value(journalEntryId),
+      kind: Value(kind),
+      storageName: Value(storageName),
+      mimeType: Value(mimeType),
+      byteLength: Value(byteLength),
+      cipherSha256: Value(cipherSha256),
+      widthPx: Value(widthPx),
+      heightPx: Value(heightPx),
+      position: Value(position),
+      createdAt: Value(createdAt),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
+    );
+  }
+
+  factory JournalAttachment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JournalAttachment(
+      id: serializer.fromJson<String>(json['id']),
+      journalEntryId: serializer.fromJson<String>(json['journal_entry_id']),
+      kind: serializer.fromJson<String>(json['kind']),
+      storageName: serializer.fromJson<String>(json['storage_name']),
+      mimeType: serializer.fromJson<String>(json['mime_type']),
+      byteLength: serializer.fromJson<int>(json['byte_length']),
+      cipherSha256: serializer.fromJson<String>(json['cipher_sha256']),
+      widthPx: serializer.fromJson<int>(json['width_px']),
+      heightPx: serializer.fromJson<int>(json['height_px']),
+      position: serializer.fromJson<int>(json['position']),
+      createdAt: serializer.fromJson<int>(json['created_at']),
+      archivedAt: serializer.fromJson<int?>(json['archived_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'journal_entry_id': serializer.toJson<String>(journalEntryId),
+      'kind': serializer.toJson<String>(kind),
+      'storage_name': serializer.toJson<String>(storageName),
+      'mime_type': serializer.toJson<String>(mimeType),
+      'byte_length': serializer.toJson<int>(byteLength),
+      'cipher_sha256': serializer.toJson<String>(cipherSha256),
+      'width_px': serializer.toJson<int>(widthPx),
+      'height_px': serializer.toJson<int>(heightPx),
+      'position': serializer.toJson<int>(position),
+      'created_at': serializer.toJson<int>(createdAt),
+      'archived_at': serializer.toJson<int?>(archivedAt),
+    };
+  }
+
+  JournalAttachment copyWith({
+    String? id,
+    String? journalEntryId,
+    String? kind,
+    String? storageName,
+    String? mimeType,
+    int? byteLength,
+    String? cipherSha256,
+    int? widthPx,
+    int? heightPx,
+    int? position,
+    int? createdAt,
+    Value<int?> archivedAt = const Value.absent(),
+  }) => JournalAttachment(
+    id: id ?? this.id,
+    journalEntryId: journalEntryId ?? this.journalEntryId,
+    kind: kind ?? this.kind,
+    storageName: storageName ?? this.storageName,
+    mimeType: mimeType ?? this.mimeType,
+    byteLength: byteLength ?? this.byteLength,
+    cipherSha256: cipherSha256 ?? this.cipherSha256,
+    widthPx: widthPx ?? this.widthPx,
+    heightPx: heightPx ?? this.heightPx,
+    position: position ?? this.position,
+    createdAt: createdAt ?? this.createdAt,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+  );
+  JournalAttachment copyWithCompanion(JournalAttachmentsCompanion data) {
+    return JournalAttachment(
+      id: data.id.present ? data.id.value : this.id,
+      journalEntryId: data.journalEntryId.present
+          ? data.journalEntryId.value
+          : this.journalEntryId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      storageName: data.storageName.present
+          ? data.storageName.value
+          : this.storageName,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      byteLength: data.byteLength.present
+          ? data.byteLength.value
+          : this.byteLength,
+      cipherSha256: data.cipherSha256.present
+          ? data.cipherSha256.value
+          : this.cipherSha256,
+      widthPx: data.widthPx.present ? data.widthPx.value : this.widthPx,
+      heightPx: data.heightPx.present ? data.heightPx.value : this.heightPx,
+      position: data.position.present ? data.position.value : this.position,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalAttachment(')
+          ..write('id: $id, ')
+          ..write('journalEntryId: $journalEntryId, ')
+          ..write('kind: $kind, ')
+          ..write('storageName: $storageName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('byteLength: $byteLength, ')
+          ..write('cipherSha256: $cipherSha256, ')
+          ..write('widthPx: $widthPx, ')
+          ..write('heightPx: $heightPx, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('archivedAt: $archivedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    journalEntryId,
+    kind,
+    storageName,
+    mimeType,
+    byteLength,
+    cipherSha256,
+    widthPx,
+    heightPx,
+    position,
+    createdAt,
+    archivedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JournalAttachment &&
+          other.id == this.id &&
+          other.journalEntryId == this.journalEntryId &&
+          other.kind == this.kind &&
+          other.storageName == this.storageName &&
+          other.mimeType == this.mimeType &&
+          other.byteLength == this.byteLength &&
+          other.cipherSha256 == this.cipherSha256 &&
+          other.widthPx == this.widthPx &&
+          other.heightPx == this.heightPx &&
+          other.position == this.position &&
+          other.createdAt == this.createdAt &&
+          other.archivedAt == this.archivedAt);
+}
+
+class JournalAttachmentsCompanion extends UpdateCompanion<JournalAttachment> {
+  final Value<String> id;
+  final Value<String> journalEntryId;
+  final Value<String> kind;
+  final Value<String> storageName;
+  final Value<String> mimeType;
+  final Value<int> byteLength;
+  final Value<String> cipherSha256;
+  final Value<int> widthPx;
+  final Value<int> heightPx;
+  final Value<int> position;
+  final Value<int> createdAt;
+  final Value<int?> archivedAt;
+  final Value<int> rowid;
+  const JournalAttachmentsCompanion({
+    this.id = const Value.absent(),
+    this.journalEntryId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.storageName = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.byteLength = const Value.absent(),
+    this.cipherSha256 = const Value.absent(),
+    this.widthPx = const Value.absent(),
+    this.heightPx = const Value.absent(),
+    this.position = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JournalAttachmentsCompanion.insert({
+    required String id,
+    required String journalEntryId,
+    required String kind,
+    required String storageName,
+    required String mimeType,
+    required int byteLength,
+    required String cipherSha256,
+    required int widthPx,
+    required int heightPx,
+    required int position,
+    required int createdAt,
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       journalEntryId = Value(journalEntryId),
+       kind = Value(kind),
+       storageName = Value(storageName),
+       mimeType = Value(mimeType),
+       byteLength = Value(byteLength),
+       cipherSha256 = Value(cipherSha256),
+       widthPx = Value(widthPx),
+       heightPx = Value(heightPx),
+       position = Value(position),
+       createdAt = Value(createdAt);
+  static Insertable<JournalAttachment> custom({
+    Expression<String>? id,
+    Expression<String>? journalEntryId,
+    Expression<String>? kind,
+    Expression<String>? storageName,
+    Expression<String>? mimeType,
+    Expression<int>? byteLength,
+    Expression<String>? cipherSha256,
+    Expression<int>? widthPx,
+    Expression<int>? heightPx,
+    Expression<int>? position,
+    Expression<int>? createdAt,
+    Expression<int>? archivedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (journalEntryId != null) 'journal_entry_id': journalEntryId,
+      if (kind != null) 'kind': kind,
+      if (storageName != null) 'storage_name': storageName,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (byteLength != null) 'byte_length': byteLength,
+      if (cipherSha256 != null) 'cipher_sha256': cipherSha256,
+      if (widthPx != null) 'width_px': widthPx,
+      if (heightPx != null) 'height_px': heightPx,
+      if (position != null) 'position': position,
+      if (createdAt != null) 'created_at': createdAt,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JournalAttachmentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? journalEntryId,
+    Value<String>? kind,
+    Value<String>? storageName,
+    Value<String>? mimeType,
+    Value<int>? byteLength,
+    Value<String>? cipherSha256,
+    Value<int>? widthPx,
+    Value<int>? heightPx,
+    Value<int>? position,
+    Value<int>? createdAt,
+    Value<int?>? archivedAt,
+    Value<int>? rowid,
+  }) {
+    return JournalAttachmentsCompanion(
+      id: id ?? this.id,
+      journalEntryId: journalEntryId ?? this.journalEntryId,
+      kind: kind ?? this.kind,
+      storageName: storageName ?? this.storageName,
+      mimeType: mimeType ?? this.mimeType,
+      byteLength: byteLength ?? this.byteLength,
+      cipherSha256: cipherSha256 ?? this.cipherSha256,
+      widthPx: widthPx ?? this.widthPx,
+      heightPx: heightPx ?? this.heightPx,
+      position: position ?? this.position,
+      createdAt: createdAt ?? this.createdAt,
+      archivedAt: archivedAt ?? this.archivedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (journalEntryId.present) {
+      map['journal_entry_id'] = Variable<String>(journalEntryId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (storageName.present) {
+      map['storage_name'] = Variable<String>(storageName.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (byteLength.present) {
+      map['byte_length'] = Variable<int>(byteLength.value);
+    }
+    if (cipherSha256.present) {
+      map['cipher_sha256'] = Variable<String>(cipherSha256.value);
+    }
+    if (widthPx.present) {
+      map['width_px'] = Variable<int>(widthPx.value);
+    }
+    if (heightPx.present) {
+      map['height_px'] = Variable<int>(heightPx.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<int>(archivedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalAttachmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('journalEntryId: $journalEntryId, ')
+          ..write('kind: $kind, ')
+          ..write('storageName: $storageName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('byteLength: $byteLength, ')
+          ..write('cipherSha256: $cipherSha256, ')
+          ..write('widthPx: $widthPx, ')
+          ..write('heightPx: $heightPx, ')
+          ..write('position: $position, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class XpTransactions extends Table
+    with TableInfo<XpTransactions, XpTransaction> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  XpTransactions(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL REFERENCES life_areas(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES missions(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _journalEntryIdMeta = const VerificationMeta(
+    'journalEntryId',
+  );
+  late final GeneratedColumn<String> journalEntryId = GeneratedColumn<String>(
+    'journal_entry_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES journal_entries(id)ON DELETE SET NULL',
+  );
+  static const VerificationMeta _sourceTypeMeta = const VerificationMeta(
+    'sourceType',
+  );
+  late final GeneratedColumn<String> sourceType = GeneratedColumn<String>(
+    'source_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (source_type IN (\'MISSION\', \'JOURNAL\', \'MANUAL_ADJUSTMENT\'))',
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (amount <> 0)',
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  late final GeneratedColumn<int> occurredAt = GeneratedColumn<int>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    areaId,
+    missionId,
+    journalEntryId,
+    sourceType,
+    amount,
+    reason,
+    occurredAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'xp_transactions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<XpTransaction> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_areaIdMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    }
+    if (data.containsKey('journal_entry_id')) {
+      context.handle(
+        _journalEntryIdMeta,
+        journalEntryId.isAcceptableOrUnknown(
+          data['journal_entry_id']!,
+          _journalEntryIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('source_type')) {
+      context.handle(
+        _sourceTypeMeta,
+        sourceType.isAcceptableOrUnknown(data['source_type']!, _sourceTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceTypeMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  XpTransaction map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return XpTransaction(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      ),
+      journalEntryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}journal_entry_id'],
+      ),
+      sourceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_type'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount'],
+      )!,
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      ),
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+    );
+  }
+
+  @override
+  XpTransactions createAlias(String alias) {
+    return XpTransactions(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'CHECK(source_type = \'MANUAL_ADJUSTMENT\' OR amount > 0)',
+    'CHECK(source_type <> \'MANUAL_ADJUSTMENT\' OR length(trim(reason)) > 0)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class XpTransaction extends DataClass implements Insertable<XpTransaction> {
+  final String id;
+  final String areaId;
+  final String? missionId;
+  final String? journalEntryId;
+  final String sourceType;
+  final int amount;
+  final String? reason;
+  final int occurredAt;
+  const XpTransaction({
+    required this.id,
+    required this.areaId,
+    this.missionId,
+    this.journalEntryId,
+    required this.sourceType,
+    required this.amount,
+    this.reason,
+    required this.occurredAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['area_id'] = Variable<String>(areaId);
+    if (!nullToAbsent || missionId != null) {
+      map['mission_id'] = Variable<String>(missionId);
+    }
+    if (!nullToAbsent || journalEntryId != null) {
+      map['journal_entry_id'] = Variable<String>(journalEntryId);
+    }
+    map['source_type'] = Variable<String>(sourceType);
+    map['amount'] = Variable<int>(amount);
+    if (!nullToAbsent || reason != null) {
+      map['reason'] = Variable<String>(reason);
+    }
+    map['occurred_at'] = Variable<int>(occurredAt);
+    return map;
+  }
+
+  XpTransactionsCompanion toCompanion(bool nullToAbsent) {
+    return XpTransactionsCompanion(
+      id: Value(id),
+      areaId: Value(areaId),
+      missionId: missionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(missionId),
+      journalEntryId: journalEntryId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(journalEntryId),
+      sourceType: Value(sourceType),
+      amount: Value(amount),
+      reason: reason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reason),
+      occurredAt: Value(occurredAt),
+    );
+  }
+
+  factory XpTransaction.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return XpTransaction(
+      id: serializer.fromJson<String>(json['id']),
+      areaId: serializer.fromJson<String>(json['area_id']),
+      missionId: serializer.fromJson<String?>(json['mission_id']),
+      journalEntryId: serializer.fromJson<String?>(json['journal_entry_id']),
+      sourceType: serializer.fromJson<String>(json['source_type']),
+      amount: serializer.fromJson<int>(json['amount']),
+      reason: serializer.fromJson<String?>(json['reason']),
+      occurredAt: serializer.fromJson<int>(json['occurred_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'area_id': serializer.toJson<String>(areaId),
+      'mission_id': serializer.toJson<String?>(missionId),
+      'journal_entry_id': serializer.toJson<String?>(journalEntryId),
+      'source_type': serializer.toJson<String>(sourceType),
+      'amount': serializer.toJson<int>(amount),
+      'reason': serializer.toJson<String?>(reason),
+      'occurred_at': serializer.toJson<int>(occurredAt),
+    };
+  }
+
+  XpTransaction copyWith({
+    String? id,
+    String? areaId,
+    Value<String?> missionId = const Value.absent(),
+    Value<String?> journalEntryId = const Value.absent(),
+    String? sourceType,
+    int? amount,
+    Value<String?> reason = const Value.absent(),
+    int? occurredAt,
+  }) => XpTransaction(
+    id: id ?? this.id,
+    areaId: areaId ?? this.areaId,
+    missionId: missionId.present ? missionId.value : this.missionId,
+    journalEntryId: journalEntryId.present
+        ? journalEntryId.value
+        : this.journalEntryId,
+    sourceType: sourceType ?? this.sourceType,
+    amount: amount ?? this.amount,
+    reason: reason.present ? reason.value : this.reason,
+    occurredAt: occurredAt ?? this.occurredAt,
+  );
+  XpTransaction copyWithCompanion(XpTransactionsCompanion data) {
+    return XpTransaction(
+      id: data.id.present ? data.id.value : this.id,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      journalEntryId: data.journalEntryId.present
+          ? data.journalEntryId.value
+          : this.journalEntryId,
+      sourceType: data.sourceType.present
+          ? data.sourceType.value
+          : this.sourceType,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpTransaction(')
+          ..write('id: $id, ')
+          ..write('areaId: $areaId, ')
+          ..write('missionId: $missionId, ')
+          ..write('journalEntryId: $journalEntryId, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('amount: $amount, ')
+          ..write('reason: $reason, ')
+          ..write('occurredAt: $occurredAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    areaId,
+    missionId,
+    journalEntryId,
+    sourceType,
+    amount,
+    reason,
+    occurredAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is XpTransaction &&
+          other.id == this.id &&
+          other.areaId == this.areaId &&
+          other.missionId == this.missionId &&
+          other.journalEntryId == this.journalEntryId &&
+          other.sourceType == this.sourceType &&
+          other.amount == this.amount &&
+          other.reason == this.reason &&
+          other.occurredAt == this.occurredAt);
+}
+
+class XpTransactionsCompanion extends UpdateCompanion<XpTransaction> {
+  final Value<String> id;
+  final Value<String> areaId;
+  final Value<String?> missionId;
+  final Value<String?> journalEntryId;
+  final Value<String> sourceType;
+  final Value<int> amount;
+  final Value<String?> reason;
+  final Value<int> occurredAt;
+  final Value<int> rowid;
+  const XpTransactionsCompanion({
+    this.id = const Value.absent(),
+    this.areaId = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.journalEntryId = const Value.absent(),
+    this.sourceType = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  XpTransactionsCompanion.insert({
+    required String id,
+    required String areaId,
+    this.missionId = const Value.absent(),
+    this.journalEntryId = const Value.absent(),
+    required String sourceType,
+    required int amount,
+    this.reason = const Value.absent(),
+    required int occurredAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       areaId = Value(areaId),
+       sourceType = Value(sourceType),
+       amount = Value(amount),
+       occurredAt = Value(occurredAt);
+  static Insertable<XpTransaction> custom({
+    Expression<String>? id,
+    Expression<String>? areaId,
+    Expression<String>? missionId,
+    Expression<String>? journalEntryId,
+    Expression<String>? sourceType,
+    Expression<int>? amount,
+    Expression<String>? reason,
+    Expression<int>? occurredAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (areaId != null) 'area_id': areaId,
+      if (missionId != null) 'mission_id': missionId,
+      if (journalEntryId != null) 'journal_entry_id': journalEntryId,
+      if (sourceType != null) 'source_type': sourceType,
+      if (amount != null) 'amount': amount,
+      if (reason != null) 'reason': reason,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  XpTransactionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? areaId,
+    Value<String?>? missionId,
+    Value<String?>? journalEntryId,
+    Value<String>? sourceType,
+    Value<int>? amount,
+    Value<String?>? reason,
+    Value<int>? occurredAt,
+    Value<int>? rowid,
+  }) {
+    return XpTransactionsCompanion(
+      id: id ?? this.id,
+      areaId: areaId ?? this.areaId,
+      missionId: missionId ?? this.missionId,
+      journalEntryId: journalEntryId ?? this.journalEntryId,
+      sourceType: sourceType ?? this.sourceType,
+      amount: amount ?? this.amount,
+      reason: reason ?? this.reason,
+      occurredAt: occurredAt ?? this.occurredAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (journalEntryId.present) {
+      map['journal_entry_id'] = Variable<String>(journalEntryId.value);
+    }
+    if (sourceType.present) {
+      map['source_type'] = Variable<String>(sourceType.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<int>(occurredAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('XpTransactionsCompanion(')
+          ..write('id: $id, ')
+          ..write('areaId: $areaId, ')
+          ..write('missionId: $missionId, ')
+          ..write('journalEntryId: $journalEntryId, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('amount: $amount, ')
+          ..write('reason: $reason, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class TitleDefinitions extends Table
+    with TableInfo<TitleDefinitions, TitleDefinition> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  TitleDefinitions(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: '',
+  );
+  static const VerificationMeta _titleKindMeta = const VerificationMeta(
+    'titleKind',
+  );
+  late final GeneratedColumn<String> titleKind = GeneratedColumn<String>(
+    'title_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (title_kind IN (\'PERMANENT\', \'DYNAMIC\', \'TEMPORARY\'))',
+  );
+  static const VerificationMeta _ruleKeyMeta = const VerificationMeta(
+    'ruleKey',
+  );
+  late final GeneratedColumn<String> ruleKey = GeneratedColumn<String>(
+    'rule_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL UNIQUE',
+  );
+  static const VerificationMeta _thresholdMeta = const VerificationMeta(
+    'threshold',
+  );
+  late final GeneratedColumn<int> threshold = GeneratedColumn<int>(
+    'threshold',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'CHECK (threshold IS NULL OR threshold >= 0)',
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  late final GeneratedColumn<int> isActive = GeneratedColumn<int>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (is_active IN (0, 1))',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    description,
+    titleKind,
+    ruleKey,
+    threshold,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'title_definitions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TitleDefinition> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('title_kind')) {
+      context.handle(
+        _titleKindMeta,
+        titleKind.isAcceptableOrUnknown(data['title_kind']!, _titleKindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleKindMeta);
+    }
+    if (data.containsKey('rule_key')) {
+      context.handle(
+        _ruleKeyMeta,
+        ruleKey.isAcceptableOrUnknown(data['rule_key']!, _ruleKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ruleKeyMeta);
+    }
+    if (data.containsKey('threshold')) {
+      context.handle(
+        _thresholdMeta,
+        threshold.isAcceptableOrUnknown(data['threshold']!, _thresholdMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isActiveMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TitleDefinition map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TitleDefinition(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      titleKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title_kind'],
+      )!,
+      ruleKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rule_key'],
+      )!,
+      threshold: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}threshold'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  TitleDefinitions createAlias(String alias) {
+    return TitleDefinitions(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class TitleDefinition extends DataClass implements Insertable<TitleDefinition> {
+  final String id;
+  final String name;
+  final String? description;
+  final String titleKind;
+  final String ruleKey;
+  final int? threshold;
+  final int isActive;
+  const TitleDefinition({
+    required this.id,
+    required this.name,
+    this.description,
+    required this.titleKind,
+    required this.ruleKey,
+    this.threshold,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['title_kind'] = Variable<String>(titleKind);
+    map['rule_key'] = Variable<String>(ruleKey);
+    if (!nullToAbsent || threshold != null) {
+      map['threshold'] = Variable<int>(threshold);
+    }
+    map['is_active'] = Variable<int>(isActive);
+    return map;
+  }
+
+  TitleDefinitionsCompanion toCompanion(bool nullToAbsent) {
+    return TitleDefinitionsCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      titleKind: Value(titleKind),
+      ruleKey: Value(ruleKey),
+      threshold: threshold == null && nullToAbsent
+          ? const Value.absent()
+          : Value(threshold),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory TitleDefinition.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TitleDefinition(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      titleKind: serializer.fromJson<String>(json['title_kind']),
+      ruleKey: serializer.fromJson<String>(json['rule_key']),
+      threshold: serializer.fromJson<int?>(json['threshold']),
+      isActive: serializer.fromJson<int>(json['is_active']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String?>(description),
+      'title_kind': serializer.toJson<String>(titleKind),
+      'rule_key': serializer.toJson<String>(ruleKey),
+      'threshold': serializer.toJson<int?>(threshold),
+      'is_active': serializer.toJson<int>(isActive),
+    };
+  }
+
+  TitleDefinition copyWith({
+    String? id,
+    String? name,
+    Value<String?> description = const Value.absent(),
+    String? titleKind,
+    String? ruleKey,
+    Value<int?> threshold = const Value.absent(),
+    int? isActive,
+  }) => TitleDefinition(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    description: description.present ? description.value : this.description,
+    titleKind: titleKind ?? this.titleKind,
+    ruleKey: ruleKey ?? this.ruleKey,
+    threshold: threshold.present ? threshold.value : this.threshold,
+    isActive: isActive ?? this.isActive,
+  );
+  TitleDefinition copyWithCompanion(TitleDefinitionsCompanion data) {
+    return TitleDefinition(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      titleKind: data.titleKind.present ? data.titleKind.value : this.titleKind,
+      ruleKey: data.ruleKey.present ? data.ruleKey.value : this.ruleKey,
+      threshold: data.threshold.present ? data.threshold.value : this.threshold,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TitleDefinition(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('titleKind: $titleKind, ')
+          ..write('ruleKey: $ruleKey, ')
+          ..write('threshold: $threshold, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    description,
+    titleKind,
+    ruleKey,
+    threshold,
+    isActive,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TitleDefinition &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.titleKind == this.titleKind &&
+          other.ruleKey == this.ruleKey &&
+          other.threshold == this.threshold &&
+          other.isActive == this.isActive);
+}
+
+class TitleDefinitionsCompanion extends UpdateCompanion<TitleDefinition> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> description;
+  final Value<String> titleKind;
+  final Value<String> ruleKey;
+  final Value<int?> threshold;
+  final Value<int> isActive;
+  final Value<int> rowid;
+  const TitleDefinitionsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.titleKind = const Value.absent(),
+    this.ruleKey = const Value.absent(),
+    this.threshold = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TitleDefinitionsCompanion.insert({
+    required String id,
+    required String name,
+    this.description = const Value.absent(),
+    required String titleKind,
+    required String ruleKey,
+    this.threshold = const Value.absent(),
+    required int isActive,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       titleKind = Value(titleKind),
+       ruleKey = Value(ruleKey),
+       isActive = Value(isActive);
+  static Insertable<TitleDefinition> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? titleKind,
+    Expression<String>? ruleKey,
+    Expression<int>? threshold,
+    Expression<int>? isActive,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (titleKind != null) 'title_kind': titleKind,
+      if (ruleKey != null) 'rule_key': ruleKey,
+      if (threshold != null) 'threshold': threshold,
+      if (isActive != null) 'is_active': isActive,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TitleDefinitionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? description,
+    Value<String>? titleKind,
+    Value<String>? ruleKey,
+    Value<int?>? threshold,
+    Value<int>? isActive,
+    Value<int>? rowid,
+  }) {
+    return TitleDefinitionsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      titleKind: titleKind ?? this.titleKind,
+      ruleKey: ruleKey ?? this.ruleKey,
+      threshold: threshold ?? this.threshold,
+      isActive: isActive ?? this.isActive,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (titleKind.present) {
+      map['title_kind'] = Variable<String>(titleKind.value);
+    }
+    if (ruleKey.present) {
+      map['rule_key'] = Variable<String>(ruleKey.value);
+    }
+    if (threshold.present) {
+      map['threshold'] = Variable<int>(threshold.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<int>(isActive.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TitleDefinitionsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('titleKind: $titleKind, ')
+          ..write('ruleKey: $ruleKey, ')
+          ..write('threshold: $threshold, ')
+          ..write('isActive: $isActive, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class TitleHistory extends Table
+    with TableInfo<TitleHistory, TitleHistoryData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  TitleHistory(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _titleIdMeta = const VerificationMeta(
+    'titleId',
+  );
+  late final GeneratedColumn<String> titleId = GeneratedColumn<String>(
+    'title_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL REFERENCES title_definitions(id)ON DELETE RESTRICT',
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (status IN (\'ACTIVE\', \'INACTIVE\', \'EARNED\'))',
+  );
+  static const VerificationMeta _activatedAtMeta = const VerificationMeta(
+    'activatedAt',
+  );
+  late final GeneratedColumn<int> activatedAt = GeneratedColumn<int>(
+    'activated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _deactivatedAtMeta = const VerificationMeta(
+    'deactivatedAt',
+  );
+  late final GeneratedColumn<int> deactivatedAt = GeneratedColumn<int>(
+    'deactivated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (deactivated_at IS NULL OR deactivated_at >= activated_at)',
+  );
+  static const VerificationMeta _bestStreakMeta = const VerificationMeta(
+    'bestStreak',
+  );
+  late final GeneratedColumn<int> bestStreak = GeneratedColumn<int>(
+    'best_streak',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (best_streak >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  static const VerificationMeta _recoveryCountMeta = const VerificationMeta(
+    'recoveryCount',
+  );
+  late final GeneratedColumn<int> recoveryCount = GeneratedColumn<int>(
+    'recovery_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL DEFAULT 0 CHECK (recovery_count >= 0)',
+    defaultValue: const CustomExpression('0'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    titleId,
+    status,
+    activatedAt,
+    deactivatedAt,
+    bestStreak,
+    recoveryCount,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'title_history';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TitleHistoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title_id')) {
+      context.handle(
+        _titleIdMeta,
+        titleId.isAcceptableOrUnknown(data['title_id']!, _titleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleIdMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('activated_at')) {
+      context.handle(
+        _activatedAtMeta,
+        activatedAt.isAcceptableOrUnknown(
+          data['activated_at']!,
+          _activatedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_activatedAtMeta);
+    }
+    if (data.containsKey('deactivated_at')) {
+      context.handle(
+        _deactivatedAtMeta,
+        deactivatedAt.isAcceptableOrUnknown(
+          data['deactivated_at']!,
+          _deactivatedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('best_streak')) {
+      context.handle(
+        _bestStreakMeta,
+        bestStreak.isAcceptableOrUnknown(data['best_streak']!, _bestStreakMeta),
+      );
+    }
+    if (data.containsKey('recovery_count')) {
+      context.handle(
+        _recoveryCountMeta,
+        recoveryCount.isAcceptableOrUnknown(
+          data['recovery_count']!,
+          _recoveryCountMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TitleHistoryData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TitleHistoryData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      titleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title_id'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      activatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}activated_at'],
+      )!,
+      deactivatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}deactivated_at'],
+      ),
+      bestStreak: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}best_streak'],
+      )!,
+      recoveryCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}recovery_count'],
+      )!,
+    );
+  }
+
+  @override
+  TitleHistory createAlias(String alias) {
+    return TitleHistory(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class TitleHistoryData extends DataClass
+    implements Insertable<TitleHistoryData> {
+  final String id;
+  final String titleId;
+  final String status;
+  final int activatedAt;
+  final int? deactivatedAt;
+  final int bestStreak;
+  final int recoveryCount;
+  const TitleHistoryData({
+    required this.id,
+    required this.titleId,
+    required this.status,
+    required this.activatedAt,
+    this.deactivatedAt,
+    required this.bestStreak,
+    required this.recoveryCount,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title_id'] = Variable<String>(titleId);
+    map['status'] = Variable<String>(status);
+    map['activated_at'] = Variable<int>(activatedAt);
+    if (!nullToAbsent || deactivatedAt != null) {
+      map['deactivated_at'] = Variable<int>(deactivatedAt);
+    }
+    map['best_streak'] = Variable<int>(bestStreak);
+    map['recovery_count'] = Variable<int>(recoveryCount);
+    return map;
+  }
+
+  TitleHistoryCompanion toCompanion(bool nullToAbsent) {
+    return TitleHistoryCompanion(
+      id: Value(id),
+      titleId: Value(titleId),
+      status: Value(status),
+      activatedAt: Value(activatedAt),
+      deactivatedAt: deactivatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deactivatedAt),
+      bestStreak: Value(bestStreak),
+      recoveryCount: Value(recoveryCount),
+    );
+  }
+
+  factory TitleHistoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TitleHistoryData(
+      id: serializer.fromJson<String>(json['id']),
+      titleId: serializer.fromJson<String>(json['title_id']),
+      status: serializer.fromJson<String>(json['status']),
+      activatedAt: serializer.fromJson<int>(json['activated_at']),
+      deactivatedAt: serializer.fromJson<int?>(json['deactivated_at']),
+      bestStreak: serializer.fromJson<int>(json['best_streak']),
+      recoveryCount: serializer.fromJson<int>(json['recovery_count']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title_id': serializer.toJson<String>(titleId),
+      'status': serializer.toJson<String>(status),
+      'activated_at': serializer.toJson<int>(activatedAt),
+      'deactivated_at': serializer.toJson<int?>(deactivatedAt),
+      'best_streak': serializer.toJson<int>(bestStreak),
+      'recovery_count': serializer.toJson<int>(recoveryCount),
+    };
+  }
+
+  TitleHistoryData copyWith({
+    String? id,
+    String? titleId,
+    String? status,
+    int? activatedAt,
+    Value<int?> deactivatedAt = const Value.absent(),
+    int? bestStreak,
+    int? recoveryCount,
+  }) => TitleHistoryData(
+    id: id ?? this.id,
+    titleId: titleId ?? this.titleId,
+    status: status ?? this.status,
+    activatedAt: activatedAt ?? this.activatedAt,
+    deactivatedAt: deactivatedAt.present
+        ? deactivatedAt.value
+        : this.deactivatedAt,
+    bestStreak: bestStreak ?? this.bestStreak,
+    recoveryCount: recoveryCount ?? this.recoveryCount,
+  );
+  TitleHistoryData copyWithCompanion(TitleHistoryCompanion data) {
+    return TitleHistoryData(
+      id: data.id.present ? data.id.value : this.id,
+      titleId: data.titleId.present ? data.titleId.value : this.titleId,
+      status: data.status.present ? data.status.value : this.status,
+      activatedAt: data.activatedAt.present
+          ? data.activatedAt.value
+          : this.activatedAt,
+      deactivatedAt: data.deactivatedAt.present
+          ? data.deactivatedAt.value
+          : this.deactivatedAt,
+      bestStreak: data.bestStreak.present
+          ? data.bestStreak.value
+          : this.bestStreak,
+      recoveryCount: data.recoveryCount.present
+          ? data.recoveryCount.value
+          : this.recoveryCount,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TitleHistoryData(')
+          ..write('id: $id, ')
+          ..write('titleId: $titleId, ')
+          ..write('status: $status, ')
+          ..write('activatedAt: $activatedAt, ')
+          ..write('deactivatedAt: $deactivatedAt, ')
+          ..write('bestStreak: $bestStreak, ')
+          ..write('recoveryCount: $recoveryCount')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    titleId,
+    status,
+    activatedAt,
+    deactivatedAt,
+    bestStreak,
+    recoveryCount,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TitleHistoryData &&
+          other.id == this.id &&
+          other.titleId == this.titleId &&
+          other.status == this.status &&
+          other.activatedAt == this.activatedAt &&
+          other.deactivatedAt == this.deactivatedAt &&
+          other.bestStreak == this.bestStreak &&
+          other.recoveryCount == this.recoveryCount);
+}
+
+class TitleHistoryCompanion extends UpdateCompanion<TitleHistoryData> {
+  final Value<String> id;
+  final Value<String> titleId;
+  final Value<String> status;
+  final Value<int> activatedAt;
+  final Value<int?> deactivatedAt;
+  final Value<int> bestStreak;
+  final Value<int> recoveryCount;
+  final Value<int> rowid;
+  const TitleHistoryCompanion({
+    this.id = const Value.absent(),
+    this.titleId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.activatedAt = const Value.absent(),
+    this.deactivatedAt = const Value.absent(),
+    this.bestStreak = const Value.absent(),
+    this.recoveryCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TitleHistoryCompanion.insert({
+    required String id,
+    required String titleId,
+    required String status,
+    required int activatedAt,
+    this.deactivatedAt = const Value.absent(),
+    this.bestStreak = const Value.absent(),
+    this.recoveryCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       titleId = Value(titleId),
+       status = Value(status),
+       activatedAt = Value(activatedAt);
+  static Insertable<TitleHistoryData> custom({
+    Expression<String>? id,
+    Expression<String>? titleId,
+    Expression<String>? status,
+    Expression<int>? activatedAt,
+    Expression<int>? deactivatedAt,
+    Expression<int>? bestStreak,
+    Expression<int>? recoveryCount,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (titleId != null) 'title_id': titleId,
+      if (status != null) 'status': status,
+      if (activatedAt != null) 'activated_at': activatedAt,
+      if (deactivatedAt != null) 'deactivated_at': deactivatedAt,
+      if (bestStreak != null) 'best_streak': bestStreak,
+      if (recoveryCount != null) 'recovery_count': recoveryCount,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TitleHistoryCompanion copyWith({
+    Value<String>? id,
+    Value<String>? titleId,
+    Value<String>? status,
+    Value<int>? activatedAt,
+    Value<int?>? deactivatedAt,
+    Value<int>? bestStreak,
+    Value<int>? recoveryCount,
+    Value<int>? rowid,
+  }) {
+    return TitleHistoryCompanion(
+      id: id ?? this.id,
+      titleId: titleId ?? this.titleId,
+      status: status ?? this.status,
+      activatedAt: activatedAt ?? this.activatedAt,
+      deactivatedAt: deactivatedAt ?? this.deactivatedAt,
+      bestStreak: bestStreak ?? this.bestStreak,
+      recoveryCount: recoveryCount ?? this.recoveryCount,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (titleId.present) {
+      map['title_id'] = Variable<String>(titleId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (activatedAt.present) {
+      map['activated_at'] = Variable<int>(activatedAt.value);
+    }
+    if (deactivatedAt.present) {
+      map['deactivated_at'] = Variable<int>(deactivatedAt.value);
+    }
+    if (bestStreak.present) {
+      map['best_streak'] = Variable<int>(bestStreak.value);
+    }
+    if (recoveryCount.present) {
+      map['recovery_count'] = Variable<int>(recoveryCount.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TitleHistoryCompanion(')
+          ..write('id: $id, ')
+          ..write('titleId: $titleId, ')
+          ..write('status: $status, ')
+          ..write('activatedAt: $activatedAt, ')
+          ..write('deactivatedAt: $deactivatedAt, ')
+          ..write('bestStreak: $bestStreak, ')
+          ..write('recoveryCount: $recoveryCount, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class AppSettings extends Table with TableInfo<AppSettings, AppSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  AppSettings(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL PRIMARY KEY CHECK (id = 1)',
+  );
+  static const VerificationMeta _themeKeyMeta = const VerificationMeta(
+    'themeKey',
+  );
+  late final GeneratedColumn<String> themeKey = GeneratedColumn<String>(
+    'theme_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _primaryColorMeta = const VerificationMeta(
+    'primaryColor',
+  );
+  late final GeneratedColumn<String> primaryColor = GeneratedColumn<String>(
+    'primary_color',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (primary_color GLOB \'#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]\')',
+  );
+  static const VerificationMeta _largeTextMeta = const VerificationMeta(
+    'largeText',
+  );
+  late final GeneratedColumn<int> largeText = GeneratedColumn<int>(
+    'large_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (large_text IN (0, 1))',
+  );
+  static const VerificationMeta _reduceMotionMeta = const VerificationMeta(
+    'reduceMotion',
+  );
+  late final GeneratedColumn<int> reduceMotion = GeneratedColumn<int>(
+    'reduce_motion',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (reduce_motion IN (0, 1))',
+  );
+  static const VerificationMeta _highContrastMeta = const VerificationMeta(
+    'highContrast',
+  );
+  late final GeneratedColumn<int> highContrast = GeneratedColumn<int>(
+    'high_contrast',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (high_contrast IN (0, 1))',
+  );
+  static const VerificationMeta _hideAmountsMeta = const VerificationMeta(
+    'hideAmounts',
+  );
+  late final GeneratedColumn<int> hideAmounts = GeneratedColumn<int>(
+    'hide_amounts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (hide_amounts IN (0, 1))',
+  );
+  static const VerificationMeta _missionNotificationsMeta =
+      const VerificationMeta('missionNotifications');
+  late final GeneratedColumn<int> missionNotifications = GeneratedColumn<int>(
+    'mission_notifications',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (mission_notifications IN (0, 1))',
+  );
+  static const VerificationMeta _dailySummaryMeta = const VerificationMeta(
+    'dailySummary',
+  );
+  late final GeneratedColumn<int> dailySummary = GeneratedColumn<int>(
+    'daily_summary',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (daily_summary IN (0, 1))',
+  );
+  static const VerificationMeta _soundEnabledMeta = const VerificationMeta(
+    'soundEnabled',
+  );
+  late final GeneratedColumn<int> soundEnabled = GeneratedColumn<int>(
+    'sound_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (sound_enabled IN (0, 1))',
+  );
+  static const VerificationMeta _autoLockMinutesMeta = const VerificationMeta(
+    'autoLockMinutes',
+  );
+  late final GeneratedColumn<int> autoLockMinutes = GeneratedColumn<int>(
+    'auto_lock_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (auto_lock_minutes >= 0)',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    themeKey,
+    primaryColor,
+    largeText,
+    reduceMotion,
+    highContrast,
+    hideAmounts,
+    missionNotifications,
+    dailySummary,
+    soundEnabled,
+    autoLockMinutes,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('theme_key')) {
+      context.handle(
+        _themeKeyMeta,
+        themeKey.isAcceptableOrUnknown(data['theme_key']!, _themeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_themeKeyMeta);
+    }
+    if (data.containsKey('primary_color')) {
+      context.handle(
+        _primaryColorMeta,
+        primaryColor.isAcceptableOrUnknown(
+          data['primary_color']!,
+          _primaryColorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_primaryColorMeta);
+    }
+    if (data.containsKey('large_text')) {
+      context.handle(
+        _largeTextMeta,
+        largeText.isAcceptableOrUnknown(data['large_text']!, _largeTextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_largeTextMeta);
+    }
+    if (data.containsKey('reduce_motion')) {
+      context.handle(
+        _reduceMotionMeta,
+        reduceMotion.isAcceptableOrUnknown(
+          data['reduce_motion']!,
+          _reduceMotionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_reduceMotionMeta);
+    }
+    if (data.containsKey('high_contrast')) {
+      context.handle(
+        _highContrastMeta,
+        highContrast.isAcceptableOrUnknown(
+          data['high_contrast']!,
+          _highContrastMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_highContrastMeta);
+    }
+    if (data.containsKey('hide_amounts')) {
+      context.handle(
+        _hideAmountsMeta,
+        hideAmounts.isAcceptableOrUnknown(
+          data['hide_amounts']!,
+          _hideAmountsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_hideAmountsMeta);
+    }
+    if (data.containsKey('mission_notifications')) {
+      context.handle(
+        _missionNotificationsMeta,
+        missionNotifications.isAcceptableOrUnknown(
+          data['mission_notifications']!,
+          _missionNotificationsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_missionNotificationsMeta);
+    }
+    if (data.containsKey('daily_summary')) {
+      context.handle(
+        _dailySummaryMeta,
+        dailySummary.isAcceptableOrUnknown(
+          data['daily_summary']!,
+          _dailySummaryMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dailySummaryMeta);
+    }
+    if (data.containsKey('sound_enabled')) {
+      context.handle(
+        _soundEnabledMeta,
+        soundEnabled.isAcceptableOrUnknown(
+          data['sound_enabled']!,
+          _soundEnabledMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_soundEnabledMeta);
+    }
+    if (data.containsKey('auto_lock_minutes')) {
+      context.handle(
+        _autoLockMinutesMeta,
+        autoLockMinutes.isAcceptableOrUnknown(
+          data['auto_lock_minutes']!,
+          _autoLockMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_autoLockMinutesMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AppSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppSetting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      themeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}theme_key'],
+      )!,
+      primaryColor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}primary_color'],
+      )!,
+      largeText: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}large_text'],
+      )!,
+      reduceMotion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reduce_motion'],
+      )!,
+      highContrast: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}high_contrast'],
+      )!,
+      hideAmounts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hide_amounts'],
+      )!,
+      missionNotifications: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mission_notifications'],
+      )!,
+      dailySummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}daily_summary'],
+      )!,
+      soundEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sound_enabled'],
+      )!,
+      autoLockMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}auto_lock_minutes'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  AppSettings createAlias(String alias) {
+    return AppSettings(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class AppSetting extends DataClass implements Insertable<AppSetting> {
+  final int id;
+  final String themeKey;
+  final String primaryColor;
+  final int largeText;
+  final int reduceMotion;
+  final int highContrast;
+  final int hideAmounts;
+  final int missionNotifications;
+  final int dailySummary;
+  final int soundEnabled;
+  final int autoLockMinutes;
+  final int updatedAt;
+  const AppSetting({
+    required this.id,
+    required this.themeKey,
+    required this.primaryColor,
+    required this.largeText,
+    required this.reduceMotion,
+    required this.highContrast,
+    required this.hideAmounts,
+    required this.missionNotifications,
+    required this.dailySummary,
+    required this.soundEnabled,
+    required this.autoLockMinutes,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['theme_key'] = Variable<String>(themeKey);
+    map['primary_color'] = Variable<String>(primaryColor);
+    map['large_text'] = Variable<int>(largeText);
+    map['reduce_motion'] = Variable<int>(reduceMotion);
+    map['high_contrast'] = Variable<int>(highContrast);
+    map['hide_amounts'] = Variable<int>(hideAmounts);
+    map['mission_notifications'] = Variable<int>(missionNotifications);
+    map['daily_summary'] = Variable<int>(dailySummary);
+    map['sound_enabled'] = Variable<int>(soundEnabled);
+    map['auto_lock_minutes'] = Variable<int>(autoLockMinutes);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  AppSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AppSettingsCompanion(
+      id: Value(id),
+      themeKey: Value(themeKey),
+      primaryColor: Value(primaryColor),
+      largeText: Value(largeText),
+      reduceMotion: Value(reduceMotion),
+      highContrast: Value(highContrast),
+      hideAmounts: Value(hideAmounts),
+      missionNotifications: Value(missionNotifications),
+      dailySummary: Value(dailySummary),
+      soundEnabled: Value(soundEnabled),
+      autoLockMinutes: Value(autoLockMinutes),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AppSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppSetting(
+      id: serializer.fromJson<int>(json['id']),
+      themeKey: serializer.fromJson<String>(json['theme_key']),
+      primaryColor: serializer.fromJson<String>(json['primary_color']),
+      largeText: serializer.fromJson<int>(json['large_text']),
+      reduceMotion: serializer.fromJson<int>(json['reduce_motion']),
+      highContrast: serializer.fromJson<int>(json['high_contrast']),
+      hideAmounts: serializer.fromJson<int>(json['hide_amounts']),
+      missionNotifications: serializer.fromJson<int>(
+        json['mission_notifications'],
+      ),
+      dailySummary: serializer.fromJson<int>(json['daily_summary']),
+      soundEnabled: serializer.fromJson<int>(json['sound_enabled']),
+      autoLockMinutes: serializer.fromJson<int>(json['auto_lock_minutes']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'theme_key': serializer.toJson<String>(themeKey),
+      'primary_color': serializer.toJson<String>(primaryColor),
+      'large_text': serializer.toJson<int>(largeText),
+      'reduce_motion': serializer.toJson<int>(reduceMotion),
+      'high_contrast': serializer.toJson<int>(highContrast),
+      'hide_amounts': serializer.toJson<int>(hideAmounts),
+      'mission_notifications': serializer.toJson<int>(missionNotifications),
+      'daily_summary': serializer.toJson<int>(dailySummary),
+      'sound_enabled': serializer.toJson<int>(soundEnabled),
+      'auto_lock_minutes': serializer.toJson<int>(autoLockMinutes),
+      'updated_at': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  AppSetting copyWith({
+    int? id,
+    String? themeKey,
+    String? primaryColor,
+    int? largeText,
+    int? reduceMotion,
+    int? highContrast,
+    int? hideAmounts,
+    int? missionNotifications,
+    int? dailySummary,
+    int? soundEnabled,
+    int? autoLockMinutes,
+    int? updatedAt,
+  }) => AppSetting(
+    id: id ?? this.id,
+    themeKey: themeKey ?? this.themeKey,
+    primaryColor: primaryColor ?? this.primaryColor,
+    largeText: largeText ?? this.largeText,
+    reduceMotion: reduceMotion ?? this.reduceMotion,
+    highContrast: highContrast ?? this.highContrast,
+    hideAmounts: hideAmounts ?? this.hideAmounts,
+    missionNotifications: missionNotifications ?? this.missionNotifications,
+    dailySummary: dailySummary ?? this.dailySummary,
+    soundEnabled: soundEnabled ?? this.soundEnabled,
+    autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AppSetting copyWithCompanion(AppSettingsCompanion data) {
+    return AppSetting(
+      id: data.id.present ? data.id.value : this.id,
+      themeKey: data.themeKey.present ? data.themeKey.value : this.themeKey,
+      primaryColor: data.primaryColor.present
+          ? data.primaryColor.value
+          : this.primaryColor,
+      largeText: data.largeText.present ? data.largeText.value : this.largeText,
+      reduceMotion: data.reduceMotion.present
+          ? data.reduceMotion.value
+          : this.reduceMotion,
+      highContrast: data.highContrast.present
+          ? data.highContrast.value
+          : this.highContrast,
+      hideAmounts: data.hideAmounts.present
+          ? data.hideAmounts.value
+          : this.hideAmounts,
+      missionNotifications: data.missionNotifications.present
+          ? data.missionNotifications.value
+          : this.missionNotifications,
+      dailySummary: data.dailySummary.present
+          ? data.dailySummary.value
+          : this.dailySummary,
+      soundEnabled: data.soundEnabled.present
+          ? data.soundEnabled.value
+          : this.soundEnabled,
+      autoLockMinutes: data.autoLockMinutes.present
+          ? data.autoLockMinutes.value
+          : this.autoLockMinutes,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSetting(')
+          ..write('id: $id, ')
+          ..write('themeKey: $themeKey, ')
+          ..write('primaryColor: $primaryColor, ')
+          ..write('largeText: $largeText, ')
+          ..write('reduceMotion: $reduceMotion, ')
+          ..write('highContrast: $highContrast, ')
+          ..write('hideAmounts: $hideAmounts, ')
+          ..write('missionNotifications: $missionNotifications, ')
+          ..write('dailySummary: $dailySummary, ')
+          ..write('soundEnabled: $soundEnabled, ')
+          ..write('autoLockMinutes: $autoLockMinutes, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    themeKey,
+    primaryColor,
+    largeText,
+    reduceMotion,
+    highContrast,
+    hideAmounts,
+    missionNotifications,
+    dailySummary,
+    soundEnabled,
+    autoLockMinutes,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppSetting &&
+          other.id == this.id &&
+          other.themeKey == this.themeKey &&
+          other.primaryColor == this.primaryColor &&
+          other.largeText == this.largeText &&
+          other.reduceMotion == this.reduceMotion &&
+          other.highContrast == this.highContrast &&
+          other.hideAmounts == this.hideAmounts &&
+          other.missionNotifications == this.missionNotifications &&
+          other.dailySummary == this.dailySummary &&
+          other.soundEnabled == this.soundEnabled &&
+          other.autoLockMinutes == this.autoLockMinutes &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
+  final Value<int> id;
+  final Value<String> themeKey;
+  final Value<String> primaryColor;
+  final Value<int> largeText;
+  final Value<int> reduceMotion;
+  final Value<int> highContrast;
+  final Value<int> hideAmounts;
+  final Value<int> missionNotifications;
+  final Value<int> dailySummary;
+  final Value<int> soundEnabled;
+  final Value<int> autoLockMinutes;
+  final Value<int> updatedAt;
+  const AppSettingsCompanion({
+    this.id = const Value.absent(),
+    this.themeKey = const Value.absent(),
+    this.primaryColor = const Value.absent(),
+    this.largeText = const Value.absent(),
+    this.reduceMotion = const Value.absent(),
+    this.highContrast = const Value.absent(),
+    this.hideAmounts = const Value.absent(),
+    this.missionNotifications = const Value.absent(),
+    this.dailySummary = const Value.absent(),
+    this.soundEnabled = const Value.absent(),
+    this.autoLockMinutes = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  AppSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    required String themeKey,
+    required String primaryColor,
+    required int largeText,
+    required int reduceMotion,
+    required int highContrast,
+    required int hideAmounts,
+    required int missionNotifications,
+    required int dailySummary,
+    required int soundEnabled,
+    required int autoLockMinutes,
+    required int updatedAt,
+  }) : themeKey = Value(themeKey),
+       primaryColor = Value(primaryColor),
+       largeText = Value(largeText),
+       reduceMotion = Value(reduceMotion),
+       highContrast = Value(highContrast),
+       hideAmounts = Value(hideAmounts),
+       missionNotifications = Value(missionNotifications),
+       dailySummary = Value(dailySummary),
+       soundEnabled = Value(soundEnabled),
+       autoLockMinutes = Value(autoLockMinutes),
+       updatedAt = Value(updatedAt);
+  static Insertable<AppSetting> custom({
+    Expression<int>? id,
+    Expression<String>? themeKey,
+    Expression<String>? primaryColor,
+    Expression<int>? largeText,
+    Expression<int>? reduceMotion,
+    Expression<int>? highContrast,
+    Expression<int>? hideAmounts,
+    Expression<int>? missionNotifications,
+    Expression<int>? dailySummary,
+    Expression<int>? soundEnabled,
+    Expression<int>? autoLockMinutes,
+    Expression<int>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (themeKey != null) 'theme_key': themeKey,
+      if (primaryColor != null) 'primary_color': primaryColor,
+      if (largeText != null) 'large_text': largeText,
+      if (reduceMotion != null) 'reduce_motion': reduceMotion,
+      if (highContrast != null) 'high_contrast': highContrast,
+      if (hideAmounts != null) 'hide_amounts': hideAmounts,
+      if (missionNotifications != null)
+        'mission_notifications': missionNotifications,
+      if (dailySummary != null) 'daily_summary': dailySummary,
+      if (soundEnabled != null) 'sound_enabled': soundEnabled,
+      if (autoLockMinutes != null) 'auto_lock_minutes': autoLockMinutes,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  AppSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? themeKey,
+    Value<String>? primaryColor,
+    Value<int>? largeText,
+    Value<int>? reduceMotion,
+    Value<int>? highContrast,
+    Value<int>? hideAmounts,
+    Value<int>? missionNotifications,
+    Value<int>? dailySummary,
+    Value<int>? soundEnabled,
+    Value<int>? autoLockMinutes,
+    Value<int>? updatedAt,
+  }) {
+    return AppSettingsCompanion(
+      id: id ?? this.id,
+      themeKey: themeKey ?? this.themeKey,
+      primaryColor: primaryColor ?? this.primaryColor,
+      largeText: largeText ?? this.largeText,
+      reduceMotion: reduceMotion ?? this.reduceMotion,
+      highContrast: highContrast ?? this.highContrast,
+      hideAmounts: hideAmounts ?? this.hideAmounts,
+      missionNotifications: missionNotifications ?? this.missionNotifications,
+      dailySummary: dailySummary ?? this.dailySummary,
+      soundEnabled: soundEnabled ?? this.soundEnabled,
+      autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (themeKey.present) {
+      map['theme_key'] = Variable<String>(themeKey.value);
+    }
+    if (primaryColor.present) {
+      map['primary_color'] = Variable<String>(primaryColor.value);
+    }
+    if (largeText.present) {
+      map['large_text'] = Variable<int>(largeText.value);
+    }
+    if (reduceMotion.present) {
+      map['reduce_motion'] = Variable<int>(reduceMotion.value);
+    }
+    if (highContrast.present) {
+      map['high_contrast'] = Variable<int>(highContrast.value);
+    }
+    if (hideAmounts.present) {
+      map['hide_amounts'] = Variable<int>(hideAmounts.value);
+    }
+    if (missionNotifications.present) {
+      map['mission_notifications'] = Variable<int>(missionNotifications.value);
+    }
+    if (dailySummary.present) {
+      map['daily_summary'] = Variable<int>(dailySummary.value);
+    }
+    if (soundEnabled.present) {
+      map['sound_enabled'] = Variable<int>(soundEnabled.value);
+    }
+    if (autoLockMinutes.present) {
+      map['auto_lock_minutes'] = Variable<int>(autoLockMinutes.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('themeKey: $themeKey, ')
+          ..write('primaryColor: $primaryColor, ')
+          ..write('largeText: $largeText, ')
+          ..write('reduceMotion: $reduceMotion, ')
+          ..write('highContrast: $highContrast, ')
+          ..write('hideAmounts: $hideAmounts, ')
+          ..write('missionNotifications: $missionNotifications, ')
+          ..write('dailySummary: $dailySummary, ')
+          ..write('soundEnabled: $soundEnabled, ')
+          ..write('autoLockMinutes: $autoLockMinutes, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class SchemaMetadata extends Table
+    with TableInfo<SchemaMetadata, SchemaMetadataData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  SchemaMetadata(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL PRIMARY KEY',
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'schema_metadata';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SchemaMetadataData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  SchemaMetadataData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SchemaMetadataData(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  SchemaMetadata createAlias(String alias) {
+    return SchemaMetadata(attachedDatabase, alias);
+  }
+
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class SchemaMetadataData extends DataClass
+    implements Insertable<SchemaMetadataData> {
+  final String key;
+  final String value;
+  final int updatedAt;
+  const SchemaMetadataData({
+    required this.key,
+    required this.value,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  SchemaMetadataCompanion toCompanion(bool nullToAbsent) {
+    return SchemaMetadataCompanion(
+      key: Value(key),
+      value: Value(value),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory SchemaMetadataData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SchemaMetadataData(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+      updatedAt: serializer.fromJson<int>(json['updated_at']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+      'updated_at': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  SchemaMetadataData copyWith({String? key, String? value, int? updatedAt}) =>
+      SchemaMetadataData(
+        key: key ?? this.key,
+        value: value ?? this.value,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  SchemaMetadataData copyWithCompanion(SchemaMetadataCompanion data) {
+    return SchemaMetadataData(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SchemaMetadataData(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SchemaMetadataData &&
+          other.key == this.key &&
+          other.value == this.value &&
+          other.updatedAt == this.updatedAt);
+}
+
+class SchemaMetadataCompanion extends UpdateCompanion<SchemaMetadataData> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const SchemaMetadataCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SchemaMetadataCompanion.insert({
+    required String key,
+    required String value,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value),
+       updatedAt = Value(updatedAt);
+  static Insertable<SchemaMetadataData> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SchemaMetadataCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return SchemaMetadataCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SchemaMetadataCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+abstract class _$AppDatabase extends GeneratedDatabase {
+  _$AppDatabase(QueryExecutor e) : super(e);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final LifeAreas lifeAreas = LifeAreas(this);
+  late final Index uqLifeAreasActiveName = Index(
+    'uq_life_areas_active_name',
+    'CREATE UNIQUE INDEX uq_life_areas_active_name ON life_areas (name COLLATE NOCASE) WHERE archived_at IS NULL',
+  );
+  late final Index uqLifeAreasDefaultActive = Index(
+    'uq_life_areas_default_active',
+    'CREATE UNIQUE INDEX uq_life_areas_default_active ON life_areas (is_default) WHERE is_default = 1 AND archived_at IS NULL',
+  );
+  late final MissionTemplates missionTemplates = MissionTemplates(this);
+  late final MissionTemplateObjectives missionTemplateObjectives =
+      MissionTemplateObjectives(this);
+  late final RecurrenceRules recurrenceRules = RecurrenceRules(this);
+  late final Missions missions = Missions(this);
+  late final Index uqOccurrence = Index(
+    'uq_occurrence',
+    'CREATE UNIQUE INDEX uq_occurrence ON missions (template_id, scheduled_at) WHERE template_id IS NOT NULL',
+  );
+  late final Index idxMissionsStatusDate = Index(
+    'idx_missions_status_date',
+    'CREATE INDEX idx_missions_status_date ON missions (status, scheduled_at)',
+  );
+  late final Index idxMissionsAreaDate = Index(
+    'idx_missions_area_date',
+    'CREATE INDEX idx_missions_area_date ON missions (area_id, scheduled_at)',
+  );
+  late final MissionObjectives missionObjectives = MissionObjectives(this);
+  late final TimeEntries timeEntries = TimeEntries(this);
+  late final Index idxTimeMissionStart = Index(
+    'idx_time_mission_start',
+    'CREATE INDEX idx_time_mission_start ON time_entries (mission_id, started_at)',
+  );
+  late final Index uqTimeOpenTimerWork = Index(
+    'uq_time_open_timer_work',
+    'CREATE UNIQUE INDEX uq_time_open_timer_work ON time_entries (mission_id) WHERE source = \'TIMER\' AND segment_type = \'WORK\' AND ended_at IS NULL',
+  );
+  late final MissionEvents missionEvents = MissionEvents(this);
+  late final Index idxEventMissionTime = Index(
+    'idx_event_mission_time',
+    'CREATE INDEX idx_event_mission_time ON mission_events (mission_id, occurred_at)',
+  );
+  late final NotificationSchedules notificationSchedules =
+      NotificationSchedules(this);
+  late final Index idxNotificationDue = Index(
+    'idx_notification_due',
+    'CREATE INDEX idx_notification_due ON notification_schedules (status, notify_at)',
+  );
+  late final Transactions transactions = Transactions(this);
+  late final Index idxTxDateType = Index(
+    'idx_tx_date_type',
+    'CREATE INDEX idx_tx_date_type ON transactions (occurred_at, transaction_type)',
+  );
+  late final Index idxTransactionsMission = Index(
+    'idx_transactions_mission',
+    'CREATE INDEX idx_transactions_mission ON transactions (mission_id)',
+  );
+  late final Index idxTransactionsRelated = Index(
+    'idx_transactions_related',
+    'CREATE INDEX idx_transactions_related ON transactions (related_transaction_id)',
+  );
+  late final SavingsGoals savingsGoals = SavingsGoals(this);
+  late final GoalAllocations goalAllocations = GoalAllocations(this);
+  late final Index idxGoalTime = Index(
+    'idx_goal_time',
+    'CREATE INDEX idx_goal_time ON goal_allocations (goal_id, occurred_at)',
+  );
+  late final JournalEntries journalEntries = JournalEntries(this);
+  late final Index idxJournalTime = Index(
+    'idx_journal_time',
+    'CREATE INDEX idx_journal_time ON journal_entries (occurred_at)',
+  );
+  late final Index idxJournalMission = Index(
+    'idx_journal_mission',
+    'CREATE INDEX idx_journal_mission ON journal_entries (mission_id)',
+  );
+  late final Index idxJournalTransaction = Index(
+    'idx_journal_transaction',
+    'CREATE INDEX idx_journal_transaction ON journal_entries (transaction_id)',
+  );
+  late final JournalAttachments journalAttachments = JournalAttachments(this);
+  late final XpTransactions xpTransactions = XpTransactions(this);
+  late final Index uqXpMission = Index(
+    'uq_xp_mission',
+    'CREATE UNIQUE INDEX uq_xp_mission ON xp_transactions (mission_id) WHERE source_type = \'MISSION\'',
+  );
+  late final Index idxXpAreaTime = Index(
+    'idx_xp_area_time',
+    'CREATE INDEX idx_xp_area_time ON xp_transactions (area_id, occurred_at)',
+  );
+  late final Index idxXpTime = Index(
+    'idx_xp_time',
+    'CREATE INDEX idx_xp_time ON xp_transactions (occurred_at)',
+  );
+  late final TitleDefinitions titleDefinitions = TitleDefinitions(this);
+  late final TitleHistory titleHistory = TitleHistory(this);
+  late final Index idxTitleHistoryTime = Index(
+    'idx_title_history_time',
+    'CREATE INDEX idx_title_history_time ON title_history (title_id, activated_at)',
+  );
+  late final Index uqTitleHistoryCurrent = Index(
+    'uq_title_history_current',
+    'CREATE UNIQUE INDEX uq_title_history_current ON title_history (title_id) WHERE deactivated_at IS NULL AND status IN (\'ACTIVE\', \'EARNED\')',
+  );
+  late final AppSettings appSettings = AppSettings(this);
+  late final SchemaMetadata schemaMetadata = SchemaMetadata(this);
+  @override
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  @override
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    lifeAreas,
+    uqLifeAreasActiveName,
+    uqLifeAreasDefaultActive,
+    missionTemplates,
+    missionTemplateObjectives,
+    recurrenceRules,
+    missions,
+    uqOccurrence,
+    idxMissionsStatusDate,
+    idxMissionsAreaDate,
+    missionObjectives,
+    timeEntries,
+    idxTimeMissionStart,
+    uqTimeOpenTimerWork,
+    missionEvents,
+    idxEventMissionTime,
+    notificationSchedules,
+    idxNotificationDue,
+    transactions,
+    idxTxDateType,
+    idxTransactionsMission,
+    idxTransactionsRelated,
+    savingsGoals,
+    goalAllocations,
+    idxGoalTime,
+    journalEntries,
+    idxJournalTime,
+    idxJournalMission,
+    idxJournalTransaction,
+    journalAttachments,
+    xpTransactions,
+    uqXpMission,
+    idxXpAreaTime,
+    idxXpTime,
+    titleDefinitions,
+    titleHistory,
+    idxTitleHistoryTime,
+    uqTitleHistoryCurrent,
+    appSettings,
+    schemaMetadata,
+  ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'mission_templates',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('mission_template_objectives', kind: UpdateKind.delete),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'mission_templates',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('recurrence_rules', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'mission_templates',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('missions', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'missions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('transactions', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'missions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('journal_entries', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'transactions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('journal_entries', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'journal_entries',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('journal_attachments', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'journal_entries',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('xp_transactions', kind: UpdateKind.update)],
+    ),
+  ]);
+}
+
+typedef $LifeAreasCreateCompanionBuilder =
+    LifeAreasCompanion Function({
+      required String id,
+      required String name,
+      required String iconKey,
+      required String colorHex,
+      required int isDefault,
+      Value<int> isVisible,
+      required int sortOrder,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+typedef $LifeAreasUpdateCompanionBuilder =
+    LifeAreasCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> iconKey,
+      Value<String> colorHex,
+      Value<int> isDefault,
+      Value<int> isVisible,
+      Value<int> sortOrder,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+
+final class $LifeAreasReferences
+    extends BaseReferences<_$AppDatabase, LifeAreas, LifeArea> {
+  $LifeAreasReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<MissionTemplates, List<MissionTemplate>>
+  _missionTemplatesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.missionTemplates,
+    aliasName: 'life_areas__id__mission_templates__area_id',
+  );
+
+  $MissionTemplatesProcessedTableManager get missionTemplatesRefs {
+    final manager = $MissionTemplatesTableManager(
+      $_db,
+      $_db.missionTemplates,
+    ).filter((f) => f.areaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _missionTemplatesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<Missions, List<Mission>> _missionsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.missions,
+    aliasName: 'life_areas__id__missions__area_id',
+  );
+
+  $MissionsProcessedTableManager get missionsRefs {
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.areaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_missionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<XpTransactions, List<XpTransaction>>
+  _xpTransactionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.xpTransactions,
+    aliasName: 'life_areas__id__xp_transactions__area_id',
+  );
+
+  $XpTransactionsProcessedTableManager get xpTransactionsRefs {
+    final manager = $XpTransactionsTableManager(
+      $_db,
+      $_db.xpTransactions,
+    ).filter((f) => f.areaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_xpTransactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $LifeAreasFilterComposer extends Composer<_$AppDatabase, LifeAreas> {
+  $LifeAreasFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get iconKey => $composableBuilder(
+    column: $table.iconKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isVisible => $composableBuilder(
+    column: $table.isVisible,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> missionTemplatesRefs(
+    Expression<bool> Function($MissionTemplatesFilterComposer f) f,
+  ) {
+    final $MissionTemplatesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesFilterComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> missionsRefs(
+    Expression<bool> Function($MissionsFilterComposer f) f,
+  ) {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> xpTransactionsRefs(
+    Expression<bool> Function($XpTransactionsFilterComposer f) f,
+  ) {
+    final $XpTransactionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.xpTransactions,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $XpTransactionsFilterComposer(
+            $db: $db,
+            $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $LifeAreasOrderingComposer extends Composer<_$AppDatabase, LifeAreas> {
+  $LifeAreasOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get iconKey => $composableBuilder(
+    column: $table.iconKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isVisible => $composableBuilder(
+    column: $table.isVisible,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $LifeAreasAnnotationComposer extends Composer<_$AppDatabase, LifeAreas> {
+  $LifeAreasAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get iconKey =>
+      $composableBuilder(column: $table.iconKey, builder: (column) => column);
+
+  GeneratedColumn<String> get colorHex =>
+      $composableBuilder(column: $table.colorHex, builder: (column) => column);
+
+  GeneratedColumn<int> get isDefault =>
+      $composableBuilder(column: $table.isDefault, builder: (column) => column);
+
+  GeneratedColumn<int> get isVisible =>
+      $composableBuilder(column: $table.isVisible, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  Expression<T> missionTemplatesRefs<T extends Object>(
+    Expression<T> Function($MissionTemplatesAnnotationComposer a) f,
+  ) {
+    final $MissionTemplatesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesAnnotationComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> missionsRefs<T extends Object>(
+    Expression<T> Function($MissionsAnnotationComposer a) f,
+  ) {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> xpTransactionsRefs<T extends Object>(
+    Expression<T> Function($XpTransactionsAnnotationComposer a) f,
+  ) {
+    final $XpTransactionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.xpTransactions,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $XpTransactionsAnnotationComposer(
+            $db: $db,
+            $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $LifeAreasTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          LifeAreas,
+          LifeArea,
+          $LifeAreasFilterComposer,
+          $LifeAreasOrderingComposer,
+          $LifeAreasAnnotationComposer,
+          $LifeAreasCreateCompanionBuilder,
+          $LifeAreasUpdateCompanionBuilder,
+          (LifeArea, $LifeAreasReferences),
+          LifeArea,
+          PrefetchHooks Function({
+            bool missionTemplatesRefs,
+            bool missionsRefs,
+            bool xpTransactionsRefs,
+          })
+        > {
+  $LifeAreasTableManager(_$AppDatabase db, LifeAreas table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $LifeAreasFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $LifeAreasOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $LifeAreasAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> iconKey = const Value.absent(),
+                Value<String> colorHex = const Value.absent(),
+                Value<int> isDefault = const Value.absent(),
+                Value<int> isVisible = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LifeAreasCompanion(
+                id: id,
+                name: name,
+                iconKey: iconKey,
+                colorHex: colorHex,
+                isDefault: isDefault,
+                isVisible: isVisible,
+                sortOrder: sortOrder,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String iconKey,
+                required String colorHex,
+                required int isDefault,
+                Value<int> isVisible = const Value.absent(),
+                required int sortOrder,
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LifeAreasCompanion.insert(
+                id: id,
+                name: name,
+                iconKey: iconKey,
+                colorHex: colorHex,
+                isDefault: isDefault,
+                isVisible: isVisible,
+                sortOrder: sortOrder,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (e.readTable(table), $LifeAreasReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                missionTemplatesRefs = false,
+                missionsRefs = false,
+                xpTransactionsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (missionTemplatesRefs) db.missionTemplates,
+                    if (missionsRefs) db.missions,
+                    if (xpTransactionsRefs) db.xpTransactions,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (missionTemplatesRefs)
+                        await $_getPrefetchedData<
+                          LifeArea,
+                          LifeAreas,
+                          MissionTemplate
+                        >(
+                          currentTable: table,
+                          referencedTable: $LifeAreasReferences
+                              ._missionTemplatesRefsTable(db),
+                          managerFromTypedResult: (p0) => $LifeAreasReferences(
+                            db,
+                            table,
+                            p0,
+                          ).missionTemplatesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.areaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (missionsRefs)
+                        await $_getPrefetchedData<LifeArea, LifeAreas, Mission>(
+                          currentTable: table,
+                          referencedTable: $LifeAreasReferences
+                              ._missionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $LifeAreasReferences(db, table, p0).missionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.areaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (xpTransactionsRefs)
+                        await $_getPrefetchedData<
+                          LifeArea,
+                          LifeAreas,
+                          XpTransaction
+                        >(
+                          currentTable: table,
+                          referencedTable: $LifeAreasReferences
+                              ._xpTransactionsRefsTable(db),
+                          managerFromTypedResult: (p0) => $LifeAreasReferences(
+                            db,
+                            table,
+                            p0,
+                          ).xpTransactionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.areaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $LifeAreasProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      LifeAreas,
+      LifeArea,
+      $LifeAreasFilterComposer,
+      $LifeAreasOrderingComposer,
+      $LifeAreasAnnotationComposer,
+      $LifeAreasCreateCompanionBuilder,
+      $LifeAreasUpdateCompanionBuilder,
+      (LifeArea, $LifeAreasReferences),
+      LifeArea,
+      PrefetchHooks Function({
+        bool missionTemplatesRefs,
+        bool missionsRefs,
+        bool xpTransactionsRefs,
+      })
+    >;
+typedef $MissionTemplatesCreateCompanionBuilder =
+    MissionTemplatesCompanion Function({
+      required String id,
+      required String areaId,
+      required String title,
+      Value<String?> description,
+      required String missionType,
+      Value<String> importance,
+      Value<String> priority,
+      Value<String?> difficulty,
+      required int isRequired,
+      required int xpReward,
+      Value<int?> estimatedMinutes,
+      Value<int?> budgetMinor,
+      required int isActive,
+      Value<int> rowid,
+    });
+typedef $MissionTemplatesUpdateCompanionBuilder =
+    MissionTemplatesCompanion Function({
+      Value<String> id,
+      Value<String> areaId,
+      Value<String> title,
+      Value<String?> description,
+      Value<String> missionType,
+      Value<String> importance,
+      Value<String> priority,
+      Value<String?> difficulty,
+      Value<int> isRequired,
+      Value<int> xpReward,
+      Value<int?> estimatedMinutes,
+      Value<int?> budgetMinor,
+      Value<int> isActive,
+      Value<int> rowid,
+    });
+
+final class $MissionTemplatesReferences
+    extends BaseReferences<_$AppDatabase, MissionTemplates, MissionTemplate> {
+  $MissionTemplatesReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static LifeAreas _areaIdTable(_$AppDatabase db) =>
+      db.lifeAreas.createAlias('mission_templates__area_id__life_areas__id');
+
+  $LifeAreasProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $LifeAreasTableManager(
+      $_db,
+      $_db.lifeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    MissionTemplateObjectives,
+    List<MissionTemplateObjective>
+  >
+  _missionTemplateObjectivesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.missionTemplateObjectives,
+        aliasName:
+            'mission_templates__id__mission_template_objectives__template_id',
+      );
+
+  $MissionTemplateObjectivesProcessedTableManager
+  get missionTemplateObjectivesRefs {
+    final manager = $MissionTemplateObjectivesTableManager(
+      $_db,
+      $_db.missionTemplateObjectives,
+    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _missionTemplateObjectivesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<RecurrenceRules, List<RecurrenceRule>>
+  _recurrenceRulesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.recurrenceRules,
+    aliasName: 'mission_templates__id__recurrence_rules__template_id',
+  );
+
+  $RecurrenceRulesProcessedTableManager get recurrenceRulesRefs {
+    final manager = $RecurrenceRulesTableManager(
+      $_db,
+      $_db.recurrenceRules,
+    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _recurrenceRulesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<Missions, List<Mission>> _missionsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.missions,
+    aliasName: 'mission_templates__id__missions__template_id',
+  );
+
+  $MissionsProcessedTableManager get missionsRefs {
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.templateId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_missionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $MissionTemplatesFilterComposer
+    extends Composer<_$AppDatabase, MissionTemplates> {
+  $MissionTemplatesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get missionType => $composableBuilder(
+    column: $table.missionType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get importance => $composableBuilder(
+    column: $table.importance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get xpReward => $composableBuilder(
+    column: $table.xpReward,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get estimatedMinutes => $composableBuilder(
+    column: $table.estimatedMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $LifeAreasFilterComposer get areaId {
+    final $LifeAreasFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasFilterComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> missionTemplateObjectivesRefs(
+    Expression<bool> Function($MissionTemplateObjectivesFilterComposer f) f,
+  ) {
+    final $MissionTemplateObjectivesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionTemplateObjectives,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplateObjectivesFilterComposer(
+            $db: $db,
+            $table: $db.missionTemplateObjectives,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> recurrenceRulesRefs(
+    Expression<bool> Function($RecurrenceRulesFilterComposer f) f,
+  ) {
+    final $RecurrenceRulesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.recurrenceRules,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $RecurrenceRulesFilterComposer(
+            $db: $db,
+            $table: $db.recurrenceRules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> missionsRefs(
+    Expression<bool> Function($MissionsFilterComposer f) f,
+  ) {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $MissionTemplatesOrderingComposer
+    extends Composer<_$AppDatabase, MissionTemplates> {
+  $MissionTemplatesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get missionType => $composableBuilder(
+    column: $table.missionType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get importance => $composableBuilder(
+    column: $table.importance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get xpReward => $composableBuilder(
+    column: $table.xpReward,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get estimatedMinutes => $composableBuilder(
+    column: $table.estimatedMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $LifeAreasOrderingComposer get areaId {
+    final $LifeAreasOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasOrderingComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionTemplatesAnnotationComposer
+    extends Composer<_$AppDatabase, MissionTemplates> {
+  $MissionTemplatesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get missionType => $composableBuilder(
+    column: $table.missionType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get importance => $composableBuilder(
+    column: $table.importance,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  GeneratedColumn<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get xpReward =>
+      $composableBuilder(column: $table.xpReward, builder: (column) => column);
+
+  GeneratedColumn<int> get estimatedMinutes => $composableBuilder(
+    column: $table.estimatedMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  $LifeAreasAnnotationComposer get areaId {
+    final $LifeAreasAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasAnnotationComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> missionTemplateObjectivesRefs<T extends Object>(
+    Expression<T> Function($MissionTemplateObjectivesAnnotationComposer a) f,
+  ) {
+    final $MissionTemplateObjectivesAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.missionTemplateObjectives,
+          getReferencedColumn: (t) => t.templateId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $MissionTemplateObjectivesAnnotationComposer(
+                $db: $db,
+                $table: $db.missionTemplateObjectives,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> recurrenceRulesRefs<T extends Object>(
+    Expression<T> Function($RecurrenceRulesAnnotationComposer a) f,
+  ) {
+    final $RecurrenceRulesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.recurrenceRules,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $RecurrenceRulesAnnotationComposer(
+            $db: $db,
+            $table: $db.recurrenceRules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> missionsRefs<T extends Object>(
+    Expression<T> Function($MissionsAnnotationComposer a) f,
+  ) {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.templateId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $MissionTemplatesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          MissionTemplates,
+          MissionTemplate,
+          $MissionTemplatesFilterComposer,
+          $MissionTemplatesOrderingComposer,
+          $MissionTemplatesAnnotationComposer,
+          $MissionTemplatesCreateCompanionBuilder,
+          $MissionTemplatesUpdateCompanionBuilder,
+          (MissionTemplate, $MissionTemplatesReferences),
+          MissionTemplate,
+          PrefetchHooks Function({
+            bool areaId,
+            bool missionTemplateObjectivesRefs,
+            bool recurrenceRulesRefs,
+            bool missionsRefs,
+          })
+        > {
+  $MissionTemplatesTableManager(_$AppDatabase db, MissionTemplates table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $MissionTemplatesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $MissionTemplatesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $MissionTemplatesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> areaId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String> missionType = const Value.absent(),
+                Value<String> importance = const Value.absent(),
+                Value<String> priority = const Value.absent(),
+                Value<String?> difficulty = const Value.absent(),
+                Value<int> isRequired = const Value.absent(),
+                Value<int> xpReward = const Value.absent(),
+                Value<int?> estimatedMinutes = const Value.absent(),
+                Value<int?> budgetMinor = const Value.absent(),
+                Value<int> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionTemplatesCompanion(
+                id: id,
+                areaId: areaId,
+                title: title,
+                description: description,
+                missionType: missionType,
+                importance: importance,
+                priority: priority,
+                difficulty: difficulty,
+                isRequired: isRequired,
+                xpReward: xpReward,
+                estimatedMinutes: estimatedMinutes,
+                budgetMinor: budgetMinor,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String areaId,
+                required String title,
+                Value<String?> description = const Value.absent(),
+                required String missionType,
+                Value<String> importance = const Value.absent(),
+                Value<String> priority = const Value.absent(),
+                Value<String?> difficulty = const Value.absent(),
+                required int isRequired,
+                required int xpReward,
+                Value<int?> estimatedMinutes = const Value.absent(),
+                Value<int?> budgetMinor = const Value.absent(),
+                required int isActive,
+                Value<int> rowid = const Value.absent(),
+              }) => MissionTemplatesCompanion.insert(
+                id: id,
+                areaId: areaId,
+                title: title,
+                description: description,
+                missionType: missionType,
+                importance: importance,
+                priority: priority,
+                difficulty: difficulty,
+                isRequired: isRequired,
+                xpReward: xpReward,
+                estimatedMinutes: estimatedMinutes,
+                budgetMinor: budgetMinor,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $MissionTemplatesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                areaId = false,
+                missionTemplateObjectivesRefs = false,
+                recurrenceRulesRefs = false,
+                missionsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (missionTemplateObjectivesRefs)
+                      db.missionTemplateObjectives,
+                    if (recurrenceRulesRefs) db.recurrenceRules,
+                    if (missionsRefs) db.missions,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (areaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.areaId,
+                                    referencedTable: $MissionTemplatesReferences
+                                        ._areaIdTable(db),
+                                    referencedColumn:
+                                        $MissionTemplatesReferences
+                                            ._areaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (missionTemplateObjectivesRefs)
+                        await $_getPrefetchedData<
+                          MissionTemplate,
+                          MissionTemplates,
+                          MissionTemplateObjective
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionTemplatesReferences
+                              ._missionTemplateObjectivesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $MissionTemplatesReferences(
+                                db,
+                                table,
+                                p0,
+                              ).missionTemplateObjectivesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.templateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (recurrenceRulesRefs)
+                        await $_getPrefetchedData<
+                          MissionTemplate,
+                          MissionTemplates,
+                          RecurrenceRule
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionTemplatesReferences
+                              ._recurrenceRulesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $MissionTemplatesReferences(
+                                db,
+                                table,
+                                p0,
+                              ).recurrenceRulesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.templateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (missionsRefs)
+                        await $_getPrefetchedData<
+                          MissionTemplate,
+                          MissionTemplates,
+                          Mission
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionTemplatesReferences
+                              ._missionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $MissionTemplatesReferences(
+                                db,
+                                table,
+                                p0,
+                              ).missionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.templateId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $MissionTemplatesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      MissionTemplates,
+      MissionTemplate,
+      $MissionTemplatesFilterComposer,
+      $MissionTemplatesOrderingComposer,
+      $MissionTemplatesAnnotationComposer,
+      $MissionTemplatesCreateCompanionBuilder,
+      $MissionTemplatesUpdateCompanionBuilder,
+      (MissionTemplate, $MissionTemplatesReferences),
+      MissionTemplate,
+      PrefetchHooks Function({
+        bool areaId,
+        bool missionTemplateObjectivesRefs,
+        bool recurrenceRulesRefs,
+        bool missionsRefs,
+      })
+    >;
+typedef $MissionTemplateObjectivesCreateCompanionBuilder =
+    MissionTemplateObjectivesCompanion Function({
+      required String id,
+      required String templateId,
+      required String description,
+      required int position,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowVersion,
+      Value<int> rowid,
+    });
+typedef $MissionTemplateObjectivesUpdateCompanionBuilder =
+    MissionTemplateObjectivesCompanion Function({
+      Value<String> id,
+      Value<String> templateId,
+      Value<String> description,
+      Value<int> position,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowVersion,
+      Value<int> rowid,
+    });
+
+final class $MissionTemplateObjectivesReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          MissionTemplateObjectives,
+          MissionTemplateObjective
+        > {
+  $MissionTemplateObjectivesReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MissionTemplates _templateIdTable(_$AppDatabase db) =>
+      db.missionTemplates.createAlias(
+        'mission_template_objectives__template_id__mission_templates__id',
+      );
+
+  $MissionTemplatesProcessedTableManager get templateId {
+    final $_column = $_itemColumn<String>('template_id')!;
+
+    final manager = $MissionTemplatesTableManager(
+      $_db,
+      $_db.missionTemplates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $MissionTemplateObjectivesFilterComposer
+    extends Composer<_$AppDatabase, MissionTemplateObjectives> {
+  $MissionTemplateObjectivesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rowVersion => $composableBuilder(
+    column: $table.rowVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionTemplatesFilterComposer get templateId {
+    final $MissionTemplatesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesFilterComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionTemplateObjectivesOrderingComposer
+    extends Composer<_$AppDatabase, MissionTemplateObjectives> {
+  $MissionTemplateObjectivesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rowVersion => $composableBuilder(
+    column: $table.rowVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionTemplatesOrderingComposer get templateId {
+    final $MissionTemplatesOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesOrderingComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionTemplateObjectivesAnnotationComposer
+    extends Composer<_$AppDatabase, MissionTemplateObjectives> {
+  $MissionTemplateObjectivesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get rowVersion => $composableBuilder(
+    column: $table.rowVersion,
+    builder: (column) => column,
+  );
+
+  $MissionTemplatesAnnotationComposer get templateId {
+    final $MissionTemplatesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesAnnotationComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionTemplateObjectivesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          MissionTemplateObjectives,
+          MissionTemplateObjective,
+          $MissionTemplateObjectivesFilterComposer,
+          $MissionTemplateObjectivesOrderingComposer,
+          $MissionTemplateObjectivesAnnotationComposer,
+          $MissionTemplateObjectivesCreateCompanionBuilder,
+          $MissionTemplateObjectivesUpdateCompanionBuilder,
+          (MissionTemplateObjective, $MissionTemplateObjectivesReferences),
+          MissionTemplateObjective,
+          PrefetchHooks Function({bool templateId})
+        > {
+  $MissionTemplateObjectivesTableManager(
+    _$AppDatabase db,
+    MissionTemplateObjectives table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $MissionTemplateObjectivesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $MissionTemplateObjectivesOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $MissionTemplateObjectivesAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> templateId = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionTemplateObjectivesCompanion(
+                id: id,
+                templateId: templateId,
+                description: description,
+                position: position,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowVersion: rowVersion,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String templateId,
+                required String description,
+                required int position,
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionTemplateObjectivesCompanion.insert(
+                id: id,
+                templateId: templateId,
+                description: description,
+                position: position,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowVersion: rowVersion,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $MissionTemplateObjectivesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({templateId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (templateId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.templateId,
+                                referencedTable:
+                                    $MissionTemplateObjectivesReferences
+                                        ._templateIdTable(db),
+                                referencedColumn:
+                                    $MissionTemplateObjectivesReferences
+                                        ._templateIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $MissionTemplateObjectivesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      MissionTemplateObjectives,
+      MissionTemplateObjective,
+      $MissionTemplateObjectivesFilterComposer,
+      $MissionTemplateObjectivesOrderingComposer,
+      $MissionTemplateObjectivesAnnotationComposer,
+      $MissionTemplateObjectivesCreateCompanionBuilder,
+      $MissionTemplateObjectivesUpdateCompanionBuilder,
+      (MissionTemplateObjective, $MissionTemplateObjectivesReferences),
+      MissionTemplateObjective,
+      PrefetchHooks Function({bool templateId})
+    >;
+typedef $RecurrenceRulesCreateCompanionBuilder =
+    RecurrenceRulesCompanion Function({
+      required String id,
+      required String templateId,
+      required String frequency,
+      required int intervalValue,
+      Value<int?> weekdaysMask,
+      Value<int?> localTimeMinutes,
+      required String startDate,
+      Value<String?> endDate,
+      required String timezoneId,
+      Value<String?> lastGeneratedOn,
+      Value<int> rowid,
+    });
+typedef $RecurrenceRulesUpdateCompanionBuilder =
+    RecurrenceRulesCompanion Function({
+      Value<String> id,
+      Value<String> templateId,
+      Value<String> frequency,
+      Value<int> intervalValue,
+      Value<int?> weekdaysMask,
+      Value<int?> localTimeMinutes,
+      Value<String> startDate,
+      Value<String?> endDate,
+      Value<String> timezoneId,
+      Value<String?> lastGeneratedOn,
+      Value<int> rowid,
+    });
+
+final class $RecurrenceRulesReferences
+    extends BaseReferences<_$AppDatabase, RecurrenceRules, RecurrenceRule> {
+  $RecurrenceRulesReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MissionTemplates _templateIdTable(_$AppDatabase db) => db
+      .missionTemplates
+      .createAlias('recurrence_rules__template_id__mission_templates__id');
+
+  $MissionTemplatesProcessedTableManager get templateId {
+    final $_column = $_itemColumn<String>('template_id')!;
+
+    final manager = $MissionTemplatesTableManager(
+      $_db,
+      $_db.missionTemplates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $RecurrenceRulesFilterComposer
+    extends Composer<_$AppDatabase, RecurrenceRules> {
+  $RecurrenceRulesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get frequency => $composableBuilder(
+    column: $table.frequency,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get intervalValue => $composableBuilder(
+    column: $table.intervalValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get weekdaysMask => $composableBuilder(
+    column: $table.weekdaysMask,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get localTimeMinutes => $composableBuilder(
+    column: $table.localTimeMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezoneId => $composableBuilder(
+    column: $table.timezoneId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastGeneratedOn => $composableBuilder(
+    column: $table.lastGeneratedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionTemplatesFilterComposer get templateId {
+    final $MissionTemplatesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesFilterComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $RecurrenceRulesOrderingComposer
+    extends Composer<_$AppDatabase, RecurrenceRules> {
+  $RecurrenceRulesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get frequency => $composableBuilder(
+    column: $table.frequency,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get intervalValue => $composableBuilder(
+    column: $table.intervalValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get weekdaysMask => $composableBuilder(
+    column: $table.weekdaysMask,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get localTimeMinutes => $composableBuilder(
+    column: $table.localTimeMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezoneId => $composableBuilder(
+    column: $table.timezoneId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastGeneratedOn => $composableBuilder(
+    column: $table.lastGeneratedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionTemplatesOrderingComposer get templateId {
+    final $MissionTemplatesOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesOrderingComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $RecurrenceRulesAnnotationComposer
+    extends Composer<_$AppDatabase, RecurrenceRules> {
+  $RecurrenceRulesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get frequency =>
+      $composableBuilder(column: $table.frequency, builder: (column) => column);
+
+  GeneratedColumn<int> get intervalValue => $composableBuilder(
+    column: $table.intervalValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get weekdaysMask => $composableBuilder(
+    column: $table.weekdaysMask,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get localTimeMinutes => $composableBuilder(
+    column: $table.localTimeMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<String> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<String> get timezoneId => $composableBuilder(
+    column: $table.timezoneId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastGeneratedOn => $composableBuilder(
+    column: $table.lastGeneratedOn,
+    builder: (column) => column,
+  );
+
+  $MissionTemplatesAnnotationComposer get templateId {
+    final $MissionTemplatesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesAnnotationComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $RecurrenceRulesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          RecurrenceRules,
+          RecurrenceRule,
+          $RecurrenceRulesFilterComposer,
+          $RecurrenceRulesOrderingComposer,
+          $RecurrenceRulesAnnotationComposer,
+          $RecurrenceRulesCreateCompanionBuilder,
+          $RecurrenceRulesUpdateCompanionBuilder,
+          (RecurrenceRule, $RecurrenceRulesReferences),
+          RecurrenceRule,
+          PrefetchHooks Function({bool templateId})
+        > {
+  $RecurrenceRulesTableManager(_$AppDatabase db, RecurrenceRules table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $RecurrenceRulesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $RecurrenceRulesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $RecurrenceRulesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> templateId = const Value.absent(),
+                Value<String> frequency = const Value.absent(),
+                Value<int> intervalValue = const Value.absent(),
+                Value<int?> weekdaysMask = const Value.absent(),
+                Value<int?> localTimeMinutes = const Value.absent(),
+                Value<String> startDate = const Value.absent(),
+                Value<String?> endDate = const Value.absent(),
+                Value<String> timezoneId = const Value.absent(),
+                Value<String?> lastGeneratedOn = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecurrenceRulesCompanion(
+                id: id,
+                templateId: templateId,
+                frequency: frequency,
+                intervalValue: intervalValue,
+                weekdaysMask: weekdaysMask,
+                localTimeMinutes: localTimeMinutes,
+                startDate: startDate,
+                endDate: endDate,
+                timezoneId: timezoneId,
+                lastGeneratedOn: lastGeneratedOn,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String templateId,
+                required String frequency,
+                required int intervalValue,
+                Value<int?> weekdaysMask = const Value.absent(),
+                Value<int?> localTimeMinutes = const Value.absent(),
+                required String startDate,
+                Value<String?> endDate = const Value.absent(),
+                required String timezoneId,
+                Value<String?> lastGeneratedOn = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecurrenceRulesCompanion.insert(
+                id: id,
+                templateId: templateId,
+                frequency: frequency,
+                intervalValue: intervalValue,
+                weekdaysMask: weekdaysMask,
+                localTimeMinutes: localTimeMinutes,
+                startDate: startDate,
+                endDate: endDate,
+                timezoneId: timezoneId,
+                lastGeneratedOn: lastGeneratedOn,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $RecurrenceRulesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({templateId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (templateId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.templateId,
+                                referencedTable: $RecurrenceRulesReferences
+                                    ._templateIdTable(db),
+                                referencedColumn: $RecurrenceRulesReferences
+                                    ._templateIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $RecurrenceRulesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      RecurrenceRules,
+      RecurrenceRule,
+      $RecurrenceRulesFilterComposer,
+      $RecurrenceRulesOrderingComposer,
+      $RecurrenceRulesAnnotationComposer,
+      $RecurrenceRulesCreateCompanionBuilder,
+      $RecurrenceRulesUpdateCompanionBuilder,
+      (RecurrenceRule, $RecurrenceRulesReferences),
+      RecurrenceRule,
+      PrefetchHooks Function({bool templateId})
+    >;
+typedef $MissionsCreateCompanionBuilder =
+    MissionsCompanion Function({
+      required String id,
+      Value<String?> templateId,
+      required String areaId,
+      required String title,
+      Value<String?> description,
+      required String missionType,
+      Value<String> importance,
+      Value<String> priority,
+      Value<String?> difficulty,
+      required int isRequired,
+      required String status,
+      Value<int?> scheduledAt,
+      Value<int?> availableFrom,
+      Value<int?> expiresAt,
+      Value<int?> estimatedMinutes,
+      Value<int?> budgetMinor,
+      required int xpPlanned,
+      Value<String?> actualResult,
+      Value<String?> convenienceRating,
+      Value<int?> completedAt,
+      Value<int?> archivedAt,
+      Value<int> rowVersion,
+      Value<int> rowid,
+    });
+typedef $MissionsUpdateCompanionBuilder =
+    MissionsCompanion Function({
+      Value<String> id,
+      Value<String?> templateId,
+      Value<String> areaId,
+      Value<String> title,
+      Value<String?> description,
+      Value<String> missionType,
+      Value<String> importance,
+      Value<String> priority,
+      Value<String?> difficulty,
+      Value<int> isRequired,
+      Value<String> status,
+      Value<int?> scheduledAt,
+      Value<int?> availableFrom,
+      Value<int?> expiresAt,
+      Value<int?> estimatedMinutes,
+      Value<int?> budgetMinor,
+      Value<int> xpPlanned,
+      Value<String?> actualResult,
+      Value<String?> convenienceRating,
+      Value<int?> completedAt,
+      Value<int?> archivedAt,
+      Value<int> rowVersion,
+      Value<int> rowid,
+    });
+
+final class $MissionsReferences
+    extends BaseReferences<_$AppDatabase, Missions, Mission> {
+  $MissionsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MissionTemplates _templateIdTable(_$AppDatabase db) => db
+      .missionTemplates
+      .createAlias('missions__template_id__mission_templates__id');
+
+  $MissionTemplatesProcessedTableManager? get templateId {
+    final $_column = $_itemColumn<String>('template_id');
+    if ($_column == null) return null;
+    final manager = $MissionTemplatesTableManager(
+      $_db,
+      $_db.missionTemplates,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_templateIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static LifeAreas _areaIdTable(_$AppDatabase db) =>
+      db.lifeAreas.createAlias('missions__area_id__life_areas__id');
+
+  $LifeAreasProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $LifeAreasTableManager(
+      $_db,
+      $_db.lifeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<MissionObjectives, List<MissionObjective>>
+  _missionObjectivesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.missionObjectives,
+        aliasName: 'missions__id__mission_objectives__mission_id',
+      );
+
+  $MissionObjectivesProcessedTableManager get missionObjectivesRefs {
+    final manager = $MissionObjectivesTableManager(
+      $_db,
+      $_db.missionObjectives,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _missionObjectivesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<TimeEntries, List<TimeEntry>>
+  _timeEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.timeEntries,
+    aliasName: 'missions__id__time_entries__mission_id',
+  );
+
+  $TimeEntriesProcessedTableManager get timeEntriesRefs {
+    final manager = $TimeEntriesTableManager(
+      $_db,
+      $_db.timeEntries,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_timeEntriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<MissionEvents, List<MissionEvent>>
+  _missionEventsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.missionEvents,
+    aliasName: 'missions__id__mission_events__mission_id',
+  );
+
+  $MissionEventsProcessedTableManager get missionEventsRefs {
+    final manager = $MissionEventsTableManager(
+      $_db,
+      $_db.missionEvents,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_missionEventsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<NotificationSchedules, List<NotificationSchedule>>
+  _notificationSchedulesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.notificationSchedules,
+        aliasName: 'missions__id__notification_schedules__mission_id',
+      );
+
+  $NotificationSchedulesProcessedTableManager get notificationSchedulesRefs {
+    final manager = $NotificationSchedulesTableManager(
+      $_db,
+      $_db.notificationSchedules,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _notificationSchedulesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<Transactions, List<Transaction>>
+  _transactionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.transactions,
+    aliasName: 'missions__id__transactions__mission_id',
+  );
+
+  $TransactionsProcessedTableManager get transactionsRefs {
+    final manager = $TransactionsTableManager(
+      $_db,
+      $_db.transactions,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_transactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<JournalEntries, List<JournalEntry>>
+  _journalEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.journalEntries,
+    aliasName: 'missions__id__journal_entries__mission_id',
+  );
+
+  $JournalEntriesProcessedTableManager get journalEntriesRefs {
+    final manager = $JournalEntriesTableManager(
+      $_db,
+      $_db.journalEntries,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_journalEntriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<XpTransactions, List<XpTransaction>>
+  _xpTransactionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.xpTransactions,
+    aliasName: 'missions__id__xp_transactions__mission_id',
+  );
+
+  $XpTransactionsProcessedTableManager get xpTransactionsRefs {
+    final manager = $XpTransactionsTableManager(
+      $_db,
+      $_db.xpTransactions,
+    ).filter((f) => f.missionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_xpTransactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $MissionsFilterComposer extends Composer<_$AppDatabase, Missions> {
+  $MissionsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get missionType => $composableBuilder(
+    column: $table.missionType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get importance => $composableBuilder(
+    column: $table.importance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get availableFrom => $composableBuilder(
+    column: $table.availableFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get estimatedMinutes => $composableBuilder(
+    column: $table.estimatedMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get xpPlanned => $composableBuilder(
+    column: $table.xpPlanned,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get actualResult => $composableBuilder(
+    column: $table.actualResult,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get convenienceRating => $composableBuilder(
+    column: $table.convenienceRating,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rowVersion => $composableBuilder(
+    column: $table.rowVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionTemplatesFilterComposer get templateId {
+    final $MissionTemplatesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesFilterComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $LifeAreasFilterComposer get areaId {
+    final $LifeAreasFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasFilterComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> missionObjectivesRefs(
+    Expression<bool> Function($MissionObjectivesFilterComposer f) f,
+  ) {
+    final $MissionObjectivesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionObjectives,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionObjectivesFilterComposer(
+            $db: $db,
+            $table: $db.missionObjectives,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> timeEntriesRefs(
+    Expression<bool> Function($TimeEntriesFilterComposer f) f,
+  ) {
+    final $TimeEntriesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.timeEntries,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TimeEntriesFilterComposer(
+            $db: $db,
+            $table: $db.timeEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> missionEventsRefs(
+    Expression<bool> Function($MissionEventsFilterComposer f) f,
+  ) {
+    final $MissionEventsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionEvents,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionEventsFilterComposer(
+            $db: $db,
+            $table: $db.missionEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> notificationSchedulesRefs(
+    Expression<bool> Function($NotificationSchedulesFilterComposer f) f,
+  ) {
+    final $NotificationSchedulesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notificationSchedules,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $NotificationSchedulesFilterComposer(
+            $db: $db,
+            $table: $db.notificationSchedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> transactionsRefs(
+    Expression<bool> Function($TransactionsFilterComposer f) f,
+  ) {
+    final $TransactionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TransactionsFilterComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> journalEntriesRefs(
+    Expression<bool> Function($JournalEntriesFilterComposer f) f,
+  ) {
+    final $JournalEntriesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesFilterComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> xpTransactionsRefs(
+    Expression<bool> Function($XpTransactionsFilterComposer f) f,
+  ) {
+    final $XpTransactionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.xpTransactions,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $XpTransactionsFilterComposer(
+            $db: $db,
+            $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $MissionsOrderingComposer extends Composer<_$AppDatabase, Missions> {
+  $MissionsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get missionType => $composableBuilder(
+    column: $table.missionType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get importance => $composableBuilder(
+    column: $table.importance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get availableFrom => $composableBuilder(
+    column: $table.availableFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get estimatedMinutes => $composableBuilder(
+    column: $table.estimatedMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get xpPlanned => $composableBuilder(
+    column: $table.xpPlanned,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get actualResult => $composableBuilder(
+    column: $table.actualResult,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get convenienceRating => $composableBuilder(
+    column: $table.convenienceRating,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rowVersion => $composableBuilder(
+    column: $table.rowVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionTemplatesOrderingComposer get templateId {
+    final $MissionTemplatesOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesOrderingComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $LifeAreasOrderingComposer get areaId {
+    final $LifeAreasOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasOrderingComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionsAnnotationComposer extends Composer<_$AppDatabase, Missions> {
+  $MissionsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get missionType => $composableBuilder(
+    column: $table.missionType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get importance => $composableBuilder(
+    column: $table.importance,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
+  GeneratedColumn<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get isRequired => $composableBuilder(
+    column: $table.isRequired,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get availableFrom => $composableBuilder(
+    column: $table.availableFrom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get expiresAt =>
+      $composableBuilder(column: $table.expiresAt, builder: (column) => column);
+
+  GeneratedColumn<int> get estimatedMinutes => $composableBuilder(
+    column: $table.estimatedMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get xpPlanned =>
+      $composableBuilder(column: $table.xpPlanned, builder: (column) => column);
+
+  GeneratedColumn<String> get actualResult => $composableBuilder(
+    column: $table.actualResult,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get convenienceRating => $composableBuilder(
+    column: $table.convenienceRating,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get rowVersion => $composableBuilder(
+    column: $table.rowVersion,
+    builder: (column) => column,
+  );
+
+  $MissionTemplatesAnnotationComposer get templateId {
+    final $MissionTemplatesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.templateId,
+      referencedTable: $db.missionTemplates,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionTemplatesAnnotationComposer(
+            $db: $db,
+            $table: $db.missionTemplates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $LifeAreasAnnotationComposer get areaId {
+    final $LifeAreasAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasAnnotationComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> missionObjectivesRefs<T extends Object>(
+    Expression<T> Function($MissionObjectivesAnnotationComposer a) f,
+  ) {
+    final $MissionObjectivesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionObjectives,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionObjectivesAnnotationComposer(
+            $db: $db,
+            $table: $db.missionObjectives,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> timeEntriesRefs<T extends Object>(
+    Expression<T> Function($TimeEntriesAnnotationComposer a) f,
+  ) {
+    final $TimeEntriesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.timeEntries,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TimeEntriesAnnotationComposer(
+            $db: $db,
+            $table: $db.timeEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> missionEventsRefs<T extends Object>(
+    Expression<T> Function($MissionEventsAnnotationComposer a) f,
+  ) {
+    final $MissionEventsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.missionEvents,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionEventsAnnotationComposer(
+            $db: $db,
+            $table: $db.missionEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> notificationSchedulesRefs<T extends Object>(
+    Expression<T> Function($NotificationSchedulesAnnotationComposer a) f,
+  ) {
+    final $NotificationSchedulesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notificationSchedules,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $NotificationSchedulesAnnotationComposer(
+            $db: $db,
+            $table: $db.notificationSchedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> transactionsRefs<T extends Object>(
+    Expression<T> Function($TransactionsAnnotationComposer a) f,
+  ) {
+    final $TransactionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TransactionsAnnotationComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> journalEntriesRefs<T extends Object>(
+    Expression<T> Function($JournalEntriesAnnotationComposer a) f,
+  ) {
+    final $JournalEntriesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesAnnotationComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> xpTransactionsRefs<T extends Object>(
+    Expression<T> Function($XpTransactionsAnnotationComposer a) f,
+  ) {
+    final $XpTransactionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.xpTransactions,
+      getReferencedColumn: (t) => t.missionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $XpTransactionsAnnotationComposer(
+            $db: $db,
+            $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $MissionsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          Missions,
+          Mission,
+          $MissionsFilterComposer,
+          $MissionsOrderingComposer,
+          $MissionsAnnotationComposer,
+          $MissionsCreateCompanionBuilder,
+          $MissionsUpdateCompanionBuilder,
+          (Mission, $MissionsReferences),
+          Mission,
+          PrefetchHooks Function({
+            bool templateId,
+            bool areaId,
+            bool missionObjectivesRefs,
+            bool timeEntriesRefs,
+            bool missionEventsRefs,
+            bool notificationSchedulesRefs,
+            bool transactionsRefs,
+            bool journalEntriesRefs,
+            bool xpTransactionsRefs,
+          })
+        > {
+  $MissionsTableManager(_$AppDatabase db, Missions table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $MissionsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $MissionsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $MissionsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> templateId = const Value.absent(),
+                Value<String> areaId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String> missionType = const Value.absent(),
+                Value<String> importance = const Value.absent(),
+                Value<String> priority = const Value.absent(),
+                Value<String?> difficulty = const Value.absent(),
+                Value<int> isRequired = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> scheduledAt = const Value.absent(),
+                Value<int?> availableFrom = const Value.absent(),
+                Value<int?> expiresAt = const Value.absent(),
+                Value<int?> estimatedMinutes = const Value.absent(),
+                Value<int?> budgetMinor = const Value.absent(),
+                Value<int> xpPlanned = const Value.absent(),
+                Value<String?> actualResult = const Value.absent(),
+                Value<String?> convenienceRating = const Value.absent(),
+                Value<int?> completedAt = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionsCompanion(
+                id: id,
+                templateId: templateId,
+                areaId: areaId,
+                title: title,
+                description: description,
+                missionType: missionType,
+                importance: importance,
+                priority: priority,
+                difficulty: difficulty,
+                isRequired: isRequired,
+                status: status,
+                scheduledAt: scheduledAt,
+                availableFrom: availableFrom,
+                expiresAt: expiresAt,
+                estimatedMinutes: estimatedMinutes,
+                budgetMinor: budgetMinor,
+                xpPlanned: xpPlanned,
+                actualResult: actualResult,
+                convenienceRating: convenienceRating,
+                completedAt: completedAt,
+                archivedAt: archivedAt,
+                rowVersion: rowVersion,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> templateId = const Value.absent(),
+                required String areaId,
+                required String title,
+                Value<String?> description = const Value.absent(),
+                required String missionType,
+                Value<String> importance = const Value.absent(),
+                Value<String> priority = const Value.absent(),
+                Value<String?> difficulty = const Value.absent(),
+                required int isRequired,
+                required String status,
+                Value<int?> scheduledAt = const Value.absent(),
+                Value<int?> availableFrom = const Value.absent(),
+                Value<int?> expiresAt = const Value.absent(),
+                Value<int?> estimatedMinutes = const Value.absent(),
+                Value<int?> budgetMinor = const Value.absent(),
+                required int xpPlanned,
+                Value<String?> actualResult = const Value.absent(),
+                Value<String?> convenienceRating = const Value.absent(),
+                Value<int?> completedAt = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowVersion = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionsCompanion.insert(
+                id: id,
+                templateId: templateId,
+                areaId: areaId,
+                title: title,
+                description: description,
+                missionType: missionType,
+                importance: importance,
+                priority: priority,
+                difficulty: difficulty,
+                isRequired: isRequired,
+                status: status,
+                scheduledAt: scheduledAt,
+                availableFrom: availableFrom,
+                expiresAt: expiresAt,
+                estimatedMinutes: estimatedMinutes,
+                budgetMinor: budgetMinor,
+                xpPlanned: xpPlanned,
+                actualResult: actualResult,
+                convenienceRating: convenienceRating,
+                completedAt: completedAt,
+                archivedAt: archivedAt,
+                rowVersion: rowVersion,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (e.readTable(table), $MissionsReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                templateId = false,
+                areaId = false,
+                missionObjectivesRefs = false,
+                timeEntriesRefs = false,
+                missionEventsRefs = false,
+                notificationSchedulesRefs = false,
+                transactionsRefs = false,
+                journalEntriesRefs = false,
+                xpTransactionsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (missionObjectivesRefs) db.missionObjectives,
+                    if (timeEntriesRefs) db.timeEntries,
+                    if (missionEventsRefs) db.missionEvents,
+                    if (notificationSchedulesRefs) db.notificationSchedules,
+                    if (transactionsRefs) db.transactions,
+                    if (journalEntriesRefs) db.journalEntries,
+                    if (xpTransactionsRefs) db.xpTransactions,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (templateId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.templateId,
+                                    referencedTable: $MissionsReferences
+                                        ._templateIdTable(db),
+                                    referencedColumn: $MissionsReferences
+                                        ._templateIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (areaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.areaId,
+                                    referencedTable: $MissionsReferences
+                                        ._areaIdTable(db),
+                                    referencedColumn: $MissionsReferences
+                                        ._areaIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (missionObjectivesRefs)
+                        await $_getPrefetchedData<
+                          Mission,
+                          Missions,
+                          MissionObjective
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._missionObjectivesRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).missionObjectivesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (timeEntriesRefs)
+                        await $_getPrefetchedData<Mission, Missions, TimeEntry>(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._timeEntriesRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).timeEntriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (missionEventsRefs)
+                        await $_getPrefetchedData<
+                          Mission,
+                          Missions,
+                          MissionEvent
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._missionEventsRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).missionEventsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (notificationSchedulesRefs)
+                        await $_getPrefetchedData<
+                          Mission,
+                          Missions,
+                          NotificationSchedule
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._notificationSchedulesRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).notificationSchedulesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (transactionsRefs)
+                        await $_getPrefetchedData<
+                          Mission,
+                          Missions,
+                          Transaction
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._transactionsRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).transactionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (journalEntriesRefs)
+                        await $_getPrefetchedData<
+                          Mission,
+                          Missions,
+                          JournalEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._journalEntriesRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).journalEntriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (xpTransactionsRefs)
+                        await $_getPrefetchedData<
+                          Mission,
+                          Missions,
+                          XpTransaction
+                        >(
+                          currentTable: table,
+                          referencedTable: $MissionsReferences
+                              ._xpTransactionsRefsTable(db),
+                          managerFromTypedResult: (p0) => $MissionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).xpTransactionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.missionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $MissionsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      Missions,
+      Mission,
+      $MissionsFilterComposer,
+      $MissionsOrderingComposer,
+      $MissionsAnnotationComposer,
+      $MissionsCreateCompanionBuilder,
+      $MissionsUpdateCompanionBuilder,
+      (Mission, $MissionsReferences),
+      Mission,
+      PrefetchHooks Function({
+        bool templateId,
+        bool areaId,
+        bool missionObjectivesRefs,
+        bool timeEntriesRefs,
+        bool missionEventsRefs,
+        bool notificationSchedulesRefs,
+        bool transactionsRefs,
+        bool journalEntriesRefs,
+        bool xpTransactionsRefs,
+      })
+    >;
+typedef $MissionObjectivesCreateCompanionBuilder =
+    MissionObjectivesCompanion Function({
+      required String id,
+      required String missionId,
+      required String description,
+      required int position,
+      Value<int?> completedAt,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $MissionObjectivesUpdateCompanionBuilder =
+    MissionObjectivesCompanion Function({
+      Value<String> id,
+      Value<String> missionId,
+      Value<String> description,
+      Value<int> position,
+      Value<int?> completedAt,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $MissionObjectivesReferences
+    extends BaseReferences<_$AppDatabase, MissionObjectives, MissionObjective> {
+  $MissionObjectivesReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static Missions _missionIdTable(_$AppDatabase db) =>
+      db.missions.createAlias('mission_objectives__mission_id__missions__id');
+
+  $MissionsProcessedTableManager get missionId {
+    final $_column = $_itemColumn<String>('mission_id')!;
+
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $MissionObjectivesFilterComposer
+    extends Composer<_$AppDatabase, MissionObjectives> {
+  $MissionObjectivesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionObjectivesOrderingComposer
+    extends Composer<_$AppDatabase, MissionObjectives> {
+  $MissionObjectivesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionObjectivesAnnotationComposer
+    extends Composer<_$AppDatabase, MissionObjectives> {
+  $MissionObjectivesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionObjectivesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          MissionObjectives,
+          MissionObjective,
+          $MissionObjectivesFilterComposer,
+          $MissionObjectivesOrderingComposer,
+          $MissionObjectivesAnnotationComposer,
+          $MissionObjectivesCreateCompanionBuilder,
+          $MissionObjectivesUpdateCompanionBuilder,
+          (MissionObjective, $MissionObjectivesReferences),
+          MissionObjective,
+          PrefetchHooks Function({bool missionId})
+        > {
+  $MissionObjectivesTableManager(_$AppDatabase db, MissionObjectives table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $MissionObjectivesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $MissionObjectivesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $MissionObjectivesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> missionId = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int?> completedAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionObjectivesCompanion(
+                id: id,
+                missionId: missionId,
+                description: description,
+                position: position,
+                completedAt: completedAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String missionId,
+                required String description,
+                required int position,
+                Value<int?> completedAt = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => MissionObjectivesCompanion.insert(
+                id: id,
+                missionId: missionId,
+                description: description,
+                position: position,
+                completedAt: completedAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $MissionObjectivesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({missionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (missionId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.missionId,
+                                referencedTable: $MissionObjectivesReferences
+                                    ._missionIdTable(db),
+                                referencedColumn: $MissionObjectivesReferences
+                                    ._missionIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $MissionObjectivesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      MissionObjectives,
+      MissionObjective,
+      $MissionObjectivesFilterComposer,
+      $MissionObjectivesOrderingComposer,
+      $MissionObjectivesAnnotationComposer,
+      $MissionObjectivesCreateCompanionBuilder,
+      $MissionObjectivesUpdateCompanionBuilder,
+      (MissionObjective, $MissionObjectivesReferences),
+      MissionObjective,
+      PrefetchHooks Function({bool missionId})
+    >;
+typedef $TimeEntriesCreateCompanionBuilder =
+    TimeEntriesCompanion Function({
+      required String id,
+      required String missionId,
+      required String source,
+      required String segmentType,
+      Value<int?> startedAt,
+      Value<int?> endedAt,
+      required int durationSeconds,
+      Value<String?> note,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $TimeEntriesUpdateCompanionBuilder =
+    TimeEntriesCompanion Function({
+      Value<String> id,
+      Value<String> missionId,
+      Value<String> source,
+      Value<String> segmentType,
+      Value<int?> startedAt,
+      Value<int?> endedAt,
+      Value<int> durationSeconds,
+      Value<String?> note,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $TimeEntriesReferences
+    extends BaseReferences<_$AppDatabase, TimeEntries, TimeEntry> {
+  $TimeEntriesReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static Missions _missionIdTable(_$AppDatabase db) =>
+      db.missions.createAlias('time_entries__mission_id__missions__id');
+
+  $MissionsProcessedTableManager get missionId {
+    final $_column = $_itemColumn<String>('mission_id')!;
+
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $TimeEntriesFilterComposer extends Composer<_$AppDatabase, TimeEntries> {
+  $TimeEntriesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get segmentType => $composableBuilder(
+    column: $table.segmentType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationSeconds => $composableBuilder(
+    column: $table.durationSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TimeEntriesOrderingComposer
+    extends Composer<_$AppDatabase, TimeEntries> {
+  $TimeEntriesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get segmentType => $composableBuilder(
+    column: $table.segmentType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationSeconds => $composableBuilder(
+    column: $table.durationSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TimeEntriesAnnotationComposer
+    extends Composer<_$AppDatabase, TimeEntries> {
+  $TimeEntriesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get segmentType => $composableBuilder(
+    column: $table.segmentType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get durationSeconds => $composableBuilder(
+    column: $table.durationSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TimeEntriesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          TimeEntries,
+          TimeEntry,
+          $TimeEntriesFilterComposer,
+          $TimeEntriesOrderingComposer,
+          $TimeEntriesAnnotationComposer,
+          $TimeEntriesCreateCompanionBuilder,
+          $TimeEntriesUpdateCompanionBuilder,
+          (TimeEntry, $TimeEntriesReferences),
+          TimeEntry,
+          PrefetchHooks Function({bool missionId})
+        > {
+  $TimeEntriesTableManager(_$AppDatabase db, TimeEntries table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $TimeEntriesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $TimeEntriesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $TimeEntriesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> missionId = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<String> segmentType = const Value.absent(),
+                Value<int?> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                Value<int> durationSeconds = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TimeEntriesCompanion(
+                id: id,
+                missionId: missionId,
+                source: source,
+                segmentType: segmentType,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                durationSeconds: durationSeconds,
+                note: note,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String missionId,
+                required String source,
+                required String segmentType,
+                Value<int?> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+                required int durationSeconds,
+                Value<String?> note = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TimeEntriesCompanion.insert(
+                id: id,
+                missionId: missionId,
+                source: source,
+                segmentType: segmentType,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                durationSeconds: durationSeconds,
+                note: note,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $TimeEntriesReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({missionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (missionId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.missionId,
+                                referencedTable: $TimeEntriesReferences
+                                    ._missionIdTable(db),
+                                referencedColumn: $TimeEntriesReferences
+                                    ._missionIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $TimeEntriesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      TimeEntries,
+      TimeEntry,
+      $TimeEntriesFilterComposer,
+      $TimeEntriesOrderingComposer,
+      $TimeEntriesAnnotationComposer,
+      $TimeEntriesCreateCompanionBuilder,
+      $TimeEntriesUpdateCompanionBuilder,
+      (TimeEntry, $TimeEntriesReferences),
+      TimeEntry,
+      PrefetchHooks Function({bool missionId})
+    >;
+typedef $MissionEventsCreateCompanionBuilder =
+    MissionEventsCompanion Function({
+      required String id,
+      required String missionId,
+      required String eventType,
+      Value<String?> fromStatus,
+      Value<String?> toStatus,
+      Value<String?> reason,
+      Value<String?> snapshotJson,
+      required int occurredAt,
+      Value<int> rowid,
+    });
+typedef $MissionEventsUpdateCompanionBuilder =
+    MissionEventsCompanion Function({
+      Value<String> id,
+      Value<String> missionId,
+      Value<String> eventType,
+      Value<String?> fromStatus,
+      Value<String?> toStatus,
+      Value<String?> reason,
+      Value<String?> snapshotJson,
+      Value<int> occurredAt,
+      Value<int> rowid,
+    });
+
+final class $MissionEventsReferences
+    extends BaseReferences<_$AppDatabase, MissionEvents, MissionEvent> {
+  $MissionEventsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static Missions _missionIdTable(_$AppDatabase db) =>
+      db.missions.createAlias('mission_events__mission_id__missions__id');
+
+  $MissionsProcessedTableManager get missionId {
+    final $_column = $_itemColumn<String>('mission_id')!;
+
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $MissionEventsFilterComposer
+    extends Composer<_$AppDatabase, MissionEvents> {
+  $MissionEventsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fromStatus => $composableBuilder(
+    column: $table.fromStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toStatus => $composableBuilder(
+    column: $table.toStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snapshotJson => $composableBuilder(
+    column: $table.snapshotJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionEventsOrderingComposer
+    extends Composer<_$AppDatabase, MissionEvents> {
+  $MissionEventsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromStatus => $composableBuilder(
+    column: $table.fromStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toStatus => $composableBuilder(
+    column: $table.toStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snapshotJson => $composableBuilder(
+    column: $table.snapshotJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionEventsAnnotationComposer
+    extends Composer<_$AppDatabase, MissionEvents> {
+  $MissionEventsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get eventType =>
+      $composableBuilder(column: $table.eventType, builder: (column) => column);
+
+  GeneratedColumn<String> get fromStatus => $composableBuilder(
+    column: $table.fromStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get toStatus =>
+      $composableBuilder(column: $table.toStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<String> get snapshotJson => $composableBuilder(
+    column: $table.snapshotJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $MissionEventsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          MissionEvents,
+          MissionEvent,
+          $MissionEventsFilterComposer,
+          $MissionEventsOrderingComposer,
+          $MissionEventsAnnotationComposer,
+          $MissionEventsCreateCompanionBuilder,
+          $MissionEventsUpdateCompanionBuilder,
+          (MissionEvent, $MissionEventsReferences),
+          MissionEvent,
+          PrefetchHooks Function({bool missionId})
+        > {
+  $MissionEventsTableManager(_$AppDatabase db, MissionEvents table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $MissionEventsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $MissionEventsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $MissionEventsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> missionId = const Value.absent(),
+                Value<String> eventType = const Value.absent(),
+                Value<String?> fromStatus = const Value.absent(),
+                Value<String?> toStatus = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> snapshotJson = const Value.absent(),
+                Value<int> occurredAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MissionEventsCompanion(
+                id: id,
+                missionId: missionId,
+                eventType: eventType,
+                fromStatus: fromStatus,
+                toStatus: toStatus,
+                reason: reason,
+                snapshotJson: snapshotJson,
+                occurredAt: occurredAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String missionId,
+                required String eventType,
+                Value<String?> fromStatus = const Value.absent(),
+                Value<String?> toStatus = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<String?> snapshotJson = const Value.absent(),
+                required int occurredAt,
+                Value<int> rowid = const Value.absent(),
+              }) => MissionEventsCompanion.insert(
+                id: id,
+                missionId: missionId,
+                eventType: eventType,
+                fromStatus: fromStatus,
+                toStatus: toStatus,
+                reason: reason,
+                snapshotJson: snapshotJson,
+                occurredAt: occurredAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $MissionEventsReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({missionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (missionId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.missionId,
+                                referencedTable: $MissionEventsReferences
+                                    ._missionIdTable(db),
+                                referencedColumn: $MissionEventsReferences
+                                    ._missionIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $MissionEventsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      MissionEvents,
+      MissionEvent,
+      $MissionEventsFilterComposer,
+      $MissionEventsOrderingComposer,
+      $MissionEventsAnnotationComposer,
+      $MissionEventsCreateCompanionBuilder,
+      $MissionEventsUpdateCompanionBuilder,
+      (MissionEvent, $MissionEventsReferences),
+      MissionEvent,
+      PrefetchHooks Function({bool missionId})
+    >;
+typedef $NotificationSchedulesCreateCompanionBuilder =
+    NotificationSchedulesCompanion Function({
+      required String id,
+      required String missionId,
+      required String notificationType,
+      required int notifyAt,
+      required String status,
+      Value<int?> systemNotificationId,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $NotificationSchedulesUpdateCompanionBuilder =
+    NotificationSchedulesCompanion Function({
+      Value<String> id,
+      Value<String> missionId,
+      Value<String> notificationType,
+      Value<int> notifyAt,
+      Value<String> status,
+      Value<int?> systemNotificationId,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $NotificationSchedulesReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          NotificationSchedules,
+          NotificationSchedule
+        > {
+  $NotificationSchedulesReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static Missions _missionIdTable(_$AppDatabase db) => db.missions.createAlias(
+    'notification_schedules__mission_id__missions__id',
+  );
+
+  $MissionsProcessedTableManager get missionId {
+    final $_column = $_itemColumn<String>('mission_id')!;
+
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $NotificationSchedulesFilterComposer
+    extends Composer<_$AppDatabase, NotificationSchedules> {
+  $NotificationSchedulesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get notifyAt => $composableBuilder(
+    column: $table.notifyAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get systemNotificationId => $composableBuilder(
+    column: $table.systemNotificationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $NotificationSchedulesOrderingComposer
+    extends Composer<_$AppDatabase, NotificationSchedules> {
+  $NotificationSchedulesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get notifyAt => $composableBuilder(
+    column: $table.notifyAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get systemNotificationId => $composableBuilder(
+    column: $table.systemNotificationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $NotificationSchedulesAnnotationComposer
+    extends Composer<_$AppDatabase, NotificationSchedules> {
+  $NotificationSchedulesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get notifyAt =>
+      $composableBuilder(column: $table.notifyAt, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get systemNotificationId => $composableBuilder(
+    column: $table.systemNotificationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $NotificationSchedulesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          NotificationSchedules,
+          NotificationSchedule,
+          $NotificationSchedulesFilterComposer,
+          $NotificationSchedulesOrderingComposer,
+          $NotificationSchedulesAnnotationComposer,
+          $NotificationSchedulesCreateCompanionBuilder,
+          $NotificationSchedulesUpdateCompanionBuilder,
+          (NotificationSchedule, $NotificationSchedulesReferences),
+          NotificationSchedule,
+          PrefetchHooks Function({bool missionId})
+        > {
+  $NotificationSchedulesTableManager(
+    _$AppDatabase db,
+    NotificationSchedules table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $NotificationSchedulesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $NotificationSchedulesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $NotificationSchedulesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> missionId = const Value.absent(),
+                Value<String> notificationType = const Value.absent(),
+                Value<int> notifyAt = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> systemNotificationId = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotificationSchedulesCompanion(
+                id: id,
+                missionId: missionId,
+                notificationType: notificationType,
+                notifyAt: notifyAt,
+                status: status,
+                systemNotificationId: systemNotificationId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String missionId,
+                required String notificationType,
+                required int notifyAt,
+                required String status,
+                Value<int?> systemNotificationId = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => NotificationSchedulesCompanion.insert(
+                id: id,
+                missionId: missionId,
+                notificationType: notificationType,
+                notifyAt: notifyAt,
+                status: status,
+                systemNotificationId: systemNotificationId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $NotificationSchedulesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({missionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (missionId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.missionId,
+                                referencedTable:
+                                    $NotificationSchedulesReferences
+                                        ._missionIdTable(db),
+                                referencedColumn:
+                                    $NotificationSchedulesReferences
+                                        ._missionIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $NotificationSchedulesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      NotificationSchedules,
+      NotificationSchedule,
+      $NotificationSchedulesFilterComposer,
+      $NotificationSchedulesOrderingComposer,
+      $NotificationSchedulesAnnotationComposer,
+      $NotificationSchedulesCreateCompanionBuilder,
+      $NotificationSchedulesUpdateCompanionBuilder,
+      (NotificationSchedule, $NotificationSchedulesReferences),
+      NotificationSchedule,
+      PrefetchHooks Function({bool missionId})
+    >;
+typedef $TransactionsCreateCompanionBuilder =
+    TransactionsCompanion Function({
+      required String id,
+      required String operationId,
+      Value<String?> missionId,
+      Value<String?> relatedTransactionId,
+      required String transactionType,
+      required int amountMinor,
+      Value<String?> paymentMethod,
+      Value<String?> category,
+      Value<String?> note,
+      required int occurredAt,
+      required int createdAt,
+      Value<int?> reversedAt,
+      Value<int> rowid,
+    });
+typedef $TransactionsUpdateCompanionBuilder =
+    TransactionsCompanion Function({
+      Value<String> id,
+      Value<String> operationId,
+      Value<String?> missionId,
+      Value<String?> relatedTransactionId,
+      Value<String> transactionType,
+      Value<int> amountMinor,
+      Value<String?> paymentMethod,
+      Value<String?> category,
+      Value<String?> note,
+      Value<int> occurredAt,
+      Value<int> createdAt,
+      Value<int?> reversedAt,
+      Value<int> rowid,
+    });
+
+final class $TransactionsReferences
+    extends BaseReferences<_$AppDatabase, Transactions, Transaction> {
+  $TransactionsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static Missions _missionIdTable(_$AppDatabase db) =>
+      db.missions.createAlias('transactions__mission_id__missions__id');
+
+  $MissionsProcessedTableManager? get missionId {
+    final $_column = $_itemColumn<String>('mission_id');
+    if ($_column == null) return null;
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<JournalEntries, List<JournalEntry>>
+  _journalEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.journalEntries,
+    aliasName: 'transactions__id__journal_entries__transaction_id',
+  );
+
+  $JournalEntriesProcessedTableManager get journalEntriesRefs {
+    final manager = $JournalEntriesTableManager(
+      $_db,
+      $_db.journalEntries,
+    ).filter((f) => f.transactionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_journalEntriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $TransactionsFilterComposer
+    extends Composer<_$AppDatabase, Transactions> {
+  $TransactionsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relatedTransactionId => $composableBuilder(
+    column: $table.relatedTransactionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transactionType => $composableBuilder(
+    column: $table.transactionType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reversedAt => $composableBuilder(
+    column: $table.reversedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> journalEntriesRefs(
+    Expression<bool> Function($JournalEntriesFilterComposer f) f,
+  ) {
+    final $JournalEntriesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.transactionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesFilterComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $TransactionsOrderingComposer
+    extends Composer<_$AppDatabase, Transactions> {
+  $TransactionsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relatedTransactionId => $composableBuilder(
+    column: $table.relatedTransactionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transactionType => $composableBuilder(
+    column: $table.transactionType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reversedAt => $composableBuilder(
+    column: $table.reversedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TransactionsAnnotationComposer
+    extends Composer<_$AppDatabase, Transactions> {
+  $TransactionsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relatedTransactionId => $composableBuilder(
+    column: $table.relatedTransactionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get transactionType => $composableBuilder(
+    column: $table.transactionType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get reversedAt => $composableBuilder(
+    column: $table.reversedAt,
+    builder: (column) => column,
+  );
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> journalEntriesRefs<T extends Object>(
+    Expression<T> Function($JournalEntriesAnnotationComposer a) f,
+  ) {
+    final $JournalEntriesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.transactionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesAnnotationComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $TransactionsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          Transactions,
+          Transaction,
+          $TransactionsFilterComposer,
+          $TransactionsOrderingComposer,
+          $TransactionsAnnotationComposer,
+          $TransactionsCreateCompanionBuilder,
+          $TransactionsUpdateCompanionBuilder,
+          (Transaction, $TransactionsReferences),
+          Transaction,
+          PrefetchHooks Function({bool missionId, bool journalEntriesRefs})
+        > {
+  $TransactionsTableManager(_$AppDatabase db, Transactions table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $TransactionsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $TransactionsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $TransactionsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> operationId = const Value.absent(),
+                Value<String?> missionId = const Value.absent(),
+                Value<String?> relatedTransactionId = const Value.absent(),
+                Value<String> transactionType = const Value.absent(),
+                Value<int> amountMinor = const Value.absent(),
+                Value<String?> paymentMethod = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> occurredAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int?> reversedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TransactionsCompanion(
+                id: id,
+                operationId: operationId,
+                missionId: missionId,
+                relatedTransactionId: relatedTransactionId,
+                transactionType: transactionType,
+                amountMinor: amountMinor,
+                paymentMethod: paymentMethod,
+                category: category,
+                note: note,
+                occurredAt: occurredAt,
+                createdAt: createdAt,
+                reversedAt: reversedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String operationId,
+                Value<String?> missionId = const Value.absent(),
+                Value<String?> relatedTransactionId = const Value.absent(),
+                required String transactionType,
+                required int amountMinor,
+                Value<String?> paymentMethod = const Value.absent(),
+                Value<String?> category = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                required int occurredAt,
+                required int createdAt,
+                Value<int?> reversedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TransactionsCompanion.insert(
+                id: id,
+                operationId: operationId,
+                missionId: missionId,
+                relatedTransactionId: relatedTransactionId,
+                transactionType: transactionType,
+                amountMinor: amountMinor,
+                paymentMethod: paymentMethod,
+                category: category,
+                note: note,
+                occurredAt: occurredAt,
+                createdAt: createdAt,
+                reversedAt: reversedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $TransactionsReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({missionId = false, journalEntriesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (journalEntriesRefs) db.journalEntries,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (missionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.missionId,
+                                    referencedTable: $TransactionsReferences
+                                        ._missionIdTable(db),
+                                    referencedColumn: $TransactionsReferences
+                                        ._missionIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (journalEntriesRefs)
+                        await $_getPrefetchedData<
+                          Transaction,
+                          Transactions,
+                          JournalEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $TransactionsReferences
+                              ._journalEntriesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $TransactionsReferences(
+                                db,
+                                table,
+                                p0,
+                              ).journalEntriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.transactionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $TransactionsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      Transactions,
+      Transaction,
+      $TransactionsFilterComposer,
+      $TransactionsOrderingComposer,
+      $TransactionsAnnotationComposer,
+      $TransactionsCreateCompanionBuilder,
+      $TransactionsUpdateCompanionBuilder,
+      (Transaction, $TransactionsReferences),
+      Transaction,
+      PrefetchHooks Function({bool missionId, bool journalEntriesRefs})
+    >;
+typedef $SavingsGoalsCreateCompanionBuilder =
+    SavingsGoalsCompanion Function({
+      required String id,
+      required String title,
+      required int targetMinor,
+      required String status,
+      Value<String?> dueDate,
+      required int createdAt,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+typedef $SavingsGoalsUpdateCompanionBuilder =
+    SavingsGoalsCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<int> targetMinor,
+      Value<String> status,
+      Value<String?> dueDate,
+      Value<int> createdAt,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+
+final class $SavingsGoalsReferences
+    extends BaseReferences<_$AppDatabase, SavingsGoals, SavingsGoal> {
+  $SavingsGoalsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<GoalAllocations, List<GoalAllocation>>
+  _goalAllocationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.goalAllocations,
+    aliasName: 'savings_goals__id__goal_allocations__goal_id',
+  );
+
+  $GoalAllocationsProcessedTableManager get goalAllocationsRefs {
+    final manager = $GoalAllocationsTableManager(
+      $_db,
+      $_db.goalAllocations,
+    ).filter((f) => f.goalId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _goalAllocationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $SavingsGoalsFilterComposer
+    extends Composer<_$AppDatabase, SavingsGoals> {
+  $SavingsGoalsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetMinor => $composableBuilder(
+    column: $table.targetMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dueDate => $composableBuilder(
+    column: $table.dueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> goalAllocationsRefs(
+    Expression<bool> Function($GoalAllocationsFilterComposer f) f,
+  ) {
+    final $GoalAllocationsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.goalAllocations,
+      getReferencedColumn: (t) => t.goalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $GoalAllocationsFilterComposer(
+            $db: $db,
+            $table: $db.goalAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $SavingsGoalsOrderingComposer
+    extends Composer<_$AppDatabase, SavingsGoals> {
+  $SavingsGoalsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetMinor => $composableBuilder(
+    column: $table.targetMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dueDate => $composableBuilder(
+    column: $table.dueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $SavingsGoalsAnnotationComposer
+    extends Composer<_$AppDatabase, SavingsGoals> {
+  $SavingsGoalsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<int> get targetMinor => $composableBuilder(
+    column: $table.targetMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get dueDate =>
+      $composableBuilder(column: $table.dueDate, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  Expression<T> goalAllocationsRefs<T extends Object>(
+    Expression<T> Function($GoalAllocationsAnnotationComposer a) f,
+  ) {
+    final $GoalAllocationsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.goalAllocations,
+      getReferencedColumn: (t) => t.goalId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $GoalAllocationsAnnotationComposer(
+            $db: $db,
+            $table: $db.goalAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $SavingsGoalsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          SavingsGoals,
+          SavingsGoal,
+          $SavingsGoalsFilterComposer,
+          $SavingsGoalsOrderingComposer,
+          $SavingsGoalsAnnotationComposer,
+          $SavingsGoalsCreateCompanionBuilder,
+          $SavingsGoalsUpdateCompanionBuilder,
+          (SavingsGoal, $SavingsGoalsReferences),
+          SavingsGoal,
+          PrefetchHooks Function({bool goalAllocationsRefs})
+        > {
+  $SavingsGoalsTableManager(_$AppDatabase db, SavingsGoals table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SavingsGoalsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SavingsGoalsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SavingsGoalsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<int> targetMinor = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> dueDate = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SavingsGoalsCompanion(
+                id: id,
+                title: title,
+                targetMinor: targetMinor,
+                status: status,
+                dueDate: dueDate,
+                createdAt: createdAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                required int targetMinor,
+                required String status,
+                Value<String?> dueDate = const Value.absent(),
+                required int createdAt,
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SavingsGoalsCompanion.insert(
+                id: id,
+                title: title,
+                targetMinor: targetMinor,
+                status: status,
+                dueDate: dueDate,
+                createdAt: createdAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $SavingsGoalsReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({goalAllocationsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (goalAllocationsRefs) db.goalAllocations,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (goalAllocationsRefs)
+                    await $_getPrefetchedData<
+                      SavingsGoal,
+                      SavingsGoals,
+                      GoalAllocation
+                    >(
+                      currentTable: table,
+                      referencedTable: $SavingsGoalsReferences
+                          ._goalAllocationsRefsTable(db),
+                      managerFromTypedResult: (p0) => $SavingsGoalsReferences(
+                        db,
+                        table,
+                        p0,
+                      ).goalAllocationsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.goalId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $SavingsGoalsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      SavingsGoals,
+      SavingsGoal,
+      $SavingsGoalsFilterComposer,
+      $SavingsGoalsOrderingComposer,
+      $SavingsGoalsAnnotationComposer,
+      $SavingsGoalsCreateCompanionBuilder,
+      $SavingsGoalsUpdateCompanionBuilder,
+      (SavingsGoal, $SavingsGoalsReferences),
+      SavingsGoal,
+      PrefetchHooks Function({bool goalAllocationsRefs})
+    >;
+typedef $GoalAllocationsCreateCompanionBuilder =
+    GoalAllocationsCompanion Function({
+      required String id,
+      required String operationId,
+      required String goalId,
+      required String direction,
+      required int amountMinor,
+      Value<String?> note,
+      required int occurredAt,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $GoalAllocationsUpdateCompanionBuilder =
+    GoalAllocationsCompanion Function({
+      Value<String> id,
+      Value<String> operationId,
+      Value<String> goalId,
+      Value<String> direction,
+      Value<int> amountMinor,
+      Value<String?> note,
+      Value<int> occurredAt,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $GoalAllocationsReferences
+    extends BaseReferences<_$AppDatabase, GoalAllocations, GoalAllocation> {
+  $GoalAllocationsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static SavingsGoals _goalIdTable(_$AppDatabase db) => db.savingsGoals
+      .createAlias('goal_allocations__goal_id__savings_goals__id');
+
+  $SavingsGoalsProcessedTableManager get goalId {
+    final $_column = $_itemColumn<String>('goal_id')!;
+
+    final manager = $SavingsGoalsTableManager(
+      $_db,
+      $_db.savingsGoals,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_goalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $GoalAllocationsFilterComposer
+    extends Composer<_$AppDatabase, GoalAllocations> {
+  $GoalAllocationsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $SavingsGoalsFilterComposer get goalId {
+    final $SavingsGoalsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.goalId,
+      referencedTable: $db.savingsGoals,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $SavingsGoalsFilterComposer(
+            $db: $db,
+            $table: $db.savingsGoals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $GoalAllocationsOrderingComposer
+    extends Composer<_$AppDatabase, GoalAllocations> {
+  $GoalAllocationsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $SavingsGoalsOrderingComposer get goalId {
+    final $SavingsGoalsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.goalId,
+      referencedTable: $db.savingsGoals,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $SavingsGoalsOrderingComposer(
+            $db: $db,
+            $table: $db.savingsGoals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $GoalAllocationsAnnotationComposer
+    extends Composer<_$AppDatabase, GoalAllocations> {
+  $GoalAllocationsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumn<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $SavingsGoalsAnnotationComposer get goalId {
+    final $SavingsGoalsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.goalId,
+      referencedTable: $db.savingsGoals,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $SavingsGoalsAnnotationComposer(
+            $db: $db,
+            $table: $db.savingsGoals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $GoalAllocationsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          GoalAllocations,
+          GoalAllocation,
+          $GoalAllocationsFilterComposer,
+          $GoalAllocationsOrderingComposer,
+          $GoalAllocationsAnnotationComposer,
+          $GoalAllocationsCreateCompanionBuilder,
+          $GoalAllocationsUpdateCompanionBuilder,
+          (GoalAllocation, $GoalAllocationsReferences),
+          GoalAllocation,
+          PrefetchHooks Function({bool goalId})
+        > {
+  $GoalAllocationsTableManager(_$AppDatabase db, GoalAllocations table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $GoalAllocationsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $GoalAllocationsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $GoalAllocationsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> operationId = const Value.absent(),
+                Value<String> goalId = const Value.absent(),
+                Value<String> direction = const Value.absent(),
+                Value<int> amountMinor = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> occurredAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GoalAllocationsCompanion(
+                id: id,
+                operationId: operationId,
+                goalId: goalId,
+                direction: direction,
+                amountMinor: amountMinor,
+                note: note,
+                occurredAt: occurredAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String operationId,
+                required String goalId,
+                required String direction,
+                required int amountMinor,
+                Value<String?> note = const Value.absent(),
+                required int occurredAt,
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => GoalAllocationsCompanion.insert(
+                id: id,
+                operationId: operationId,
+                goalId: goalId,
+                direction: direction,
+                amountMinor: amountMinor,
+                note: note,
+                occurredAt: occurredAt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $GoalAllocationsReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({goalId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (goalId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.goalId,
+                                referencedTable: $GoalAllocationsReferences
+                                    ._goalIdTable(db),
+                                referencedColumn: $GoalAllocationsReferences
+                                    ._goalIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $GoalAllocationsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      GoalAllocations,
+      GoalAllocation,
+      $GoalAllocationsFilterComposer,
+      $GoalAllocationsOrderingComposer,
+      $GoalAllocationsAnnotationComposer,
+      $GoalAllocationsCreateCompanionBuilder,
+      $GoalAllocationsUpdateCompanionBuilder,
+      (GoalAllocation, $GoalAllocationsReferences),
+      GoalAllocation,
+      PrefetchHooks Function({bool goalId})
+    >;
+typedef $JournalEntriesCreateCompanionBuilder =
+    JournalEntriesCompanion Function({
+      required String id,
+      required String originType,
+      Value<String?> missionId,
+      Value<String?> transactionId,
+      required String title,
+      Value<String?> body,
+      Value<String?> mood,
+      required int isPrivate,
+      required int occurredAt,
+      required int createdAt,
+      required int updatedAt,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+typedef $JournalEntriesUpdateCompanionBuilder =
+    JournalEntriesCompanion Function({
+      Value<String> id,
+      Value<String> originType,
+      Value<String?> missionId,
+      Value<String?> transactionId,
+      Value<String> title,
+      Value<String?> body,
+      Value<String?> mood,
+      Value<int> isPrivate,
+      Value<int> occurredAt,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+
+final class $JournalEntriesReferences
+    extends BaseReferences<_$AppDatabase, JournalEntries, JournalEntry> {
+  $JournalEntriesReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static Missions _missionIdTable(_$AppDatabase db) =>
+      db.missions.createAlias('journal_entries__mission_id__missions__id');
+
+  $MissionsProcessedTableManager? get missionId {
+    final $_column = $_itemColumn<String>('mission_id');
+    if ($_column == null) return null;
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static Transactions _transactionIdTable(_$AppDatabase db) => db.transactions
+      .createAlias('journal_entries__transaction_id__transactions__id');
+
+  $TransactionsProcessedTableManager? get transactionId {
+    final $_column = $_itemColumn<String>('transaction_id');
+    if ($_column == null) return null;
+    final manager = $TransactionsTableManager(
+      $_db,
+      $_db.transactions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_transactionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<JournalAttachments, List<JournalAttachment>>
+  _journalAttachmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.journalAttachments,
+        aliasName: 'journal_entries__id__journal_attachments__journal_entry_id',
+      );
+
+  $JournalAttachmentsProcessedTableManager get journalAttachmentsRefs {
+    final manager = $JournalAttachmentsTableManager(
+      $_db,
+      $_db.journalAttachments,
+    ).filter((f) => f.journalEntryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _journalAttachmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<XpTransactions, List<XpTransaction>>
+  _xpTransactionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.xpTransactions,
+    aliasName: 'journal_entries__id__xp_transactions__journal_entry_id',
+  );
+
+  $XpTransactionsProcessedTableManager get xpTransactionsRefs {
+    final manager = $XpTransactionsTableManager(
+      $_db,
+      $_db.xpTransactions,
+    ).filter((f) => f.journalEntryId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_xpTransactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $JournalEntriesFilterComposer
+    extends Composer<_$AppDatabase, JournalEntries> {
+  $JournalEntriesFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originType => $composableBuilder(
+    column: $table.originType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mood => $composableBuilder(
+    column: $table.mood,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isPrivate => $composableBuilder(
+    column: $table.isPrivate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $TransactionsFilterComposer get transactionId {
+    final $TransactionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.transactionId,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TransactionsFilterComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> journalAttachmentsRefs(
+    Expression<bool> Function($JournalAttachmentsFilterComposer f) f,
+  ) {
+    final $JournalAttachmentsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.journalAttachments,
+      getReferencedColumn: (t) => t.journalEntryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalAttachmentsFilterComposer(
+            $db: $db,
+            $table: $db.journalAttachments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> xpTransactionsRefs(
+    Expression<bool> Function($XpTransactionsFilterComposer f) f,
+  ) {
+    final $XpTransactionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.xpTransactions,
+      getReferencedColumn: (t) => t.journalEntryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $XpTransactionsFilterComposer(
+            $db: $db,
+            $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $JournalEntriesOrderingComposer
+    extends Composer<_$AppDatabase, JournalEntries> {
+  $JournalEntriesOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originType => $composableBuilder(
+    column: $table.originType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mood => $composableBuilder(
+    column: $table.mood,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isPrivate => $composableBuilder(
+    column: $table.isPrivate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $TransactionsOrderingComposer get transactionId {
+    final $TransactionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.transactionId,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TransactionsOrderingComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $JournalEntriesAnnotationComposer
+    extends Composer<_$AppDatabase, JournalEntries> {
+  $JournalEntriesAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get originType => $composableBuilder(
+    column: $table.originType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get mood =>
+      $composableBuilder(column: $table.mood, builder: (column) => column);
+
+  GeneratedColumn<int> get isPrivate =>
+      $composableBuilder(column: $table.isPrivate, builder: (column) => column);
+
+  GeneratedColumn<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $TransactionsAnnotationComposer get transactionId {
+    final $TransactionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.transactionId,
+      referencedTable: $db.transactions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TransactionsAnnotationComposer(
+            $db: $db,
+            $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> journalAttachmentsRefs<T extends Object>(
+    Expression<T> Function($JournalAttachmentsAnnotationComposer a) f,
+  ) {
+    final $JournalAttachmentsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.journalAttachments,
+      getReferencedColumn: (t) => t.journalEntryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalAttachmentsAnnotationComposer(
+            $db: $db,
+            $table: $db.journalAttachments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> xpTransactionsRefs<T extends Object>(
+    Expression<T> Function($XpTransactionsAnnotationComposer a) f,
+  ) {
+    final $XpTransactionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.xpTransactions,
+      getReferencedColumn: (t) => t.journalEntryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $XpTransactionsAnnotationComposer(
+            $db: $db,
+            $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $JournalEntriesTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          JournalEntries,
+          JournalEntry,
+          $JournalEntriesFilterComposer,
+          $JournalEntriesOrderingComposer,
+          $JournalEntriesAnnotationComposer,
+          $JournalEntriesCreateCompanionBuilder,
+          $JournalEntriesUpdateCompanionBuilder,
+          (JournalEntry, $JournalEntriesReferences),
+          JournalEntry,
+          PrefetchHooks Function({
+            bool missionId,
+            bool transactionId,
+            bool journalAttachmentsRefs,
+            bool xpTransactionsRefs,
+          })
+        > {
+  $JournalEntriesTableManager(_$AppDatabase db, JournalEntries table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $JournalEntriesFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $JournalEntriesOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $JournalEntriesAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> originType = const Value.absent(),
+                Value<String?> missionId = const Value.absent(),
+                Value<String?> transactionId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String?> body = const Value.absent(),
+                Value<String?> mood = const Value.absent(),
+                Value<int> isPrivate = const Value.absent(),
+                Value<int> occurredAt = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalEntriesCompanion(
+                id: id,
+                originType: originType,
+                missionId: missionId,
+                transactionId: transactionId,
+                title: title,
+                body: body,
+                mood: mood,
+                isPrivate: isPrivate,
+                occurredAt: occurredAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String originType,
+                Value<String?> missionId = const Value.absent(),
+                Value<String?> transactionId = const Value.absent(),
+                required String title,
+                Value<String?> body = const Value.absent(),
+                Value<String?> mood = const Value.absent(),
+                required int isPrivate,
+                required int occurredAt,
+                required int createdAt,
+                required int updatedAt,
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalEntriesCompanion.insert(
+                id: id,
+                originType: originType,
+                missionId: missionId,
+                transactionId: transactionId,
+                title: title,
+                body: body,
+                mood: mood,
+                isPrivate: isPrivate,
+                occurredAt: occurredAt,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $JournalEntriesReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                missionId = false,
+                transactionId = false,
+                journalAttachmentsRefs = false,
+                xpTransactionsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (journalAttachmentsRefs) db.journalAttachments,
+                    if (xpTransactionsRefs) db.xpTransactions,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (missionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.missionId,
+                                    referencedTable: $JournalEntriesReferences
+                                        ._missionIdTable(db),
+                                    referencedColumn: $JournalEntriesReferences
+                                        ._missionIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (transactionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.transactionId,
+                                    referencedTable: $JournalEntriesReferences
+                                        ._transactionIdTable(db),
+                                    referencedColumn: $JournalEntriesReferences
+                                        ._transactionIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (journalAttachmentsRefs)
+                        await $_getPrefetchedData<
+                          JournalEntry,
+                          JournalEntries,
+                          JournalAttachment
+                        >(
+                          currentTable: table,
+                          referencedTable: $JournalEntriesReferences
+                              ._journalAttachmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $JournalEntriesReferences(
+                                db,
+                                table,
+                                p0,
+                              ).journalAttachmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.journalEntryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (xpTransactionsRefs)
+                        await $_getPrefetchedData<
+                          JournalEntry,
+                          JournalEntries,
+                          XpTransaction
+                        >(
+                          currentTable: table,
+                          referencedTable: $JournalEntriesReferences
+                              ._xpTransactionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $JournalEntriesReferences(
+                                db,
+                                table,
+                                p0,
+                              ).xpTransactionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.journalEntryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $JournalEntriesProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      JournalEntries,
+      JournalEntry,
+      $JournalEntriesFilterComposer,
+      $JournalEntriesOrderingComposer,
+      $JournalEntriesAnnotationComposer,
+      $JournalEntriesCreateCompanionBuilder,
+      $JournalEntriesUpdateCompanionBuilder,
+      (JournalEntry, $JournalEntriesReferences),
+      JournalEntry,
+      PrefetchHooks Function({
+        bool missionId,
+        bool transactionId,
+        bool journalAttachmentsRefs,
+        bool xpTransactionsRefs,
+      })
+    >;
+typedef $JournalAttachmentsCreateCompanionBuilder =
+    JournalAttachmentsCompanion Function({
+      required String id,
+      required String journalEntryId,
+      required String kind,
+      required String storageName,
+      required String mimeType,
+      required int byteLength,
+      required String cipherSha256,
+      required int widthPx,
+      required int heightPx,
+      required int position,
+      required int createdAt,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+typedef $JournalAttachmentsUpdateCompanionBuilder =
+    JournalAttachmentsCompanion Function({
+      Value<String> id,
+      Value<String> journalEntryId,
+      Value<String> kind,
+      Value<String> storageName,
+      Value<String> mimeType,
+      Value<int> byteLength,
+      Value<String> cipherSha256,
+      Value<int> widthPx,
+      Value<int> heightPx,
+      Value<int> position,
+      Value<int> createdAt,
+      Value<int?> archivedAt,
+      Value<int> rowid,
+    });
+
+final class $JournalAttachmentsReferences
+    extends
+        BaseReferences<_$AppDatabase, JournalAttachments, JournalAttachment> {
+  $JournalAttachmentsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static JournalEntries _journalEntryIdTable(_$AppDatabase db) =>
+      db.journalEntries.createAlias(
+        'journal_attachments__journal_entry_id__journal_entries__id',
+      );
+
+  $JournalEntriesProcessedTableManager get journalEntryId {
+    final $_column = $_itemColumn<String>('journal_entry_id')!;
+
+    final manager = $JournalEntriesTableManager(
+      $_db,
+      $_db.journalEntries,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_journalEntryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $JournalAttachmentsFilterComposer
+    extends Composer<_$AppDatabase, JournalAttachments> {
+  $JournalAttachmentsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get storageName => $composableBuilder(
+    column: $table.storageName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get byteLength => $composableBuilder(
+    column: $table.byteLength,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cipherSha256 => $composableBuilder(
+    column: $table.cipherSha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get widthPx => $composableBuilder(
+    column: $table.widthPx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get heightPx => $composableBuilder(
+    column: $table.heightPx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $JournalEntriesFilterComposer get journalEntryId {
+    final $JournalEntriesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.journalEntryId,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesFilterComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $JournalAttachmentsOrderingComposer
+    extends Composer<_$AppDatabase, JournalAttachments> {
+  $JournalAttachmentsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get storageName => $composableBuilder(
+    column: $table.storageName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get byteLength => $composableBuilder(
+    column: $table.byteLength,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cipherSha256 => $composableBuilder(
+    column: $table.cipherSha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get widthPx => $composableBuilder(
+    column: $table.widthPx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get heightPx => $composableBuilder(
+    column: $table.heightPx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $JournalEntriesOrderingComposer get journalEntryId {
+    final $JournalEntriesOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.journalEntryId,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesOrderingComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $JournalAttachmentsAnnotationComposer
+    extends Composer<_$AppDatabase, JournalAttachments> {
+  $JournalAttachmentsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get storageName => $composableBuilder(
+    column: $table.storageName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get byteLength => $composableBuilder(
+    column: $table.byteLength,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cipherSha256 => $composableBuilder(
+    column: $table.cipherSha256,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get widthPx =>
+      $composableBuilder(column: $table.widthPx, builder: (column) => column);
+
+  GeneratedColumn<int> get heightPx =>
+      $composableBuilder(column: $table.heightPx, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  $JournalEntriesAnnotationComposer get journalEntryId {
+    final $JournalEntriesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.journalEntryId,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesAnnotationComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $JournalAttachmentsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          JournalAttachments,
+          JournalAttachment,
+          $JournalAttachmentsFilterComposer,
+          $JournalAttachmentsOrderingComposer,
+          $JournalAttachmentsAnnotationComposer,
+          $JournalAttachmentsCreateCompanionBuilder,
+          $JournalAttachmentsUpdateCompanionBuilder,
+          (JournalAttachment, $JournalAttachmentsReferences),
+          JournalAttachment,
+          PrefetchHooks Function({bool journalEntryId})
+        > {
+  $JournalAttachmentsTableManager(_$AppDatabase db, JournalAttachments table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $JournalAttachmentsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $JournalAttachmentsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $JournalAttachmentsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> journalEntryId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> storageName = const Value.absent(),
+                Value<String> mimeType = const Value.absent(),
+                Value<int> byteLength = const Value.absent(),
+                Value<String> cipherSha256 = const Value.absent(),
+                Value<int> widthPx = const Value.absent(),
+                Value<int> heightPx = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalAttachmentsCompanion(
+                id: id,
+                journalEntryId: journalEntryId,
+                kind: kind,
+                storageName: storageName,
+                mimeType: mimeType,
+                byteLength: byteLength,
+                cipherSha256: cipherSha256,
+                widthPx: widthPx,
+                heightPx: heightPx,
+                position: position,
+                createdAt: createdAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String journalEntryId,
+                required String kind,
+                required String storageName,
+                required String mimeType,
+                required int byteLength,
+                required String cipherSha256,
+                required int widthPx,
+                required int heightPx,
+                required int position,
+                required int createdAt,
+                Value<int?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalAttachmentsCompanion.insert(
+                id: id,
+                journalEntryId: journalEntryId,
+                kind: kind,
+                storageName: storageName,
+                mimeType: mimeType,
+                byteLength: byteLength,
+                cipherSha256: cipherSha256,
+                widthPx: widthPx,
+                heightPx: heightPx,
+                position: position,
+                createdAt: createdAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $JournalAttachmentsReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({journalEntryId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (journalEntryId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.journalEntryId,
+                                referencedTable: $JournalAttachmentsReferences
+                                    ._journalEntryIdTable(db),
+                                referencedColumn: $JournalAttachmentsReferences
+                                    ._journalEntryIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $JournalAttachmentsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      JournalAttachments,
+      JournalAttachment,
+      $JournalAttachmentsFilterComposer,
+      $JournalAttachmentsOrderingComposer,
+      $JournalAttachmentsAnnotationComposer,
+      $JournalAttachmentsCreateCompanionBuilder,
+      $JournalAttachmentsUpdateCompanionBuilder,
+      (JournalAttachment, $JournalAttachmentsReferences),
+      JournalAttachment,
+      PrefetchHooks Function({bool journalEntryId})
+    >;
+typedef $XpTransactionsCreateCompanionBuilder =
+    XpTransactionsCompanion Function({
+      required String id,
+      required String areaId,
+      Value<String?> missionId,
+      Value<String?> journalEntryId,
+      required String sourceType,
+      required int amount,
+      Value<String?> reason,
+      required int occurredAt,
+      Value<int> rowid,
+    });
+typedef $XpTransactionsUpdateCompanionBuilder =
+    XpTransactionsCompanion Function({
+      Value<String> id,
+      Value<String> areaId,
+      Value<String?> missionId,
+      Value<String?> journalEntryId,
+      Value<String> sourceType,
+      Value<int> amount,
+      Value<String?> reason,
+      Value<int> occurredAt,
+      Value<int> rowid,
+    });
+
+final class $XpTransactionsReferences
+    extends BaseReferences<_$AppDatabase, XpTransactions, XpTransaction> {
+  $XpTransactionsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static LifeAreas _areaIdTable(_$AppDatabase db) =>
+      db.lifeAreas.createAlias('xp_transactions__area_id__life_areas__id');
+
+  $LifeAreasProcessedTableManager get areaId {
+    final $_column = $_itemColumn<String>('area_id')!;
+
+    final manager = $LifeAreasTableManager(
+      $_db,
+      $_db.lifeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static Missions _missionIdTable(_$AppDatabase db) =>
+      db.missions.createAlias('xp_transactions__mission_id__missions__id');
+
+  $MissionsProcessedTableManager? get missionId {
+    final $_column = $_itemColumn<String>('mission_id');
+    if ($_column == null) return null;
+    final manager = $MissionsTableManager(
+      $_db,
+      $_db.missions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_missionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static JournalEntries _journalEntryIdTable(_$AppDatabase db) => db
+      .journalEntries
+      .createAlias('xp_transactions__journal_entry_id__journal_entries__id');
+
+  $JournalEntriesProcessedTableManager? get journalEntryId {
+    final $_column = $_itemColumn<String>('journal_entry_id');
+    if ($_column == null) return null;
+    final manager = $JournalEntriesTableManager(
+      $_db,
+      $_db.journalEntries,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_journalEntryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $XpTransactionsFilterComposer
+    extends Composer<_$AppDatabase, XpTransactions> {
+  $XpTransactionsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $LifeAreasFilterComposer get areaId {
+    final $LifeAreasFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasFilterComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $MissionsFilterComposer get missionId {
+    final $MissionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsFilterComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $JournalEntriesFilterComposer get journalEntryId {
+    final $JournalEntriesFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.journalEntryId,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesFilterComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $XpTransactionsOrderingComposer
+    extends Composer<_$AppDatabase, XpTransactions> {
+  $XpTransactionsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $LifeAreasOrderingComposer get areaId {
+    final $LifeAreasOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasOrderingComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $MissionsOrderingComposer get missionId {
+    final $MissionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsOrderingComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $JournalEntriesOrderingComposer get journalEntryId {
+    final $JournalEntriesOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.journalEntryId,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesOrderingComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $XpTransactionsAnnotationComposer
+    extends Composer<_$AppDatabase, XpTransactions> {
+  $XpTransactionsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<int> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  $LifeAreasAnnotationComposer get areaId {
+    final $LifeAreasAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasAnnotationComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $MissionsAnnotationComposer get missionId {
+    final $MissionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.missionId,
+      referencedTable: $db.missions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $MissionsAnnotationComposer(
+            $db: $db,
+            $table: $db.missions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $JournalEntriesAnnotationComposer get journalEntryId {
+    final $JournalEntriesAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.journalEntryId,
+      referencedTable: $db.journalEntries,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $JournalEntriesAnnotationComposer(
+            $db: $db,
+            $table: $db.journalEntries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $XpTransactionsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          XpTransactions,
+          XpTransaction,
+          $XpTransactionsFilterComposer,
+          $XpTransactionsOrderingComposer,
+          $XpTransactionsAnnotationComposer,
+          $XpTransactionsCreateCompanionBuilder,
+          $XpTransactionsUpdateCompanionBuilder,
+          (XpTransaction, $XpTransactionsReferences),
+          XpTransaction,
+          PrefetchHooks Function({
+            bool areaId,
+            bool missionId,
+            bool journalEntryId,
+          })
+        > {
+  $XpTransactionsTableManager(_$AppDatabase db, XpTransactions table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $XpTransactionsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $XpTransactionsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $XpTransactionsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> areaId = const Value.absent(),
+                Value<String?> missionId = const Value.absent(),
+                Value<String?> journalEntryId = const Value.absent(),
+                Value<String> sourceType = const Value.absent(),
+                Value<int> amount = const Value.absent(),
+                Value<String?> reason = const Value.absent(),
+                Value<int> occurredAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => XpTransactionsCompanion(
+                id: id,
+                areaId: areaId,
+                missionId: missionId,
+                journalEntryId: journalEntryId,
+                sourceType: sourceType,
+                amount: amount,
+                reason: reason,
+                occurredAt: occurredAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String areaId,
+                Value<String?> missionId = const Value.absent(),
+                Value<String?> journalEntryId = const Value.absent(),
+                required String sourceType,
+                required int amount,
+                Value<String?> reason = const Value.absent(),
+                required int occurredAt,
+                Value<int> rowid = const Value.absent(),
+              }) => XpTransactionsCompanion.insert(
+                id: id,
+                areaId: areaId,
+                missionId: missionId,
+                journalEntryId: journalEntryId,
+                sourceType: sourceType,
+                amount: amount,
+                reason: reason,
+                occurredAt: occurredAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $XpTransactionsReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({areaId = false, missionId = false, journalEntryId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (areaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.areaId,
+                                    referencedTable: $XpTransactionsReferences
+                                        ._areaIdTable(db),
+                                    referencedColumn: $XpTransactionsReferences
+                                        ._areaIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (missionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.missionId,
+                                    referencedTable: $XpTransactionsReferences
+                                        ._missionIdTable(db),
+                                    referencedColumn: $XpTransactionsReferences
+                                        ._missionIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (journalEntryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.journalEntryId,
+                                    referencedTable: $XpTransactionsReferences
+                                        ._journalEntryIdTable(db),
+                                    referencedColumn: $XpTransactionsReferences
+                                        ._journalEntryIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $XpTransactionsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      XpTransactions,
+      XpTransaction,
+      $XpTransactionsFilterComposer,
+      $XpTransactionsOrderingComposer,
+      $XpTransactionsAnnotationComposer,
+      $XpTransactionsCreateCompanionBuilder,
+      $XpTransactionsUpdateCompanionBuilder,
+      (XpTransaction, $XpTransactionsReferences),
+      XpTransaction,
+      PrefetchHooks Function({bool areaId, bool missionId, bool journalEntryId})
+    >;
+typedef $TitleDefinitionsCreateCompanionBuilder =
+    TitleDefinitionsCompanion Function({
+      required String id,
+      required String name,
+      Value<String?> description,
+      required String titleKind,
+      required String ruleKey,
+      Value<int?> threshold,
+      required int isActive,
+      Value<int> rowid,
+    });
+typedef $TitleDefinitionsUpdateCompanionBuilder =
+    TitleDefinitionsCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String?> description,
+      Value<String> titleKind,
+      Value<String> ruleKey,
+      Value<int?> threshold,
+      Value<int> isActive,
+      Value<int> rowid,
+    });
+
+final class $TitleDefinitionsReferences
+    extends BaseReferences<_$AppDatabase, TitleDefinitions, TitleDefinition> {
+  $TitleDefinitionsReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<TitleHistory, List<TitleHistoryData>>
+  _titleHistoryRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.titleHistory,
+    aliasName: 'title_definitions__id__title_history__title_id',
+  );
+
+  $TitleHistoryProcessedTableManager get titleHistoryRefs {
+    final manager = $TitleHistoryTableManager(
+      $_db,
+      $_db.titleHistory,
+    ).filter((f) => f.titleId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_titleHistoryRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $TitleDefinitionsFilterComposer
+    extends Composer<_$AppDatabase, TitleDefinitions> {
+  $TitleDefinitionsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get titleKind => $composableBuilder(
+    column: $table.titleKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ruleKey => $composableBuilder(
+    column: $table.ruleKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get threshold => $composableBuilder(
+    column: $table.threshold,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> titleHistoryRefs(
+    Expression<bool> Function($TitleHistoryFilterComposer f) f,
+  ) {
+    final $TitleHistoryFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.titleHistory,
+      getReferencedColumn: (t) => t.titleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TitleHistoryFilterComposer(
+            $db: $db,
+            $table: $db.titleHistory,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $TitleDefinitionsOrderingComposer
+    extends Composer<_$AppDatabase, TitleDefinitions> {
+  $TitleDefinitionsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get titleKind => $composableBuilder(
+    column: $table.titleKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ruleKey => $composableBuilder(
+    column: $table.ruleKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get threshold => $composableBuilder(
+    column: $table.threshold,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $TitleDefinitionsAnnotationComposer
+    extends Composer<_$AppDatabase, TitleDefinitions> {
+  $TitleDefinitionsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get titleKind =>
+      $composableBuilder(column: $table.titleKind, builder: (column) => column);
+
+  GeneratedColumn<String> get ruleKey =>
+      $composableBuilder(column: $table.ruleKey, builder: (column) => column);
+
+  GeneratedColumn<int> get threshold =>
+      $composableBuilder(column: $table.threshold, builder: (column) => column);
+
+  GeneratedColumn<int> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  Expression<T> titleHistoryRefs<T extends Object>(
+    Expression<T> Function($TitleHistoryAnnotationComposer a) f,
+  ) {
+    final $TitleHistoryAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.titleHistory,
+      getReferencedColumn: (t) => t.titleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TitleHistoryAnnotationComposer(
+            $db: $db,
+            $table: $db.titleHistory,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $TitleDefinitionsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          TitleDefinitions,
+          TitleDefinition,
+          $TitleDefinitionsFilterComposer,
+          $TitleDefinitionsOrderingComposer,
+          $TitleDefinitionsAnnotationComposer,
+          $TitleDefinitionsCreateCompanionBuilder,
+          $TitleDefinitionsUpdateCompanionBuilder,
+          (TitleDefinition, $TitleDefinitionsReferences),
+          TitleDefinition,
+          PrefetchHooks Function({bool titleHistoryRefs})
+        > {
+  $TitleDefinitionsTableManager(_$AppDatabase db, TitleDefinitions table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $TitleDefinitionsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $TitleDefinitionsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $TitleDefinitionsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<String> titleKind = const Value.absent(),
+                Value<String> ruleKey = const Value.absent(),
+                Value<int?> threshold = const Value.absent(),
+                Value<int> isActive = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TitleDefinitionsCompanion(
+                id: id,
+                name: name,
+                description: description,
+                titleKind: titleKind,
+                ruleKey: ruleKey,
+                threshold: threshold,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<String?> description = const Value.absent(),
+                required String titleKind,
+                required String ruleKey,
+                Value<int?> threshold = const Value.absent(),
+                required int isActive,
+                Value<int> rowid = const Value.absent(),
+              }) => TitleDefinitionsCompanion.insert(
+                id: id,
+                name: name,
+                description: description,
+                titleKind: titleKind,
+                ruleKey: ruleKey,
+                threshold: threshold,
+                isActive: isActive,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $TitleDefinitionsReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({titleHistoryRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (titleHistoryRefs) db.titleHistory],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (titleHistoryRefs)
+                    await $_getPrefetchedData<
+                      TitleDefinition,
+                      TitleDefinitions,
+                      TitleHistoryData
+                    >(
+                      currentTable: table,
+                      referencedTable: $TitleDefinitionsReferences
+                          ._titleHistoryRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $TitleDefinitionsReferences(
+                            db,
+                            table,
+                            p0,
+                          ).titleHistoryRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.titleId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $TitleDefinitionsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      TitleDefinitions,
+      TitleDefinition,
+      $TitleDefinitionsFilterComposer,
+      $TitleDefinitionsOrderingComposer,
+      $TitleDefinitionsAnnotationComposer,
+      $TitleDefinitionsCreateCompanionBuilder,
+      $TitleDefinitionsUpdateCompanionBuilder,
+      (TitleDefinition, $TitleDefinitionsReferences),
+      TitleDefinition,
+      PrefetchHooks Function({bool titleHistoryRefs})
+    >;
+typedef $TitleHistoryCreateCompanionBuilder =
+    TitleHistoryCompanion Function({
+      required String id,
+      required String titleId,
+      required String status,
+      required int activatedAt,
+      Value<int?> deactivatedAt,
+      Value<int> bestStreak,
+      Value<int> recoveryCount,
+      Value<int> rowid,
+    });
+typedef $TitleHistoryUpdateCompanionBuilder =
+    TitleHistoryCompanion Function({
+      Value<String> id,
+      Value<String> titleId,
+      Value<String> status,
+      Value<int> activatedAt,
+      Value<int?> deactivatedAt,
+      Value<int> bestStreak,
+      Value<int> recoveryCount,
+      Value<int> rowid,
+    });
+
+final class $TitleHistoryReferences
+    extends BaseReferences<_$AppDatabase, TitleHistory, TitleHistoryData> {
+  $TitleHistoryReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static TitleDefinitions _titleIdTable(_$AppDatabase db) => db.titleDefinitions
+      .createAlias('title_history__title_id__title_definitions__id');
+
+  $TitleDefinitionsProcessedTableManager get titleId {
+    final $_column = $_itemColumn<String>('title_id')!;
+
+    final manager = $TitleDefinitionsTableManager(
+      $_db,
+      $_db.titleDefinitions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_titleIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $TitleHistoryFilterComposer
+    extends Composer<_$AppDatabase, TitleHistory> {
+  $TitleHistoryFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get activatedAt => $composableBuilder(
+    column: $table.activatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get deactivatedAt => $composableBuilder(
+    column: $table.deactivatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get bestStreak => $composableBuilder(
+    column: $table.bestStreak,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get recoveryCount => $composableBuilder(
+    column: $table.recoveryCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $TitleDefinitionsFilterComposer get titleId {
+    final $TitleDefinitionsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.titleId,
+      referencedTable: $db.titleDefinitions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TitleDefinitionsFilterComposer(
+            $db: $db,
+            $table: $db.titleDefinitions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TitleHistoryOrderingComposer
+    extends Composer<_$AppDatabase, TitleHistory> {
+  $TitleHistoryOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get activatedAt => $composableBuilder(
+    column: $table.activatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get deactivatedAt => $composableBuilder(
+    column: $table.deactivatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get bestStreak => $composableBuilder(
+    column: $table.bestStreak,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get recoveryCount => $composableBuilder(
+    column: $table.recoveryCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $TitleDefinitionsOrderingComposer get titleId {
+    final $TitleDefinitionsOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.titleId,
+      referencedTable: $db.titleDefinitions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TitleDefinitionsOrderingComposer(
+            $db: $db,
+            $table: $db.titleDefinitions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TitleHistoryAnnotationComposer
+    extends Composer<_$AppDatabase, TitleHistory> {
+  $TitleHistoryAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get activatedAt => $composableBuilder(
+    column: $table.activatedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get deactivatedAt => $composableBuilder(
+    column: $table.deactivatedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get bestStreak => $composableBuilder(
+    column: $table.bestStreak,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get recoveryCount => $composableBuilder(
+    column: $table.recoveryCount,
+    builder: (column) => column,
+  );
+
+  $TitleDefinitionsAnnotationComposer get titleId {
+    final $TitleDefinitionsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.titleId,
+      referencedTable: $db.titleDefinitions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $TitleDefinitionsAnnotationComposer(
+            $db: $db,
+            $table: $db.titleDefinitions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $TitleHistoryTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          TitleHistory,
+          TitleHistoryData,
+          $TitleHistoryFilterComposer,
+          $TitleHistoryOrderingComposer,
+          $TitleHistoryAnnotationComposer,
+          $TitleHistoryCreateCompanionBuilder,
+          $TitleHistoryUpdateCompanionBuilder,
+          (TitleHistoryData, $TitleHistoryReferences),
+          TitleHistoryData,
+          PrefetchHooks Function({bool titleId})
+        > {
+  $TitleHistoryTableManager(_$AppDatabase db, TitleHistory table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $TitleHistoryFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $TitleHistoryOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $TitleHistoryAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> titleId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int> activatedAt = const Value.absent(),
+                Value<int?> deactivatedAt = const Value.absent(),
+                Value<int> bestStreak = const Value.absent(),
+                Value<int> recoveryCount = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TitleHistoryCompanion(
+                id: id,
+                titleId: titleId,
+                status: status,
+                activatedAt: activatedAt,
+                deactivatedAt: deactivatedAt,
+                bestStreak: bestStreak,
+                recoveryCount: recoveryCount,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String titleId,
+                required String status,
+                required int activatedAt,
+                Value<int?> deactivatedAt = const Value.absent(),
+                Value<int> bestStreak = const Value.absent(),
+                Value<int> recoveryCount = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TitleHistoryCompanion.insert(
+                id: id,
+                titleId: titleId,
+                status: status,
+                activatedAt: activatedAt,
+                deactivatedAt: deactivatedAt,
+                bestStreak: bestStreak,
+                recoveryCount: recoveryCount,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $TitleHistoryReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({titleId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (titleId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.titleId,
+                                referencedTable: $TitleHistoryReferences
+                                    ._titleIdTable(db),
+                                referencedColumn: $TitleHistoryReferences
+                                    ._titleIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $TitleHistoryProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      TitleHistory,
+      TitleHistoryData,
+      $TitleHistoryFilterComposer,
+      $TitleHistoryOrderingComposer,
+      $TitleHistoryAnnotationComposer,
+      $TitleHistoryCreateCompanionBuilder,
+      $TitleHistoryUpdateCompanionBuilder,
+      (TitleHistoryData, $TitleHistoryReferences),
+      TitleHistoryData,
+      PrefetchHooks Function({bool titleId})
+    >;
+typedef $AppSettingsCreateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<int> id,
+      required String themeKey,
+      required String primaryColor,
+      required int largeText,
+      required int reduceMotion,
+      required int highContrast,
+      required int hideAmounts,
+      required int missionNotifications,
+      required int dailySummary,
+      required int soundEnabled,
+      required int autoLockMinutes,
+      required int updatedAt,
+    });
+typedef $AppSettingsUpdateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<int> id,
+      Value<String> themeKey,
+      Value<String> primaryColor,
+      Value<int> largeText,
+      Value<int> reduceMotion,
+      Value<int> highContrast,
+      Value<int> hideAmounts,
+      Value<int> missionNotifications,
+      Value<int> dailySummary,
+      Value<int> soundEnabled,
+      Value<int> autoLockMinutes,
+      Value<int> updatedAt,
+    });
+
+class $AppSettingsFilterComposer extends Composer<_$AppDatabase, AppSettings> {
+  $AppSettingsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get themeKey => $composableBuilder(
+    column: $table.themeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get largeText => $composableBuilder(
+    column: $table.largeText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reduceMotion => $composableBuilder(
+    column: $table.reduceMotion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get highContrast => $composableBuilder(
+    column: $table.highContrast,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hideAmounts => $composableBuilder(
+    column: $table.hideAmounts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get missionNotifications => $composableBuilder(
+    column: $table.missionNotifications,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dailySummary => $composableBuilder(
+    column: $table.dailySummary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get soundEnabled => $composableBuilder(
+    column: $table.soundEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get autoLockMinutes => $composableBuilder(
+    column: $table.autoLockMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $AppSettingsOrderingComposer
+    extends Composer<_$AppDatabase, AppSettings> {
+  $AppSettingsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get themeKey => $composableBuilder(
+    column: $table.themeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get largeText => $composableBuilder(
+    column: $table.largeText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reduceMotion => $composableBuilder(
+    column: $table.reduceMotion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get highContrast => $composableBuilder(
+    column: $table.highContrast,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hideAmounts => $composableBuilder(
+    column: $table.hideAmounts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get missionNotifications => $composableBuilder(
+    column: $table.missionNotifications,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dailySummary => $composableBuilder(
+    column: $table.dailySummary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get soundEnabled => $composableBuilder(
+    column: $table.soundEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get autoLockMinutes => $composableBuilder(
+    column: $table.autoLockMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $AppSettingsAnnotationComposer
+    extends Composer<_$AppDatabase, AppSettings> {
+  $AppSettingsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get themeKey =>
+      $composableBuilder(column: $table.themeKey, builder: (column) => column);
+
+  GeneratedColumn<String> get primaryColor => $composableBuilder(
+    column: $table.primaryColor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get largeText =>
+      $composableBuilder(column: $table.largeText, builder: (column) => column);
+
+  GeneratedColumn<int> get reduceMotion => $composableBuilder(
+    column: $table.reduceMotion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get highContrast => $composableBuilder(
+    column: $table.highContrast,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hideAmounts => $composableBuilder(
+    column: $table.hideAmounts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get missionNotifications => $composableBuilder(
+    column: $table.missionNotifications,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dailySummary => $composableBuilder(
+    column: $table.dailySummary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get soundEnabled => $composableBuilder(
+    column: $table.soundEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get autoLockMinutes => $composableBuilder(
+    column: $table.autoLockMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $AppSettingsTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          AppSettings,
+          AppSetting,
+          $AppSettingsFilterComposer,
+          $AppSettingsOrderingComposer,
+          $AppSettingsAnnotationComposer,
+          $AppSettingsCreateCompanionBuilder,
+          $AppSettingsUpdateCompanionBuilder,
+          (AppSetting, BaseReferences<_$AppDatabase, AppSettings, AppSetting>),
+          AppSetting,
+          PrefetchHooks Function()
+        > {
+  $AppSettingsTableManager(_$AppDatabase db, AppSettings table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $AppSettingsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $AppSettingsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $AppSettingsAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> themeKey = const Value.absent(),
+                Value<String> primaryColor = const Value.absent(),
+                Value<int> largeText = const Value.absent(),
+                Value<int> reduceMotion = const Value.absent(),
+                Value<int> highContrast = const Value.absent(),
+                Value<int> hideAmounts = const Value.absent(),
+                Value<int> missionNotifications = const Value.absent(),
+                Value<int> dailySummary = const Value.absent(),
+                Value<int> soundEnabled = const Value.absent(),
+                Value<int> autoLockMinutes = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+              }) => AppSettingsCompanion(
+                id: id,
+                themeKey: themeKey,
+                primaryColor: primaryColor,
+                largeText: largeText,
+                reduceMotion: reduceMotion,
+                highContrast: highContrast,
+                hideAmounts: hideAmounts,
+                missionNotifications: missionNotifications,
+                dailySummary: dailySummary,
+                soundEnabled: soundEnabled,
+                autoLockMinutes: autoLockMinutes,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String themeKey,
+                required String primaryColor,
+                required int largeText,
+                required int reduceMotion,
+                required int highContrast,
+                required int hideAmounts,
+                required int missionNotifications,
+                required int dailySummary,
+                required int soundEnabled,
+                required int autoLockMinutes,
+                required int updatedAt,
+              }) => AppSettingsCompanion.insert(
+                id: id,
+                themeKey: themeKey,
+                primaryColor: primaryColor,
+                largeText: largeText,
+                reduceMotion: reduceMotion,
+                highContrast: highContrast,
+                hideAmounts: hideAmounts,
+                missionNotifications: missionNotifications,
+                dailySummary: dailySummary,
+                soundEnabled: soundEnabled,
+                autoLockMinutes: autoLockMinutes,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $AppSettingsProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      AppSettings,
+      AppSetting,
+      $AppSettingsFilterComposer,
+      $AppSettingsOrderingComposer,
+      $AppSettingsAnnotationComposer,
+      $AppSettingsCreateCompanionBuilder,
+      $AppSettingsUpdateCompanionBuilder,
+      (AppSetting, BaseReferences<_$AppDatabase, AppSettings, AppSetting>),
+      AppSetting,
+      PrefetchHooks Function()
+    >;
+typedef $SchemaMetadataCreateCompanionBuilder =
+    SchemaMetadataCompanion Function({
+      required String key,
+      required String value,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $SchemaMetadataUpdateCompanionBuilder =
+    SchemaMetadataCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $SchemaMetadataFilterComposer
+    extends Composer<_$AppDatabase, SchemaMetadata> {
+  $SchemaMetadataFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $SchemaMetadataOrderingComposer
+    extends Composer<_$AppDatabase, SchemaMetadata> {
+  $SchemaMetadataOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $SchemaMetadataAnnotationComposer
+    extends Composer<_$AppDatabase, SchemaMetadata> {
+  $SchemaMetadataAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $SchemaMetadataTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          SchemaMetadata,
+          SchemaMetadataData,
+          $SchemaMetadataFilterComposer,
+          $SchemaMetadataOrderingComposer,
+          $SchemaMetadataAnnotationComposer,
+          $SchemaMetadataCreateCompanionBuilder,
+          $SchemaMetadataUpdateCompanionBuilder,
+          (
+            SchemaMetadataData,
+            BaseReferences<_$AppDatabase, SchemaMetadata, SchemaMetadataData>,
+          ),
+          SchemaMetadataData,
+          PrefetchHooks Function()
+        > {
+  $SchemaMetadataTableManager(_$AppDatabase db, SchemaMetadata table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $SchemaMetadataFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $SchemaMetadataOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $SchemaMetadataAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SchemaMetadataCompanion(
+                key: key,
+                value: value,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SchemaMetadataCompanion.insert(
+                key: key,
+                value: value,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $SchemaMetadataProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      SchemaMetadata,
+      SchemaMetadataData,
+      $SchemaMetadataFilterComposer,
+      $SchemaMetadataOrderingComposer,
+      $SchemaMetadataAnnotationComposer,
+      $SchemaMetadataCreateCompanionBuilder,
+      $SchemaMetadataUpdateCompanionBuilder,
+      (
+        SchemaMetadataData,
+        BaseReferences<_$AppDatabase, SchemaMetadata, SchemaMetadataData>,
+      ),
+      SchemaMetadataData,
+      PrefetchHooks Function()
+    >;
+
+class $AppDatabaseManager {
+  final _$AppDatabase _db;
+  $AppDatabaseManager(this._db);
+  $LifeAreasTableManager get lifeAreas =>
+      $LifeAreasTableManager(_db, _db.lifeAreas);
+  $MissionTemplatesTableManager get missionTemplates =>
+      $MissionTemplatesTableManager(_db, _db.missionTemplates);
+  $MissionTemplateObjectivesTableManager get missionTemplateObjectives =>
+      $MissionTemplateObjectivesTableManager(
+        _db,
+        _db.missionTemplateObjectives,
+      );
+  $RecurrenceRulesTableManager get recurrenceRules =>
+      $RecurrenceRulesTableManager(_db, _db.recurrenceRules);
+  $MissionsTableManager get missions =>
+      $MissionsTableManager(_db, _db.missions);
+  $MissionObjectivesTableManager get missionObjectives =>
+      $MissionObjectivesTableManager(_db, _db.missionObjectives);
+  $TimeEntriesTableManager get timeEntries =>
+      $TimeEntriesTableManager(_db, _db.timeEntries);
+  $MissionEventsTableManager get missionEvents =>
+      $MissionEventsTableManager(_db, _db.missionEvents);
+  $NotificationSchedulesTableManager get notificationSchedules =>
+      $NotificationSchedulesTableManager(_db, _db.notificationSchedules);
+  $TransactionsTableManager get transactions =>
+      $TransactionsTableManager(_db, _db.transactions);
+  $SavingsGoalsTableManager get savingsGoals =>
+      $SavingsGoalsTableManager(_db, _db.savingsGoals);
+  $GoalAllocationsTableManager get goalAllocations =>
+      $GoalAllocationsTableManager(_db, _db.goalAllocations);
+  $JournalEntriesTableManager get journalEntries =>
+      $JournalEntriesTableManager(_db, _db.journalEntries);
+  $JournalAttachmentsTableManager get journalAttachments =>
+      $JournalAttachmentsTableManager(_db, _db.journalAttachments);
+  $XpTransactionsTableManager get xpTransactions =>
+      $XpTransactionsTableManager(_db, _db.xpTransactions);
+  $TitleDefinitionsTableManager get titleDefinitions =>
+      $TitleDefinitionsTableManager(_db, _db.titleDefinitions);
+  $TitleHistoryTableManager get titleHistory =>
+      $TitleHistoryTableManager(_db, _db.titleHistory);
+  $AppSettingsTableManager get appSettings =>
+      $AppSettingsTableManager(_db, _db.appSettings);
+  $SchemaMetadataTableManager get schemaMetadata =>
+      $SchemaMetadataTableManager(_db, _db.schemaMetadata);
+}

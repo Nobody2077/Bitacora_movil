@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Bitácora RPG — DEV",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_dev.dart",
+      "flutterMode": "debug",
+      "toolArgs": ["--flavor", "dev"]
+    },
+    {
+      "name": "Bitácora RPG — PROD (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_prod.dart",
+      "flutterMode": "debug",
+      "toolArgs": ["--flavor", "prod"]
+    }
+  ]
+}

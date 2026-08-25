@@ -1,0 +1,157 @@
+import 'dart:async';
+
+import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../features/access/application/access_session_controller.dart';
+import '../../features/access/application/access_session_state.dart';
+import '../../features/economy/data/drift_economy_repository.dart';
+import '../../features/economy/domain/repositories/economy_repository.dart';
+import '../../features/journal/data/drift_journal_repository.dart';
+import '../../features/journal/domain/repositories/journal_repository.dart';
+import '../../features/missions/data/drift_mission_repository.dart';
+import '../../features/missions/domain/repositories/mission_repository.dart';
+import '../../features/progress/data/drift_progress_repository.dart';
+import '../../features/progress/domain/repositories/progress_repository.dart';
+import '../../features/settings/data/drift_settings_repository.dart';
+import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../infrastructure/database/app_database.dart';
+import '../../infrastructure/database/connection/encrypted_database_connection.dart';
+import '../../infrastructure/database/daos/economy_dao.dart';
+import '../../infrastructure/database/daos/journal_dao.dart';
+import '../../infrastructure/database/daos/mission_dao.dart';
+import '../../infrastructure/database/daos/notification_dao.dart';
+import '../../infrastructure/database/daos/progress_dao.dart';
+import '../../infrastructure/database/daos/recurrence_dao.dart';
+import '../../infrastructure/database/daos/settings_dao.dart';
+import '../../infrastructure/database/database_file_locator.dart';
+import '../../infrastructure/security/database_key_store.dart';
+import '../../infrastructure/security/method_channel_database_key_store.dart';
+import 'access_dependencies.dart';
+
+final class AccessDatabaseLockedException implements Exception {
+  const AccessDatabaseLockedException();
+
+  @override
+  String toString() => 'AccessDatabaseLockedException(DATABASE_LOCKED)';
+}
+
+/// Punto sustituible para pruebas del límite Android Keystore.
+final Provider<DatabaseKeyStore> databaseKeyStoreProvider =
+    Provider<DatabaseKeyStore>(
+      (Ref ref) => const MethodChannelDatabaseKeyStore(),
+    );
+
+/// Executor sustituible para pruebas de persistencia sin plugins de plataforma.
+///
+/// [LazyDatabase] posterga Keystore y apertura de archivo hasta la
+/// primera consulta. Por eso declarar estos providers no cambia aún el arranque
+/// productivo de la aplicación.
+final Provider<QueryExecutor> databaseExecutorProvider =
+    Provider<QueryExecutor>((Ref ref) {
+      final bool accessGranted = ref.watch(
+        accessSessionProvider.select(
+          (AccessSessionState session) => session.canBuildProtected,
+        ),
+      );
+      if (!accessGranted) {
+        throw const AccessDatabaseLockedException();
+      }
+
+      final keyStore = ref.watch(databaseKeyStoreProvider);
+      final DatabaseFileLocator locator = ref.watch(
+        databaseFileLocatorProvider,
+      );
+      final _DatabaseAccessLease lease = _DatabaseAccessLease();
+      ref.onDispose(lease.invalidate);
+      return LazyDatabase(() async {
+        lease.ensureValid();
+        final databaseFile = await locator.resolve();
+        lease.ensureValid();
+        final QueryExecutor executor = await EncryptedDatabaseConnection(
+          keyStore: keyStore,
+        ).open(databaseFile: databaseFile);
+        if (!lease.isValid) {
+          await executor.close();
+          throw const AccessDatabaseLockedException();
+        }
+        return executor;
+      });
+    });
+
+/// Única instancia de base de datos por [ProviderContainer].
+final Provider<AppDatabase> appDatabaseProvider = Provider<AppDatabase>((
+  Ref ref,
+) {
+  final database = AppDatabase(ref.watch(databaseExecutorProvider));
+  ref.onDispose(() => unawaited(database.close()));
+  return database;
+});
+
+final Provider<MissionDao> missionDaoProvider = Provider<MissionDao>(
+  (Ref ref) => MissionDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<RecurrenceDao> recurrenceDaoProvider = Provider<RecurrenceDao>(
+  (Ref ref) => RecurrenceDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<NotificationDao> notificationDaoProvider =
+    Provider<NotificationDao>(
+      (Ref ref) => NotificationDao(ref.watch(appDatabaseProvider)),
+    );
+
+final Provider<EconomyDao> economyDaoProvider = Provider<EconomyDao>(
+  (Ref ref) => EconomyDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<JournalDao> journalDaoProvider = Provider<JournalDao>(
+  (Ref ref) => JournalDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<ProgressDao> progressDaoProvider = Provider<ProgressDao>(
+  (Ref ref) => ProgressDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<SettingsDao> settingsDaoProvider = Provider<SettingsDao>(
+  (Ref ref) => SettingsDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<MissionRepository> missionRepositoryProvider =
+    Provider<MissionRepository>(
+      (Ref ref) => DriftMissionRepository(ref.watch(missionDaoProvider)),
+    );
+
+final Provider<EconomyRepository> economyRepositoryProvider =
+    Provider<EconomyRepository>(
+      (Ref ref) => DriftEconomyRepository(ref.watch(economyDaoProvider)),
+    );
+
+final Provider<JournalRepository> journalRepositoryProvider =
+    Provider<JournalRepository>(
+      (Ref ref) => DriftJournalRepository(ref.watch(journalDaoProvider)),
+    );
+
+final Provider<ProgressRepository> progressRepositoryProvider =
+    Provider<ProgressRepository>(
+      (Ref ref) => DriftProgressRepository(ref.watch(progressDaoProvider)),
+    );
+
+final Provider<SettingsRepository> settingsRepositoryProvider =
+    Provider<SettingsRepository>(
+      (Ref ref) => DriftSettingsRepository(ref.watch(settingsDaoProvider)),
+    );
+
+final class _DatabaseAccessLease {
+  bool _valid = true;
+
+  bool get isValid => _valid;
+
+  void invalidate() => _valid = false;
+
+  void ensureValid() {
+    if (!_valid) {
+      throw const AccessDatabaseLockedException();
+    }
+  }
+}
