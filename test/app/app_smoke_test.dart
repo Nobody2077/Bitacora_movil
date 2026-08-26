@@ -14,6 +14,7 @@ void main() {
     testWidgets('usa NavigationBar en teléfono y cambia de rama', (
       WidgetTester tester,
     ) async {
+      _ensureResumed(tester);
       _setSurface(tester, const Size(412, 915));
       await tester.pumpWidget(_testApp(initialLocation: AppRoutes.home));
       await tester.pumpAndSettle();
@@ -31,6 +32,7 @@ void main() {
     testWidgets('usa NavigationRail extendido en tablet', (
       WidgetTester tester,
     ) async {
+      _ensureResumed(tester);
       _setSurface(tester, const Size(1280, 800));
       await tester.pumpWidget(
         _testApp(initialLocation: AppRoutes.dashboardDaily),
@@ -68,4 +70,10 @@ void _setSurface(WidgetTester tester, Size size) {
   tester.view.physicalSize = size;
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
+}
+
+void _ensureResumed(WidgetTester tester) {
+  if (tester.binding.lifecycleState != AppLifecycleState.resumed) {
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+  }
 }

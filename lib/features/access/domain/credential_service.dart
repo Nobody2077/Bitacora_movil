@@ -11,6 +11,8 @@ import 'recovery_code.dart';
 
 enum CredentialAttemptStatus { verified, rejected, blocked }
 
+typedef CredentialCommitGuard = bool Function();
+
 /// Non-sensitive verification metadata; it never carries a credential.
 final class CredentialAttemptResult {
   const CredentialAttemptResult._({
@@ -141,25 +143,27 @@ final class CredentialService {
       Set<AccessEnrollmentDraft>.identity();
   final Set<AccessRecoveryDraft> _activeRecoveryDrafts =
       Set<AccessRecoveryDraft>.identity();
-  int _draftRevision = 0;
+  // Epoch común para material de un solo uso y commits de credenciales. Toda
+  // transición de sesión cerrada lo incrementa mediante [discardDrafts].
+  int _operationEpoch = 0;
 
   /// Invalidates one-time plaintext material, for example on lock/background.
   /// Session code must still discard any late future through its own revision.
   void discardDrafts() {
-    _draftRevision += 1;
+    _operationEpoch += 1;
     _activeDrafts.clear();
     _activeRecoveryDrafts.clear();
   }
 
   void discardEnrollmentDraft(AccessEnrollmentDraft draft) {
     if (_activeDrafts.remove(draft)) {
-      _draftRevision += 1;
+      _operationEpoch += 1;
     }
   }
 
   void discardRecoveryDraft(AccessRecoveryDraft draft) {
     if (_activeRecoveryDrafts.remove(draft)) {
-      _draftRevision += 1;
+      _operationEpoch += 1;
     }
   }
 
@@ -168,7 +172,7 @@ final class CredentialService {
   Future<AccessEnrollmentDraft> createEnrollmentDraft({required String pin}) {
     _requireAcceptablePin(pin);
     return _mutex.protect(() async {
-      final draftRevision = _draftRevision;
+      final draftRevision = _operationEpoch;
       if (await _store.read() != null) {
         throw const AccessCredentialException(
           AccessCredentialErrorCode.alreadyConfigured,
@@ -182,7 +186,7 @@ final class CredentialService {
         _hasher.deriveVerifier(secret: pin, salt: pinSalt),
         _hasher.deriveVerifier(secret: recovery.canonical, salt: recoverySalt),
       ]);
-      if (draftRevision != _draftRevision) {
+      if (draftRevision != _operationEpoch) {
         throw const AccessCredentialException(
           AccessCredentialErrorCode.staleDraft,
         );
@@ -209,8 +213,9 @@ final class CredentialService {
   Future<void> confirmEnrollment({
     required AccessEnrollmentDraft draft,
     required String recoveryCode,
+    CredentialCommitGuard? canCommit,
   }) => _mutex.protect(() async {
-    final draftRevision = _draftRevision;
+    final draftRevision = _operationEpoch;
     if (!_activeDrafts.contains(draft)) {
       throw const AccessCredentialException(
         AccessCredentialErrorCode.invalidRecoveryCode,
@@ -229,7 +234,7 @@ final class CredentialService {
       );
     }
     final existing = await _store.read();
-    if (draftRevision != _draftRevision || !_activeDrafts.contains(draft)) {
+    if (draftRevision != _operationEpoch || !_activeDrafts.contains(draft)) {
       throw const AccessCredentialException(
         AccessCredentialErrorCode.staleDraft,
       );
@@ -240,32 +245,46 @@ final class CredentialService {
         AccessCredentialErrorCode.alreadyConfigured,
       );
     }
+    _requireCurrentMutation(draftRevision, canCommit: canCommit);
     await _store.write(draft._record);
     _activeDrafts.remove(draft);
   });
 
-  Future<CredentialAttemptResult> verifyPin(String pin) =>
-      _mutex.protect(() async {
-        final record = await _requireRecord();
-        final blocked = _blockedResult(record);
-        if (blocked != null) {
-          return blocked;
-        }
-        final candidate = await _hasher.deriveVerifier(
-          secret: pin,
-          salt: record.pinSalt,
-        );
-        final matches =
-            PinPolicy.isAcceptable(pin) &&
-            _hasher.constantTimeEquals(candidate, record.pinVerifier);
-        return matches ? _accept(record) : _reject(record);
-      });
+  Future<CredentialAttemptResult> verifyPin(
+    String pin, {
+    CredentialCommitGuard? canCommit,
+  }) {
+    final mutationRevision = _operationEpoch;
+    return _mutex.protect(() async {
+      final record = await _requireRecord();
+      final blocked = _blockedResult(record);
+      if (blocked != null) {
+        return blocked;
+      }
+      final candidate = await _hasher.deriveVerifier(
+        secret: pin,
+        salt: record.pinSalt,
+      );
+      final matches =
+          PinPolicy.isAcceptable(pin) &&
+          _hasher.constantTimeEquals(candidate, record.pinVerifier);
+      return matches
+          ? _accept(
+              record,
+              mutationRevision: mutationRevision,
+              canCommit: canCommit,
+            )
+          : _reject(record);
+    });
+  }
 
   Future<CredentialAttemptResult> changePin({
     required String currentPin,
     required String newPin,
+    CredentialCommitGuard? canCommit,
   }) {
     _requireAcceptablePin(newPin);
+    final mutationRevision = _operationEpoch;
     return _mutex.protect(() async {
       final record = await _requireRecord();
       final blocked = _blockedResult(record);
@@ -282,6 +301,7 @@ final class CredentialService {
       }
       final salt = _hasher.generateSalt();
       final verifier = await _hasher.deriveVerifier(secret: newPin, salt: salt);
+      _requireCurrentMutation(mutationRevision, canCommit: canCommit);
       await _store.write(
         _resetAttempts(record.copyWith(pinSalt: salt, pinVerifier: verifier)),
       );
@@ -297,7 +317,7 @@ final class CredentialService {
   }) {
     _requireAcceptablePin(newPin);
     return _mutex.protect(() async {
-      final draftRevision = _draftRevision;
+      final draftRevision = _operationEpoch;
       final record = await _requireRecord();
       final blocked = _blockedResult(record);
       if (blocked != null) {
@@ -323,7 +343,7 @@ final class CredentialService {
           salt: recoverySalt,
         ),
       ]);
-      if (draftRevision != _draftRevision) {
+      if (draftRevision != _operationEpoch) {
         throw const AccessCredentialException(
           AccessCredentialErrorCode.staleDraft,
         );
@@ -352,8 +372,9 @@ final class CredentialService {
   Future<void> confirmRecovery({
     required AccessRecoveryDraft draft,
     required String recoveryCode,
+    CredentialCommitGuard? canCommit,
   }) => _mutex.protect(() async {
-    final draftRevision = _draftRevision;
+    final draftRevision = _operationEpoch;
     if (!_activeRecoveryDrafts.contains(draft)) {
       throw const AccessCredentialException(
         AccessCredentialErrorCode.invalidRecoveryCode,
@@ -372,7 +393,7 @@ final class CredentialService {
       );
     }
     final baseline = await _requireRecord();
-    if (draftRevision != _draftRevision ||
+    if (draftRevision != _operationEpoch ||
         !_activeRecoveryDrafts.contains(draft) ||
         baseline.toJsonString() != draft._baselineJson) {
       _activeRecoveryDrafts.remove(draft);
@@ -380,6 +401,7 @@ final class CredentialService {
         AccessCredentialErrorCode.staleDraft,
       );
     }
+    _requireCurrentMutation(draftRevision, canCommit: canCommit);
     await _store.write(draft._replacement);
     _activeRecoveryDrafts.remove(draft);
   });
@@ -388,37 +410,46 @@ final class CredentialService {
   Future<CredentialAttemptResult> setBiometricsEnabled({
     required String currentPin,
     required bool enabled,
-  }) => _mutex.protect(() async {
-    final record = await _requireRecord();
-    final blocked = _blockedResult(record);
-    if (blocked != null) {
-      return blocked;
-    }
-    final currentVerifier = await _hasher.deriveVerifier(
-      secret: currentPin,
-      salt: record.pinSalt,
-    );
-    if (!PinPolicy.isAcceptable(currentPin) ||
-        !_hasher.constantTimeEquals(currentVerifier, record.pinVerifier)) {
-      return _reject(record);
-    }
-    await _store.write(
-      _resetAttempts(record.copyWith(biometricsEnabled: enabled)),
-    );
-    return CredentialAttemptResult.verified();
-  });
+    CredentialCommitGuard? canCommit,
+  }) {
+    final mutationRevision = _operationEpoch;
+    return _mutex.protect(() async {
+      final record = await _requireRecord();
+      final blocked = _blockedResult(record);
+      if (blocked != null) {
+        return blocked;
+      }
+      final currentVerifier = await _hasher.deriveVerifier(
+        secret: currentPin,
+        salt: record.pinSalt,
+      );
+      if (!PinPolicy.isAcceptable(currentPin) ||
+          !_hasher.constantTimeEquals(currentVerifier, record.pinVerifier)) {
+        return _reject(record);
+      }
+      _requireCurrentMutation(mutationRevision, canCommit: canCommit);
+      await _store.write(
+        _resetAttempts(record.copyWith(biometricsEnabled: enabled)),
+      );
+      return CredentialAttemptResult.verified();
+    });
+  }
 
   /// Clears persisted PIN/recovery throttling only after the caller has
   /// received an authenticated result from the biometric platform boundary.
-  Future<void> recordBiometricSuccess() => _mutex.protect(() async {
-    final record = await _requireRecord();
-    if (!record.biometricsEnabled) {
-      throw const AccessCredentialException(
-        AccessCredentialErrorCode.biometricsNotEnabled,
-      );
-    }
-    await _store.write(_resetAttempts(record));
-  });
+  Future<void> recordBiometricSuccess({CredentialCommitGuard? canCommit}) {
+    final mutationRevision = _operationEpoch;
+    return _mutex.protect(() async {
+      final record = await _requireRecord();
+      if (!record.biometricsEnabled) {
+        throw const AccessCredentialException(
+          AccessCredentialErrorCode.biometricsNotEnabled,
+        );
+      }
+      _requireCurrentMutation(mutationRevision, canCommit: canCommit);
+      await _store.write(_resetAttempts(record));
+    });
+  }
 
   Future<AccessCredentialRecord> _requireRecord() async {
     final record = await _store.read();
@@ -446,7 +477,12 @@ final class CredentialService {
     );
   }
 
-  Future<CredentialAttemptResult> _accept(AccessCredentialRecord record) async {
+  Future<CredentialAttemptResult> _accept(
+    AccessCredentialRecord record, {
+    required int mutationRevision,
+    CredentialCommitGuard? canCommit,
+  }) async {
+    _requireCurrentMutation(mutationRevision, canCommit: canCommit);
     await _store.write(_resetAttempts(record));
     return CredentialAttemptResult.verified();
   }
@@ -497,6 +533,17 @@ final class CredentialService {
     if (!PinPolicy.isAcceptable(pin)) {
       throw const AccessCredentialException(
         AccessCredentialErrorCode.invalidPin,
+      );
+    }
+  }
+
+  void _requireCurrentMutation(
+    int mutationRevision, {
+    CredentialCommitGuard? canCommit,
+  }) {
+    if (mutationRevision != _operationEpoch || canCommit?.call() == false) {
+      throw const AccessCredentialException(
+        AccessCredentialErrorCode.staleOperation,
       );
     }
   }

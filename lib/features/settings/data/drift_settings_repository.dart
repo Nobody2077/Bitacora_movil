@@ -13,9 +13,17 @@ final class DriftSettingsRepository implements SettingsRepository {
   @override
   Future<Result<AppPreferences>> load() async {
     try {
-      return Success<AppPreferences>(
-        SettingsMapper.fromDrift(await _dao.getSettings()),
+      final AppPreferences preferences = SettingsMapper.fromDrift(
+        await _dao.getSettings(),
       );
+      if (!AppPreferences.supportedAutoLockMinutes.contains(
+        preferences.autoLockMinutes,
+      )) {
+        return const Failure<AppPreferences>(
+          ValidationFailure('El autobloqueo persistido no está soportado.'),
+        );
+      }
+      return Success<AppPreferences>(preferences);
     } on Object catch (error) {
       return Failure<AppPreferences>(
         StorageFailure('No se pudieron leer los ajustes.', cause: error),
@@ -27,7 +35,9 @@ final class DriftSettingsRepository implements SettingsRepository {
   Future<Result<void>> save(AppPreferences preferences) async {
     if (!preferences.updatedAtUtc.isUtc ||
         preferences.themeKey.trim().isEmpty ||
-        preferences.autoLockMinutes < 0) {
+        !AppPreferences.supportedAutoLockMinutes.contains(
+          preferences.autoLockMinutes,
+        )) {
       return const Failure<void>(
         ValidationFailure('Los ajustes contienen valores inválidos.'),
       );

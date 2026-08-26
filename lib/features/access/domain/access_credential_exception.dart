@@ -7,6 +7,7 @@ enum AccessCredentialErrorCode {
   invalidHashParameters,
   invalidRecoveryCode,
   staleDraft,
+  staleOperation,
   biometricsNotEnabled,
 }
 

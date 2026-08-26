@@ -1,7 +1,7 @@
 # ADR-002 — Contrato de acceso y privacidad v1
 
 Fecha: 25 de agosto de 2026  
-Estado: aceptado para A2  
+Estado: aceptado e implementado en A2
 Alcance: Android MVP, local-first y de un solo usuario
 
 ## 1. Contexto

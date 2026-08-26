@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 24 de agosto de 2026
+Última actualización: 25 de agosto de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -8,8 +8,8 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | --- | --- | --- |
 | A0 — Base del proyecto | **COMPLETADA** | G0 verde |
 | A1 — Persistencia | **COMPLETADA** | G1 verde |
-| A2 — Acceso y privacidad | **AUTORIZADA** | En espera de ejecución |
-| A3 — Misiones | BLOQUEADA | Requiere G2 |
+| A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
+| A3 — Misiones | **AUTORIZADA** | En espera de ejecución |
 | A4 — Economía | BLOQUEADA | Requiere G3 |
 | A5 — Bitácora y progreso | BLOQUEADA | Requiere G4 |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
@@ -56,4 +56,28 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 - `app-dev-debug.apk`: compilado.
 - `app-prod-debug.apk`: compilado.
 
-No se implementaron PIN, biometría, sesión, guard de rutas ni privacy cover durante A1; comienzan en A2.
+A2 no implementó lógica de Misiones; ese dominio comienza únicamente en A3.
+
+## Evidencia G2
+
+- `ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`: contrato cerrado antes de implementar A2.
+- PIN obligatorio de seis dígitos y recuperación Crockford Base32 de 160 bits, protegidos con PBKDF2-HMAC-SHA256 de 600.000 iteraciones, salts independientes y comparación constante.
+- estado de acceso cifrado mediante AES-256-GCM con alias AndroidKeyStore independiente; corrupción, alias ausente y estado ausente con base existente fallan cerrados.
+- espera progresiva compartida y persistente para PIN y recuperación, sin borrado automático.
+- biometría opcional y exclusivamente biométrica; el PIN propio permanece como fallback y recuperación.
+- sesión cerrada por defecto, commits asíncronos cercados por epoch/revisión y resultados tardíos incapaces de reabrir la app.
+- base inaccesible antes de desbloquear y cierre de la `AppDatabase` cifrada ya abierta comprobado al bloquear en Android.
+- guard global y defensa en profundidad: ningún builder protegido, DAO, repositorio ni watch se construye con la sesión cerrada.
+- destino pendiente validado contra catálogo, sin query ni fragmento, redactado y consumido una sola vez.
+- autobloqueo exacto en `timeout - 1`, `timeout` y `timeout + 1`; opciones persistibles limitadas a 0, 1, 5 y 15 minutos.
+- política aún no cargada o inválida falla segura con bloqueo inmediato; cubierta opaca desde el primer frame y ante pausa previa al primer post-frame.
+- Android API 34/dev: `FLAG_SECURE`, `FlutterFragmentActivity`, Keystore y biometría aprobados.
+- reinicio real Android automatizado: estado cifrado sembrado, PID terminado con `adb force-stop`, ausencia del PID confirmada y nuevo proceso iniciado en `locked`; desbloqueo posterior con PIN válido aprobado.
+- diagnósticos completos de GoRouter desactivados en dev y prod para no registrar locations sensibles.
+- regresión cifrada G1 aprobada, incluida clave errónea sin mutación y pérdida de clave fail-closed.
+- `dart format`: 106 archivos sin cambios.
+- `flutter analyze`: cero problemas.
+- `flutter test`: 101 pruebas aprobadas.
+- integración Android: 2 pruebas de persistencia cifrada, 1 de seguridad nativa y 2 etapas de reinicio aprobadas.
+- `app-dev-debug.apk` y `app-prod-debug.apk`: compiladas.
+- `tool/gate_g2.ps1 -DeviceId emulator-5554`: aprobado de extremo a extremo el 25 de agosto de 2026.

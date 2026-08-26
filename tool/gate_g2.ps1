@@ -23,6 +23,11 @@ try {
         throw "Android access/privacy integration failed with exit code $LASTEXITCODE."
     }
 
+    & (Join-Path $PSScriptRoot 'process_restart_g2.ps1') -DeviceId $DeviceId
+    if ($LASTEXITCODE -ne 0) {
+        throw "Android process-restart evidence failed with exit code $LASTEXITCODE."
+    }
+
     flutter build apk --debug --flavor dev -t lib/main_dev.dart
     if ($LASTEXITCODE -ne 0) {
         throw "dev APK build failed with exit code $LASTEXITCODE."

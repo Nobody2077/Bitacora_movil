@@ -162,6 +162,7 @@ class AccessSessionController extends Notifier<AccessSessionState> {
       await _credentialService.confirmEnrollment(
         draft: draft,
         recoveryCode: recoveryCode,
+        canCommit: () => _isCurrent(operationRevision),
       );
       if (!_isCurrent(operationRevision)) {
         await _reconcileLockedState();
@@ -201,6 +202,7 @@ class AccessSessionController extends Notifier<AccessSessionState> {
     try {
       final CredentialAttemptResult result = await _credentialService.verifyPin(
         pin,
+        canCommit: () => _isCurrent(operationRevision),
       );
       if (!_isCurrent(operationRevision)) {
         await _reconcileLockedState();
@@ -238,7 +240,9 @@ class AccessSessionController extends Notifier<AccessSessionState> {
 
     if (outcome == BiometricAuthenticationOutcome.authenticated) {
       try {
-        await _credentialService.recordBiometricSuccess();
+        await _credentialService.recordBiometricSuccess(
+          canCommit: () => _isCurrent(operationRevision),
+        );
         if (!_isCurrent(operationRevision)) {
           await _reconcileLockedState();
           return false;
@@ -364,6 +368,7 @@ class AccessSessionController extends Notifier<AccessSessionState> {
       await _credentialService.confirmRecovery(
         draft: draft,
         recoveryCode: recoveryCode,
+        canCommit: () => _isCurrent(operationRevision),
       );
       if (!_isCurrent(operationRevision)) {
         await _reconcileLockedState();
@@ -418,6 +423,7 @@ class AccessSessionController extends Notifier<AccessSessionState> {
       final CredentialAttemptResult result = await _credentialService.changePin(
         currentPin: currentPin,
         newPin: newPin,
+        canCommit: () => _isCurrent(operationRevision),
       );
       if (!_isCurrent(operationRevision)) {
         await _reconcileLockedState();
@@ -468,7 +474,11 @@ class AccessSessionController extends Notifier<AccessSessionState> {
 
     try {
       final CredentialAttemptResult result = await _credentialService
-          .setBiometricsEnabled(currentPin: currentPin, enabled: enabled);
+          .setBiometricsEnabled(
+            currentPin: currentPin,
+            enabled: enabled,
+            canCommit: () => _isCurrent(operationRevision),
+          );
       if (!_isCurrent(operationRevision)) {
         await _reconcileLockedState();
         return false;

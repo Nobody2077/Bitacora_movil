@@ -52,6 +52,41 @@ void main() {
       );
       expect(container.read(privacyControllerProvider).covered, isTrue);
     });
+
+    test('política aún no cargada falla segura y bloquea al cubrir', () {
+      final _FakeMonotonicClock clock = _FakeMonotonicClock();
+      final ProviderContainer container = _privacyContainer(clock);
+      addTearDown(container.dispose);
+      container.read(accessSessionProvider);
+
+      container.read(privacyControllerProvider.notifier).coverForBackground();
+
+      expect(container.read(autoLockMinutesProvider), 0);
+      expect(
+        container.read(accessSessionProvider).phase,
+        AccessSessionPhase.locked,
+      );
+    });
+
+    test('recargar política descarta un valor anterior más permisivo', () {
+      final _FakeMonotonicClock clock = _FakeMonotonicClock();
+      final ProviderContainer container = _privacyContainer(clock);
+      addTearDown(container.dispose);
+      container.read(accessSessionProvider);
+      final AutoLockPolicyController policy = container.read(
+        autoLockMinutesProvider.notifier,
+      );
+      policy.setMinutes(15);
+
+      policy.useSafeFallback();
+      container.read(privacyControllerProvider.notifier).coverForBackground();
+
+      expect(container.read(autoLockMinutesProvider), 0);
+      expect(
+        container.read(accessSessionProvider).phase,
+        AccessSessionPhase.locked,
+      );
+    });
   });
 }
 

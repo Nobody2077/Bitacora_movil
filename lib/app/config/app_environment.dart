@@ -15,7 +15,9 @@ class AppEnvironment {
   static const AppEnvironment development = AppEnvironment(
     flavor: AppFlavor.development,
     appName: 'Bitácora RPG DEV',
-    enableRouterDiagnostics: true,
+    // go_router incluye locations completas en sus diagnósticos. Se mantiene
+    // desactivado también en dev para no registrar IDs, query ni fragmentos.
+    enableRouterDiagnostics: false,
   );
 
   static const AppEnvironment production = AppEnvironment(

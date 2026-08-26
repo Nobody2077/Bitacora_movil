@@ -33,7 +33,9 @@ class _AppPrivacyBoundaryState extends ConsumerState<AppPrivacyBoundary> {
       onStateChange: _handleLifecycleState,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(_resumeAndScheduleReveal());
+      if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
+        unawaited(_resumeAndScheduleReveal());
+      }
     });
   }
 
@@ -73,6 +75,7 @@ class _AppPrivacyBoundaryState extends ConsumerState<AppPrivacyBoundary> {
   }
 
   Future<void> _loadAutoLockPolicy(int sessionRevision) async {
+    ref.read(autoLockMinutesProvider.notifier).useSafeFallback();
     try {
       final Result<AppPreferences> result = await ref
           .read(settingsRepositoryProvider)
@@ -91,18 +94,19 @@ class _AppPrivacyBoundaryState extends ConsumerState<AppPrivacyBoundary> {
               .setMinutes(preferences.autoLockMinutes);
         },
         onFailure: (_) {
-          ref.read(autoLockMinutesProvider.notifier).restoreDefault();
+          ref.read(autoLockMinutesProvider.notifier).useSafeFallback();
         },
       );
     } on Object {
       if (mounted) {
-        ref.read(autoLockMinutesProvider.notifier).restoreDefault();
+        ref.read(autoLockMinutesProvider.notifier).useSafeFallback();
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(persistenceAccessGuardProvider);
     ref.listen<AccessSessionState>(accessSessionProvider, (previous, next) {
       if (next.canRevealPrivacyShield) {
         _scheduleReveal();

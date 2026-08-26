@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../settings/domain/models/app_preferences.dart';
 import 'access_session_controller.dart';
 import 'monotonic_clock.dart';
 
-const Set<int> supportedAutoLockMinutes = <int>{0, 1, 5, 15};
+const Set<int> supportedAutoLockMinutes =
+    AppPreferences.supportedAutoLockMinutes;
 
 final Provider<MonotonicClock> monotonicClockProvider =
     Provider<MonotonicClock>((Ref ref) => StopwatchMonotonicClock());
@@ -16,7 +18,7 @@ final NotifierProvider<AutoLockPolicyController, int> autoLockMinutesProvider =
 
 class AutoLockPolicyController extends Notifier<int> {
   @override
-  int build() => 5;
+  int build() => 0;
 
   bool setMinutes(int minutes) {
     if (!supportedAutoLockMinutes.contains(minutes)) {
@@ -26,7 +28,12 @@ class AutoLockPolicyController extends Notifier<int> {
     return true;
   }
 
-  void restoreDefault() => state = 5;
+  /// Estado conservador mientras la preferencia cifrada aún no pudo leerse.
+  ///
+  /// El valor persistido nuevo sigue siendo cinco minutos; usar cero solo en
+  /// memoria evita debilitar una preferencia previa de cero o un minuto si la
+  /// app sale a segundo plano durante la carga o si esa lectura falla.
+  void useSafeFallback() => state = 0;
 }
 
 @immutable

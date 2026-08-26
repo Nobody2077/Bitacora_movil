@@ -213,6 +213,150 @@ void main() {
     });
 
     test(
+      'background impide commit biométrico durante verificación del PIN',
+      () async {
+        final _FastHasher baseHasher = _FastHasher();
+        final _BlockingHasher hasher = _BlockingHasher(baseHasher);
+        final _MemoryCredentialStore store = _MemoryCredentialStore(
+          await _record(hasher: hasher, biometricsEnabled: false),
+        );
+        final String baseline = store.record!.toJsonString();
+        final ProviderContainer container = _container(
+          store: store,
+          hasher: hasher,
+          biometric: const _AvailableBiometric(),
+          seed: const AccessSessionState.unlockedForTesting(),
+        );
+        addTearDown(container.dispose);
+        final AccessSessionController controller = container.read(
+          accessSessionProvider.notifier,
+        );
+        hasher.arm();
+
+        final Future<bool> attempt = controller.setBiometricsEnabled(
+          currentPin: '246802',
+          enabled: true,
+        );
+        await hasher.blocked;
+        controller.handleBackgrounded();
+        hasher.release();
+
+        expect(await attempt, isFalse);
+        expect(store.record?.toJsonString(), baseline);
+        expect(
+          container.read(accessSessionProvider).phase,
+          AccessSessionPhase.locked,
+        );
+      },
+    );
+
+    test(
+      'background impide commit de cambio de PIN durante derivación',
+      () async {
+        final _FastHasher baseHasher = _FastHasher();
+        final _BlockingHasher hasher = _BlockingHasher(baseHasher);
+        final _MemoryCredentialStore store = _MemoryCredentialStore(
+          await _record(hasher: hasher, biometricsEnabled: false),
+        );
+        final String baseline = store.record!.toJsonString();
+        final ProviderContainer container = _container(
+          store: store,
+          hasher: hasher,
+          seed: const AccessSessionState.unlockedForTesting(),
+        );
+        addTearDown(container.dispose);
+        final AccessSessionController controller = container.read(
+          accessSessionProvider.notifier,
+        );
+        hasher.arm();
+
+        final Future<bool> attempt = controller.changePin(
+          currentPin: '246802',
+          newPin: '975310',
+          confirmation: '975310',
+        );
+        await hasher.blocked;
+        controller.handleBackgrounded();
+        hasher.release();
+
+        expect(await attempt, isFalse);
+        expect(store.record?.toJsonString(), baseline);
+        expect(
+          container.read(accessSessionProvider).phase,
+          AccessSessionPhase.locked,
+        );
+      },
+    );
+
+    test(
+      'commit ya encolado termina pero nunca reabre tras background',
+      () async {
+        final _FastHasher hasher = _FastHasher();
+        final _MemoryCredentialStore store = _MemoryCredentialStore(
+          await _record(hasher: hasher, biometricsEnabled: false),
+        )..blockNextWrite();
+        final ProviderContainer container = _container(
+          store: store,
+          hasher: hasher,
+          biometric: const _AvailableBiometric(),
+          seed: const AccessSessionState.unlockedForTesting(),
+        );
+        addTearDown(container.dispose);
+        final AccessSessionController controller = container.read(
+          accessSessionProvider.notifier,
+        );
+
+        final Future<bool> attempt = controller.setBiometricsEnabled(
+          currentPin: '246802',
+          enabled: true,
+        );
+        await store.nextWriteStarted;
+        controller.handleBackgrounded();
+        store.releaseNextWrite();
+
+        expect(await attempt, isFalse);
+        expect(store.record?.biometricsEnabled, isTrue);
+        expect(
+          container.read(accessSessionProvider).phase,
+          AccessSessionPhase.locked,
+        );
+        expect(
+          container.read(accessSessionProvider).canBuildProtected,
+          isFalse,
+        );
+      },
+    );
+
+    test('fallo encolado persiste contador aunque ocurra background', () async {
+      final _FastHasher hasher = _FastHasher();
+      final _MemoryCredentialStore store = _MemoryCredentialStore(
+        await _record(hasher: hasher, biometricsEnabled: false),
+      )..blockNextWrite();
+      final ProviderContainer container = _container(
+        store: store,
+        hasher: hasher,
+      );
+      addTearDown(container.dispose);
+      container.read(accessSessionProvider);
+      await _waitForPhase(container, AccessSessionPhase.locked);
+      final AccessSessionController controller = container.read(
+        accessSessionProvider.notifier,
+      );
+
+      final Future<bool> attempt = controller.unlockWithPin('135790');
+      await store.nextWriteStarted;
+      controller.handleBackgrounded();
+      store.releaseNextWrite();
+
+      expect(await attempt, isFalse);
+      expect(store.record?.failedAttempts, 1);
+      expect(
+        container.read(accessSessionProvider).phase,
+        AccessSessionPhase.locked,
+      );
+    });
+
+    test(
       'destino pendiente se valida, redacta y consume una sola vez',
       () async {
         final _FastHasher hasher = _FastHasher();
@@ -316,12 +460,42 @@ final class _MemoryCredentialStore implements AccessCredentialStore {
 
   AccessCredentialRecord? record;
   int writeCount = 0;
+  Completer<void>? _nextWriteBarrier;
+  Completer<void>? _nextWriteStarted;
+
+  Future<void> get nextWriteStarted =>
+      (_nextWriteStarted ??
+              (throw StateError('No hay una escritura bloqueada.')))
+          .future;
+
+  void blockNextWrite() {
+    if (_nextWriteBarrier != null) {
+      throw StateError('Ya existe una escritura bloqueada.');
+    }
+    _nextWriteBarrier = Completer<void>();
+    _nextWriteStarted = Completer<void>();
+  }
+
+  void releaseNextWrite() {
+    final Completer<void>? barrier = _nextWriteBarrier;
+    if (barrier == null || barrier.isCompleted) {
+      throw StateError('No hay una escritura pendiente.');
+    }
+    barrier.complete();
+  }
 
   @override
   Future<AccessCredentialRecord?> read() async => record;
 
   @override
   Future<void> write(AccessCredentialRecord value) async {
+    final Completer<void>? barrier = _nextWriteBarrier;
+    if (barrier != null) {
+      _nextWriteStarted!.complete();
+      await barrier.future;
+      _nextWriteBarrier = null;
+      _nextWriteStarted = null;
+    }
     record = value;
     writeCount += 1;
   }
@@ -373,6 +547,47 @@ final class _FastHasher implements AccessCredentialHasher {
   }
 }
 
+final class _BlockingHasher implements AccessCredentialHasher {
+  _BlockingHasher(this._delegate);
+
+  final AccessCredentialHasher _delegate;
+  final Completer<void> _started = Completer<void>();
+  final Completer<void> _release = Completer<void>();
+  bool _armed = false;
+
+  Future<void> get blocked => _started.future;
+
+  void arm() => _armed = true;
+
+  void release() => _release.complete();
+
+  @override
+  int get saltLength => _delegate.saltLength;
+
+  @override
+  int get verifierLength => _delegate.verifierLength;
+
+  @override
+  List<int> generateSalt() => _delegate.generateSalt();
+
+  @override
+  Future<List<int>> deriveVerifier({
+    required String secret,
+    required List<int> salt,
+  }) async {
+    if (_armed) {
+      _armed = false;
+      _started.complete();
+      await _release.future;
+    }
+    return _delegate.deriveVerifier(secret: secret, salt: salt);
+  }
+
+  @override
+  bool constantTimeEquals(List<int> left, List<int> right) =>
+      _delegate.constantTimeEquals(left, right);
+}
+
 final class _FixedRandom implements RandomByteSource {
   int _value = 1;
 
@@ -401,6 +616,21 @@ final class _UnavailableBiometric implements BiometricAuthenticator {
   Future<void> cancelAuthentication() async {}
 }
 
+final class _AvailableBiometric implements BiometricAuthenticator {
+  const _AvailableBiometric();
+
+  @override
+  Future<BiometricAuthenticationOutcome> authenticate() async =>
+      BiometricAuthenticationOutcome.authenticated;
+
+  @override
+  Future<BiometricAvailability> availability() async =>
+      BiometricAvailability.available;
+
+  @override
+  Future<void> cancelAuthentication() async {}
+}
+
 final class _CompletingBiometric implements BiometricAuthenticator {
   final Completer<BiometricAuthenticationOutcome> _completer =
       Completer<BiometricAuthenticationOutcome>();
@@ -419,8 +649,7 @@ final class _CompletingBiometric implements BiometricAuthenticator {
   Future<void> cancelAuthentication() async {}
 }
 
-final class _CompletingAvailabilityBiometric
-    implements BiometricAuthenticator {
+final class _CompletingAvailabilityBiometric implements BiometricAuthenticator {
   final Completer<BiometricAvailability> _availability =
       Completer<BiometricAvailability>();
 

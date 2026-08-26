@@ -1,5 +1,7 @@
 /// Preferencias persistidas del usuario. No representa permisos del sistema.
 final class AppPreferences {
+  static const Set<int> supportedAutoLockMinutes = <int>{0, 1, 5, 15};
+
   const AppPreferences({
     required this.themeKey,
     required this.primaryColorHex,

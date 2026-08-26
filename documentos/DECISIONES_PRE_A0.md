@@ -1,8 +1,8 @@
 # Bitácora RPG Personal — decisiones vinculantes de construcción
 
-Versión: 1.1  
-Fecha: 24 de agosto de 2026  
-Estado: vigente; A0 y A1 completadas, A2 autorizada
+Versión: 1.2
+Fecha: 25 de agosto de 2026
+Estado: vigente; A0, A1 y A2 completadas, A3 autorizada
 
 ## 1. Propósito y precedencia
 
@@ -10,7 +10,7 @@ Este archivo cierra las decisiones que estaban abiertas entre la especificación
 
 Precedencia por materia:
 
-1. Este archivo y ADR posteriores. Para persistencia v1, prevalece `ADR-001-CONTRATO_PERSISTENCIA_V1.md`.
+1. Este archivo y ADR posteriores. Para persistencia v1 prevalece `ADR-001-CONTRATO_PERSISTENCIA_V1.md`; para acceso y privacidad v1 prevalece `ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`.
 2. Mapa de Navegación Definitivo v1.0 para rutas, retorno y adaptación.
 3. UML y Modelo de Datos v1.0 para entidades, con las ampliaciones de este archivo.
 4. Sistema de Diseño y Alta Fidelidad v2.0 para UI.
@@ -59,6 +59,13 @@ Riverpod usará providers manuales durante el MVP. No se incorporan `riverpod_an
 
 Todas las restricciones son exactas y `pubspec.lock` se versiona. La actualización de Flutter o paquetes requiere un ADR, changelog revisado y las pruebas de la fase afectada en verde.
 
+### A2
+
+- `cryptography 2.9.0`
+- `local_auth 3.0.2`
+- resolución Android fijada: `local_auth_android 2.0.8`
+- sin `cryptography_flutter` mientras Android mínimo sea API 24
+
 ## 4. Navegación canónica
 
 El catálogo inicial de la Arquitectura Técnica queda reemplazado por el Mapa de Navegación Definitivo.
@@ -84,7 +91,7 @@ El shell usa `StatefulShellRoute.indexedStack` con seis ramas de dominio indepen
 - Dashboard y Ajustes seleccionan Más en compacto;
 - al ensanchar mientras `/more` está activo, se normaliza a `/dashboard/daily`.
 
-El guard real pertenece a A2. Su contrato queda congelado desde A0: solo las dos rutas de acceso son públicas; un destino protegido se conserva como `PendingDestination(navId, location)` sin contenido sensible; al autenticar se reemplaza la puerta y `/lock` no permanece en Back.
+El guard real implementado en A2 cumple el contrato congelado desde A0: solo las dos rutas de acceso son públicas; un destino protegido se conserva como `PendingDestination(navId, location)` sin contenido sensible; al autenticar se reemplaza la puerta y `/lock` no permanece en Back.
 
 ## 5. Arquitectura y coordinación transversal
 
@@ -248,5 +255,6 @@ Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas espec�
 - Arquitectura: aprobada con las correcciones de este archivo.
 - A0: completada; gate G0 en verde el 24 de agosto de 2026.
 - A1: completada; gate G1 en verde el 24 de agosto de 2026.
-- A2: autorizada como única fase siguiente — Acceso y privacidad.
-- A3–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.
+- A2: completada; gate G2 en verde el 25 de agosto de 2026.
+- A3: autorizada como única fase siguiente — Misiones.
+- A4–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.

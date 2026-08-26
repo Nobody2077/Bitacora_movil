@@ -42,6 +42,15 @@ final Provider<DatabaseKeyStore> databaseKeyStoreProvider =
       (Ref ref) => const MethodChannelDatabaseKeyStore(),
     );
 
+/// Identificador estable del material de clave de la base.
+///
+/// Producción usa exclusivamente `primary`; las pruebas Android debug lo
+/// sustituyen por un `test_*` aislado para comprobar el grafo real sin tocar la
+/// base del usuario.
+final Provider<String> databaseStorageIdProvider = Provider<String>(
+  (Ref ref) => 'primary',
+);
+
 /// Executor sustituible para pruebas de persistencia sin plugins de plataforma.
 ///
 /// [LazyDatabase] posterga Keystore y apertura de archivo hasta la
@@ -62,6 +71,7 @@ final Provider<QueryExecutor> databaseExecutorProvider =
       final DatabaseFileLocator locator = ref.watch(
         databaseFileLocatorProvider,
       );
+      final String storageId = ref.watch(databaseStorageIdProvider);
       final _DatabaseAccessLease lease = _DatabaseAccessLease();
       ref.onDispose(lease.invalidate);
       return LazyDatabase(() async {
@@ -70,7 +80,7 @@ final Provider<QueryExecutor> databaseExecutorProvider =
         lease.ensureValid();
         final QueryExecutor executor = await EncryptedDatabaseConnection(
           keyStore: keyStore,
-        ).open(databaseFile: databaseFile);
+        ).open(databaseFile: databaseFile, storageId: storageId);
         if (!lease.isValid) {
           await executor.close();
           throw const AccessDatabaseLockedException();
@@ -86,6 +96,27 @@ final Provider<AppDatabase> appDatabaseProvider = Provider<AppDatabase>((
   final database = AppDatabase(ref.watch(databaseExecutorProvider));
   ref.onDispose(() => unawaited(database.close()));
   return database;
+});
+
+/// Mantiene activa la frontera sesión→persistencia desde la raíz visual.
+///
+/// Los providers normales pueden quedar pausados si solo fueron leídos. Esta
+/// escucha activa fuerza su destrucción al cerrar la sesión, incluso cuando no
+/// queda ningún consumidor de repositorios montado. Destruir primero la base
+/// inicia el cierre del executor; invalidar después el executor cancela además
+/// cualquier apertura perezosa que todavía estuviera en curso.
+final Provider<void> persistenceAccessGuardProvider = Provider<void>((Ref ref) {
+  ref.listen<bool>(
+    accessSessionProvider.select(
+      (AccessSessionState session) => session.canBuildProtected,
+    ),
+    (bool? previous, bool next) {
+      if (previous == true && !next) {
+        ref.invalidate(appDatabaseProvider);
+        ref.invalidate(databaseExecutorProvider);
+      }
+    },
+  );
 });
 
 final Provider<MissionDao> missionDaoProvider = Provider<MissionDao>(
