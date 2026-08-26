@@ -14,7 +14,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - Misiones ya permite planificar, ejecutar y cerrar registros reales, incluido tiempo, XP, Bitácora y movimiento económico opcional; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional propia.
-- Existen 60 patrones de ruta; 14 producen pantallas específicas y 46 producen `FeaturePlaceholderPage`.
+- Existen 60 patrones de ruta; 15 producen pantallas específicas y 45 producen `FeaturePlaceholderPage`.
 - `flutter analyze` y la compilación `devDebug` fueron ejecutados el 26 de agosto de 2026 y terminaron sin problemas.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
 
@@ -67,6 +67,9 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Recuperación del cronómetro mediante timestamps persistidos, sin proceso permanente ni escrituras por segundo.
 - Refresco visual cancelado cuando la app deja de estar visible.
 - Regla global de un solo cronómetro activo validada dentro de la transacción.
+- Consulta global del cronómetro abierto y aviso visible en Misiones de hoy.
+- Cambio atómico de cronómetro: pausa la misión actual e inicia o reanuda la elegida; ante un fallo se revierten ambas operaciones.
+- Conflicto al iniciar otra misión conectado a `/missions/:missionId/switch-timer`.
 - Pantalla adaptable de misión activa conectada a `/missions/:missionId/active`.
 - `CompleteMission` transversal con una sola transacción Drift para misión, cronómetro, objetivos, evento, XP, Bitácora, movimiento económico opcional y cancelación de avisos pendientes.
 - Cierre completo con XP planificado o parcial con 0 XP predeterminado.
@@ -89,7 +92,7 @@ Ya está conectado:
 
 Falta:
 
-- Flujo para cambiar desde una misión hacia el único cronómetro ya activo.
+- Acceso persistente al cronómetro desde módulos distintos a Misiones; hoy está visible en Misiones de hoy.
 - XP parcial editable manualmente; el cierre parcial actual aplica el valor predeterminado 0.
 - Pantallas próximas, todas, calendario y recurrentes.
 - Reconciliador Android para notificaciones programadas.
@@ -197,19 +200,19 @@ Las carpetas `test/`, `integration_test/` y `tool/` no son código muerto. Conti
 
 ## Secuencia recomendada para continuar A3
 
-1. Implementar cambio seguro hacia el único cronómetro activo y su acceso global.
+1. Validar en la tablet física el ciclo crear → iniciar → cambiar → pausar → cerrar.
 2. Conectar plantillas y generación recurrente.
 3. Implementar agenda/reconciliación de notificaciones.
 4. Implementar listas próximas, todas y calendario.
-5. Añadir correcciones auditadas y XP manual para cierres parciales.
+5. Añadir acceso al cronómetro fuera de Misiones, correcciones auditadas y XP manual para cierres parciales.
 
-El ciclo principal de una misión ya está conectado de extremo a extremo. El siguiente incremento debe resolver la conmutación del cronómetro único antes de ampliar recurrencia y consultas.
+El ciclo principal y la conmutación del cronómetro único ya están conectados de extremo a extremo. El siguiente incremento funcional es recurrencia, después de validar el flujo actual en Android físico.
 
 ## APK y artefactos locales
 
 El 26 de agosto de 2026 se eliminaron cuatro APK debug reproducibles: dev y prod estaban duplicados entre las salidas de Flutter y Gradle. La limpieza liberó aproximadamente 804 MiB y no eliminó código fuente ni datos de la aplicación.
 
-Después del incremento de cronómetro se compiló correctamente una APK `devDebug` como verificación. Las dos copias producidas por Flutter y Gradle se eliminaron al terminar; no se almacenan binarios de verificación.
+Después del incremento de cambio de cronómetro se compiló correctamente una APK `devDebug`. La instalación física está pendiente porque el 26 de agosto de 2026 ADB no detectó la Redmi Pad 2 conectada; se debe activar Depuración USB, seleccionar transferencia de archivos y aceptar la autorización RSA. El APK se conserva temporalmente en `build/` solo para completar esa instalación y debe eliminarse después.
 
 Consideraciones:
 

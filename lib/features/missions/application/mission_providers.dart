@@ -57,6 +57,17 @@ final StreamProvider<List<Mission>> todayMissionsProvider =
           );
     });
 
+final FutureProvider<Mission?> activeTimerMissionProvider =
+    FutureProvider<Mission?>((Ref ref) async {
+      final Result<Mission?> result = await ref
+          .watch(missionRepositoryProvider)
+          .findActiveTimer();
+      return result.fold(
+        onSuccess: (mission) => mission,
+        onFailure: (failure) => throw failure,
+      );
+    });
+
 final missionDetailProvider = FutureProvider.family<Mission?, String>((
   Ref ref,
   String missionId,

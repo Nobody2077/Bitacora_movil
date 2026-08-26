@@ -261,6 +261,10 @@ final class _FakeMissionRepository implements MissionRepository {
       const Success<Mission?>(null);
 
   @override
+  Future<Result<Mission?>> findActiveTimer() async =>
+      const Success<Mission?>(null);
+
+  @override
   Future<Result<List<MissionArea>>> findVisibleAreas() async =>
       const Success<List<MissionArea>>(<MissionArea>[]);
 
@@ -292,6 +296,16 @@ final class _FakeMissionRepository implements MissionRepository {
     required String missionId,
     required int expectedRowVersion,
     required String eventId,
+    required DateTime occurredAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<Mission>> switchTimer({
+    required Mission activeMission,
+    required Mission targetMission,
+    required String pauseEventId,
+    required String timeEntryId,
+    required String startEventId,
     required DateTime occurredAtUtc,
   }) => throw UnimplementedError();
 

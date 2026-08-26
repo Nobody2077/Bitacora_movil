@@ -147,9 +147,17 @@ class _MissionActivePageState extends ConsumerState<MissionActivePage>
         });
         ref.invalidate(missionDetailProvider(widget.missionId));
         ref.invalidate(todayMissionsProvider);
+        ref.invalidate(activeTimerMissionProvider);
       },
       onFailure: (AppFailure failure) {
         setState(() => _changing = false);
+        if (failure is ActiveTimerFailure) {
+          context.pushNamed(
+            'missionSwitchTimer',
+            pathParameters: <String, String>{'missionId': mission.id},
+          );
+          return;
+        }
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(failure.message)));

@@ -15,6 +15,9 @@ class MissionsTodayPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<Mission>> missions = ref.watch(todayMissionsProvider);
     final AsyncValue<List<MissionArea>> areas = ref.watch(missionAreasProvider);
+    final AsyncValue<Mission?> activeTimer = ref.watch(
+      activeTimerMissionProvider,
+    );
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -28,6 +31,10 @@ class MissionsTodayPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   _Header(compact: compact),
+                  if (activeTimer.value != null) ...<Widget>[
+                    const SizedBox(height: 18),
+                    _ActiveTimerBanner(mission: activeTimer.value!),
+                  ],
                   const SizedBox(height: 24),
                   _MissionSummary(missions: missions),
                   const SizedBox(height: 16),
@@ -48,6 +55,59 @@ class MissionsTodayPage extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _ActiveTimerBanner extends StatelessWidget {
+  const _ActiveTimerBanner({required this.mission});
+
+  final Mission mission;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return TerminalPanel(
+      borderColor: tokens.progressGreen,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 18,
+        runSpacing: 14,
+        children: <Widget>[
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(Icons.timer_outlined, color: tokens.progressGreen),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'CRONÓMETRO ACTIVO',
+                    style: TextStyle(
+                      color: tokens.progressGreen,
+                      fontFamily: 'JetBrains Mono',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(mission.title),
+                ],
+              ),
+            ],
+          ),
+          TerminalPrimaryButton(
+            label: 'Continuar',
+            icon: Icons.play_arrow,
+            onPressed: () => context.goNamed(
+              'missionActive',
+              pathParameters: <String, String>{'missionId': mission.id},
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

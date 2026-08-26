@@ -12,6 +12,7 @@ import '../../features/missions/presentation/mission_active_page.dart';
 import '../../features/missions/presentation/mission_completion_pages.dart';
 import '../../features/missions/presentation/mission_detail_page.dart';
 import '../../features/missions/presentation/mission_form_page.dart';
+import '../../features/missions/presentation/mission_switch_timer_page.dart';
 import '../../features/missions/presentation/missions_today_page.dart';
 import '../../features/settings/presentation/more_page.dart';
 import '../../shared/adaptive/adaptive_shell.dart';
@@ -120,6 +121,12 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
           final String? missionId = state.pathParameters['missionId'];
           if (missionId != null) {
             return MissionActivePage(missionId: missionId);
+          }
+        }
+        if (contract.name == 'missionSwitchTimer') {
+          final String? missionId = state.pathParameters['missionId'];
+          if (missionId != null) {
+            return MissionSwitchTimerPage(missionId: missionId);
           }
         }
         if (contract.name == 'missionReview') {

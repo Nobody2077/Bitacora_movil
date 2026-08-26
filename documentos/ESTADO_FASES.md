@@ -22,12 +22,14 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 - Cronómetro por timestamps con inicio, pausa, reanudación y recuperación después de cerrar la app.
 - Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
 - Regla de un solo cronómetro activo validada dentro de la transacción.
+- Cambio atómico entre cronómetros conectado a su ruta canónica, con pausa e inicio/reanudación en una única transacción.
+- Consulta del cronómetro global y acceso visible desde Misiones de hoy.
 - Refresco visual limitado al primer plano; no se usa servicio Android permanente.
 - `CompleteMission` coordina misión, tiempo, objetivos, evento, XP, Bitácora, economía opcional y avisos en una sola transacción.
 - Revisión completa/parcial y resultado conectados a las rutas canónicas.
 - `flutter analyze`: cero problemas el 26 de agosto de 2026.
 - `assembleDevDebug`: compilado correctamente el 26 de agosto de 2026.
-- APK de verificación eliminado después de compilar; no hay binarios almacenados.
+- APK `devDebug` compilada; instalación en Redmi Pad 2 pendiente porque ADB todavía no detecta el dispositivo USB.
 
 ## Evidencia G0
 

@@ -18,6 +18,16 @@ final class ConflictFailure extends AppFailure {
   const ConflictFailure(String message) : super('conflict_failure', message);
 }
 
+final class ActiveTimerFailure extends AppFailure {
+  const ActiveTimerFailure({required this.activeMissionId})
+    : super(
+        'active_timer_failure',
+        'Ya existe otra misión con el cronómetro activo.',
+      );
+
+  final String activeMissionId;
+}
+
 final class StorageFailure extends AppFailure {
   const StorageFailure(String message, {Object? cause})
     : super('storage_failure', message, cause: cause);

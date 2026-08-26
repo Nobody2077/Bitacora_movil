@@ -201,4 +201,33 @@ final class MissionApplicationService {
       occurredAtUtc: nowUtc,
     );
   }
+
+  Future<Result<Mission>> switchTimer({
+    required Mission activeMission,
+    required Mission targetMission,
+  }) {
+    if (activeMission.id == targetMission.id ||
+        activeMission.status != MissionStatus.active ||
+        activeMission.openWorkTimer == null ||
+        !const <MissionStatus>{
+          MissionStatus.scheduled,
+          MissionStatus.available,
+          MissionStatus.rescheduled,
+          MissionStatus.paused,
+        }.contains(targetMission.status)) {
+      return Future<Result<Mission>>.value(
+        const Failure<Mission>(
+          ValidationFailure('No se puede cambiar a esta misión.'),
+        ),
+      );
+    }
+    return _repository.switchTimer(
+      activeMission: activeMission,
+      targetMission: targetMission,
+      pauseEventId: _idGenerator.nextId(),
+      timeEntryId: _idGenerator.nextId(),
+      startEventId: _idGenerator.nextId(),
+      occurredAtUtc: _clock.nowUtc(),
+    );
+  }
 }

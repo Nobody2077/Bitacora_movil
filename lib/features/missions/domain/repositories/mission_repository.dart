@@ -4,6 +4,8 @@ import '../models/mission.dart';
 abstract interface class MissionRepository {
   Future<Result<Mission?>> findById(String id);
 
+  Future<Result<Mission?>> findActiveTimer();
+
   Future<Result<List<MissionArea>>> findVisibleAreas();
 
   Future<Result<List<Mission>>> findScheduledBetween({
@@ -41,6 +43,15 @@ abstract interface class MissionRepository {
     required String missionId,
     required int expectedRowVersion,
     required String eventId,
+    required DateTime occurredAtUtc,
+  });
+
+  Future<Result<Mission>> switchTimer({
+    required Mission activeMission,
+    required Mission targetMission,
+    required String pauseEventId,
+    required String timeEntryId,
+    required String startEventId,
     required DateTime occurredAtUtc,
   });
 }

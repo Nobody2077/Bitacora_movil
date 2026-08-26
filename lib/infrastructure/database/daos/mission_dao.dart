@@ -87,6 +87,22 @@ final class MissionDao {
     return _database.transaction(() => _getAggregate(missionId));
   }
 
+  Future<MissionAggregate?> findActiveTimerAggregate() {
+    return _database.transaction(() async {
+      final TimeEntry? timer =
+          await (_database.select(_database.timeEntries)
+                ..where(
+                  (table) =>
+                      table.source.equals('TIMER') &
+                      table.segmentType.equals('WORK') &
+                      table.endedAt.isNull(),
+                )
+                ..limit(1))
+              .getSingleOrNull();
+      return timer == null ? null : _getAggregate(timer.missionId);
+    });
+  }
+
   Future<MissionAggregate> _getAggregate(String missionId) async {
     final mission = await findById(missionId);
     if (mission == null) {
@@ -400,6 +416,37 @@ final class MissionDao {
 
       await _database.into(_database.missionEvents).insert(event);
       return _getAggregate(missionId);
+    });
+  }
+
+  Future<MissionAggregate> switchWorkTimer({
+    required String activeMissionId,
+    required int activeRowVersion,
+    required MissionEventsCompanion pauseEvent,
+    required int occurredAtUtcMs,
+    required String targetMissionId,
+    required int targetRowVersion,
+    required String targetStatus,
+    required TimeEntriesCompanion targetTimeEntry,
+    required MissionEventsCompanion startEvent,
+  }) {
+    if (activeMissionId == targetMissionId) {
+      throw ArgumentError('Active and target missions must be different.');
+    }
+    return _database.transaction(() async {
+      await pauseWorkTimer(
+        missionId: activeMissionId,
+        expectedRowVersion: activeRowVersion,
+        occurredAtUtcMs: occurredAtUtcMs,
+        event: pauseEvent,
+      );
+      return startWorkTimer(
+        missionId: targetMissionId,
+        expectedRowVersion: targetRowVersion,
+        expectedStatus: targetStatus,
+        timeEntry: targetTimeEntry,
+        event: startEvent,
+      );
     });
   }
 
