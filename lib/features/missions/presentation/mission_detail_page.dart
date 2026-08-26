@@ -33,6 +33,10 @@ class MissionDetailPage extends ConsumerWidget {
             'missionEdit',
             pathParameters: <String, String>{'missionId': value.id},
           ),
+          onTimer: () => context.pushNamed(
+            'missionActive',
+            pathParameters: <String, String>{'missionId': value.id},
+          ),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -61,11 +65,13 @@ class _MissionDetailContent extends StatelessWidget {
     required this.mission,
     required this.area,
     required this.onEdit,
+    required this.onTimer,
   });
 
   final Mission mission;
   final MissionArea? area;
   final VoidCallback onEdit;
+  final VoidCallback onTimer;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -97,7 +103,11 @@ class _MissionDetailContent extends StatelessWidget {
                     ],
                   ),
                 const SizedBox(height: 18),
-                _ActionPanel(mission: mission, onEdit: onEdit),
+                _ActionPanel(
+                  mission: mission,
+                  onEdit: onEdit,
+                  onTimer: onTimer,
+                ),
               ],
             ),
           ),
@@ -368,10 +378,15 @@ class _PlanRow extends StatelessWidget {
 }
 
 class _ActionPanel extends StatelessWidget {
-  const _ActionPanel({required this.mission, required this.onEdit});
+  const _ActionPanel({
+    required this.mission,
+    required this.onEdit,
+    required this.onTimer,
+  });
 
   final Mission mission;
   final VoidCallback onEdit;
+  final VoidCallback onTimer;
 
   @override
   Widget build(BuildContext context) => TerminalPanel(
@@ -384,10 +399,21 @@ class _ActionPanel extends StatelessWidget {
           icon: Icons.edit_outlined,
           onPressed: onEdit,
         ),
-        const TerminalOutlineButton(
-          label: 'Cronómetro · Próximo paso',
+        TerminalOutlineButton(
+          label: mission.status == MissionStatus.active
+              ? 'Cronómetro activo'
+              : 'Abrir cronómetro',
           icon: Icons.timer_outlined,
-          onPressed: null,
+          onPressed:
+              const <MissionStatus>{
+                MissionStatus.scheduled,
+                MissionStatus.available,
+                MissionStatus.active,
+                MissionStatus.paused,
+                MissionStatus.rescheduled,
+              }.contains(mission.status)
+              ? onTimer
+              : null,
         ),
       ],
     ),

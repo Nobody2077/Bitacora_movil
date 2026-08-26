@@ -278,6 +278,24 @@ final class _FakeMissionRepository implements MissionRepository {
   }) async => Success<Mission>(mission);
 
   @override
+  Future<Result<Mission>> startTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required MissionStatus expectedStatus,
+    required String timeEntryId,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<Mission>> pauseTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
   Stream<Result<List<Mission>>> watchScheduledBetween({
     required DateTime startUtc,
     required DateTime endUtc,

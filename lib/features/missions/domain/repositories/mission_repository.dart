@@ -27,4 +27,20 @@ abstract interface class MissionRepository {
     required String eventId,
     required DateTime occurredAtUtc,
   });
+
+  Future<Result<Mission>> startTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required MissionStatus expectedStatus,
+    required String timeEntryId,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  });
+
+  Future<Result<Mission>> pauseTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  });
 }

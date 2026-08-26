@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../domain/models/mission.dart';
 import '../domain/repositories/mission_repository.dart';
@@ -157,5 +158,47 @@ final class MissionApplicationService {
     return existing == null
         ? _repository.create(mission, eventId: eventId, occurredAtUtc: nowUtc)
         : _repository.update(mission, eventId: eventId, occurredAtUtc: nowUtc);
+  }
+
+  Future<Result<Mission>> startTimer(Mission mission) {
+    if (!const <MissionStatus>{
+      MissionStatus.scheduled,
+      MissionStatus.available,
+      MissionStatus.rescheduled,
+      MissionStatus.paused,
+    }.contains(mission.status)) {
+      return Future<Result<Mission>>.value(
+        const Failure<Mission>(
+          ValidationFailure('El estado actual no permite iniciar el tiempo.'),
+        ),
+      );
+    }
+    final DateTime nowUtc = _clock.nowUtc();
+    return _repository.startTimer(
+      missionId: mission.id,
+      expectedRowVersion: mission.rowVersion,
+      expectedStatus: mission.status,
+      timeEntryId: _idGenerator.nextId(),
+      eventId: _idGenerator.nextId(),
+      occurredAtUtc: nowUtc,
+    );
+  }
+
+  Future<Result<Mission>> pauseTimer(Mission mission) {
+    if (mission.status != MissionStatus.active ||
+        mission.openWorkTimer == null) {
+      return Future<Result<Mission>>.value(
+        const Failure<Mission>(
+          ValidationFailure('La misión no tiene un cronómetro activo.'),
+        ),
+      );
+    }
+    final DateTime nowUtc = _clock.nowUtc();
+    return _repository.pauseTimer(
+      missionId: mission.id,
+      expectedRowVersion: mission.rowVersion,
+      eventId: _idGenerator.nextId(),
+      occurredAtUtc: nowUtc,
+    );
   }
 }

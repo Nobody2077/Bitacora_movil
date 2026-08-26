@@ -238,6 +238,171 @@ final class MissionDao {
     });
   }
 
+  Future<MissionAggregate> startWorkTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required String expectedStatus,
+    required TimeEntriesCompanion timeEntry,
+    required MissionEventsCompanion event,
+  }) {
+    if (!const <String>{
+      'SCHEDULED',
+      'AVAILABLE',
+      'RESCHEDULED',
+      'PAUSED',
+    }.contains(expectedStatus)) {
+      throw ArgumentError.value(expectedStatus, 'expectedStatus');
+    }
+    _requireMissionId(timeEntry.missionId, missionId, 'time entry');
+    _requireMissionId(event.missionId, missionId, 'event');
+    final String expectedEventType = expectedStatus == 'PAUSED'
+        ? 'RESUMED'
+        : 'STARTED';
+    if (!timeEntry.id.present ||
+        !timeEntry.source.present ||
+        timeEntry.source.value != 'TIMER' ||
+        !timeEntry.segmentType.present ||
+        timeEntry.segmentType.value != 'WORK' ||
+        !timeEntry.startedAt.present ||
+        timeEntry.endedAt.present ||
+        !timeEntry.durationSeconds.present ||
+        timeEntry.durationSeconds.value != 0 ||
+        !timeEntry.createdAt.present ||
+        !event.eventType.present ||
+        event.eventType.value != expectedEventType) {
+      throw ArgumentError(
+        'A work timer requires an open TIMER/WORK entry and a matching event.',
+      );
+    }
+    _validateTransitionEvent(
+      event: event,
+      missionId: missionId,
+      expectedStatus: expectedStatus,
+      nextStatus: 'ACTIVE',
+    );
+
+    return _database.transaction(() async {
+      final TimeEntry? activeTimer =
+          await (_database.select(_database.timeEntries)
+                ..where(
+                  (table) =>
+                      table.source.equals('TIMER') &
+                      table.segmentType.equals('WORK') &
+                      table.endedAt.isNull(),
+                )
+                ..limit(1))
+              .getSingleOrNull();
+      if (activeTimer != null) {
+        throw ActiveTimerConflictException(
+          activeMissionId: activeTimer.missionId,
+        );
+      }
+
+      final int affected =
+          await (_database.update(_database.missions)..where(
+                (table) =>
+                    table.id.equals(missionId) &
+                    table.rowVersion.equals(expectedRowVersion) &
+                    table.status.equals(expectedStatus),
+              ))
+              .write(
+                MissionsCompanion(
+                  status: const Value<String>('ACTIVE'),
+                  rowVersion: Value<int>(expectedRowVersion + 1),
+                ),
+              );
+      if (affected != 1) {
+        throw OptimisticLockException(
+          table: 'missions',
+          id: missionId,
+          expectedRowVersion: expectedRowVersion,
+        );
+      }
+
+      await _database.into(_database.timeEntries).insert(timeEntry);
+      await _database.into(_database.missionEvents).insert(event);
+      return _getAggregate(missionId);
+    });
+  }
+
+  Future<MissionAggregate> pauseWorkTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required int occurredAtUtcMs,
+    required MissionEventsCompanion event,
+  }) {
+    _validateTransitionEvent(
+      event: event,
+      missionId: missionId,
+      expectedStatus: 'ACTIVE',
+      nextStatus: 'PAUSED',
+    );
+
+    return _database.transaction(() async {
+      final TimeEntry? openEntry =
+          await (_database.select(_database.timeEntries)..where(
+                (table) =>
+                    table.missionId.equals(missionId) &
+                    table.source.equals('TIMER') &
+                    table.segmentType.equals('WORK') &
+                    table.endedAt.isNull(),
+              ))
+              .getSingleOrNull();
+      if (openEntry?.startedAt == null) {
+        throw const DatabaseInvariantException(
+          'An ACTIVE mission must have one open TIMER/WORK entry.',
+        );
+      }
+
+      final int safeEndedAt = occurredAtUtcMs < openEntry!.startedAt!
+          ? openEntry.startedAt!
+          : occurredAtUtcMs;
+      final int durationSeconds = (safeEndedAt - openEntry.startedAt!) ~/ 1000;
+      final int closed =
+          await (_database.update(_database.timeEntries)..where(
+                (table) =>
+                    table.id.equals(openEntry.id) & table.endedAt.isNull(),
+              ))
+              .write(
+                TimeEntriesCompanion(
+                  endedAt: Value<int?>(safeEndedAt),
+                  durationSeconds: Value<int>(durationSeconds),
+                ),
+              );
+      if (closed != 1) {
+        throw OptimisticLockException(
+          table: 'time_entries',
+          id: openEntry.id,
+          expectedRowVersion: expectedRowVersion,
+        );
+      }
+
+      final int affected =
+          await (_database.update(_database.missions)..where(
+                (table) =>
+                    table.id.equals(missionId) &
+                    table.rowVersion.equals(expectedRowVersion) &
+                    table.status.equals('ACTIVE'),
+              ))
+              .write(
+                MissionsCompanion(
+                  status: const Value<String>('PAUSED'),
+                  rowVersion: Value<int>(expectedRowVersion + 1),
+                ),
+              );
+      if (affected != 1) {
+        throw OptimisticLockException(
+          table: 'missions',
+          id: missionId,
+          expectedRowVersion: expectedRowVersion,
+        );
+      }
+
+      await _database.into(_database.missionEvents).insert(event);
+      return _getAggregate(missionId);
+    });
+  }
+
   Future<Mission> transitionStatusWithEvent({
     required String missionId,
     required int expectedRowVersion,

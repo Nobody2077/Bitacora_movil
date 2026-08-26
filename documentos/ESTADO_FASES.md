@@ -9,12 +9,23 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A0 — Base del proyecto | **COMPLETADA** | G0 verde |
 | A1 — Persistencia | **COMPLETADA** | G1 verde |
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
-| A3 — Misiones | **EN DESARROLLO** | Primer incremento funcional implementado; G3 pendiente |
+| A3 — Misiones | **EN DESARROLLO** | Flujo base y cronómetro persistente implementados; G3 pendiente |
 | A4 — Economía | BLOQUEADA | Requiere G3 |
 | A5 — Bitácora y progreso | BLOQUEADA | Requiere G4 |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
+
+## Evidencia A3 en desarrollo
+
+- Lista de hoy, creación, edición y detalle conectados a la persistencia cifrada.
+- Cronómetro por timestamps con inicio, pausa, reanudación y recuperación después de cerrar la app.
+- Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
+- Regla de un solo cronómetro activo validada dentro de la transacción.
+- Refresco visual limitado al primer plano; no se usa servicio Android permanente.
+- `flutter analyze`: cero problemas el 26 de agosto de 2026.
+- `assembleDevDebug`: compilado correctamente el 26 de agosto de 2026.
+- APK de verificación eliminado después de compilar; no hay binarios almacenados.
 
 ## Evidencia G0
 

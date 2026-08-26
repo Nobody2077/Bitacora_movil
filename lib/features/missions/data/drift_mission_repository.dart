@@ -52,6 +52,7 @@ final class DriftMissionRepository implements MissionRepository {
         MissionMapper.fromDrift(
           aggregate.mission,
           objectives: aggregate.objectives,
+          timeEntries: aggregate.timeEntries,
         ),
       );
     } on RecordNotFoundException {
@@ -176,6 +177,7 @@ final class DriftMissionRepository implements MissionRepository {
         MissionMapper.fromDrift(
           aggregate.mission,
           objectives: aggregate.objectives,
+          timeEntries: aggregate.timeEntries,
         ),
       );
     } on Object catch (error) {
@@ -237,6 +239,7 @@ final class DriftMissionRepository implements MissionRepository {
         MissionMapper.fromDrift(
           aggregate.mission,
           objectives: aggregate.objectives,
+          timeEntries: aggregate.timeEntries,
         ),
       );
     } on OptimisticLockException {
@@ -252,6 +255,137 @@ final class DriftMissionRepository implements MissionRepository {
     } on Object catch (error) {
       return Failure<Mission>(
         StorageFailure('No se pudo actualizar la misión.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<Mission>> startTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required MissionStatus expectedStatus,
+    required String timeEntryId,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) async {
+    if (missionId.trim().isEmpty ||
+        timeEntryId.trim().isEmpty ||
+        eventId.trim().isEmpty ||
+        expectedRowVersion < 1 ||
+        !occurredAtUtc.isUtc ||
+        !const <MissionStatus>{
+          MissionStatus.scheduled,
+          MissionStatus.available,
+          MissionStatus.rescheduled,
+          MissionStatus.paused,
+        }.contains(expectedStatus)) {
+      return const Failure<Mission>(
+        ValidationFailure('No se puede iniciar esta misión.'),
+      );
+    }
+
+    final String eventType = expectedStatus == MissionStatus.paused
+        ? 'RESUMED'
+        : 'STARTED';
+    try {
+      final aggregate = await _dao.startWorkTimer(
+        missionId: missionId,
+        expectedRowVersion: expectedRowVersion,
+        expectedStatus: _status(expectedStatus),
+        timeEntry: drift.TimeEntriesCompanion.insert(
+          id: timeEntryId,
+          missionId: missionId,
+          source: 'TIMER',
+          segmentType: 'WORK',
+          startedAt: Value<int?>(occurredAtUtc.millisecondsSinceEpoch),
+          durationSeconds: 0,
+          createdAt: occurredAtUtc.millisecondsSinceEpoch,
+        ),
+        event: drift.MissionEventsCompanion.insert(
+          id: eventId,
+          missionId: missionId,
+          eventType: eventType,
+          fromStatus: Value<String?>(_status(expectedStatus)),
+          toStatus: const Value<String?>('ACTIVE'),
+          occurredAt: occurredAtUtc.millisecondsSinceEpoch,
+        ),
+      );
+      return Success<Mission>(
+        MissionMapper.fromDrift(
+          aggregate.mission,
+          objectives: aggregate.objectives,
+          timeEntries: aggregate.timeEntries,
+        ),
+      );
+    } on ActiveTimerConflictException {
+      return const Failure<Mission>(
+        ConflictFailure(
+          'Ya existe otra misión con el cronómetro activo. Paúsala antes de iniciar esta.',
+        ),
+      );
+    } on OptimisticLockException {
+      return Failure<Mission>(
+        ConflictFailure(
+          'La misión cambió antes de iniciar el cronómetro. Vuelve a abrirla.',
+        ),
+      );
+    } on Object catch (error) {
+      return Failure<Mission>(
+        StorageFailure('No se pudo iniciar el cronómetro.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<Mission>> pauseTimer({
+    required String missionId,
+    required int expectedRowVersion,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) async {
+    if (missionId.trim().isEmpty ||
+        eventId.trim().isEmpty ||
+        expectedRowVersion < 1 ||
+        !occurredAtUtc.isUtc) {
+      return const Failure<Mission>(
+        ValidationFailure('No se puede pausar esta misión.'),
+      );
+    }
+
+    try {
+      final aggregate = await _dao.pauseWorkTimer(
+        missionId: missionId,
+        expectedRowVersion: expectedRowVersion,
+        occurredAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
+        event: drift.MissionEventsCompanion.insert(
+          id: eventId,
+          missionId: missionId,
+          eventType: 'PAUSED',
+          fromStatus: const Value<String?>('ACTIVE'),
+          toStatus: const Value<String?>('PAUSED'),
+          occurredAt: occurredAtUtc.millisecondsSinceEpoch,
+        ),
+      );
+      return Success<Mission>(
+        MissionMapper.fromDrift(
+          aggregate.mission,
+          objectives: aggregate.objectives,
+          timeEntries: aggregate.timeEntries,
+        ),
+      );
+    } on OptimisticLockException {
+      return Failure<Mission>(
+        ConflictFailure(
+          'La misión cambió antes de pausar el cronómetro. Vuelve a abrirla.',
+        ),
+      );
+    } on DatabaseInvariantException {
+      return Failure<Mission>(
+        ConflictFailure('No existe un cronómetro abierto para esta misión.'),
+      );
+    } on Object catch (error) {
+      return Failure<Mission>(
+        StorageFailure('No se pudo pausar el cronómetro.', cause: error),
       );
     }
   }

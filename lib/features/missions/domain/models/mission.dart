@@ -38,6 +38,10 @@ enum ConvenienceRating {
   wouldNotRepeat,
 }
 
+enum MissionTimeSource { timer, manual }
+
+enum MissionTimeSegmentType { work, breakTime }
+
 /// Área de vida disponible para clasificar una misión.
 final class MissionArea {
   const MissionArea({
@@ -74,6 +78,43 @@ final class MissionObjective {
   bool get isCompleted => completedAtUtc != null;
 }
 
+/// Segmento de tiempo registrado para una misión.
+final class MissionTimeEntry {
+  const MissionTimeEntry({
+    required this.id,
+    required this.source,
+    required this.segmentType,
+    required this.durationSeconds,
+    required this.createdAtUtc,
+    this.startedAtUtc,
+    this.endedAtUtc,
+    this.note,
+  });
+
+  final String id;
+  final MissionTimeSource source;
+  final MissionTimeSegmentType segmentType;
+  final DateTime? startedAtUtc;
+  final DateTime? endedAtUtc;
+  final int durationSeconds;
+  final String? note;
+  final DateTime createdAtUtc;
+
+  bool get isOpen =>
+      source == MissionTimeSource.timer &&
+      segmentType == MissionTimeSegmentType.work &&
+      endedAtUtc == null;
+
+  int elapsedSecondsAt(DateTime nowUtc) {
+    final DateTime? startedAt = startedAtUtc;
+    if (!isOpen || startedAt == null) {
+      return durationSeconds;
+    }
+    final int elapsed = nowUtc.difference(startedAt).inSeconds;
+    return elapsed < 0 ? 0 : elapsed;
+  }
+}
+
 /// Agregado de misión independiente del formato de persistencia.
 final class Mission {
   const Mission({
@@ -99,6 +140,7 @@ final class Mission {
     this.convenienceRating,
     this.completedAtUtc,
     this.objectives = const <MissionObjective>[],
+    this.timeEntries = const <MissionTimeEntry>[],
   });
 
   final String id;
@@ -123,6 +165,20 @@ final class Mission {
   final DateTime? completedAtUtc;
   final int rowVersion;
   final List<MissionObjective> objectives;
+  final List<MissionTimeEntry> timeEntries;
+
+  MissionTimeEntry? get openWorkTimer {
+    for (final entry in timeEntries.reversed) {
+      if (entry.isOpen) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  int elapsedWorkSecondsAt(DateTime nowUtc) => timeEntries
+      .where((entry) => entry.segmentType == MissionTimeSegmentType.work)
+      .fold<int>(0, (total, entry) => total + entry.elapsedSecondsAt(nowUtc));
 
   Mission copyWith({
     String? areaId,
@@ -138,6 +194,7 @@ final class Mission {
     int? budgetMinor,
     int? xpPlanned,
     List<MissionObjective>? objectives,
+    List<MissionTimeEntry>? timeEntries,
   }) => Mission(
     id: id,
     templateId: templateId,
@@ -161,5 +218,6 @@ final class Mission {
     completedAtUtc: completedAtUtc,
     rowVersion: rowVersion,
     objectives: objectives ?? this.objectives,
+    timeEntries: timeEntries ?? this.timeEntries,
   );
 }

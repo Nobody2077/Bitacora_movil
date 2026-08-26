@@ -75,3 +75,13 @@ String missionMoneyLabel(int minor) {
       ? value.toStringAsFixed(0)
       : value.toStringAsFixed(2);
 }
+
+String missionDurationLabel(int totalSeconds) {
+  final int safeSeconds = totalSeconds < 0 ? 0 : totalSeconds;
+  final int hours = safeSeconds ~/ 3600;
+  final int minutes = (safeSeconds % 3600) ~/ 60;
+  final int seconds = safeSeconds % 60;
+  return '${hours.toString().padLeft(2, '0')}:'
+      '${minutes.toString().padLeft(2, '0')}:'
+      '${seconds.toString().padLeft(2, '0')}';
+}

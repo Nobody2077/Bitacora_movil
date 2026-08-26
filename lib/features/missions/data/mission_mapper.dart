@@ -6,6 +6,7 @@ abstract final class MissionMapper {
     drift.Mission value, {
     Iterable<drift.MissionObjective> objectives =
         const <drift.MissionObjective>[],
+    Iterable<drift.TimeEntry> timeEntries = const <drift.TimeEntry>[],
   }) => Mission(
     id: value.id,
     templateId: value.templateId,
@@ -29,6 +30,7 @@ abstract final class MissionMapper {
     completedAtUtc: _utc(value.completedAt),
     rowVersion: value.rowVersion,
     objectives: objectives.map(_objective).toList(growable: false),
+    timeEntries: timeEntries.map(_timeEntry).toList(growable: false),
   );
 
   static MissionObjective _objective(drift.MissionObjective value) =>
@@ -39,6 +41,29 @@ abstract final class MissionMapper {
         createdAtUtc: _requiredUtc(value.createdAt),
         completedAtUtc: _utc(value.completedAt),
       );
+
+  static MissionTimeEntry _timeEntry(drift.TimeEntry value) => MissionTimeEntry(
+    id: value.id,
+    source: switch (value.source) {
+      'TIMER' => MissionTimeSource.timer,
+      'MANUAL' => MissionTimeSource.manual,
+      _ => throw FormatException(
+        'Unknown persisted time source: ${value.source}',
+      ),
+    },
+    segmentType: switch (value.segmentType) {
+      'WORK' => MissionTimeSegmentType.work,
+      'BREAK' => MissionTimeSegmentType.breakTime,
+      _ => throw FormatException(
+        'Unknown persisted segment type: ${value.segmentType}',
+      ),
+    },
+    startedAtUtc: _utc(value.startedAt),
+    endedAtUtc: _utc(value.endedAt),
+    durationSeconds: value.durationSeconds,
+    note: value.note,
+    createdAtUtc: _requiredUtc(value.createdAt),
+  );
 
   static DateTime _requiredUtc(int milliseconds) =>
       DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);

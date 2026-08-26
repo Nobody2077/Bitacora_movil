@@ -39,3 +39,10 @@ final class IdempotencyConflictException extends DatabaseContractException {
 final class DatabaseInvariantException extends DatabaseContractException {
   const DatabaseInvariantException(super.message);
 }
+
+final class ActiveTimerConflictException extends DatabaseContractException {
+  const ActiveTimerConflictException({required this.activeMissionId})
+    : super('Another mission already has an active timer.');
+
+  final String activeMissionId;
+}

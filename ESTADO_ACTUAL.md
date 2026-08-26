@@ -13,9 +13,9 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - A3 — Misiones está en desarrollo y sigue siendo la única fase de implementación inmediata.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
-- Misiones ya permite listar el día, crear, abrir y editar registros reales; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional.
-- Existen 60 patrones de ruta; 11 producen pantallas específicas y 49 producen `FeaturePlaceholderPage`.
-- `flutter analyze` fue ejecutado el 26 de agosto de 2026 y terminó sin problemas.
+- Misiones ya permite listar el día, crear, abrir, editar, iniciar, pausar y reanudar registros reales; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional.
+- Existen 60 patrones de ruta; 12 producen pantallas específicas y 48 producen `FeaturePlaceholderPage`.
+- `flutter analyze` y la compilación `devDebug` fueron ejecutados el 26 de agosto de 2026 y terminaron sin problemas.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
 
 ## Qué funciona actualmente
@@ -53,7 +53,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - `FLAG_SECURE` contra capturas y vistas recientes.
 - Guard global que impide construir rutas y persistencia protegidas con sesión cerrada.
 
-### Primer incremento funcional de Misiones
+### Incrementos funcionales de Misiones
 
 - Capa `application` con reloj e identificadores inyectables.
 - Consulta reactiva de las misiones programadas para el día local.
@@ -63,6 +63,11 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Pantallas adaptables de Misiones de hoy, nueva/editar y detalle.
 - Componentes reutilizables de panel, botón, badge y métrica con geometría Terminal.
 - Rutas reales conectadas sin debilitar el guard de acceso.
+- Inicio, pausa y reanudación atómicos con eventos `STARTED`, `PAUSED` y `RESUMED`.
+- Recuperación del cronómetro mediante timestamps persistidos, sin proceso permanente ni escrituras por segundo.
+- Refresco visual cancelado cuando la app deja de estar visible.
+- Regla global de un solo cronómetro activo validada dentro de la transacción.
+- Pantalla adaptable de misión activa conectada a `/missions/:missionId/active`.
 
 ## Qué todavía no está implementado
 
@@ -80,8 +85,8 @@ Ya está conectado:
 
 Falta:
 
-- Controlador de cronómetro y transiciones de ejecución.
-- Pantallas próximas, todas, calendario, recurrentes, activa, revisión y resultado.
+- Flujo para cambiar desde una misión hacia el único cronómetro ya activo.
+- Pantallas próximas, todas, calendario, recurrentes, revisión y resultado.
 - `lib/app/application/commands/complete_mission.dart` y su unidad de trabajo Drift.
 - Coordinación atómica de misión, tiempo, evento, XP, Bitácora y movimiento económico opcional.
 - Reconciliador Android para notificaciones programadas.
@@ -189,18 +194,19 @@ Las carpetas `test/`, `integration_test/` y `tool/` no son código muerto. Conti
 
 ## Secuencia recomendada para continuar A3
 
-1. Añadir transiciones de estado de la misión desde detalle conservando `row_version`.
-2. Implementar misión activa y control de tiempo.
-3. Implementar `CompleteMission` como comando transaccional transversal.
-4. Conectar plantillas y generación recurrente.
-5. Implementar agenda/reconciliación de notificaciones.
-6. Sustituir las rutas avanzadas de Misiones que aún usan placeholder.
+1. Implementar revisión, resultado y `CompleteMission` como comando transaccional transversal.
+2. Implementar cambio seguro hacia el único cronómetro activo y su acceso global.
+3. Conectar plantillas y generación recurrente.
+4. Implementar agenda/reconciliación de notificaciones.
+5. Sustituir las rutas avanzadas de Misiones que aún usan placeholder.
 
-El primer incremento útil ya está completado: permite crear una misión, verla en “Hoy”, abrir su detalle y editarla. El siguiente incremento debe cerrar el ciclo de ejecución sin saltar las garantías transaccionales.
+El flujo base y el cronómetro persistente ya están conectados. El siguiente incremento debe cerrar la misión y coordinar tiempo, XP, Bitácora y economía sin saltar las garantías transaccionales.
 
 ## APK y artefactos locales
 
 El 26 de agosto de 2026 se eliminaron cuatro APK debug reproducibles: dev y prod estaban duplicados entre las salidas de Flutter y Gradle. La limpieza liberó aproximadamente 804 MiB y no eliminó código fuente ni datos de la aplicación.
+
+Después del incremento de cronómetro se compiló correctamente una APK `devDebug` como verificación. Las dos copias producidas por Flutter y Gradle se eliminaron al terminar; no se almacenan binarios de verificación.
 
 Consideraciones:
 
