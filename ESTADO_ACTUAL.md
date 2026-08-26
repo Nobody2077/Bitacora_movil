@@ -10,11 +10,11 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 
 - La aplicación es Flutter Android, local-first, privada y de un solo usuario.
 - A0, A1 y A2 están completadas.
-- A3 — Misiones es la única fase autorizada para implementación inmediata.
+- A3 — Misiones está en desarrollo y sigue siendo la única fase de implementación inmediata.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
-- Inicio, Misiones, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional.
-- Existen 60 patrones de ruta; 7 producen pantallas específicas y 53 producen `FeaturePlaceholderPage`.
+- Misiones ya permite listar el día, crear, abrir y editar registros reales; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional.
+- Existen 60 patrones de ruta; 11 producen pantallas específicas y 49 producen `FeaturePlaceholderPage`.
 - `flutter analyze` fue ejecutado el 26 de agosto de 2026 y terminó sin problemas.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
 
@@ -53,26 +53,35 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - `FLAG_SECURE` contra capturas y vistas recientes.
 - Guard global que impide construir rutas y persistencia protegidas con sesión cerrada.
 
+### Primer incremento funcional de Misiones
+
+- Capa `application` con reloj e identificadores inyectables.
+- Consulta reactiva de las misiones programadas para el día local.
+- Lectura de áreas de vida desde los seeds de la base.
+- Creación atómica de Mission, objetivos y evento `CREATED`.
+- Edición atómica con `row_version`, reemplazo de objetivos y evento `UPDATED`.
+- Pantallas adaptables de Misiones de hoy, nueva/editar y detalle.
+- Componentes reutilizables de panel, botón, badge y métrica con geometría Terminal.
+- Rutas reales conectadas sin debilitar el guard de acceso.
+
 ## Qué todavía no está implementado
 
 ### A3 — Misiones
 
-Existe:
+Ya está conectado:
 
 - `Mission`, `MissionObjective` y enums del dominio.
 - `MissionMapper`.
-- `MissionRepository` con lecturas por ID y período.
+- `MissionRepository` con lecturas, observación del día, áreas y escrituras.
 - `MissionDao` con inserción de agregados, edición optimista, transiciones, eventos y tiempo.
 - `RecurrenceDao` con plantillas, reglas y generación idempotente de apariciones.
+- Lista de hoy, formulario crear/editar y detalle con datos cifrados reales.
 - `NotificationDao` con agenda y transiciones de estado.
 
 Falta:
 
-- `lib/features/missions/application/`.
-- `lib/features/missions/presentation/`.
-- Controladores y estado de listas, formularios, detalle y cronómetro.
-- Extender el contrato de repositorio o añadir casos de uso para escrituras; la UI no puede llamar al DAO.
-- Pantallas de hoy, próximas, todas, calendario, recurrentes, crear, editar, detalle, activa, revisión y resultado.
+- Controlador de cronómetro y transiciones de ejecución.
+- Pantallas próximas, todas, calendario, recurrentes, activa, revisión y resultado.
 - `lib/app/application/commands/complete_mission.dart` y su unidad de trabajo Drift.
 - Coordinación atómica de misión, tiempo, evento, XP, Bitácora y movimiento económico opcional.
 - Reconciliador Android para notificaciones programadas.
@@ -94,7 +103,7 @@ main_dev/main_prod
                 ├── appRouterProvider
                 │   ├── accessSessionProvider
                 │   ├── guard de rutas
-                │   └── shell adaptable / placeholders
+                │   └── shell adaptable / Misiones reales / placeholders
                 └── AppPrivacyBoundary
                     ├── auto-lock
                     ├── privacy cover
@@ -107,6 +116,7 @@ Conexiones activas importantes:
 - `settingsRepositoryProvider` alimenta las preferencias de privacidad.
 - `accessSessionProvider` alimenta router, privacidad y frontera de persistencia.
 - `appDatabaseProvider` se crea perezosamente y se invalida al bloquear.
+- `missionRepositoryProvider` alimenta la lista, el detalle y las escrituras de Misiones mediante la capa `application`.
 - Los bridges Kotlin conectan credenciales, clave de base y seguridad de ventana con Android.
 
 ## Registrado, pero todavía sin consumidor funcional
@@ -115,7 +125,6 @@ Estas piezas no deben borrarse solo porque hoy no aparecen en una pantalla. Son 
 
 | Pieza | Situación actual | Destino previsto |
 | --- | --- | --- |
-| `missionRepositoryProvider` | Sin consumidor en producción; usado por pruebas | A3 |
 | `recurrenceDaoProvider` | Solo registrado y comprobado por pruebas | A3 |
 | `notificationDaoProvider` | Solo registrado y comprobado por pruebas | A3 |
 | `economyRepositoryProvider` | Solo declaración en `lib` | A4 |
@@ -180,39 +189,26 @@ Las carpetas `test/`, `integration_test/` y `tool/` no son código muerto. Conti
 
 ## Secuencia recomendada para continuar A3
 
-1. Crear contratos de casos de uso y estados de presentación para Misiones.
-2. Conectar `missionRepositoryProvider` a una pantalla real de Misiones de hoy.
-3. Implementar formulario de creación/edición y objetivos.
-4. Implementar detalle y transiciones de estado con `row_version`.
-5. Implementar misión activa y control de tiempo.
-6. Conectar plantillas y generación recurrente.
-7. Implementar agenda/reconciliación de notificaciones.
-8. Implementar `CompleteMission` como comando transaccional transversal.
-9. Reemplazar los placeholders de Misiones sin alterar el catálogo de rutas.
+1. Añadir transiciones de estado de la misión desde detalle conservando `row_version`.
+2. Implementar misión activa y control de tiempo.
+3. Implementar `CompleteMission` como comando transaccional transversal.
+4. Conectar plantillas y generación recurrente.
+5. Implementar agenda/reconciliación de notificaciones.
+6. Sustituir las rutas avanzadas de Misiones que aún usan placeholder.
 
-El primer incremento útil debe permitir crear una misión, verla en “Hoy”, abrir su detalle y editarla. Esto entrega aplicación visible sin esperar a terminar toda A3.
+El primer incremento útil ya está completado: permite crear una misión, verla en “Hoy”, abrir su detalle y editarla. El siguiente incremento debe cerrar el ciclo de ejecución sin saltar las garantías transaccionales.
 
-## APK almacenados localmente
+## APK y artefactos locales
 
-Los siguientes artefactos existían durante la revisión. Son builds debug del 25 de agosto de 2026 y no están versionados.
-
-| Flavor | Ruta principal | Tamaño | SHA-256 |
-| --- | --- | ---: | --- |
-| dev | `build/app/outputs/flutter-apk/app-dev-debug.apk` | 210.709.242 bytes / 200,95 MiB | `E8FE893BB05847AA48A8B0A86275B08201B2742B732B6E776179705D41C234F9` |
-| prod | `build/app/outputs/flutter-apk/app-prod-debug.apk` | 210.709.270 bytes / 200,95 MiB | `2827432FD6AAA634B9C214F1104AA1D62D72ACDB0D793D41226A06CBC7703D8A` |
-
-Copias equivalentes generadas por Gradle:
-
-- `build/app/outputs/apk/dev/debug/app-dev-debug.apk`, mismo hash que dev.
-- `build/app/outputs/apk/prod/debug/app-prod-debug.apk`, mismo hash que prod.
+El 26 de agosto de 2026 se eliminaron cuatro APK debug reproducibles: dev y prod estaban duplicados entre las salidas de Flutter y Gradle. La limpieza liberó aproximadamente 804 MiB y no eliminó código fuente ni datos de la aplicación.
 
 Consideraciones:
 
 - `build/` está excluido por `.gitignore`.
-- Cada APK supera el límite de 100 MiB para blobs normales de GitHub.
+- No hay APK almacenados actualmente dentro del proyecto.
 - No usar `git add -f` para incluirlos.
 - Si se desea distribución desde GitHub, usar assets de una Release.
-- Después de cambios de código, regenerar el APK; estos archivos no están ligados automáticamente al último commit.
+- Generar el APK únicamente cuando exista un commit que se quiera instalar o distribuir.
 
 ## Comandos operativos
 

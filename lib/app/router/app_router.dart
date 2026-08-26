@@ -8,6 +8,9 @@ import '../../features/access/presentation/access_gate_page.dart';
 import '../../features/access/presentation/privacy_settings_pages.dart';
 import '../../features/access/presentation/protected_route_gate.dart';
 import '../../features/access/presentation/recovery_page.dart';
+import '../../features/missions/presentation/mission_detail_page.dart';
+import '../../features/missions/presentation/mission_form_page.dart';
+import '../../features/missions/presentation/missions_today_page.dart';
 import '../../features/settings/presentation/more_page.dart';
 import '../../shared/adaptive/adaptive_shell.dart';
 import '../../shared/widgets/feature_placeholder_page.dart';
@@ -95,6 +98,21 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         ref.read(protectedRouteBuildObserverProvider)(contract);
         if (contract.path == AppRoutes.more) {
           return const MorePage();
+        }
+        if (contract.name == 'missionsToday') {
+          return const MissionsTodayPage();
+        }
+        if (contract.name == 'missionNew') {
+          return const MissionFormPage();
+        }
+        if (contract.name == 'missionEdit') {
+          return MissionFormPage(missionId: state.pathParameters['missionId']);
+        }
+        if (contract.name == 'missionDetail') {
+          final String? missionId = state.pathParameters['missionId'];
+          if (missionId != null) {
+            return MissionDetailPage(missionId: missionId);
+          }
         }
         if (contract.path == AppRoutes.settings) {
           return const SettingsLandingPage();

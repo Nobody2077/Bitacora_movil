@@ -24,6 +24,18 @@ final class MissionDao {
 
   final AppDatabase _database;
 
+  Future<List<LifeArea>> findVisibleAreas() {
+    return (_database.select(_database.lifeAreas)
+          ..where(
+            (table) => table.isVisible.equals(1) & table.archivedAt.isNull(),
+          )
+          ..orderBy(<OrderingTerm Function(LifeAreas)>[
+            (table) => OrderingTerm.asc(table.sortOrder),
+            (table) => OrderingTerm.asc(table.name),
+          ]))
+        .get();
+  }
+
   Future<Mission?> findById(String id) {
     return (_database.select(
       _database.missions,
@@ -188,6 +200,42 @@ final class MissionDao {
       throw RecordNotFoundException(table: 'missions', key: missionId);
     }
     return updated;
+  }
+
+  Future<MissionAggregate> updateAggregate({
+    required String missionId,
+    required int expectedRowVersion,
+    required MissionsCompanion changes,
+    required Iterable<MissionObjectivesCompanion> objectives,
+    required MissionEventsCompanion event,
+  }) {
+    _requireMissionId(event.missionId, missionId, 'event');
+    if (!event.id.present ||
+        !event.eventType.present ||
+        event.eventType.value != 'UPDATED' ||
+        !event.occurredAt.present) {
+      throw ArgumentError(
+        'Update event must include id, UPDATED type and occurred_at.',
+      );
+    }
+
+    return _database.transaction(() async {
+      await updateWithRowVersion(
+        missionId: missionId,
+        expectedRowVersion: expectedRowVersion,
+        changes: changes,
+      );
+
+      await (_database.delete(
+        _database.missionObjectives,
+      )..where((table) => table.missionId.equals(missionId))).go();
+      for (final objective in objectives) {
+        _requireMissionId(objective.missionId, missionId, 'objective');
+        await _database.into(_database.missionObjectives).insert(objective);
+      }
+      await _database.into(_database.missionEvents).insert(event);
+      return _getAggregate(missionId);
+    });
   }
 
   Future<Mission> transitionStatusWithEvent({

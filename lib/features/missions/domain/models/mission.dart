@@ -38,6 +38,23 @@ enum ConvenienceRating {
   wouldNotRepeat,
 }
 
+/// Área de vida disponible para clasificar una misión.
+final class MissionArea {
+  const MissionArea({
+    required this.id,
+    required this.name,
+    required this.iconKey,
+    required this.colorHex,
+    required this.isDefault,
+  });
+
+  final String id;
+  final String name;
+  final String iconKey;
+  final String colorHex;
+  final bool isDefault;
+}
+
 /// Objetivo perteneciente al agregado de una misión.
 final class MissionObjective {
   const MissionObjective({
@@ -106,4 +123,43 @@ final class Mission {
   final DateTime? completedAtUtc;
   final int rowVersion;
   final List<MissionObjective> objectives;
+
+  Mission copyWith({
+    String? areaId,
+    String? title,
+    String? description,
+    MissionType? type,
+    MissionImportance? importance,
+    MissionPriority? priority,
+    MissionDifficulty? difficulty,
+    bool? isRequired,
+    DateTime? scheduledAtUtc,
+    int? estimatedMinutes,
+    int? budgetMinor,
+    int? xpPlanned,
+    List<MissionObjective>? objectives,
+  }) => Mission(
+    id: id,
+    templateId: templateId,
+    areaId: areaId ?? this.areaId,
+    title: title ?? this.title,
+    description: description,
+    type: type ?? this.type,
+    importance: importance ?? this.importance,
+    priority: priority ?? this.priority,
+    difficulty: difficulty,
+    isRequired: isRequired ?? this.isRequired,
+    status: status,
+    scheduledAtUtc: scheduledAtUtc ?? this.scheduledAtUtc,
+    availableFromUtc: availableFromUtc,
+    expiresAtUtc: expiresAtUtc,
+    estimatedMinutes: estimatedMinutes,
+    budgetMinor: budgetMinor,
+    xpPlanned: xpPlanned ?? this.xpPlanned,
+    actualResult: actualResult,
+    convenienceRating: convenienceRating,
+    completedAtUtc: completedAtUtc,
+    rowVersion: rowVersion,
+    objectives: objectives ?? this.objectives,
+  );
 }

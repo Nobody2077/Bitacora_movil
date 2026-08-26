@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 25 de agosto de 2026
+Última actualización: 26 de agosto de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -9,7 +9,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A0 — Base del proyecto | **COMPLETADA** | G0 verde |
 | A1 — Persistencia | **COMPLETADA** | G1 verde |
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
-| A3 — Misiones | **AUTORIZADA** | En espera de ejecución |
+| A3 — Misiones | **EN DESARROLLO** | Primer incremento funcional implementado; G3 pendiente |
 | A4 — Economía | BLOQUEADA | Requiere G3 |
 | A5 — Bitácora y progreso | BLOQUEADA | Requiere G4 |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |

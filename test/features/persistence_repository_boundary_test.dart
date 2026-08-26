@@ -250,12 +250,38 @@ T _success<T>(Result<T> result) => result.fold<T>(
 
 final class _FakeMissionRepository implements MissionRepository {
   @override
+  Future<Result<Mission>> create(
+    Mission mission, {
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) async => Success<Mission>(mission);
+
+  @override
   Future<Result<Mission?>> findById(String id) async =>
       const Success<Mission?>(null);
+
+  @override
+  Future<Result<List<MissionArea>>> findVisibleAreas() async =>
+      const Success<List<MissionArea>>(<MissionArea>[]);
 
   @override
   Future<Result<List<Mission>>> findScheduledBetween({
     required DateTime startUtc,
     required DateTime endUtc,
   }) async => const Success<List<Mission>>(<Mission>[]);
+
+  @override
+  Future<Result<Mission>> update(
+    Mission mission, {
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) async => Success<Mission>(mission);
+
+  @override
+  Stream<Result<List<Mission>>> watchScheduledBetween({
+    required DateTime startUtc,
+    required DateTime endUtc,
+  }) => Stream<Result<List<Mission>>>.value(
+    const Success<List<Mission>>(<Mission>[]),
+  );
 }

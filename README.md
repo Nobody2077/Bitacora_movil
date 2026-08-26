@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. La siguiente etapa es construir la experiencia funcional de Misiones. La mayoría de las rutas de negocio todavía muestran una pantalla temporal.
+> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. A3 está en desarrollo: ya se pueden listar, crear, abrir y editar Misiones; tiempo, recurrencia y cierre transaccional siguen pendientes.
 
 ## Qué busca ofrecer
 
@@ -23,10 +23,10 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A0 — Base del proyecto | Completada | Flavors, tema, navegación, shell adaptable y arquitectura base |
 | A1 — Persistencia | Completada | Drift v1, 19 tablas, DAOs, repositorios y SQLite cifrado |
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
-| A3 — Misiones | Autorizada | Siguiente implementación: pantallas, controladores, tiempo, recurrencia y `CompleteMission` |
+| A3 — Misiones | En desarrollo | Lista de hoy, creación, detalle y edición conectados; tiempo, recurrencia y `CompleteMission` pendientes |
 | A4–A8 | Pendientes | Economía, Bitácora/progreso, copias, UI final y release |
 
-La capa visual disponible hoy cubre acceso, recuperación y ajustes de privacidad. De los 60 patrones de ruta registrados, 53 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio y las superficies funcionales de Misiones, Bitácora, Economía y Dashboard.
+La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y el primer flujo funcional de Misiones. De los 60 patrones de ruta registrados, 49 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio, las rutas avanzadas de Misiones, Bitácora, Economía y Dashboard.
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
@@ -38,7 +38,7 @@ lib/
 ├── core/                Result<T> y errores comunes
 ├── features/
 │   ├── access/          acceso y privacidad implementados
-│   ├── missions/        dominio y datos parciales; UI/application pendientes
+│   ├── missions/        primer flujo funcional; ejecución avanzada pendiente
 │   ├── economy/         dominio y datos preparados para A4
 │   ├── journal/         dominio y datos preparados para A5
 │   ├── progress/        dominio y datos preparados para A5
@@ -92,9 +92,7 @@ flutter build apk --debug --flavor dev -t lib/main_dev.dart
 flutter build apk --debug --flavor prod -t lib/main_prod.dart
 ```
 
-Hay APK debug dev y prod almacenados localmente bajo `build/app/outputs/`. Pesan aproximadamente 201 MiB cada uno. `build/` está ignorado por Git y esos binarios superan el límite de 100 MiB para archivos normales de GitHub; por eso no forman parte del repositorio. Sus rutas y hashes están registrados en [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md#apk-almacenados-localmente).
-
-Si se necesita distribuirlos, deben publicarse como assets de una GitHub Release o regenerarse con separación por ABI; no deben añadirse a Git mediante `force-add`.
+No se conservan APK dentro del proyecto. `build/` está ignorado por Git y sus artefactos son reproducibles; los APK debug anteriores se eliminaron porque estaban duplicados y ocupaban aproximadamente 804 MiB. Si se necesita distribuir una versión, debe generarse desde el commit elegido y publicarse como asset de una GitHub Release o con separación por ABI; no debe añadirse al repositorio mediante `force-add`.
 
 ## Verificación disponible
 
