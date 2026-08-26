@@ -37,6 +37,10 @@ class MissionDetailPage extends ConsumerWidget {
             'missionActive',
             pathParameters: <String, String>{'missionId': value.id},
           ),
+          onComplete: () => context.pushNamed(
+            'missionReview',
+            pathParameters: <String, String>{'missionId': value.id},
+          ),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -66,12 +70,14 @@ class _MissionDetailContent extends StatelessWidget {
     required this.area,
     required this.onEdit,
     required this.onTimer,
+    required this.onComplete,
   });
 
   final Mission mission;
   final MissionArea? area;
   final VoidCallback onEdit;
   final VoidCallback onTimer;
+  final VoidCallback onComplete;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -107,6 +113,7 @@ class _MissionDetailContent extends StatelessWidget {
                   mission: mission,
                   onEdit: onEdit,
                   onTimer: onTimer,
+                  onComplete: onComplete,
                 ),
               ],
             ),
@@ -382,11 +389,13 @@ class _ActionPanel extends StatelessWidget {
     required this.mission,
     required this.onEdit,
     required this.onTimer,
+    required this.onComplete,
   });
 
   final Mission mission;
   final VoidCallback onEdit;
   final VoidCallback onTimer;
+  final VoidCallback onComplete;
 
   @override
   Widget build(BuildContext context) => TerminalPanel(
@@ -413,6 +422,21 @@ class _ActionPanel extends StatelessWidget {
                 MissionStatus.rescheduled,
               }.contains(mission.status)
               ? onTimer
+              : null,
+        ),
+        TerminalOutlineButton(
+          label: 'Registrar resultado',
+          icon: Icons.flag_outlined,
+          color: Theme.of(context).extension<AppThemeTokens>()!.progressGreen,
+          onPressed:
+              const <MissionStatus>{
+                MissionStatus.scheduled,
+                MissionStatus.available,
+                MissionStatus.active,
+                MissionStatus.paused,
+                MissionStatus.rescheduled,
+              }.contains(mission.status)
+              ? onComplete
               : null,
         ),
       ],

@@ -25,8 +25,10 @@ import '../../infrastructure/database/daos/progress_dao.dart';
 import '../../infrastructure/database/daos/recurrence_dao.dart';
 import '../../infrastructure/database/daos/settings_dao.dart';
 import '../../infrastructure/database/database_file_locator.dart';
+import '../../infrastructure/database/units_of_work/drift_complete_mission_unit_of_work.dart';
 import '../../infrastructure/security/database_key_store.dart';
 import '../../infrastructure/security/method_channel_database_key_store.dart';
+import '../application/commands/complete_mission.dart';
 import 'access_dependencies.dart';
 
 final class AccessDatabaseLockedException implements Exception {
@@ -147,6 +149,12 @@ final Provider<ProgressDao> progressDaoProvider = Provider<ProgressDao>(
 final Provider<SettingsDao> settingsDaoProvider = Provider<SettingsDao>(
   (Ref ref) => SettingsDao(ref.watch(appDatabaseProvider)),
 );
+
+final Provider<CompleteMissionUnitOfWork> completeMissionUnitOfWorkProvider =
+    Provider<CompleteMissionUnitOfWork>(
+      (Ref ref) =>
+          DriftCompleteMissionUnitOfWork(ref.watch(appDatabaseProvider)),
+    );
 
 final Provider<MissionRepository> missionRepositoryProvider =
     Provider<MissionRepository>(

@@ -111,6 +111,10 @@ class _MissionActivePageState extends ConsumerState<MissionActivePage>
                       'missionDetail',
                       pathParameters: <String, String>{'missionId': mission.id},
                     ),
+                    onFinish: () => context.pushNamed(
+                      'missionReview',
+                      pathParameters: <String, String>{'missionId': mission.id},
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const _EfficiencyNote(),
@@ -246,12 +250,14 @@ class _ExecutionActions extends StatelessWidget {
     required this.busy,
     required this.onToggle,
     required this.onDetail,
+    required this.onFinish,
   });
 
   final Mission mission;
   final bool busy;
   final VoidCallback onToggle;
   final VoidCallback onDetail;
+  final VoidCallback onFinish;
 
   @override
   Widget build(BuildContext context) {
@@ -283,10 +289,10 @@ class _ExecutionActions extends StatelessWidget {
             icon: Icons.description_outlined,
             onPressed: busy ? null : onDetail,
           ),
-          const TerminalOutlineButton(
-            label: 'Finalizar · Próximo paso',
+          TerminalOutlineButton(
+            label: 'Finalizar',
             icon: Icons.flag_outlined,
-            onPressed: null,
+            onPressed: busy ? null : onFinish,
           ),
         ],
       ),

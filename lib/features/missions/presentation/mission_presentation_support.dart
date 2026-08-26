@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/application/commands/complete_mission.dart';
 import '../domain/models/mission.dart';
 
 Color missionAreaColor(String colorHex, Color fallback) {
@@ -85,3 +86,24 @@ String missionDurationLabel(int totalSeconds) {
       '${minutes.toString().padLeft(2, '0')}:'
       '${seconds.toString().padLeft(2, '0')}';
 }
+
+String missionConvenienceLabel(ConvenienceRating value) => switch (value) {
+  ConvenienceRating.totallyWorthIt => 'Valió completamente la pena',
+  ConvenienceRating.worthItButCostly => 'Valió la pena, pero fue costosa',
+  ConvenienceRating.partiallyWorthIt => 'Valió parcialmente la pena',
+  ConvenienceRating.barelyWorthIt => 'No valió demasiado',
+  ConvenienceRating.wouldNotRepeat => 'No lo repetiría',
+};
+
+String completionPaymentMethodLabel(CompletionPaymentMethod value) =>
+    switch (value) {
+      CompletionPaymentMethod.cash => 'Efectivo',
+      CompletionPaymentMethod.bank => 'Banco',
+      CompletionPaymentMethod.wallet => 'Billetera',
+    };
+
+String completionMovementTypeLabel(CompletionMovementType value) =>
+    switch (value) {
+      CompletionMovementType.expense => 'Gasto',
+      CompletionMovementType.income => 'Ingreso',
+    };

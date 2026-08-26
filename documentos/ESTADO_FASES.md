@@ -9,7 +9,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A0 — Base del proyecto | **COMPLETADA** | G0 verde |
 | A1 — Persistencia | **COMPLETADA** | G1 verde |
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
-| A3 — Misiones | **EN DESARROLLO** | Flujo base y cronómetro persistente implementados; G3 pendiente |
+| A3 — Misiones | **EN DESARROLLO** | Ciclo base y cierre transaccional implementados; G3 pendiente |
 | A4 — Economía | BLOQUEADA | Requiere G3 |
 | A5 — Bitácora y progreso | BLOQUEADA | Requiere G4 |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
@@ -23,6 +23,8 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 - Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
 - Regla de un solo cronómetro activo validada dentro de la transacción.
 - Refresco visual limitado al primer plano; no se usa servicio Android permanente.
+- `CompleteMission` coordina misión, tiempo, objetivos, evento, XP, Bitácora, economía opcional y avisos en una sola transacción.
+- Revisión completa/parcial y resultado conectados a las rutas canónicas.
 - `flutter analyze`: cero problemas el 26 de agosto de 2026.
 - `assembleDevDebug`: compilado correctamente el 26 de agosto de 2026.
 - APK de verificación eliminado después de compilar; no hay binarios almacenados.

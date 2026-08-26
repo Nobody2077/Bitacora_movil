@@ -13,8 +13,8 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - A3 — Misiones está en desarrollo y sigue siendo la única fase de implementación inmediata.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
-- Misiones ya permite listar el día, crear, abrir, editar, iniciar, pausar y reanudar registros reales; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional.
-- Existen 60 patrones de ruta; 12 producen pantallas específicas y 48 producen `FeaturePlaceholderPage`.
+- Misiones ya permite planificar, ejecutar y cerrar registros reales, incluido tiempo, XP, Bitácora y movimiento económico opcional; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional propia.
+- Existen 60 patrones de ruta; 14 producen pantallas específicas y 46 producen `FeaturePlaceholderPage`.
 - `flutter analyze` y la compilación `devDebug` fueron ejecutados el 26 de agosto de 2026 y terminaron sin problemas.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
 
@@ -68,6 +68,10 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Refresco visual cancelado cuando la app deja de estar visible.
 - Regla global de un solo cronómetro activo validada dentro de la transacción.
 - Pantalla adaptable de misión activa conectada a `/missions/:missionId/active`.
+- `CompleteMission` transversal con una sola transacción Drift para misión, cronómetro, objetivos, evento, XP, Bitácora, movimiento económico opcional y cancelación de avisos pendientes.
+- Cierre completo con XP planificado o parcial con 0 XP predeterminado.
+- Resultado real obligatorio, conveniencia opcional y snapshot de los valores decisivos.
+- Pantallas adaptables de revisión y resultado conectadas a sus rutas canónicas.
 
 ## Qué todavía no está implementado
 
@@ -86,9 +90,8 @@ Ya está conectado:
 Falta:
 
 - Flujo para cambiar desde una misión hacia el único cronómetro ya activo.
-- Pantallas próximas, todas, calendario, recurrentes, revisión y resultado.
-- `lib/app/application/commands/complete_mission.dart` y su unidad de trabajo Drift.
-- Coordinación atómica de misión, tiempo, evento, XP, Bitácora y movimiento económico opcional.
+- XP parcial editable manualmente; el cierre parcial actual aplica el valor predeterminado 0.
+- Pantallas próximas, todas, calendario y recurrentes.
 - Reconciliador Android para notificaciones programadas.
 
 ### Fases posteriores
@@ -194,13 +197,13 @@ Las carpetas `test/`, `integration_test/` y `tool/` no son código muerto. Conti
 
 ## Secuencia recomendada para continuar A3
 
-1. Implementar revisión, resultado y `CompleteMission` como comando transaccional transversal.
-2. Implementar cambio seguro hacia el único cronómetro activo y su acceso global.
-3. Conectar plantillas y generación recurrente.
-4. Implementar agenda/reconciliación de notificaciones.
-5. Sustituir las rutas avanzadas de Misiones que aún usan placeholder.
+1. Implementar cambio seguro hacia el único cronómetro activo y su acceso global.
+2. Conectar plantillas y generación recurrente.
+3. Implementar agenda/reconciliación de notificaciones.
+4. Implementar listas próximas, todas y calendario.
+5. Añadir correcciones auditadas y XP manual para cierres parciales.
 
-El flujo base y el cronómetro persistente ya están conectados. El siguiente incremento debe cerrar la misión y coordinar tiempo, XP, Bitácora y economía sin saltar las garantías transaccionales.
+El ciclo principal de una misión ya está conectado de extremo a extremo. El siguiente incremento debe resolver la conmutación del cronómetro único antes de ampliar recurrencia y consultas.
 
 ## APK y artefactos locales
 

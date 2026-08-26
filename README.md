@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. A3 está en desarrollo: ya se pueden listar, crear, abrir, editar, iniciar, pausar y reanudar Misiones; recurrencia y cierre transaccional siguen pendientes.
+> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. A3 está en desarrollo: el flujo permite planificar, ejecutar y cerrar Misiones con tiempo, XP, Bitácora y economía; recurrencia y rutas avanzadas siguen pendientes.
 
 ## Qué busca ofrecer
 
@@ -23,10 +23,10 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A0 — Base del proyecto | Completada | Flavors, tema, navegación, shell adaptable y arquitectura base |
 | A1 — Persistencia | Completada | Drift v1, 19 tablas, DAOs, repositorios y SQLite cifrado |
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
-| A3 — Misiones | En desarrollo | Flujo base y cronómetro persistente conectados; recurrencia y `CompleteMission` pendientes |
+| A3 — Misiones | En desarrollo | Flujo base, cronómetro y `CompleteMission` transaccional conectados; recurrencia pendiente |
 | A4–A8 | Pendientes | Economía, Bitácora/progreso, copias, UI final y release |
 
-La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el flujo base de Misiones y su pantalla activa. De los 60 patrones de ruta registrados, 48 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio, las rutas avanzadas de Misiones, Bitácora, Economía y Dashboard.
+La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y el ciclo planificar–ejecutar–cerrar de Misiones. De los 60 patrones de ruta registrados, 46 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio, las rutas avanzadas de Misiones, Bitácora, Economía y Dashboard.
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
@@ -38,7 +38,7 @@ lib/
 ├── core/                Result<T> y errores comunes
 ├── features/
 │   ├── access/          acceso y privacidad implementados
-│   ├── missions/        flujo base y cronómetro; cierre avanzado pendiente
+│   ├── missions/        flujo base, cronómetro y cierre transaccional
 │   ├── economy/         dominio y datos preparados para A4
 │   ├── journal/         dominio y datos preparados para A5
 │   ├── progress/        dominio y datos preparados para A5
