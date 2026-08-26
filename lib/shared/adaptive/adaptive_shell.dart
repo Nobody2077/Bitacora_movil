@@ -12,6 +12,7 @@ import '../../features/missions/application/mission_providers.dart';
 import '../../features/missions/domain/models/mission.dart';
 import '../../features/missions/presentation/mission_presentation_support.dart';
 import 'app_breakpoints.dart';
+import 'terminal_sidebar.dart';
 
 class AdaptiveShell extends StatelessWidget {
   const AdaptiveShell({
@@ -117,45 +118,15 @@ class _RailShell extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: <Widget>[
-          NavigationRail(
-            extended: extended,
+          TerminalSidebar(
             selectedIndex: _railIndex(location),
-            onDestinationSelected: (int index) {
+            extended: extended,
+            onSelected: (int index) {
               navigationShell.goBranch(
                 index,
                 initialLocation: index == navigationShell.currentIndex,
               );
             },
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Icon(Icons.terminal, color: tokens.terminalRed, size: 30),
-            ),
-            destinations: const <NavigationRailDestination>[
-              NavigationRailDestination(
-                icon: Icon(Icons.home_outlined),
-                label: Text('Inicio'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.flag_outlined),
-                label: Text('Misiones'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                label: Text('Bitácora'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.account_balance_wallet_outlined),
-                label: Text('Economía'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.query_stats),
-                label: Text('Progreso'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.settings_outlined),
-                label: Text('Ajustes'),
-              ),
-            ],
           ),
           VerticalDivider(width: 1, color: tokens.border),
           Expanded(

@@ -30,6 +30,10 @@ La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y e
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
+El estado del sistema visual real y las reglas para extenderlo sin romper la
+coherencia de tablet y móvil están en
+[`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
+
 El próximo incremento propuesto es recurrencia: plantillas con una ventana móvil de 30 días y generación local idempotente. Las reglas exactas y el disparador de generación están descritos como decisión pendiente en `ESTADO_ACTUAL.md`.
 
 ## Arquitectura resumida
@@ -61,6 +65,8 @@ Orden recomendado de lectura:
 4. [`documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`](documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md): acceso y privacidad.
 5. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
 6. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
+7. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
+   reglas visuales y próxima migración de pantallas.
 
 Cuando un documento fuente contradiga una decisión posterior, prevalecen `DECISIONES_PRE_A0.md` y los ADR aplicables.
 

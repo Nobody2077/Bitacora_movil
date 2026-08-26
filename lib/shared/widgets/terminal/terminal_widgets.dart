@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/terminal_foundations.dart';
 
 final class TerminalCutCornerBorder extends OutlinedBorder {
   const TerminalCutCornerBorder({super.side = BorderSide.none, this.cut = 12});
@@ -61,7 +62,7 @@ class TerminalPanel extends StatelessWidget {
   const TerminalPanel({
     required this.child,
     super.key,
-    this.padding = const EdgeInsets.all(20),
+    this.padding = TerminalSpace.panel,
     this.borderColor,
     this.backgroundColor,
     this.cut = 14,
@@ -122,11 +123,11 @@ class TerminalPageHeader extends StatelessWidget {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: TerminalSpace.xxs),
               Text(
                 subtitle.toUpperCase(),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Colors.white60,
+                  color: tokens.textSecondary,
                   fontFamily: 'JetBrains Mono',
                   letterSpacing: 1,
                 ),
@@ -165,7 +166,7 @@ class TerminalPrimaryButton extends StatelessWidget {
       label: Text(label.toUpperCase()),
       style: FilledButton.styleFrom(
         minimumSize: const Size(144, 52),
-        foregroundColor: Colors.black,
+        foregroundColor: tokens.background,
         backgroundColor: tokens.infoCyan,
         disabledBackgroundColor: tokens.border,
         textStyle: const TextStyle(
@@ -279,30 +280,238 @@ class TerminalMetric extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      Icon(icon, color: color, size: 24),
-      const SizedBox(width: 8),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: color,
-              fontFamily: 'JetBrains Mono',
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Icon(icon, color: color, size: 24),
+        const SizedBox(width: TerminalSpace.xs),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              value,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: color,
+                fontFamily: 'JetBrains Mono',
+              ),
             ),
-          ),
-          Text(
-            label.toUpperCase(),
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Colors.white54,
-              fontFamily: 'JetBrains Mono',
+            Text(
+              label.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: tokens.textSecondary,
+                fontFamily: 'JetBrains Mono',
+              ),
             ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class TerminalSectionTitle extends StatelessWidget {
+  const TerminalSectionTitle({
+    required this.title,
+    super.key,
+    this.overline,
+    this.description,
+  });
+
+  final String title;
+  final String? overline;
+  final String? description;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (overline != null) ...<Widget>[
+          TerminalLabel(overline!, color: tokens.infoCyan),
+          const SizedBox(height: TerminalSpace.xs),
+        ],
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
+        if (description != null) ...<Widget>[
+          const SizedBox(height: TerminalSpace.xs),
+          Text(
+            description!,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: tokens.textSecondary),
           ),
         ],
+      ],
+    );
+  }
+}
+
+class TerminalLabel extends StatelessWidget {
+  const TerminalLabel(this.value, {super.key, this.color});
+
+  final String value;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Text(
+      value.toUpperCase(),
+      style: Theme.of(
+        context,
+      ).textTheme.labelMedium?.copyWith(color: color ?? tokens.valueYellow),
+    );
+  }
+}
+
+class TerminalCard extends StatelessWidget {
+  const TerminalCard({
+    required this.child,
+    super.key,
+    this.onTap,
+    this.padding = TerminalSpace.panel,
+    this.borderColor,
+  });
+
+  final Widget child;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry padding;
+  final Color? borderColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final TerminalCutCornerBorder shape = TerminalCutCornerBorder(
+      cut: TerminalRadius.panelCut,
+      side: BorderSide(color: borderColor ?? tokens.border),
+    );
+    return Material(
+      color: Colors.transparent,
+      shape: shape,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Ink(
+          decoration: ShapeDecoration(color: tokens.surfaceHigh, shape: shape),
+          child: Padding(padding: padding, child: child),
+        ),
       ),
-    ],
-  );
+    );
+  }
+}
+
+class TerminalDivider extends StatelessWidget {
+  const TerminalDivider({super.key, this.indent = 0, this.endIndent = 0});
+
+  final double indent;
+  final double endIndent;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Divider(color: tokens.border, indent: indent, endIndent: endIndent);
+  }
+}
+
+class TerminalProgress extends StatelessWidget {
+  const TerminalProgress({
+    required this.value,
+    super.key,
+    this.color,
+    this.label,
+  });
+
+  final double value;
+  final Color? color;
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final Color effectiveColor = color ?? tokens.infoCyan;
+    final double safeValue = value.clamp(0, 1).toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (label != null) ...<Widget>[
+          TerminalLabel(label!, color: tokens.textSecondary),
+          const SizedBox(height: TerminalSpace.xs),
+        ],
+        ClipPath(
+          clipper: const ShapeBorderClipper(
+            shape: TerminalCutCornerBorder(cut: 3),
+          ),
+          child: LinearProgressIndicator(
+            value: safeValue,
+            minHeight: 8,
+            color: effectiveColor,
+            backgroundColor: tokens.border,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TerminalEmptyState extends StatelessWidget {
+  const TerminalEmptyState({
+    required this.title,
+    required this.description,
+    super.key,
+    this.icon = Icons.inbox_outlined,
+    this.action,
+  });
+
+  final String title;
+  final String description;
+  final IconData icon;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return TerminalPanel(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: TerminalSpace.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(icon, color: tokens.infoCyan, size: 36),
+              const SizedBox(height: TerminalSpace.md),
+              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: TerminalSpace.xs),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: tokens.textSecondary),
+              ),
+              if (action != null) ...<Widget>[
+                const SizedBox(height: TerminalSpace.lg),
+                action!,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
