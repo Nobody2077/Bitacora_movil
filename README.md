@@ -30,6 +30,8 @@ La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y e
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
+El próximo incremento propuesto es recurrencia: plantillas con una ventana móvil de 30 días y generación local idempotente. Las reglas exactas y el disparador de generación están descritos como decisión pendiente en `ESTADO_ACTUAL.md`.
+
 ## Arquitectura resumida
 
 ```text

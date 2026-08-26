@@ -21,6 +21,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 - Lista de hoy, creación, edición y detalle conectados a la persistencia cifrada.
 - Flujo de planificación encadenado: crear vuelve a la lista actualizada y detalle/cronómetro permiten crear otra misión sin cerrar la anterior.
 - Pantallas reactivas de Próximas desde mañana y Todas las misiones no archivadas, conectadas a sus rutas canónicas.
+- Próximo bloque A3 documentado: plantillas y recurrencias; la base Drift/DAO existe, pero aún falta conectar caso de uso y UI.
 - Cronómetro por timestamps con inicio, pausa, reanudación y recuperación después de cerrar la app.
 - Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
 - Regla de un solo cronómetro activo validada dentro de la transacción.
@@ -28,12 +29,17 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 - Barra global del cronómetro en todos los módulos protegidos, con tiempo por timestamp y acciones para abrir o pausar.
 - `flutter analyze` y `assembleDevDebug`: aprobados después de integrar la barra global el 26 de agosto de 2026.
 - `flutter analyze` y `assembleDevDebug`: aprobados después de mejorar el flujo de creación encadenada el 26 de agosto de 2026.
+
 - Refresco visual limitado al primer plano; no se usa servicio Android permanente.
 - `CompleteMission` coordina misión, tiempo, objetivos, evento, XP, Bitácora, economía opcional y avisos en una sola transacción.
 - Revisión completa/parcial y resultado conectados a las rutas canónicas.
 - `flutter analyze`: cero problemas el 26 de agosto de 2026.
 - `assembleDevDebug`: compilado correctamente el 26 de agosto de 2026.
 - APK `devDebug` compilada, instalada y abierta manualmente en una Redmi Pad 2. ADB aún no detecta el dispositivo USB para instalaciones desde la terminal.
+
+## Punto de continuación de A3
+
+La propuesta pendiente de confirmación para recurrencias es: ventana móvil de 30 días, generación al abrir/desbloquear y al guardar plantilla, reglas diaria/semanal/días específicos/cada N días, y pausa no destructiva de plantilla. No se debe avanzar a generar apariciones sin cerrar este contrato de producto.
 
 ## Evidencia G0
 

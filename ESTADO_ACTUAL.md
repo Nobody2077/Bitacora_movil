@@ -17,6 +17,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Existen 60 patrones de ruta; 17 producen pantallas específicas y 43 producen `FeaturePlaceholderPage`.
 - `flutter analyze` y la compilación `devDebug` fueron ejecutados el 26 de agosto de 2026 y terminaron sin problemas; la APK debug fue instalada manualmente en una Redmi Pad 2.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
+- Último incremento entregado: pantallas reactivas de Próximas y Todas las misiones, commit `9593e2c`.
 
 ## Qué funciona actualmente
 
@@ -203,12 +204,25 @@ Las carpetas `test/`, `integration_test/` y `tool/` no son código muerto. Conti
 ## Secuencia recomendada para continuar A3
 
 1. Validar en la tablet física el ciclo crear → iniciar → cambiar → pausar → cerrar, incluida la barra global.
-2. Conectar plantillas y generación recurrente.
+2. Cerrar el contrato de recurrencias y conectar plantillas con generación idempotente de apariciones.
 3. Implementar agenda/reconciliación de notificaciones.
-4. Implementar calendario y recurrentes.
+4. Implementar calendario de misiones.
 5. Añadir correcciones auditadas y XP manual para cierres parciales.
 
-El ciclo principal, la conmutación y el acceso global al cronómetro único ya están conectados de extremo a extremo. El siguiente incremento funcional es recurrencia, después de validar el flujo actual en Android físico.
+El ciclo principal, la conmutación, el acceso global al cronómetro único y las listas de consulta ya están conectados de extremo a extremo. El siguiente incremento funcional es recurrencia, después de validar el flujo actual en Android físico.
+
+## Punto de continuación: recurrencias
+
+No se ha comenzado código de recurrencias de presentación ni de aplicación. `RecurrenceDao` y el esquema v1 ya contienen la base transaccional e idempotente, pero todavía no tienen repositorio, caso de uso ni pantalla conectada.
+
+Antes de generar datos reales debe confirmarse este contrato propuesto:
+
+1. Generar apariciones dentro de una ventana móvil de 30 días.
+2. Generar al abrir o desbloquear la aplicación y al guardar una plantilla; no usar servicio Android permanente.
+3. Exponer las reglas diaria, semanal, días específicos y cada N días ya previstas por el esquema.
+4. Pausar una plantilla detiene generaciones futuras, sin borrar las misiones ya creadas.
+
+Cuando se confirme, implementar en este orden: modelo y repositorio de plantilla/regla, generador con zona horaria civil e idempotencia, formulario/lista de plantillas y disparador al abrir la aplicación. La agenda de notificaciones se conecta después para no mezclar operaciones SQLite con el sistema Android.
 
 ## APK y artefactos locales
 
