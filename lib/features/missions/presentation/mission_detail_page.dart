@@ -41,6 +41,8 @@ class MissionDetailPage extends ConsumerWidget {
             'missionReview',
             pathParameters: <String, String>{'missionId': value.id},
           ),
+          onMissions: () => context.goNamed('missionsToday'),
+          onNew: () => context.pushNamed('missionNew'),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -71,6 +73,8 @@ class _MissionDetailContent extends StatelessWidget {
     required this.onEdit,
     required this.onTimer,
     required this.onComplete,
+    required this.onMissions,
+    required this.onNew,
   });
 
   final Mission mission;
@@ -78,6 +82,8 @@ class _MissionDetailContent extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onTimer;
   final VoidCallback onComplete;
+  final VoidCallback onMissions;
+  final VoidCallback onNew;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -91,7 +97,11 @@ class _MissionDetailContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                _DetailHeader(mission: mission, onEdit: onEdit),
+                _DetailHeader(
+                  mission: mission,
+                  onMissions: onMissions,
+                  onNew: onNew,
+                ),
                 const SizedBox(height: 20),
                 _IdentityPanel(mission: mission, area: area),
                 const SizedBox(height: 18),
@@ -125,19 +135,35 @@ class _MissionDetailContent extends StatelessWidget {
 }
 
 class _DetailHeader extends StatelessWidget {
-  const _DetailHeader({required this.mission, required this.onEdit});
+  const _DetailHeader({
+    required this.mission,
+    required this.onMissions,
+    required this.onNew,
+  });
 
   final Mission mission;
-  final VoidCallback onEdit;
+  final VoidCallback onMissions;
+  final VoidCallback onNew;
 
   @override
   Widget build(BuildContext context) {
-    final Widget action = TerminalOutlineButton(
-      label: 'Editar',
-      icon: Icons.edit_outlined,
-      onPressed: onEdit,
+    final Widget actions = Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: <Widget>[
+        TerminalOutlineButton(
+          label: 'Misiones',
+          icon: Icons.list_alt_outlined,
+          onPressed: onMissions,
+        ),
+        TerminalPrimaryButton(
+          label: 'Nueva misión',
+          icon: Icons.add,
+          onPressed: onNew,
+        ),
+      ],
     );
-    if (MediaQuery.sizeOf(context).width < 620) {
+    if (MediaQuery.sizeOf(context).width < 820) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -146,14 +172,14 @@ class _DetailHeader extends StatelessWidget {
             subtitle: 'Misiones · ${missionStatusLabel(mission.status)}',
           ),
           const SizedBox(height: 14),
-          action,
+          actions,
         ],
       );
     }
     return TerminalPageHeader(
       title: 'Detalle de misión',
       subtitle: 'Misiones · ${missionStatusLabel(mission.status)}',
-      action: action,
+      action: actions,
     );
   }
 }

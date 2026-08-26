@@ -19,12 +19,14 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 ## Evidencia A3 en desarrollo
 
 - Lista de hoy, creación, edición y detalle conectados a la persistencia cifrada.
+- Flujo de planificación encadenado: crear vuelve a la lista actualizada y detalle/cronómetro permiten crear otra misión sin cerrar la anterior.
 - Cronómetro por timestamps con inicio, pausa, reanudación y recuperación después de cerrar la app.
 - Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
 - Regla de un solo cronómetro activo validada dentro de la transacción.
 - Cambio atómico entre cronómetros conectado a su ruta canónica, con pausa e inicio/reanudación en una única transacción.
 - Barra global del cronómetro en todos los módulos protegidos, con tiempo por timestamp y acciones para abrir o pausar.
 - `flutter analyze` y `assembleDevDebug`: aprobados después de integrar la barra global el 26 de agosto de 2026.
+- `flutter analyze` y `assembleDevDebug`: aprobados después de mejorar el flujo de creación encadenada el 26 de agosto de 2026.
 - Refresco visual limitado al primer plano; no se usa servicio Android permanente.
 - `CompleteMission` coordina misión, tiempo, objetivos, evento, XP, Bitácora, economía opcional y avisos en una sola transacción.
 - Revisión completa/parcial y resultado conectados a las rutas canónicas.

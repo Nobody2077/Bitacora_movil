@@ -96,10 +96,32 @@ class _MissionActivePageState extends ConsumerState<MissionActivePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  TerminalPageHeader(
-                    title: 'Misión activa',
-                    subtitle: mission.title,
-                  ),
+                  if (compact)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        TerminalPageHeader(
+                          title: 'Misión activa',
+                          subtitle: mission.title,
+                        ),
+                        const SizedBox(height: 12),
+                        TerminalOutlineButton(
+                          label: 'Nueva misión',
+                          icon: Icons.add,
+                          onPressed: () => context.pushNamed('missionNew'),
+                        ),
+                      ],
+                    )
+                  else
+                    TerminalPageHeader(
+                      title: 'Misión activa',
+                      subtitle: mission.title,
+                      action: TerminalOutlineButton(
+                        label: 'Nueva misión',
+                        icon: Icons.add,
+                        onPressed: () => context.pushNamed('missionNew'),
+                      ),
+                    ),
                   const SizedBox(height: 20),
                   _TimerPanel(mission: mission, nowUtc: _nowUtc),
                   const SizedBox(height: 18),

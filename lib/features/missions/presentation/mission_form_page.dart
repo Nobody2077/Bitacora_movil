@@ -345,10 +345,15 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     result.fold<void>(
       onSuccess: (mission) {
         ref.invalidate(missionDetailProvider(mission.id));
-        context.goNamed(
-          'missionDetail',
-          pathParameters: <String, String>{'missionId': mission.id},
-        );
+        ref.invalidate(todayMissionsProvider);
+        if (widget.isEditing) {
+          context.goNamed(
+            'missionDetail',
+            pathParameters: <String, String>{'missionId': mission.id},
+          );
+          return;
+        }
+        context.goNamed('missionsToday');
       },
       onFailure: (AppFailure failure) {
         ScaffoldMessenger.of(

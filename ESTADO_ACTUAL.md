@@ -59,6 +59,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Consulta reactiva de las misiones programadas para el día local.
 - Lectura de áreas de vida desde los seeds de la base.
 - Creación atómica de Mission, objetivos y evento `CREATED`.
+- Después de crear una misión se regresa a la lista del día ya actualizada; detalle y cronómetro ofrecen accesos directos a la lista y a una nueva misión.
 - Edición atómica con `row_version`, reemplazo de objetivos y evento `UPDATED`.
 - Pantallas adaptables de Misiones de hoy, nueva/editar y detalle.
 - Componentes reutilizables de panel, botón, badge y métrica con geometría Terminal.
