@@ -83,6 +83,30 @@ final class MissionDao {
     return query.watch();
   }
 
+  Stream<List<Mission>> watchUpcoming({required int startUtcMs}) {
+    final query = _database.select(_database.missions)
+      ..where(
+        (table) =>
+            table.scheduledAt.isBiggerOrEqualValue(startUtcMs) &
+            table.archivedAt.isNull(),
+      )
+      ..orderBy(<OrderingTerm Function(Missions)>[
+        (table) => OrderingTerm.asc(table.scheduledAt),
+        (table) => OrderingTerm.asc(table.id),
+      ]);
+    return query.watch();
+  }
+
+  Stream<List<Mission>> watchAll() {
+    final query = _database.select(_database.missions)
+      ..where((table) => table.archivedAt.isNull())
+      ..orderBy(<OrderingTerm Function(Missions)>[
+        (table) => OrderingTerm.desc(table.scheduledAt),
+        (table) => OrderingTerm.desc(table.id),
+      ]);
+    return query.watch();
+  }
+
   Future<MissionAggregate> getAggregate(String missionId) {
     return _database.transaction(() => _getAggregate(missionId));
   }

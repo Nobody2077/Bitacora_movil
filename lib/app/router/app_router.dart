@@ -9,6 +9,7 @@ import '../../features/access/presentation/privacy_settings_pages.dart';
 import '../../features/access/presentation/protected_route_gate.dart';
 import '../../features/access/presentation/recovery_page.dart';
 import '../../features/missions/presentation/mission_active_page.dart';
+import '../../features/missions/presentation/mission_collection_page.dart';
 import '../../features/missions/presentation/mission_completion_pages.dart';
 import '../../features/missions/presentation/mission_detail_page.dart';
 import '../../features/missions/presentation/mission_form_page.dart';
@@ -104,6 +105,14 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         }
         if (contract.name == 'missionsToday') {
           return const MissionsTodayPage();
+        }
+        if (contract.name == 'missionsUpcoming') {
+          return const MissionCollectionPage(
+            collection: MissionCollection.upcoming,
+          );
+        }
+        if (contract.name == 'missionsAll') {
+          return const MissionCollectionPage(collection: MissionCollection.all);
         }
         if (contract.name == 'missionNew') {
           return const MissionFormPage();

@@ -20,6 +20,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 
 - Lista de hoy, creación, edición y detalle conectados a la persistencia cifrada.
 - Flujo de planificación encadenado: crear vuelve a la lista actualizada y detalle/cronómetro permiten crear otra misión sin cerrar la anterior.
+- Pantallas reactivas de Próximas desde mañana y Todas las misiones no archivadas, conectadas a sus rutas canónicas.
 - Cronómetro por timestamps con inicio, pausa, reanudación y recuperación después de cerrar la app.
 - Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
 - Regla de un solo cronómetro activo validada dentro de la transacción.

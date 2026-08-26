@@ -30,7 +30,7 @@ class MissionsTodayPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  _Header(compact: compact),
+                  const _Header(),
                   if (activeTimer.value != null) ...<Widget>[
                     const SizedBox(height: 18),
                     _ActiveTimerBanner(mission: activeTimer.value!),
@@ -113,34 +113,40 @@ class _ActiveTimerBanner extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.compact});
-
-  final bool compact;
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
-    final Widget action = TerminalOutlineButton(
-      label: 'Nueva misión',
-      icon: Icons.add,
-      onPressed: () => context.pushNamed('missionNew'),
-    );
-    if (compact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const TerminalPageHeader(
-            title: 'Centro de misiones',
-            subtitle: 'Planificación local · Misiones de hoy',
-          ),
-          const SizedBox(height: 16),
-          action,
-        ],
-      );
-    }
-    return TerminalPageHeader(
-      title: 'Centro de misiones',
-      subtitle: 'Planificación local · Misiones de hoy',
-      action: action,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const TerminalPageHeader(
+          title: 'Centro de misiones',
+          subtitle: 'Planificación local · Misiones de hoy',
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: <Widget>[
+            TerminalPrimaryButton(
+              label: 'Nueva misión',
+              icon: Icons.add,
+              onPressed: () => context.pushNamed('missionNew'),
+            ),
+            TerminalOutlineButton(
+              label: 'Próximas',
+              icon: Icons.event_outlined,
+              onPressed: () => context.goNamed('missionsUpcoming'),
+            ),
+            TerminalOutlineButton(
+              label: 'Todas',
+              icon: Icons.list_alt_outlined,
+              onPressed: () => context.goNamed('missionsAll'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

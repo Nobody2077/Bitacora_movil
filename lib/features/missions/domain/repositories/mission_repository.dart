@@ -18,6 +18,10 @@ abstract interface class MissionRepository {
     required DateTime endUtc,
   });
 
+  Stream<Result<List<Mission>>> watchUpcoming({required DateTime startUtc});
+
+  Stream<Result<List<Mission>>> watchAll();
+
   Future<Result<Mission>> create(
     Mission mission, {
     required String eventId,

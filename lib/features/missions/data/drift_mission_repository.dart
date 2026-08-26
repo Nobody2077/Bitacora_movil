@@ -145,6 +145,52 @@ final class DriftMissionRepository implements MissionRepository {
   }
 
   @override
+  Stream<Result<List<Mission>>> watchUpcoming({
+    required DateTime startUtc,
+  }) async* {
+    if (!startUtc.isUtc) {
+      yield const Failure<List<Mission>>(
+        ValidationFailure('El inicio de próximas misiones debe estar en UTC.'),
+      );
+      return;
+    }
+    try {
+      await for (final rows in _dao.watchUpcoming(
+        startUtcMs: startUtc.millisecondsSinceEpoch,
+      )) {
+        yield Success<List<Mission>>(
+          rows.map(MissionMapper.fromDrift).toList(growable: false),
+        );
+      }
+    } on Object catch (error) {
+      yield Failure<List<Mission>>(
+        StorageFailure(
+          'No se pudieron observar las próximas misiones.',
+          cause: error,
+        ),
+      );
+    }
+  }
+
+  @override
+  Stream<Result<List<Mission>>> watchAll() async* {
+    try {
+      await for (final rows in _dao.watchAll()) {
+        yield Success<List<Mission>>(
+          rows.map(MissionMapper.fromDrift).toList(growable: false),
+        );
+      }
+    } on Object catch (error) {
+      yield Failure<List<Mission>>(
+        StorageFailure(
+          'No se pudieron observar todas las misiones.',
+          cause: error,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<Result<Mission>> create(
     Mission mission, {
     required String eventId,

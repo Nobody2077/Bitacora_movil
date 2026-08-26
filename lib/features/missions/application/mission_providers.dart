@@ -57,6 +57,36 @@ final StreamProvider<List<Mission>> todayMissionsProvider =
           );
     });
 
+final StreamProvider<List<Mission>> upcomingMissionsProvider =
+    StreamProvider<List<Mission>>((Ref ref) {
+      final DateTime localNow = DateTime.now();
+      final DateTime tomorrowStartUtc = DateTime(
+        localNow.year,
+        localNow.month,
+        localNow.day + 1,
+      ).toUtc();
+      final MissionRepository repository = ref.watch(missionRepositoryProvider);
+      return repository
+          .watchUpcoming(startUtc: tomorrowStartUtc)
+          .map(
+            (result) => result.fold(
+              onSuccess: (missions) => missions,
+              onFailure: (failure) => throw failure,
+            ),
+          );
+    });
+
+final StreamProvider<List<Mission>> allMissionsProvider =
+    StreamProvider<List<Mission>>((Ref ref) {
+      final MissionRepository repository = ref.watch(missionRepositoryProvider);
+      return repository.watchAll().map(
+        (result) => result.fold(
+          onSuccess: (missions) => missions,
+          onFailure: (failure) => throw failure,
+        ),
+      );
+    });
+
 final FutureProvider<Mission?> activeTimerMissionProvider =
     FutureProvider<Mission?>((Ref ref) async {
       final Result<Mission?> result = await ref

@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. A3 está en desarrollo: el flujo permite planificar, ejecutar, cambiar el cronómetro único y cerrar Misiones con tiempo, XP, Bitácora y economía; recurrencia y rutas avanzadas siguen pendientes.
+> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. A3 está en desarrollo: el flujo permite planificar, consultar hoy/próximas/todas, ejecutar, cambiar el cronómetro único y cerrar Misiones con tiempo, XP, Bitácora y economía; recurrencia y rutas avanzadas siguen pendientes.
 
 ## Qué busca ofrecer
 
@@ -26,7 +26,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A3 — Misiones | En desarrollo | Flujo base, cambio atómico de cronómetro y `CompleteMission` conectados; recurrencia pendiente |
 | A4–A8 | Pendientes | Economía, Bitácora/progreso, copias, UI final y release |
 
-La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y el ciclo planificar–ejecutar–cambiar–cerrar de Misiones. De los 60 patrones de ruta registrados, 45 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio, las rutas avanzadas de Misiones, Bitácora, Economía y Dashboard.
+La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y el ciclo planificar–consultar–ejecutar–cambiar–cerrar de Misiones. De los 60 patrones de ruta registrados, 43 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio, las rutas avanzadas de Misiones, Bitácora, Economía y Dashboard.
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 

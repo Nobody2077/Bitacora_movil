@@ -14,7 +14,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - Misiones ya permite planificar, ejecutar y cerrar registros reales, incluido tiempo, XP, Bitácora y movimiento económico opcional; Inicio, Bitácora, Economía y Dashboard todavía no tienen experiencia funcional propia.
-- Existen 60 patrones de ruta; 15 producen pantallas específicas y 45 producen `FeaturePlaceholderPage`.
+- Existen 60 patrones de ruta; 17 producen pantallas específicas y 43 producen `FeaturePlaceholderPage`.
 - `flutter analyze` y la compilación `devDebug` fueron ejecutados el 26 de agosto de 2026 y terminaron sin problemas; la APK debug fue instalada manualmente en una Redmi Pad 2.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
 
@@ -62,6 +62,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Después de crear una misión se regresa a la lista del día ya actualizada; detalle y cronómetro ofrecen accesos directos a la lista y a una nueva misión.
 - Edición atómica con `row_version`, reemplazo de objetivos y evento `UPDATED`.
 - Pantallas adaptables de Misiones de hoy, nueva/editar y detalle.
+- Consultas reactivas y pantallas para Misiones de hoy, Próximas desde mañana y Todas las no archivadas.
 - Componentes reutilizables de panel, botón, badge y métrica con geometría Terminal.
 - Rutas reales conectadas sin debilitar el guard de acceso.
 - Inicio, pausa y reanudación atómicos con eventos `STARTED`, `PAUSED` y `RESUMED`.
@@ -95,7 +96,7 @@ Ya está conectado:
 Falta:
 
 - XP parcial editable manualmente; el cierre parcial actual aplica el valor predeterminado 0.
-- Pantallas próximas, todas, calendario y recurrentes.
+- Pantallas de calendario y recurrentes.
 - Reconciliador Android para notificaciones programadas.
 
 ### Fases posteriores
@@ -204,7 +205,7 @@ Las carpetas `test/`, `integration_test/` y `tool/` no son código muerto. Conti
 1. Validar en la tablet física el ciclo crear → iniciar → cambiar → pausar → cerrar, incluida la barra global.
 2. Conectar plantillas y generación recurrente.
 3. Implementar agenda/reconciliación de notificaciones.
-4. Implementar listas próximas, todas y calendario.
+4. Implementar calendario y recurrentes.
 5. Añadir correcciones auditadas y XP manual para cierres parciales.
 
 El ciclo principal, la conmutación y el acceso global al cronómetro único ya están conectados de extremo a extremo. El siguiente incremento funcional es recurrencia, después de validar el flujo actual en Android físico.

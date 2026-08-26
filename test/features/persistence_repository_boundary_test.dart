@@ -316,4 +316,16 @@ final class _FakeMissionRepository implements MissionRepository {
   }) => Stream<Result<List<Mission>>>.value(
     const Success<List<Mission>>(<Mission>[]),
   );
+
+  @override
+  Stream<Result<List<Mission>>> watchUpcoming({required DateTime startUtc}) =>
+      Stream<Result<List<Mission>>>.value(
+        const Success<List<Mission>>(<Mission>[]),
+      );
+
+  @override
+  Stream<Result<List<Mission>>> watchAll() =>
+      Stream<Result<List<Mission>>>.value(
+        const Success<List<Mission>>(<Mission>[]),
+      );
 }
