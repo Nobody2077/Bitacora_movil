@@ -174,6 +174,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
         ref.invalidate(missionDetailProvider(mission.id));
         ref.invalidate(missionCompletionReceiptProvider(mission.id));
         ref.invalidate(todayMissionsProvider);
+        ref.invalidate(activeTimerMissionProvider);
         context.goNamed(
           'missionResult',
           pathParameters: <String, String>{'missionId': mission.id},
