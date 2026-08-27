@@ -22,6 +22,7 @@ class _JournalTimelinePageState extends ConsumerState<JournalTimelinePage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(journalPhotoCleanupProvider);
     final JournalRange range = journalDayRange(_selectedDay);
     final AsyncValue<List<JournalEntry>> entries = ref.watch(
       journalEntriesProvider(range),

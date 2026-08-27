@@ -2,6 +2,7 @@ import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme.dart';
 import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_entry.dart';
+import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_photo.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/repositories/journal_repository.dart';
 import 'package:bitacora_rpg_personal/features/journal/presentation/journal_timeline_page.dart';
 import 'package:flutter/material.dart';
@@ -148,4 +149,22 @@ final class _JournalRepository implements JournalRepository {
   @override
   Future<Result<JournalEntry>> update(JournalEntry entry) =>
       throw UnimplementedError();
+
+  @override
+  Future<Result<JournalPhoto>> addPhoto(JournalPhoto photo) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Result<JournalPhoto?>> archivePhoto({
+    required String attachmentId,
+    required DateTime archivedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<Set<String>>> findActivePhotoStorageNames() async =>
+      const Success<Set<String>>(<String>{});
+
+  @override
+  Future<Result<List<JournalPhoto>>> findPhotos(String entryId) async =>
+      const Success<List<JournalPhoto>>(<JournalPhoto>[]);
 }

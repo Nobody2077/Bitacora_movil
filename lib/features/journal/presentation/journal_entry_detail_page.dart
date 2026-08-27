@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ import '../../missions/domain/models/mission.dart';
 import '../../missions/presentation/mission_presentation_support.dart';
 import '../application/journal_providers.dart';
 import '../domain/models/journal_entry.dart';
+import '../domain/models/journal_photo.dart';
 import 'journal_presentation_support.dart';
 
 class JournalEntryDetailPage extends ConsumerWidget {
@@ -127,12 +130,267 @@ class JournalEntryDetailPage extends ConsumerWidget {
             ],
           ),
         ),
+        const SizedBox(height: TerminalSpace.md),
+        _JournalPhotosPanel(entry: entry),
         if (entry.origin == JournalOrigin.mission ||
             entry.origin == JournalOrigin.transaction) ...<Widget>[
           const SizedBox(height: TerminalSpace.md),
           _SourcePanel(entry: entry),
         ],
       ],
+    );
+  }
+}
+
+class _JournalPhotosPanel extends ConsumerStatefulWidget {
+  const _JournalPhotosPanel({required this.entry});
+
+  final JournalEntry entry;
+
+  @override
+  ConsumerState<_JournalPhotosPanel> createState() =>
+      _JournalPhotosPanelState();
+}
+
+class _JournalPhotosPanelState extends ConsumerState<_JournalPhotosPanel> {
+  bool _working = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final AsyncValue<List<JournalPhoto>> photos = ref.watch(
+      journalPhotosProvider(widget.entry.id),
+    );
+    return TerminalPanel(
+      borderColor: tokens.infoCyan,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              const Expanded(
+                child: TerminalSectionTitle(
+                  overline: 'Archivo privado cifrado',
+                  title: 'Fotografías',
+                ),
+              ),
+              TerminalOutlineButton(
+                label: _working ? 'Procesando' : 'Agregar foto',
+                icon: _working
+                    ? Icons.hourglass_top
+                    : Icons.add_photo_alternate_outlined,
+                onPressed: _working ? null : _addPhoto,
+              ),
+            ],
+          ),
+          const SizedBox(height: TerminalSpace.sm),
+          Text(
+            'Se elimina EXIF y la imagen se cifra antes de guardarse.',
+            style: TextStyle(color: tokens.textSecondary),
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          photos.when(
+            data: (List<JournalPhoto> items) => items.isEmpty
+                ? const Text('Todavía no hay fotografías adjuntas.')
+                : LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints bounds) {
+                      final int columns = bounds.maxWidth >= 900
+                          ? 4
+                          : bounds.maxWidth >= 560
+                          ? 3
+                          : 2;
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: items.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: columns,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1.1,
+                        ),
+                        itemBuilder: (BuildContext context, int index) =>
+                            _PrivatePhotoTile(
+                              photo: items[index],
+                              disabled: _working,
+                              onRemove: () => _removePhoto(items[index]),
+                            ),
+                      );
+                    },
+                  ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, _) =>
+                const Text('No se pudieron leer las fotografías privadas.'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _addPhoto() async {
+    setState(() => _working = true);
+    final result = await ref
+        .read(journalPhotoApplicationServiceProvider)
+        .pickAndAdd(widget.entry.id);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _working = false);
+    result.fold<void>(
+      onSuccess: (JournalPhoto? photo) {
+        if (photo != null) {
+          _refresh();
+          _showMessage('Fotografía normalizada, cifrada y adjuntada.');
+        }
+      },
+      onFailure: (failure) => _showMessage(failure.message),
+    );
+  }
+
+  Future<void> _removePhoto(JournalPhoto photo) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('Retirar fotografía'),
+        content: const Text(
+          'La fotografía dejará de aparecer en esta entrada y se quitará su archivo cifrado local.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Retirar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+    setState(() => _working = true);
+    final result = await ref
+        .read(journalPhotoApplicationServiceProvider)
+        .remove(photo);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _working = false);
+    result.fold<void>(
+      onSuccess: (_) {
+        _refresh();
+        _showMessage('Fotografía retirada.');
+      },
+      onFailure: (failure) => _showMessage(failure.message),
+    );
+  }
+
+  void _refresh() {
+    ref.invalidate(journalPhotosProvider(widget.entry.id));
+    ref.invalidate(journalEntryDetailProvider(widget.entry.id));
+    ref.invalidate(journalEntriesProvider);
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _PrivatePhotoTile extends ConsumerWidget {
+  const _PrivatePhotoTile({
+    required this.photo,
+    required this.disabled,
+    required this.onRemove,
+  });
+
+  final JournalPhoto photo;
+  final bool disabled;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final AsyncValue<Uint8List> bytes = ref.watch(
+      journalPhotoBytesProvider(photo),
+    );
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: tokens.border),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(7),
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            bytes.when(
+              data: (Uint8List value) => InkWell(
+                onTap: () => _showFullPhoto(context, value),
+                child: Image.memory(
+                  value,
+                  fit: BoxFit.cover,
+                  gaplessPlayback: true,
+                ),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, _) => const Center(
+                child: Icon(Icons.broken_image_outlined, size: 36),
+              ),
+            ),
+            Positioned(
+              top: 6,
+              right: 6,
+              child: IconButton.filledTonal(
+                tooltip: 'Retirar fotografía',
+                onPressed: disabled ? null : onRemove,
+                icon: const Icon(Icons.delete_outline),
+              ),
+            ),
+            const Positioned(
+              left: 7,
+              bottom: 7,
+              child: Icon(Icons.lock, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullPhoto(BuildContext context, Uint8List bytes) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) => Dialog.fullscreen(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: <Widget>[
+            Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 5,
+                child: Image.memory(bytes, fit: BoxFit.contain),
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: IconButton.filled(
+                tooltip: 'Cerrar',
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                icon: const Icon(Icons.close),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

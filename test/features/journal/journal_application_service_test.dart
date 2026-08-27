@@ -2,6 +2,7 @@ import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/journal/application/journal_application_service.dart';
 import 'package:bitacora_rpg_personal/features/journal/data/drift_journal_repository.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_entry.dart';
+import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_photo.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/app_database.dart'
     as drift;
 import 'package:bitacora_rpg_personal/infrastructure/database/daos/journal_dao.dart';
@@ -151,6 +152,54 @@ void main() {
     expect(values, hasLength(2));
     expect((values.first as Success<List<JournalEntry>>).value, isEmpty);
     expect((values.last as Success<List<JournalEntry>>).value, hasLength(1));
+  });
+
+  test('persiste, cuenta y archiva metadatos de una fotografía', () async {
+    final JournalEntry entry =
+        (await service.save(
+                  SaveJournalEntryRequest(
+                    title: 'Entrada con fotografía',
+                    isPrivate: true,
+                    occurredAtUtc: nowUtc,
+                  ),
+                )
+                as Success<JournalEntry>)
+            .value;
+    final JournalPhoto photo = JournalPhoto(
+      id: 'photo-1',
+      journalEntryId: entry.id,
+      storageName: '00000000-0000-4000-8000-000000000001.brpa',
+      mimeType: 'image/jpeg',
+      byteLength: 123,
+      cipherSha256: List<String>.filled(64, 'a').join(),
+      widthPx: 640,
+      heightPx: 480,
+      position: 0,
+      createdAtUtc: nowUtc,
+    );
+
+    expect(await repository.addPhoto(photo), isA<Success<JournalPhoto>>());
+    final JournalEntry withPhoto =
+        (await repository.findById(entry.id) as Success<JournalEntry?>).value!;
+    expect(withPhoto.attachmentCount, 1);
+    expect(
+      (await repository.findActivePhotoStorageNames() as Success<Set<String>>)
+          .value,
+      <String>{photo.storageName},
+    );
+
+    expect(
+      await repository.archivePhoto(
+        attachmentId: photo.id,
+        archivedAtUtc: nowUtc.add(const Duration(minutes: 1)),
+      ),
+      isA<Success<JournalPhoto?>>(),
+    );
+    expect(
+      (await repository.findPhotos(entry.id) as Success<List<JournalPhoto>>)
+          .value,
+      isEmpty,
+    );
   });
 }
 

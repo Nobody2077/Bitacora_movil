@@ -3,6 +3,7 @@ import '../../../core/result/result.dart';
 import '../../../infrastructure/database/app_database.dart' as drift;
 import '../../../infrastructure/database/daos/journal_dao.dart';
 import '../domain/models/journal_entry.dart';
+import '../domain/models/journal_photo.dart';
 import '../domain/repositories/journal_repository.dart';
 import 'journal_mapper.dart';
 
@@ -104,6 +105,94 @@ final class DriftJournalRepository implements JournalRepository {
   }
 
   @override
+  Future<Result<JournalPhoto>> addPhoto(JournalPhoto photo) async {
+    final AppFailure? failure = _validatePhoto(photo);
+    if (failure != null) {
+      return Failure<JournalPhoto>(failure);
+    }
+    try {
+      final row = await _dao.addAttachment(
+        drift.JournalAttachmentsCompanion.insert(
+          id: photo.id,
+          journalEntryId: photo.journalEntryId,
+          kind: 'PHOTO',
+          storageName: photo.storageName,
+          mimeType: photo.mimeType,
+          byteLength: photo.byteLength,
+          cipherSha256: photo.cipherSha256,
+          widthPx: photo.widthPx,
+          heightPx: photo.heightPx,
+          position: photo.position,
+          createdAt: photo.createdAtUtc.millisecondsSinceEpoch,
+        ),
+      );
+      return Success<JournalPhoto>(_photoFromDrift(row));
+    } on Object catch (error) {
+      return Failure<JournalPhoto>(
+        StorageFailure('No se pudo registrar la fotografía.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<JournalPhoto?>> archivePhoto({
+    required String attachmentId,
+    required DateTime archivedAtUtc,
+  }) async {
+    if (attachmentId.trim().isEmpty || !archivedAtUtc.isUtc) {
+      return const Failure<JournalPhoto?>(
+        ValidationFailure('La fotografía no es válida.'),
+      );
+    }
+    try {
+      final row = await _dao.archiveAttachment(
+        attachmentId: attachmentId,
+        archivedAtUtcMs: archivedAtUtc.millisecondsSinceEpoch,
+      );
+      return Success<JournalPhoto?>(row == null ? null : _photoFromDrift(row));
+    } on Object catch (error) {
+      return Failure<JournalPhoto?>(
+        StorageFailure('No se pudo retirar la fotografía.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<JournalPhoto>>> findPhotos(String entryId) async {
+    if (entryId.trim().isEmpty) {
+      return const Failure<List<JournalPhoto>>(
+        ValidationFailure('La entrada de Bitácora no es válida.'),
+      );
+    }
+    try {
+      final rows = await _dao.findActiveAttachments(entryId);
+      return Success<List<JournalPhoto>>(
+        rows.map(_photoFromDrift).toList(growable: false),
+      );
+    } on Object catch (error) {
+      return Failure<List<JournalPhoto>>(
+        StorageFailure('No se pudieron leer las fotografías.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<Set<String>>> findActivePhotoStorageNames() async {
+    try {
+      return Success<Set<String>>(
+        (await _dao.findActiveAttachmentStorageNames()).toSet(),
+      );
+    } on Object catch (error) {
+      return Failure<Set<String>>(
+        StorageFailure(
+          'No se pudo verificar el almacén privado.',
+          cause: error,
+        ),
+      );
+    }
+  }
+
+  @override
   Stream<Result<List<JournalEntry>>> watchRecent({
     required DateTime startUtc,
     required DateTime endUtc,
@@ -165,4 +254,39 @@ final class DriftJournalRepository implements JournalRepository {
     }
     return null;
   }
+
+  AppFailure? _validatePhoto(JournalPhoto photo) {
+    if (photo.id.trim().isEmpty ||
+        photo.journalEntryId.trim().isEmpty ||
+        photo.storageName.trim().isEmpty ||
+        photo.mimeType != 'image/jpeg' ||
+        photo.byteLength <= 0 ||
+        !RegExp(r'^[0-9a-f]{64}$').hasMatch(photo.cipherSha256) ||
+        photo.widthPx <= 0 ||
+        photo.heightPx <= 0 ||
+        photo.position < 0 ||
+        !photo.createdAtUtc.isUtc) {
+      return const ValidationFailure(
+        'La fotografía contiene valores inválidos.',
+      );
+    }
+    return null;
+  }
+
+  static JournalPhoto _photoFromDrift(drift.JournalAttachment row) =>
+      JournalPhoto(
+        id: row.id,
+        journalEntryId: row.journalEntryId,
+        storageName: row.storageName,
+        mimeType: row.mimeType,
+        byteLength: row.byteLength,
+        cipherSha256: row.cipherSha256,
+        widthPx: row.widthPx,
+        heightPx: row.heightPx,
+        position: row.position,
+        createdAtUtc: DateTime.fromMillisecondsSinceEpoch(
+          row.createdAt,
+          isUtc: true,
+        ),
+      );
 }

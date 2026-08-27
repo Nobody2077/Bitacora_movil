@@ -255,6 +255,30 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
               ),
             ),
             const SizedBox(height: TerminalSpace.md),
+            TerminalPanel(
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text('Fotografías privadas'),
+                subtitle: Text(
+                  widget.isEditing
+                      ? 'Se administran desde el detalle para proteger el archivo cifrado.'
+                      : 'Guarda primero la entrada y podrás adjuntar fotografías en su detalle.',
+                ),
+                trailing: widget.isEditing
+                    ? const Icon(Icons.arrow_forward)
+                    : const Icon(Icons.lock_outline),
+                onTap: widget.isEditing && !_saving
+                    ? () => context.goNamed(
+                        'journalDetail',
+                        pathParameters: <String, String>{
+                          'entryId': widget.entryId!,
+                        },
+                      )
+                    : null,
+              ),
+            ),
+            const SizedBox(height: TerminalSpace.md),
             Wrap(
               alignment: WrapAlignment.end,
               spacing: 12,

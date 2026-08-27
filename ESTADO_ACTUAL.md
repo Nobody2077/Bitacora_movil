@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **27 de agosto de 2026** (A4/G4 completados; A5.1 implementada)
+- Última revisión: **27 de agosto de 2026** (A5.1 aprobada; A5.2 implementada)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -11,16 +11,17 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La aplicación es Flutter Android, local-first, privada y de un solo usuario.
 - A0–A4 están completadas. G3 quedó verde el 26 de agosto de 2026 y G4 fue
   aprobado físicamente el 27 de agosto de 2026.
-- A5 — Bitácora y progreso está en desarrollo como única fase activa. A5.1 ya
-  tiene Bitácora funcional base; A6 continúa bloqueada hasta cerrar G5.
+- A5 — Bitácora y progreso está en desarrollo como única fase activa. A5.1 fue
+  aprobada físicamente y A5.2 tiene fotos cifradas pendientes de prueba física;
+  A6 continúa bloqueada hasta cerrar G5.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
-- El gate automatizado actual ejecutó `flutter analyze` y 133 pruebas sin fallos;
-  la APK `prod-debug` se recompiló el 27 de agosto de 2026 con A5.1 integrada.
+- El gate automatizado actual ejecutó `flutter analyze` y 141 pruebas sin fallos;
+  la APK `prod-debug` se recompiló el 27 de agosto de 2026 con A5.2 integrada.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Incremento actual: A5.1 — Bitácora funcional base implementada. El siguiente
-  incremento recomendado son adjuntos fotográficos privados antes de conectar
-  búsqueda, archivo/cierre diario y Progreso.
+- Incremento actual: A5.2 — fotografías privadas implementadas. El siguiente
+  paso es su validación física; después se conectan búsqueda, archivo/cierre
+  diario y Progreso.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -50,9 +51,9 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 ### Antes de continuar o generar APK
 
 1. No limpiar datos de la app: es almacenamiento local cifrado.
-2. Validar físicamente cronología, alta, edición, detalle y vínculos de A5.1.
-3. El siguiente cambio de código son adjuntos fotográficos con copia privada,
-   metadatos verificables y eliminación segura; no guardar rutas externas.
+2. A5.1 ya fue validada físicamente por el usuario el 27 de agosto de 2026.
+3. Validar A5.2 agregando, abriendo y retirando una foto; comprobar además que
+   persiste tras cerrar la aplicación. No limpiar datos durante esta prueba.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -247,8 +248,18 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   `journalNew`, `journalEdit` y `journalDetail` sobre la persistencia cifrada.
 - La procedencia histórica no cambia al editar y una fuente eliminada no impide
   corregir el contenido de la entrada.
-- Los adjuntos fotográficos, búsqueda, archivo y cierre diario aún no tienen UI
-  funcional y pertenecen a los siguientes incrementos de A5.
+- A5.1 fue aprobada físicamente por el usuario el 27 de agosto de 2026,
+  incluida la persistencia de las entradas al salir de la aplicación.
+- A5.2 permite elegir una fotografía desde el sistema, normalizar orientación,
+  limitar el lado mayor a 4096 px, recodificar JPEG sin EXIF y cifrar con
+  AES-256-GCM usando una clave Android Keystore distinta de la base.
+- Los archivos usan nombre UUID opaco, encabezado versionado con nonce/tag y
+  SHA-256 verificable. Se prepara un temporal autenticado, se confirma SQLite y
+  recién entonces se renombra; el arranque recupera interrupciones y limpia
+  huérfanos. La vista descifra en memoria; retirar archiva primero la fila y
+  limpia después el archivo cifrado.
+- Búsqueda, archivo y cierre diario todavía pertenecen a los siguientes
+  incrementos de A5. A5.2 requiere validación física en la tablet.
 - Progreso tiene modelo, repositorio y DAO, pero no Dashboard funcional.
 - El orden recomendado es Bitácora funcional primero; después XP, niveles y
   Dashboard diario/semanal dentro de la misma A5.
@@ -330,10 +341,10 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-El punto de entrada inmediato es validar A5.1 en la tablet sin borrar datos:
-crear una entrada manual, editarla, crear otra vinculada y comprobar navegación
-y persistencia tras reiniciar. Después se incorporan adjuntos privados, búsqueda,
-archivo/cierre diario y finalmente Progreso para cerrar G5.
+El punto de entrada inmediato es validar A5.2 en la tablet sin borrar datos:
+abrir una entrada, agregar una foto, verla a tamaño completo, cerrar/reabrir la
+aplicación y retirarla. Después se incorporan búsqueda, archivo/cierre diario y
+finalmente Progreso para cerrar G5.
 
 ---
 
@@ -344,7 +355,7 @@ archivo/cierre diario y finalmente Progreso para cerrar G5.
 | `recurrenceDaoProvider` | Registrado y usado por `recurrenceRepositoryProvider` | A3 ✓ conectado |
 | `notificationDaoProvider` | Consumido por el reconciliador Android post-commit | A3 ✓ conectado |
 | `economyRepositoryProvider` | Consumido por providers, servicio, Inicio y UI de Economía | A4 ✓ conectado |
-| `journalRepositoryProvider` | Consumido por servicio, cronología, formulario y detalle | A5.1 ✓ conectado |
+| `journalRepositoryProvider` | Consumido por entradas y metadatos de fotos cifradas | A5.1/A5.2 ✓ conectado |
 | `progressRepositoryProvider` | Solo declaración en `lib` | A5 |
 | Rutas de negocio con placeholder restantes | Contrato de navegación ya congelado | A3–A7 |
 

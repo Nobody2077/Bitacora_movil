@@ -113,10 +113,56 @@ final class JournalDao {
 
   Future<JournalAttachment> addAttachment(
     JournalAttachmentsCompanion attachment,
-  ) {
-    return _database
-        .into(_database.journalAttachments)
-        .insertReturning(attachment);
+  ) async {
+    if (!attachment.journalEntryId.present) {
+      throw ArgumentError('Attachment journal entry id must be present.');
+    }
+    return _database.transaction(() async {
+      final entry =
+          await (_database.select(_database.journalEntries)..where(
+                (table) =>
+                    table.id.equals(attachment.journalEntryId.value) &
+                    table.archivedAt.isNull(),
+              ))
+              .getSingleOrNull();
+      if (entry == null) {
+        throw RecordNotFoundException(
+          table: 'journal_entries',
+          key: attachment.journalEntryId.value,
+        );
+      }
+      return _database
+          .into(_database.journalAttachments)
+          .insertReturning(attachment);
+    });
+  }
+
+  Future<List<JournalAttachment>> findActiveAttachments(String entryId) {
+    return (_database.select(_database.journalAttachments)
+          ..where(
+            (table) =>
+                table.journalEntryId.equals(entryId) &
+                table.archivedAt.isNull(),
+          )
+          ..orderBy(<OrderingTerm Function(JournalAttachments)>[
+            (table) => OrderingTerm.asc(table.position),
+            (table) => OrderingTerm.asc(table.id),
+          ]))
+        .get();
+  }
+
+  Future<List<String>> findActiveAttachmentStorageNames() async {
+    final rows =
+        await (_database.selectOnly(_database.journalAttachments)
+              ..addColumns(<Expression<Object>>[
+                _database.journalAttachments.storageName,
+              ])
+              ..where(_database.journalAttachments.archivedAt.isNull()))
+            .get();
+    return rows
+        .map((row) => row.read(_database.journalAttachments.storageName))
+        .nonNulls
+        .toList(growable: false);
   }
 
   Future<JournalEntry> updateEntry({
@@ -161,15 +207,38 @@ final class JournalDao {
     );
   }
 
-  Future<int> archiveAttachment({
+  Future<JournalAttachment?> archiveAttachment({
     required String attachmentId,
     required int archivedAtUtcMs,
   }) {
-    return (_database.update(
-      _database.journalAttachments,
-    )..where((table) => table.id.equals(attachmentId))).write(
-      JournalAttachmentsCompanion(archivedAt: Value<int?>(archivedAtUtcMs)),
-    );
+    return _database.transaction(() async {
+      final current =
+          await (_database.select(_database.journalAttachments)..where(
+                (table) =>
+                    table.id.equals(attachmentId) & table.archivedAt.isNull(),
+              ))
+              .getSingleOrNull();
+      if (current == null) {
+        return null;
+      }
+      final affected =
+          await (_database.update(_database.journalAttachments)..where(
+                (table) =>
+                    table.id.equals(attachmentId) & table.archivedAt.isNull(),
+              ))
+              .write(
+                JournalAttachmentsCompanion(
+                  archivedAt: Value<int?>(archivedAtUtcMs),
+                ),
+              );
+      if (affected != 1) {
+        throw RecordNotFoundException(
+          table: 'journal_attachments',
+          key: attachmentId,
+        );
+      }
+      return current;
+    });
   }
 
   Future<List<JournalEntry>> findByMission(String missionId) {

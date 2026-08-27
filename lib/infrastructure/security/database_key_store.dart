@@ -1,7 +1,9 @@
-/// Supplies the 256-bit key used to open the encrypted application database.
+/// Supplies isolated 256-bit key material protected by Android Keystore.
 ///
 /// Implementations must never persist or log the returned hexadecimal value in
 /// Dart. Key lifecycle and durable storage belong to the platform keystore.
+/// Production storage identifiers are allow-listed by the native bridge so
+/// the database and journal attachments never share key material.
 abstract interface class DatabaseKeyStore {
   Future<String> getOrCreateDatabaseKey({
     required bool databaseExists,

@@ -7,6 +7,7 @@ import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_controller.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_entry.dart';
+import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_photo.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/repositories/journal_repository.dart';
 import 'package:bitacora_rpg_personal/features/missions/application/mission_providers.dart';
 import 'package:bitacora_rpg_personal/features/missions/domain/models/mission.dart';
@@ -161,6 +162,24 @@ final class _SmokeJournalRepository implements JournalRepository {
   @override
   Future<Result<JournalEntry>> update(JournalEntry entry) =>
       throw UnimplementedError();
+
+  @override
+  Future<Result<JournalPhoto>> addPhoto(JournalPhoto photo) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Result<JournalPhoto?>> archivePhoto({
+    required String attachmentId,
+    required DateTime archivedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<Set<String>>> findActivePhotoStorageNames() async =>
+      const Success<Set<String>>(<String>{});
+
+  @override
+  Future<Result<List<JournalPhoto>>> findPhotos(String entryId) async =>
+      const Success<List<JournalPhoto>>(<JournalPhoto>[]);
 }
 
 void _ensureResumed(WidgetTester tester) {

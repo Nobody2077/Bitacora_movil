@@ -11,7 +11,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
-| A5 — Bitácora y progreso | **EN DESARROLLO** | A5.1 funcional implementada; adjuntos y Progreso pendientes |
+| A5 — Bitácora y progreso | **EN DESARROLLO** | A5.1 aprobada; A5.2 fotos cifradas pendiente de validación física |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
@@ -111,7 +111,7 @@ permanece bloqueada hasta completar G4.
 G4 queda **VERDE**. A5 — Bitácora y progreso pasa a ser la única fase
 autorizada; A6 permanece bloqueada hasta completar G5.
 
-## Evidencia parcial A5 — Bitácora funcional base
+## Evidencia parcial A5 — Bitácora funcional y fotografías privadas
 
 - `JournalRepository` amplió su contrato con cronología reactiva y comandos de
   creación/edición, sin exponer DataClass de Drift.
@@ -131,9 +131,26 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   e inmutable después de crear.
 - `flutter analyze`: cero problemas; `flutter test`: 133 pruebas aprobadas.
 - `assembleProdDebug`: compilada correctamente el 27 de agosto de 2026.
-- A5 todavía no cierra G5: faltan adjuntos fotográficos privados, búsqueda,
-  archivo/cierre diario, XP, niveles y Dashboard diario/semanal, además de la
-  validación física correspondiente.
+- El usuario aprobó físicamente A5.1 el 27 de agosto de 2026: cronología, alta,
+  edición, detalle, vínculos y persistencia funcionan correctamente.
+- A5.2 incorpora selección de galería, orientación normalizada, límite de 4096
+  px, recodificación JPEG sin EXIF y cifrado AES-256-GCM con nonce de 12 bytes,
+  tag de 16 bytes y clave distinta de la base protegida por Android Keystore.
+- Cada archivo tiene nombre UUID opaco, encabezado v1, SHA-256 del cifrado y
+  escritura temporal con renombrado. SQLite conserva metadatos, posición y
+  archivo lógico; el texto plano solo se reconstruye en memoria para mostrarlo.
+- Agregar prepara un temporal cifrado, confirma la fila y recién después hace
+  el renombrado atómico; compensa tanto el fallo SQLite como el fallo de
+  renombrado. El arranque recupera un temporal activo tras una interrupción y
+  limpia temporales sin fila y huérfanos cifrados.
+- El detalle permite agregar, ampliar y retirar fotografías con confirmación.
+  El formulario explica que una entrada nueva se guarda antes de adjuntar.
+- Pruebas nuevas cubren cifrado/descifrado, integridad ante alteración, limpieza
+  de huérfanos, compensación, archivado y persistencia de metadatos.
+- `flutter analyze`: cero problemas; `flutter test`: 141 pruebas aprobadas.
+- `assembleProdDebug`: compilada correctamente con A5.2 el 27 de agosto de 2026.
+- A5 todavía no cierra G5: A5.2 requiere validación física; después faltan
+  búsqueda, archivo/cierre diario, XP, niveles y Dashboard diario/semanal.
 
 ## Evidencia G0
 

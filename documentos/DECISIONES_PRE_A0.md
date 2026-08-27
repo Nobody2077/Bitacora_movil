@@ -66,6 +66,12 @@ Todas las restricciones son exactas y `pubspec.lock` se versiona. La actualizaci
 - resolución Android fijada: `local_auth_android 2.0.8`
 - sin `cryptography_flutter` mientras Android mínimo sea API 24
 
+### A5
+
+- `image_picker 1.2.3`
+- `image 4.9.2` para normalizar orientación y recodificar sin EXIF antes del
+  cifrado; su resolución ya formaba parte del lockfile de manera transitiva.
+
 ## 4. Navegación canónica
 
 El catálogo inicial de la Arquitectura Técnica queda reemplazado por el Mapa de Navegación Definitivo.
@@ -258,6 +264,7 @@ Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas espec�
 - A2: completada; gate G2 en verde el 25 de agosto de 2026.
 - A3: completada; gate G3 en verde el 26 de agosto de 2026.
 - A4: completada; gate G4 en verde el 27 de agosto de 2026.
-- A5: en desarrollo como única fase activa — Bitácora y progreso; A5.1 base
-  funcional implementada el 27 de agosto de 2026.
+- A5: en desarrollo como única fase activa — Bitácora y progreso; A5.1 aprobada
+  físicamente y A5.2 fotografías privadas implementada el 27 de agosto de 2026,
+  pendiente de validación física.
 - A6–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.
