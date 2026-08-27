@@ -1,9 +1,13 @@
 import 'package:bitacora_rpg_personal/app/app.dart';
 import 'package:bitacora_rpg_personal/app/config/app_environment.dart';
+import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
 import 'package:bitacora_rpg_personal/app/router/app_routes.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme_tokens.dart';
+import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_controller.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
+import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_entry.dart';
+import 'package:bitacora_rpg_personal/features/journal/domain/repositories/journal_repository.dart';
 import 'package:bitacora_rpg_personal/features/missions/application/mission_providers.dart';
 import 'package:bitacora_rpg_personal/features/missions/domain/models/mission.dart';
 import 'package:bitacora_rpg_personal/features/profile/application/user_profile_providers.dart';
@@ -73,6 +77,19 @@ void main() {
       expect(find.text('Elegir foto'), findsOneWidget);
       expect(find.text('Guardar nombre'), findsOneWidget);
     });
+
+    testWidgets('conecta la raíz de Bitácora a la cronología funcional', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 800));
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.journal));
+      await tester.pumpAndSettle();
+
+      expect(find.text('BITÁCORA'), findsWidgets);
+      expect(find.text('NUEVA ENTRADA'), findsOneWidget);
+      expect(find.text('Este día aún está en blanco'), findsOneWidget);
+    });
   });
 }
 
@@ -100,6 +117,9 @@ Widget _testApp({required String initialLocation}) => ProviderScope(
     userProfileProvider.overrideWith(
       (ref) async => const UserProfile.localDefault(),
     ),
+    journalRepositoryProvider.overrideWithValue(
+      const _SmokeJournalRepository(),
+    ),
   ],
   child: const BitacoraApp(),
 );
@@ -109,6 +129,38 @@ void _setSurface(WidgetTester tester, Size size) {
   tester.view.physicalSize = size;
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
+}
+
+final class _SmokeJournalRepository implements JournalRepository {
+  const _SmokeJournalRepository();
+
+  @override
+  Stream<Result<List<JournalEntry>>> watchRecent({
+    required DateTime startUtc,
+    required DateTime endUtc,
+    int limit = 100,
+  }) => Stream<Result<List<JournalEntry>>>.value(
+    const Success<List<JournalEntry>>(<JournalEntry>[]),
+  );
+
+  @override
+  Future<Result<JournalEntry>> create(JournalEntry entry) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Result<List<JournalEntry>>> findRecent({
+    required DateTime startUtc,
+    required DateTime endUtc,
+    int limit = 100,
+  }) async => const Success<List<JournalEntry>>(<JournalEntry>[]);
+
+  @override
+  Future<Result<JournalEntry?>> findById(String id) async =>
+      const Success<JournalEntry?>(null);
+
+  @override
+  Future<Result<JournalEntry>> update(JournalEntry entry) =>
+      throw UnimplementedError();
 }
 
 void _ensureResumed(WidgetTester tester) {

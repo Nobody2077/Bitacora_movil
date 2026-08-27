@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../../../infrastructure/database/app_database.dart' as drift;
 import '../domain/models/journal_entry.dart';
 
@@ -23,6 +25,31 @@ abstract final class JournalMapper {
   static DateTime _utc(int milliseconds) =>
       DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
 
+  static drift.JournalEntriesCompanion toInsert(JournalEntry value) =>
+      drift.JournalEntriesCompanion.insert(
+        id: value.id,
+        originType: _originToDrift(value.origin),
+        missionId: Value<String?>(value.missionId),
+        transactionId: Value<String?>(value.transactionId),
+        title: value.title,
+        body: Value<String?>(value.body),
+        mood: Value<String?>(_moodToDrift(value.mood)),
+        isPrivate: value.isPrivate ? 1 : 0,
+        occurredAt: value.occurredAtUtc.millisecondsSinceEpoch,
+        createdAt: value.createdAtUtc.millisecondsSinceEpoch,
+        updatedAt: value.updatedAtUtc.millisecondsSinceEpoch,
+      );
+
+  static drift.JournalEntriesCompanion toUpdate(JournalEntry value) =>
+      drift.JournalEntriesCompanion(
+        title: Value<String>(value.title),
+        body: Value<String?>(value.body),
+        mood: Value<String?>(_moodToDrift(value.mood)),
+        isPrivate: Value<int>(value.isPrivate ? 1 : 0),
+        occurredAt: Value<int>(value.occurredAtUtc.millisecondsSinceEpoch),
+        updatedAt: Value<int>(value.updatedAtUtc.millisecondsSinceEpoch),
+      );
+
   static JournalOrigin _origin(String value) => switch (value) {
     'MANUAL' => JournalOrigin.manual,
     'MISSION' => JournalOrigin.mission,
@@ -37,5 +64,19 @@ abstract final class JournalMapper {
     'NORMAL' => JournalMood.normal,
     'TIRED' => JournalMood.tired,
     _ => throw FormatException('Unknown persisted journal mood: $value'),
+  };
+
+  static String _originToDrift(JournalOrigin value) => switch (value) {
+    JournalOrigin.manual => 'MANUAL',
+    JournalOrigin.mission => 'MISSION',
+    JournalOrigin.transaction => 'TRANSACTION',
+    JournalOrigin.system => 'SYSTEM',
+  };
+
+  static String? _moodToDrift(JournalMood? value) => switch (value) {
+    null => null,
+    JournalMood.focused => 'FOCUSED',
+    JournalMood.normal => 'NORMAL',
+    JournalMood.tired => 'TIRED',
   };
 }

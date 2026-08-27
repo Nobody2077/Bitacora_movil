@@ -14,6 +14,9 @@ import '../../features/economy/presentation/economy_overview_page.dart';
 import '../../features/economy/presentation/economy_savings_pages.dart';
 import '../../features/economy/presentation/economy_transaction_pages.dart';
 import '../../features/home/presentation/home_operations_page.dart';
+import '../../features/journal/presentation/journal_entry_detail_page.dart';
+import '../../features/journal/presentation/journal_entry_form_page.dart';
+import '../../features/journal/presentation/journal_timeline_page.dart';
 import '../../features/missions/presentation/mission_active_page.dart';
 import '../../features/missions/presentation/mission_calendar_page.dart';
 import '../../features/missions/presentation/mission_collection_page.dart';
@@ -178,6 +181,26 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
           final String? missionId = state.pathParameters['missionId'];
           if (missionId != null) {
             return MissionResultPage(missionId: missionId);
+          }
+        }
+        if (contract.name == 'journal') {
+          return const JournalTimelinePage();
+        }
+        if (contract.name == 'journalNew') {
+          return JournalEntryFormPage(
+            originHint: state.uri.queryParameters['origin'],
+          );
+        }
+        if (contract.name == 'journalEdit') {
+          final String? entryId = state.pathParameters['entryId'];
+          if (entryId != null) {
+            return JournalEntryFormPage(entryId: entryId);
+          }
+        }
+        if (contract.name == 'journalDetail') {
+          final String? entryId = state.pathParameters['entryId'];
+          if (entryId != null) {
+            return JournalEntryDetailPage(entryId: entryId);
           }
         }
         if (contract.name == 'finance') {

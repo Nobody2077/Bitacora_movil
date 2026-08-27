@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **27 de agosto de 2026** (A3/G3 completados; A4 en validación)
+- Última revisión: **27 de agosto de 2026** (A4/G4 completados; A5.1 implementada)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -9,22 +9,23 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 ## Resumen ejecutivo
 
 - La aplicación es Flutter Android, local-first, privada y de un solo usuario.
-- A0, A1, A2 y A3 están completadas; G3 quedó verde el 26 de agosto de 2026.
-- A4 — Economía está en validación y es la única fase autorizada. Código, rutas,
-  pruebas y APK están verdes; A5 continúa bloqueada hasta la aprobación física G4.
+- A0–A4 están completadas. G3 quedó verde el 26 de agosto de 2026 y G4 fue
+  aprobado físicamente el 27 de agosto de 2026.
+- A5 — Bitácora y progreso está en desarrollo como única fase activa. A5.1 ya
+  tiene Bitácora funcional base; A6 continúa bloqueada hasta cerrar G5.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
-- El gate automatizado actual ejecutó formato, generación Drift,
-  `flutter analyze` y 125 pruebas sin fallos; las APK debug `dev` y `prod` se
-  generaron el 27 de agosto de 2026 con Economía integrada.
+- El gate automatizado actual ejecutó `flutter analyze` y 133 pruebas sin fallos;
+  la APK `prod-debug` se recompiló el 27 de agosto de 2026 con A5.1 integrada.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Incremento actual: Economía funcional completa en código; queda recorrer la
-  lista de prueba física y registrar la aprobación del usuario para cerrar G4.
+- Incremento actual: A5.1 — Bitácora funcional base implementada. El siguiente
+  incremento recomendado son adjuntos fotográficos privados antes de conectar
+  búsqueda, archivo/cierre diario y Progreso.
 
 ## Relevo inmediato — diseño Terminal V2
 
-Los siguientes cambios visuales están **en el árbol local sin commit**. Leer
-también `documentos/ESTADO_VISUAL.md` antes de tocar UI:
+Los siguientes cambios visuales están integrados en `main` desde el commit
+`11cbaa4`. Leer también `documentos/ESTADO_VISUAL.md` antes de tocar UI:
 
 - Shell de tablet: cabecera técnica persistente y `TerminalSidebar` propia.
 - La cabecera de `TerminalSidebar` ya no muestra la marca fija: presenta el
@@ -48,12 +49,10 @@ también `documentos/ESTADO_VISUAL.md` antes de tocar UI:
 
 ### Antes de continuar o generar APK
 
-1. Revisar físicamente Inicio, Misiones, Detalle, Nueva misión y Recurrencias
-   en tablet
-   horizontal. No limpiar datos de la app: es almacenamiento local cifrado.
-3. No implementar aún la pantalla de Bitácora como mockup. Para la lámina
-   HF-V2-BIT-01 falta primero A5 funcional: casos de uso, providers, entradas
-   manuales/vinculadas, resumen diario, estado del día y XP registrado.
+1. No limpiar datos de la app: es almacenamiento local cifrado.
+2. Validar físicamente cronología, alta, edición, detalle y vínculos de A5.1.
+3. El siguiente cambio de código son adjuntos fotográficos con copia privada,
+   metadatos verificables y eliminación segura; no guardar rutas externas.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -216,7 +215,7 @@ Ya está conectado en código:
 G3 fue aprobado físicamente en la Redmi Pad. La notificación se recibió en
 pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 
-### A4 — Economía en desarrollo
+### A4 — Economía completada
 
 - Modelo de dominio tipado para movimientos, medios de pago, metas y asignaciones.
 - Repositorio Drift ampliado con consultas reactivas y comandos de producción.
@@ -237,12 +236,22 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   el 27 de agosto de 2026.
 - APK debug `dev` y `prod` compiladas correctamente el 27 de agosto de 2026;
   `prod` se recompiló después de integrar el selector de foto.
-- Pendiente único para G4: validación física y aprobación del usuario.
+- Validación física aprobada por el usuario el 27 de agosto de 2026, incluida
+  persistencia correcta después de salir de la aplicación. G4 está verde.
 
-### Fases posteriores
+### A5 — Bitácora y progreso en desarrollo
 
-- Bitácora tiene modelo, mapper, repositorio y DAO, pero no UI ni adjuntos funcionales.
+- Bitácora tiene cronología diaria reactiva, resumen/estado del día, creación,
+  edición, detalle y vínculos navegables con misiones o movimientos.
+- Se conectaron `JournalApplicationService`, providers y las rutas `journal`,
+  `journalNew`, `journalEdit` y `journalDetail` sobre la persistencia cifrada.
+- La procedencia histórica no cambia al editar y una fuente eliminada no impide
+  corregir el contenido de la entrada.
+- Los adjuntos fotográficos, búsqueda, archivo y cierre diario aún no tienen UI
+  funcional y pertenecen a los siguientes incrementos de A5.
 - Progreso tiene modelo, repositorio y DAO, pero no Dashboard funcional.
+- El orden recomendado es Bitácora funcional primero; después XP, niveles y
+  Dashboard diario/semanal dentro de la misma A5.
 - Copia/restauración, UI v2 final, accesibilidad completa y release pertenecen a A6–A8.
 
 ---
@@ -321,9 +330,10 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-El punto de entrada inmediato es validar A4 — Economía en el dispositivo físico
-sin borrar los datos locales. Tras la aprobación se documenta G4 verde y recién
-entonces puede comenzar A5 — Bitácora y progreso.
+El punto de entrada inmediato es validar A5.1 en la tablet sin borrar datos:
+crear una entrada manual, editarla, crear otra vinculada y comprobar navegación
+y persistencia tras reiniciar. Después se incorporan adjuntos privados, búsqueda,
+archivo/cierre diario y finalmente Progreso para cerrar G5.
 
 ---
 
@@ -333,8 +343,8 @@ entonces puede comenzar A5 — Bitácora y progreso.
 |---|---|---|
 | `recurrenceDaoProvider` | Registrado y usado por `recurrenceRepositoryProvider` | A3 ✓ conectado |
 | `notificationDaoProvider` | Consumido por el reconciliador Android post-commit | A3 ✓ conectado |
-| `economyRepositoryProvider` | Consumido por providers, servicio, Inicio y UI de Economía | A4 en validación |
-| `journalRepositoryProvider` | Solo declaración en `lib` | A5 |
+| `economyRepositoryProvider` | Consumido por providers, servicio, Inicio y UI de Economía | A4 ✓ conectado |
+| `journalRepositoryProvider` | Consumido por servicio, cronología, formulario y detalle | A5.1 ✓ conectado |
 | `progressRepositoryProvider` | Solo declaración en `lib` | A5 |
 | Rutas de negocio con placeholder restantes | Contrato de navegación ya congelado | A3–A7 |
 

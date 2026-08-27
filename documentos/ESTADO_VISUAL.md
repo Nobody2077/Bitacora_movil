@@ -42,6 +42,9 @@ decisiones de producto.
   actividad diaria y mensual, historial, formularios, detalle, análisis, metas
   y reservas. Ingreso usa verde, gasto/atención usa naranja, reserva amarillo y
   la anulación conserva el rojo crítico.
+- Bitácora A5.1 implementa cronología diaria real, selector de día, resumen de
+  entradas/vínculos/estado dominante, tarjetas por procedencia, formulario de
+  alta/edición y detalle con navegación a misión o movimiento fuente.
 - `FeaturePlaceholderPage` y el contenedor «Más» ya usan las superficies
   terminales. Las rutas aún pendientes siguen siendo funcionalmente
   identificables, pero ahora respetan el sistema visual común.
@@ -106,8 +109,7 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 
 ## Verificación de este incremento
 
-El gate automatizado está limpio con 125 pruebas y `flutter analyze` sin
-incidencias. La APK `prod-debug` se recompiló correctamente después de integrar
-el perfil y el selector de foto el 27 de agosto de 2026. La revisión física de
-G3 fue aprobada en la Redmi Pad; la de A4 es el único requisito pendiente para
-cerrar G4.
+El gate automatizado está limpio con 133 pruebas y `flutter analyze` sin
+incidencias. La APK `prod-debug` se recompiló correctamente con Bitácora A5.1 el
+27 de agosto de 2026. Las revisiones físicas G3 y G4 fueron aprobadas en la Redmi
+Pad; A5 continúa en desarrollo y aún no cumple G5.

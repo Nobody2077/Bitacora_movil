@@ -1,8 +1,8 @@
 # Bitácora RPG Personal — decisiones vinculantes de construcción
 
-Versión: 1.2
-Fecha: 25 de agosto de 2026
-Estado: vigente; A0–A3 completadas, A4 autorizada
+Versión: 1.3
+Fecha: 27 de agosto de 2026
+Estado: vigente; A0–A4 completadas, A5 en desarrollo
 
 ## 1. Propósito y precedencia
 
@@ -257,5 +257,7 @@ Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas espec�
 - A1: completada; gate G1 en verde el 24 de agosto de 2026.
 - A2: completada; gate G2 en verde el 25 de agosto de 2026.
 - A3: completada; gate G3 en verde el 26 de agosto de 2026.
-- A4: autorizada como única fase siguiente — Economía.
-- A5–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.
+- A4: completada; gate G4 en verde el 27 de agosto de 2026.
+- A5: en desarrollo como única fase activa — Bitácora y progreso; A5.1 base
+  funcional implementada el 27 de agosto de 2026.
+- A6–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.

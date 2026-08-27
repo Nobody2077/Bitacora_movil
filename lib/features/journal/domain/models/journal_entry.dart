@@ -31,4 +31,28 @@ final class JournalEntry {
   final DateTime createdAtUtc;
   final DateTime updatedAtUtc;
   final int attachmentCount;
+
+  bool get isLinked => missionId != null || transactionId != null;
+
+  JournalEntry copyWith({
+    String? title,
+    String? body,
+    JournalMood? mood,
+    bool? isPrivate,
+    DateTime? occurredAtUtc,
+    DateTime? updatedAtUtc,
+  }) => JournalEntry(
+    id: id,
+    origin: origin,
+    missionId: missionId,
+    transactionId: transactionId,
+    title: title ?? this.title,
+    body: body,
+    mood: mood,
+    isPrivate: isPrivate ?? this.isPrivate,
+    occurredAtUtc: occurredAtUtc ?? this.occurredAtUtc,
+    createdAtUtc: createdAtUtc,
+    updatedAtUtc: updatedAtUtc ?? this.updatedAtUtc,
+    attachmentCount: attachmentCount,
+  );
 }

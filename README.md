@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A3 están completadas. A4 — Economía está en validación: ledger, saldos derivados, movimientos, corrección/anulación, metas, reservas, análisis y rutas reales ya están implementados. El gate automatizado quedó verde el 27 de agosto de 2026 con 125 pruebas y APK debug `dev`/`prod`; falta la validación física del usuario para cerrar G4.
+> **Estado actual:** A0–A4 están completadas. G4 fue aprobado físicamente el 27 de agosto de 2026. A5 está en desarrollo: la base funcional de Bitácora ya conecta cronología diaria, creación, edición, detalle y vínculos con misiones/movimientos. El gate quedó verde con 133 pruebas y APK `prod-debug`; adjuntos y Progreso siguen pendientes.
 
 ## Qué busca ofrecer
 
@@ -24,10 +24,11 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A1 — Persistencia | Completada | Drift v1, 19 tablas, DAOs, repositorios y SQLite cifrado |
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
-| A4 — Economía | En validación | Funcionalidad y gate automatizado verdes; validación física G4 pendiente |
-| A5–A8 | Pendientes | Bitácora/progreso comienza después de G4; luego copias, UI final y release |
+| A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
+| A5 — Bitácora y progreso | En desarrollo | A5.1 funcional; adjuntos, búsqueda/cierre diario y Progreso pendientes |
+| A6–A8 | Bloqueadas | Copias, UI final y release requieren el gate anterior |
 
-La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones y las rutas canónicas de Economía. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
+La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
@@ -35,11 +36,10 @@ El estado del sistema visual real y las reglas para extenderlo sin romper la
 coherencia de tablet y móvil están en
 [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
 
-El incremento activo es validar físicamente A4 — Economía en teléfono/tablet:
-movimientos, corrección, anulación, metas, reservas y saldos derivados.
-Bitácora funcional (A5) solo comienza después de cerrar G4 y debe
-incluir entradas manuales/vinculadas, resumen diario, estado del día y XP
-registrado, no solo una pantalla visual.
+El incremento activo es A5.1: Bitácora funcional base está implementada con
+entradas manuales/vinculadas, resumen diario y estado del día. El siguiente paso
+son adjuntos fotográficos privados; después búsqueda, archivo/cierre diario, XP,
+niveles y Dashboard diario/semanal.
 
 ## Arquitectura resumida
 
@@ -51,7 +51,7 @@ lib/
 │   ├── access/          acceso y privacidad implementados
 │   ├── missions/        flujo base, cronómetro y cierre transaccional
 │   ├── economy/         dominio, datos, aplicación y UI funcional de A4
-│   ├── journal/         dominio y datos preparados para A5
+│   ├── journal/         cronología, alta, edición, detalle y vínculos A5.1
 │   ├── progress/        dominio y datos preparados para A5
 │   ├── profile/         nombre y avatar local de la barra de tablet
 │   └── settings/        preferencias y pantallas de privacidad

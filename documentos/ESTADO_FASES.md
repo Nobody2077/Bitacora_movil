@@ -10,8 +10,8 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A1 — Persistencia | **COMPLETADA** | G1 verde |
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
-| A4 — Economía | **EN VALIDACIÓN** | Gate automatizado verde; aprobación física G4 pendiente |
-| A5 — Bitácora y progreso | BLOQUEADA | Requiere G4 |
+| A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
+| A5 — Bitácora y progreso | **EN DESARROLLO** | A5.1 funcional implementada; adjuntos y Progreso pendientes |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
@@ -74,7 +74,7 @@ al repetir la prueba con las condiciones Android correctas.
 G3 queda **VERDE**. A4 — Economía pasa a ser la única fase autorizada; A5
 permanece bloqueada hasta completar G4.
 
-## Evidencia parcial A4 — G4 todavía no cerrado
+## Evidencia G4 — A4 completada
 
 - Dominio tipado para movimientos, medios de pago, metas y asignaciones.
 - Repositorio y DAO conectan ledger reactivo, totales por periodo, balance
@@ -104,8 +104,36 @@ permanece bloqueada hasta completar G4.
   mediante el selector del sistema; no hubo migración del esquema v1.
 - `assembleProdDebug` volvió a aprobar después de integrar el perfil y
   `image_picker`.
-- Esta evidencia todavía no cierra G4: falta la prueba física y aprobación del
-  usuario. A5 permanece bloqueada hasta ese momento.
+- El usuario aprobó físicamente el 27 de agosto de 2026 el funcionamiento y la
+  persistencia de Economía, perfil y las demás funciones del incremento después
+  de salir y volver a entrar en la aplicación.
+
+G4 queda **VERDE**. A5 — Bitácora y progreso pasa a ser la única fase
+autorizada; A6 permanece bloqueada hasta completar G5.
+
+## Evidencia parcial A5 — Bitácora funcional base
+
+- `JournalRepository` amplió su contrato con cronología reactiva y comandos de
+  creación/edición, sin exponer DataClass de Drift.
+- `JournalApplicationService` valida títulos, UTC, privacidad, procedencia y
+  vínculos opcionales con una misión o un movimiento existente.
+- Crear y editar usan `JournalDao` y la base cifrada v1; no se modificó el
+  esquema ni fue necesaria una migración.
+- Una entrada vinculada conserva `origin_type` aunque la FK pase a `NULL`, y su
+  contenido permanece editable como exige ADR-001.
+- `/journal` muestra cronología por día, navegación anterior/hoy/siguiente,
+  resumen de entradas, cantidad vinculada y estado dominante del día.
+- `/journal/new`, `/journal/:entryId/edit` y `/journal/:entryId` están conectadas
+  a formulario y detalle reales. El detalle permite abrir la misión o el
+  movimiento fuente cuando todavía existe.
+- El formulario cubre título, contenido, estado `FOCUSED`/`NORMAL`/`TIRED`,
+  privacidad, fecha/hora y vínculo opcional. La procedencia se vuelve histórica
+  e inmutable después de crear.
+- `flutter analyze`: cero problemas; `flutter test`: 133 pruebas aprobadas.
+- `assembleProdDebug`: compilada correctamente el 27 de agosto de 2026.
+- A5 todavía no cierra G5: faltan adjuntos fotográficos privados, búsqueda,
+  archivo/cierre diario, XP, niveles y Dashboard diario/semanal, además de la
+  validación física correspondiente.
 
 ## Evidencia G0
 
