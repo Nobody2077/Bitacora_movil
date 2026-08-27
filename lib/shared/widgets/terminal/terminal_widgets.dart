@@ -167,7 +167,7 @@ class TerminalPrimaryButton extends StatelessWidget {
       style: FilledButton.styleFrom(
         minimumSize: const Size(144, 52),
         foregroundColor: tokens.background,
-        backgroundColor: tokens.infoCyan,
+        backgroundColor: tokens.primaryAction,
         disabledBackgroundColor: tokens.border,
         textStyle: const TextStyle(
           fontFamily: 'Rajdhani',
@@ -214,6 +214,39 @@ class TerminalOutlineButton extends StatelessWidget {
           fontWeight: FontWeight.w700,
           letterSpacing: 0.8,
         ),
+        shape: const TerminalCutCornerBorder(cut: 10),
+      ),
+    );
+  }
+}
+
+/// Acción irreversible o de seguridad. No usar para el CTA normal de pantalla.
+class TerminalCriticalButton extends StatelessWidget {
+  const TerminalCriticalButton({
+    required this.label,
+    required this.onPressed,
+    super.key,
+    this.icon = Icons.warning_amber_outlined,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return FilledButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label.toUpperCase()),
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(144, 52),
+        foregroundColor: tokens.textPrimary,
+        backgroundColor: tokens.criticalAction,
+        disabledBackgroundColor: tokens.border,
         shape: const TerminalCutCornerBorder(cut: 10),
       ),
     );

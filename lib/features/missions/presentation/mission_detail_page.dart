@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/terminal_foundations.dart';
+import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
@@ -43,6 +48,7 @@ class MissionDetailPage extends ConsumerWidget {
           ),
           onMissions: () => context.goNamed('missionsToday'),
           onNew: () => context.pushNamed('missionNew'),
+          onArchive: () => _confirmArchive(context, ref, value),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -64,6 +70,61 @@ class MissionDetailPage extends ConsumerWidget {
     }
     return null;
   }
+
+  Future<void> _confirmArchive(
+    BuildContext context,
+    WidgetRef ref,
+    Mission mission,
+  ) async {
+    final bool? accepted = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('¿Archivar misión?'),
+        content: const Text(
+          'La misión desaparecerá de tus listas y calendario. Su historial '
+          'se conservará y cualquier aviso pendiente será cancelado.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => dialogContext.pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton.icon(
+            onPressed: () => dialogContext.pop(true),
+            icon: const Icon(Icons.archive_outlined),
+            label: const Text('Archivar'),
+          ),
+        ],
+      ),
+    );
+    if (accepted != true || !context.mounted) {
+      return;
+    }
+    final Result<Mission> result = await ref
+        .read(missionApplicationServiceProvider)
+        .archiveMission(mission);
+    if (!context.mounted) {
+      return;
+    }
+    result.fold<void>(
+      onSuccess: (_) {
+        unawaited(
+          ref.read(notificationReconciliationServiceProvider).reconcile(),
+        );
+        ref.invalidate(missionDetailProvider(mission.id));
+        ref.invalidate(todayMissionsProvider);
+        ref.invalidate(upcomingMissionsProvider);
+        ref.invalidate(allMissionsProvider);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Misión archivada.')));
+        context.goNamed('missionsToday');
+      },
+      onFailure: (failure) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message))),
+    );
+  }
 }
 
 class _MissionDetailContent extends StatelessWidget {
@@ -75,6 +136,7 @@ class _MissionDetailContent extends StatelessWidget {
     required this.onComplete,
     required this.onMissions,
     required this.onNew,
+    required this.onArchive,
   });
 
   final Mission mission;
@@ -84,13 +146,14 @@ class _MissionDetailContent extends StatelessWidget {
   final VoidCallback onComplete;
   final VoidCallback onMissions;
   final VoidCallback onNew;
+  final VoidCallback onArchive;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (BuildContext context, BoxConstraints constraints) {
       final bool compact = constraints.maxWidth < 820;
       return SingleChildScrollView(
-        padding: EdgeInsets.all(compact ? 16 : 28),
+        padding: compact ? TerminalSpace.pageCompact : TerminalSpace.pageTablet,
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1180),
@@ -102,29 +165,32 @@ class _MissionDetailContent extends StatelessWidget {
                   onMissions: onMissions,
                   onNew: onNew,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: TerminalSpace.lg),
                 _IdentityPanel(mission: mission, area: area),
-                const SizedBox(height: 18),
+                const SizedBox(height: TerminalSpace.md),
                 if (compact) ...<Widget>[
                   _ObjectivesPanel(mission: mission),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: TerminalSpace.md),
                   _ExecutionPanel(mission: mission),
                 ] else
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Expanded(child: _ObjectivesPanel(mission: mission)),
-                      const SizedBox(width: 18),
+                      const SizedBox(width: TerminalSpace.md),
                       Expanded(child: _ExecutionPanel(mission: mission)),
                     ],
                   ),
-                const SizedBox(height: 18),
+                const SizedBox(height: TerminalSpace.md),
                 _ActionPanel(
                   mission: mission,
                   onEdit: onEdit,
                   onTimer: onTimer,
                   onComplete: onComplete,
+                  onArchive: onArchive,
                 ),
+                const SizedBox(height: TerminalSpace.md),
+                _ActivityPanel(mission: mission),
               ],
             ),
           ),
@@ -171,7 +237,7 @@ class _DetailHeader extends StatelessWidget {
             title: 'Detalle de misión',
             subtitle: 'Misiones · ${missionStatusLabel(mission.status)}',
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: TerminalSpace.sm),
           actions,
         ],
       );
@@ -227,7 +293,7 @@ class _IdentityPanel extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: TerminalSpace.md),
           Text(
             mission.title,
             style: Theme.of(
@@ -235,7 +301,7 @@ class _IdentityPanel extends StatelessWidget {
             ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           if (mission.description?.trim().isNotEmpty == true) ...<Widget>[
-            const SizedBox(height: 10),
+            const SizedBox(height: TerminalSpace.sm),
             Text(
               mission.description!,
               style: Theme.of(context).textTheme.bodyLarge,
@@ -264,13 +330,7 @@ class _ObjectivesPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            'OBJETIVOS',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: tokens.infoCyan,
-              letterSpacing: 1,
-            ),
-          ),
+          const TerminalSectionTitle(title: 'Objetivos', overline: 'Ejecución'),
           const SizedBox(height: 14),
           if (mission.objectives.isEmpty)
             const Text(
@@ -298,18 +358,10 @@ class _ObjectivesPanel extends StatelessWidget {
               ),
           if (mission.objectives.isNotEmpty) ...<Widget>[
             const SizedBox(height: 14),
-            Text(
-              'PROGRESO $completed/${mission.objectives.length}',
-              style: TextStyle(
-                color: tokens.progressGreen,
-                fontFamily: 'JetBrains Mono',
-              ),
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
+            TerminalProgress(
               value: completed / mission.objectives.length,
+              label: 'Progreso $completed/${mission.objectives.length}',
               color: tokens.progressGreen,
-              backgroundColor: tokens.border,
             ),
           ],
         ],
@@ -325,19 +377,13 @@ class _ExecutionPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
     return TerminalPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            'PLAN DE EJECUCIÓN',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: tokens.infoCyan,
-              letterSpacing: 1,
-            ),
+          const TerminalSectionTitle(
+            title: 'Plan de ejecución',
+            overline: 'Trazabilidad',
           ),
           const SizedBox(height: 14),
           _PlanRow(
@@ -345,6 +391,7 @@ class _ExecutionPanel extends StatelessWidget {
             label: 'Fecha',
             value: missionDateLabel(mission.scheduledAtUtc),
           ),
+          const TerminalDivider(),
           _PlanRow(
             icon: Icons.schedule,
             label: 'Duración',
@@ -352,6 +399,7 @@ class _ExecutionPanel extends StatelessWidget {
                 ? 'Sin estimar'
                 : '${mission.estimatedMinutes} min',
           ),
+          const TerminalDivider(),
           _PlanRow(
             icon: Icons.savings_outlined,
             label: 'Presupuesto',
@@ -359,11 +407,13 @@ class _ExecutionPanel extends StatelessWidget {
                 ? 'Sin presupuesto'
                 : 'Bs ${missionMoneyLabel(mission.budgetMinor!)}',
           ),
+          const TerminalDivider(),
           _PlanRow(
             icon: Icons.bolt_outlined,
             label: 'Recompensa',
             value: '${mission.xpPlanned} XP',
           ),
+          const TerminalDivider(),
           _PlanRow(
             icon: Icons.priority_high,
             label: 'Prioridad',
@@ -416,12 +466,14 @@ class _ActionPanel extends StatelessWidget {
     required this.onEdit,
     required this.onTimer,
     required this.onComplete,
+    required this.onArchive,
   });
 
   final Mission mission;
   final VoidCallback onEdit;
   final VoidCallback onTimer;
   final VoidCallback onComplete;
+  final VoidCallback onArchive;
 
   @override
   Widget build(BuildContext context) => TerminalPanel(
@@ -429,15 +481,10 @@ class _ActionPanel extends StatelessWidget {
       spacing: 12,
       runSpacing: 12,
       children: <Widget>[
-        TerminalPrimaryButton(
-          label: 'Editar misión',
-          icon: Icons.edit_outlined,
-          onPressed: onEdit,
-        ),
         TerminalOutlineButton(
           label: mission.status == MissionStatus.active
-              ? 'Cronómetro activo'
-              : 'Abrir cronómetro',
+              ? 'Abrir cronómetro'
+              : 'Cronómetro',
           icon: Icons.timer_outlined,
           onPressed:
               const <MissionStatus>{
@@ -450,10 +497,9 @@ class _ActionPanel extends StatelessWidget {
               ? onTimer
               : null,
         ),
-        TerminalOutlineButton(
-          label: 'Registrar resultado',
+        TerminalPrimaryButton(
+          label: 'Completar misión',
           icon: Icons.flag_outlined,
-          color: Theme.of(context).extension<AppThemeTokens>()!.progressGreen,
           onPressed:
               const <MissionStatus>{
                 MissionStatus.scheduled,
@@ -465,9 +511,88 @@ class _ActionPanel extends StatelessWidget {
               ? onComplete
               : null,
         ),
+        TerminalOutlineButton(
+          label: 'Editar',
+          icon: Icons.more_horiz,
+          onPressed: onEdit,
+        ),
+        TerminalCriticalButton(
+          label: 'Archivar misión',
+          icon: Icons.archive_outlined,
+          onPressed: mission.status == MissionStatus.active ? null : onArchive,
+        ),
       ],
     ),
   );
+}
+
+class _ActivityPanel extends StatelessWidget {
+  const _ActivityPanel({required this.mission});
+
+  final Mission mission;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final List<MissionTimeEntry> entries = mission.timeEntries.reversed.toList(
+      growable: false,
+    );
+    return TerminalPanel(
+      borderColor: tokens.border,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const TerminalSectionTitle(
+            title: 'Registro de actividad',
+            overline: 'Trazabilidad local',
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          if (entries.isEmpty)
+            Text(
+              'Aún no hay segmentos de tiempo registrados.',
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: tokens.textSecondary),
+            )
+          else
+            for (final MissionTimeEntry entry in entries.take(4))
+              Padding(
+                padding: const EdgeInsets.only(bottom: TerminalSpace.sm),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      entry.segmentType == MissionTimeSegmentType.work
+                          ? Icons.play_circle_outline
+                          : Icons.pause_circle_outline,
+                      color: entry.segmentType == MissionTimeSegmentType.work
+                          ? tokens.infoCyan
+                          : tokens.valueYellow,
+                    ),
+                    const SizedBox(width: TerminalSpace.sm),
+                    Expanded(
+                      child: Text(
+                        entry.segmentType == MissionTimeSegmentType.work
+                            ? 'Trabajo · ${missionDurationLabel(entry.durationSeconds)}'
+                            : 'Pausa · ${missionDurationLabel(entry.durationSeconds)}',
+                      ),
+                    ),
+                    TerminalLabel(
+                      _activityTime(entry.createdAtUtc),
+                      color: tokens.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+        ],
+      ),
+    );
+  }
+
+  static String _activityTime(DateTime instant) =>
+      '${instant.toLocal().hour.toString().padLeft(2, '0')}:'
+      '${instant.toLocal().minute.toString().padLeft(2, '0')}';
 }
 
 class _MissingMission extends StatelessWidget {

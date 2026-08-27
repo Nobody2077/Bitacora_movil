@@ -10,8 +10,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     required this.border,
     required this.borderFocused,
     required this.terminalRed,
+    required this.criticalAction,
     required this.structuralRed,
     required this.infoCyan,
+    required this.primaryAction,
     required this.valueYellow,
     required this.progressGreen,
     required this.attentionOrange,
@@ -28,8 +30,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     border: Color(0xFF2A3340),
     borderFocused: Color(0xFF55E6E6),
     terminalRed: Color(0xFFFF3B3B),
+    criticalAction: Color(0xFFD00000),
     structuralRed: Color(0xFF7A2631),
     infoCyan: Color(0xFF55E6E6),
+    primaryAction: Color(0xFF1EC2C6),
     valueYellow: Color(0xFFF5D547),
     progressGreen: Color(0xFF45D483),
     attentionOrange: Color(0xFFFF9F43),
@@ -45,8 +49,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
   final Color border;
   final Color borderFocused;
   final Color terminalRed;
+  final Color criticalAction;
   final Color structuralRed;
   final Color infoCyan;
+  final Color primaryAction;
   final Color valueYellow;
   final Color progressGreen;
   final Color attentionOrange;
@@ -63,8 +69,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     Color? border,
     Color? borderFocused,
     Color? terminalRed,
+    Color? criticalAction,
     Color? structuralRed,
     Color? infoCyan,
+    Color? primaryAction,
     Color? valueYellow,
     Color? progressGreen,
     Color? attentionOrange,
@@ -79,8 +87,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     border: border ?? this.border,
     borderFocused: borderFocused ?? this.borderFocused,
     terminalRed: terminalRed ?? this.terminalRed,
+    criticalAction: criticalAction ?? this.criticalAction,
     structuralRed: structuralRed ?? this.structuralRed,
     infoCyan: infoCyan ?? this.infoCyan,
+    primaryAction: primaryAction ?? this.primaryAction,
     valueYellow: valueYellow ?? this.valueYellow,
     progressGreen: progressGreen ?? this.progressGreen,
     attentionOrange: attentionOrange ?? this.attentionOrange,
@@ -103,8 +113,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
       border: Color.lerp(border, other.border, t)!,
       borderFocused: Color.lerp(borderFocused, other.borderFocused, t)!,
       terminalRed: Color.lerp(terminalRed, other.terminalRed, t)!,
+      criticalAction: Color.lerp(criticalAction, other.criticalAction, t)!,
       structuralRed: Color.lerp(structuralRed, other.structuralRed, t)!,
       infoCyan: Color.lerp(infoCyan, other.infoCyan, t)!,
+      primaryAction: Color.lerp(primaryAction, other.primaryAction, t)!,
       valueYellow: Color.lerp(valueYellow, other.valueYellow, t)!,
       progressGreen: Color.lerp(progressGreen, other.progressGreen, t)!,
       attentionOrange: Color.lerp(attentionOrange, other.attentionOrange, t)!,

@@ -3,52 +3,99 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
 import 'mission_presentation_support.dart';
 
-class MissionsTodayPage extends ConsumerWidget {
+/// Lista operativa: filtros, búsqueda y tarjetas trabajan sobre el stream real.
+class MissionsTodayPage extends ConsumerStatefulWidget {
   const MissionsTodayPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MissionsTodayPage> createState() => _MissionsTodayPageState();
+}
+
+class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
+  final TextEditingController _searchController = TextEditingController();
+  _MissionFilter _filter = _MissionFilter.all;
+  String? _areaId;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AsyncValue<List<Mission>> missions = ref.watch(todayMissionsProvider);
     final AsyncValue<List<MissionArea>> areas = ref.watch(missionAreasProvider);
-    final AsyncValue<Mission?> activeTimer = ref.watch(
-      activeTimerMissionProvider,
-    );
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final bool compact = constraints.maxWidth < 680;
+        final bool wide = constraints.maxWidth >= 900;
+        final List<Mission> source = missions.value ?? const <Mission>[];
+        final List<MissionArea> knownAreas =
+            areas.value ?? const <MissionArea>[];
+        final Widget list = missions.when(
+          data: (_) => _MissionList(
+            missions: _visibleMissions(source),
+            areas: knownAreas,
+            hasFilters:
+                _filter != _MissionFilter.all ||
+                _areaId != null ||
+                _searchController.text.trim().isNotEmpty,
+            onClearFilters: _clearFilters,
+          ),
+          loading: () => const _LoadingPanel(),
+          error: (Object _, StackTrace _) => _ErrorPanel(
+            message: 'No se pudieron cargar las misiones de hoy.',
+            onRetry: () => ref.invalidate(todayMissionsProvider),
+          ),
+        );
         return SingleChildScrollView(
-          padding: EdgeInsets.all(compact ? 16 : 28),
+          padding: wide ? TerminalSpace.pageTablet : TerminalSpace.pageCompact,
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1180),
+              constraints: const BoxConstraints(maxWidth: 1200),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const _Header(),
-                  if (activeTimer.value != null) ...<Widget>[
-                    const SizedBox(height: 18),
-                    _ActiveTimerBanner(mission: activeTimer.value!),
-                  ],
-                  const SizedBox(height: 24),
-                  _MissionSummary(missions: missions),
-                  const SizedBox(height: 16),
-                  missions.when(
-                    data: (items) => _MissionList(
-                      missions: items,
-                      areas: areas.value ?? const <MissionArea>[],
-                    ),
-                    loading: () => const _LoadingPanel(),
-                    error: (Object error, StackTrace stackTrace) => _ErrorPanel(
-                      message: 'No se pudieron cargar las misiones.',
-                      onRetry: () => ref.invalidate(todayMissionsProvider),
-                    ),
+                  _MissionHeader(
+                    onCreate: () => context.pushNamed('missionNew'),
+                    onCalendar: () => context.pushNamed('missionsCalendar'),
                   ),
+                  const SizedBox(height: TerminalSpace.md),
+                  _MissionControls(
+                    selectedFilter: _filter,
+                    selectedAreaId: _areaId,
+                    areas: knownAreas,
+                    controller: _searchController,
+                    onFilterChanged: (_MissionFilter value) =>
+                        setState(() => _filter = value),
+                    onAreaChanged: (String? value) =>
+                        setState(() => _areaId = value),
+                    onSearchChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: TerminalSpace.md),
+                  if (wide)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Expanded(child: list),
+                        const SizedBox(width: TerminalSpace.md),
+                        SizedBox(
+                          width: 206,
+                          child: _MissionSummary(missions: source),
+                        ),
+                      ],
+                    )
+                  else ...<Widget>[
+                    list,
+                    const SizedBox(height: TerminalSpace.md),
+                    _MissionSummary(missions: source),
+                  ],
                 ],
               ),
             ),
@@ -57,216 +104,330 @@ class MissionsTodayPage extends ConsumerWidget {
       },
     );
   }
+
+  List<Mission> _visibleMissions(List<Mission> source) {
+    final String query = _searchController.text.trim().toLowerCase();
+    return source
+        .where((Mission mission) {
+          final bool matchesArea = _areaId == null || mission.areaId == _areaId;
+          final bool matchesQuery =
+              query.isEmpty ||
+              mission.title.toLowerCase().contains(query) ||
+              (mission.description?.toLowerCase().contains(query) ?? false);
+          return matchesArea && matchesQuery && _matchesFilter(mission);
+        })
+        .toList(growable: false);
+  }
+
+  bool _matchesFilter(Mission mission) => switch (_filter) {
+    _MissionFilter.all => true,
+    _MissionFilter.today =>
+      mission.status != MissionStatus.completed &&
+          mission.status != MissionStatus.partial,
+    _MissionFilter.active =>
+      mission.status == MissionStatus.active ||
+          mission.status == MissionStatus.paused,
+    _MissionFilter.completed =>
+      mission.status == MissionStatus.completed ||
+          mission.status == MissionStatus.partial,
+  };
+
+  void _clearFilters() {
+    _searchController.clear();
+    setState(() {
+      _filter = _MissionFilter.all;
+      _areaId = null;
+    });
+  }
 }
 
-class _ActiveTimerBanner extends StatelessWidget {
-  const _ActiveTimerBanner({required this.mission});
+enum _MissionFilter { all, today, active, completed }
 
-  final Mission mission;
+class _MissionHeader extends StatelessWidget {
+  const _MissionHeader({required this.onCreate, required this.onCalendar});
+
+  final VoidCallback onCreate;
+  final VoidCallback onCalendar;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) {
+      final Widget title = const TerminalPageHeader(
+        title: 'Centro de misiones',
+        subtitle: 'Planificación local · misiones activas',
+      );
+      final Widget action = Wrap(
+        spacing: TerminalSpace.xs,
+        runSpacing: TerminalSpace.xs,
+        children: <Widget>[
+          TerminalOutlineButton(
+            label: 'Calendario',
+            icon: Icons.calendar_month_outlined,
+            onPressed: onCalendar,
+          ),
+          TerminalPrimaryButton(
+            label: 'Nueva misión',
+            icon: Icons.add_box_outlined,
+            onPressed: onCreate,
+          ),
+        ],
+      );
+      if (constraints.maxWidth < 600) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            title,
+            const SizedBox(height: TerminalSpace.md),
+            action,
+          ],
+        );
+      }
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(child: title),
+          action,
+        ],
+      );
+    },
+  );
+}
+
+class _MissionControls extends StatelessWidget {
+  const _MissionControls({
+    required this.selectedFilter,
+    required this.selectedAreaId,
+    required this.areas,
+    required this.controller,
+    required this.onFilterChanged,
+    required this.onAreaChanged,
+    required this.onSearchChanged,
+  });
+
+  final _MissionFilter selectedFilter;
+  final String? selectedAreaId;
+  final List<MissionArea> areas;
+  final TextEditingController controller;
+  final ValueChanged<_MissionFilter> onFilterChanged;
+  final ValueChanged<String?> onAreaChanged;
+  final ValueChanged<String> onSearchChanged;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
-    return TerminalPanel(
-      borderColor: tokens.progressGreen,
-      child: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 18,
-        runSpacing: 14,
-        children: <Widget>[
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(Icons.timer_outlined, color: tokens.progressGreen),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'CRONÓMETRO ACTIVO',
-                    style: TextStyle(
-                      color: tokens.progressGreen,
-                      fontFamily: 'JetBrains Mono',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(mission.title),
-                ],
-              ),
-            ],
-          ),
-          TerminalPrimaryButton(
-            label: 'Continuar',
-            icon: Icons.play_arrow,
-            onPressed: () => context.goNamed(
-              'missionActive',
-              pathParameters: <String, String>{'missionId': mission.id},
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const TerminalPageHeader(
-          title: 'Centro de misiones',
-          subtitle: 'Planificación local · Misiones de hoy',
-        ),
-        const SizedBox(height: 16),
         Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: TerminalSpace.xs,
+          runSpacing: TerminalSpace.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            TerminalPrimaryButton(
-              label: 'Nueva misión',
-              icon: Icons.add,
-              onPressed: () => context.pushNamed('missionNew'),
-            ),
-            TerminalOutlineButton(
-              label: 'Próximas',
-              icon: Icons.event_outlined,
-              onPressed: () => context.goNamed('missionsUpcoming'),
-            ),
-            TerminalOutlineButton(
-              label: 'Todas',
-              icon: Icons.list_alt_outlined,
-              onPressed: () => context.goNamed('missionsAll'),
+            for (final _MissionFilter filter in _MissionFilter.values)
+              _FilterTab(
+                label: _filterLabel(filter),
+                selected: selectedFilter == filter,
+                onTap: () => onFilterChanged(filter),
+              ),
+            SizedBox(
+              width: 230,
+              child: TextField(
+                controller: controller,
+                onChanged: onSearchChanged,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: 'Buscar misión',
+                  prefixIcon: Icon(Icons.search),
+                ),
+              ),
             ),
           ],
         ),
+        if (areas.isNotEmpty) ...<Widget>[
+          const SizedBox(height: TerminalSpace.sm),
+          Wrap(
+            spacing: TerminalSpace.xs,
+            runSpacing: TerminalSpace.xs,
+            children: <Widget>[
+              _AreaChip(
+                label: 'Todas las áreas',
+                icon: Icons.grid_view_outlined,
+                color: tokens.textSecondary,
+                selected: selectedAreaId == null,
+                onTap: () => onAreaChanged(null),
+              ),
+              for (final MissionArea area in areas)
+                _AreaChip(
+                  label: area.name,
+                  icon: missionAreaIcon(area.iconKey),
+                  color: missionAreaColor(area.colorHex, tokens.infoCyan),
+                  selected: selectedAreaId == area.id,
+                  onTap: () => onAreaChanged(area.id),
+                ),
+            ],
+          ),
+        ],
       ],
     );
   }
+
+  static String _filterLabel(_MissionFilter filter) => switch (filter) {
+    _MissionFilter.all => 'Todas',
+    _MissionFilter.today => 'Hoy',
+    _MissionFilter.active => 'En progreso',
+    _MissionFilter.completed => 'Completadas',
+  };
 }
 
-class _MissionSummary extends StatelessWidget {
-  const _MissionSummary({required this.missions});
+class _FilterTab extends StatelessWidget {
+  const _FilterTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
-  final AsyncValue<List<Mission>> missions;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
-    final List<Mission> items = missions.value ?? const <Mission>[];
-    final int completed = items
-        .where(
-          (mission) =>
-              mission.status == MissionStatus.completed ||
-              mission.status == MissionStatus.partial,
-        )
-        .length;
-    final int active = items
-        .where(
-          (mission) =>
-              mission.status == MissionStatus.active ||
-              mission.status == MissionStatus.paused,
-        )
-        .length;
-    final int xp = items.fold<int>(
-      0,
-      (total, mission) => total + mission.xpPlanned,
-    );
-    return TerminalPanel(
-      borderColor: tokens.structuralRed,
-      child: Wrap(
-        spacing: 36,
-        runSpacing: 18,
-        children: <Widget>[
-          TerminalMetric(
-            icon: Icons.track_changes_outlined,
-            value: '${items.length}',
-            label: 'Para hoy',
-            color: tokens.infoCyan,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: TerminalMotion.quick,
+          padding: const EdgeInsets.symmetric(
+            horizontal: TerminalSpace.md,
+            vertical: TerminalSpace.xs,
           ),
-          TerminalMetric(
-            icon: Icons.play_circle_outline,
-            value: '$active',
-            label: 'En progreso',
-            color: tokens.valueYellow,
+          decoration: ShapeDecoration(
+            color: selected ? tokens.infoCyan.withValues(alpha: 0.1) : null,
+            shape: TerminalCutCornerBorder(
+              cut: 5,
+              side: BorderSide(
+                color: selected ? tokens.infoCyan : tokens.border,
+              ),
+            ),
           ),
-          TerminalMetric(
-            icon: Icons.check_circle_outline,
-            value: '$completed',
-            label: 'Completadas',
-            color: tokens.progressGreen,
+          child: TerminalLabel(
+            label,
+            color: selected ? tokens.infoCyan : tokens.textSecondary,
           ),
-          TerminalMetric(
-            icon: Icons.bolt_outlined,
-            value: '+$xp',
-            label: 'XP posible',
-            color: tokens.progressGreen,
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
+class _AreaChip extends StatelessWidget {
+  const _AreaChip({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: TerminalMotion.quick,
+        padding: const EdgeInsets.symmetric(
+          horizontal: TerminalSpace.sm,
+          vertical: TerminalSpace.xs,
+        ),
+        decoration: ShapeDecoration(
+          color: selected ? color.withValues(alpha: 0.11) : null,
+          shape: TerminalCutCornerBorder(
+            cut: 5,
+            side: BorderSide(
+              color: selected ? color : color.withValues(alpha: 0.5),
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(icon, size: 15, color: color),
+            const SizedBox(width: TerminalSpace.xs),
+            TerminalLabel(label, color: color),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 class _MissionList extends StatelessWidget {
-  const _MissionList({required this.missions, required this.areas});
+  const _MissionList({
+    required this.missions,
+    required this.areas,
+    required this.hasFilters,
+    required this.onClearFilters,
+  });
 
   final List<Mission> missions;
   final List<MissionArea> areas;
+  final bool hasFilters;
+  final VoidCallback onClearFilters;
 
   @override
   Widget build(BuildContext context) {
     if (missions.isEmpty) {
-      return TerminalPanel(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-        child: Column(
-          children: <Widget>[
-            const Icon(Icons.radar, size: 52, color: Colors.white38),
-            const SizedBox(height: 16),
-            Text(
-              'AÚN NO HAY MISIONES PARA HOY',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Crea la primera misión y aparecerá aquí inmediatamente.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            TerminalPrimaryButton(
-              label: 'Crear primera misión',
-              icon: Icons.add,
-              onPressed: () => context.pushNamed('missionNew'),
-            ),
-          ],
-        ),
+      final AppThemeTokens tokens = Theme.of(
+        context,
+      ).extension<AppThemeTokens>()!;
+      return TerminalEmptyState(
+        title: hasFilters ? 'Sin coincidencias' : 'No hay misiones para hoy',
+        description: hasFilters
+            ? 'Prueba con otro filtro, área o búsqueda.'
+            : 'Crea una misión y aparecerá en el centro de operaciones.',
+        icon: hasFilters
+            ? Icons.search_off_outlined
+            : Icons.track_changes_outlined,
+        action: hasFilters
+            ? TerminalOutlineButton(
+                label: 'Limpiar filtros',
+                icon: Icons.filter_alt_off_outlined,
+                color: tokens.infoCyan,
+                onPressed: onClearFilters,
+              )
+            : TerminalPrimaryButton(
+                label: 'Nueva misión',
+                icon: Icons.add,
+                onPressed: () => context.pushNamed('missionNew'),
+              ),
       );
     }
-
     return Column(
       children: <Widget>[
-        for (final mission in missions) ...<Widget>[
+        for (final Mission mission in missions) ...<Widget>[
           _MissionCard(mission: mission, area: _areaFor(mission.areaId)),
-          const SizedBox(height: 14),
+          const SizedBox(height: TerminalSpace.sm),
         ],
       ],
     );
   }
 
-  MissionArea? _areaFor(String areaId) {
-    for (final area in areas) {
-      if (area.id == areaId) {
-        return area;
-      }
+  MissionArea? _areaFor(String id) {
+    for (final MissionArea area in areas) {
+      if (area.id == id) return area;
     }
     return null;
   }
@@ -286,100 +447,281 @@ class _MissionCard extends StatelessWidget {
     final Color areaColor = area == null
         ? tokens.infoCyan
         : missionAreaColor(area!.colorHex, tokens.infoCyan);
-    final bool compact = MediaQuery.sizeOf(context).width < 700;
-    return InkWell(
-      customBorder: const TerminalCutCornerBorder(cut: 14),
-      onTap: () => context.pushNamed(
-        'missionDetail',
-        pathParameters: <String, String>{'missionId': mission.id},
-      ),
-      child: TerminalPanel(
-        borderColor: mission.status == MissionStatus.active
-            ? tokens.terminalRed
-            : tokens.border,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: <Widget>[
-                TerminalBadge(
-                  label: missionStatusLabel(mission.status),
-                  color: mission.status == MissionStatus.completed
-                      ? tokens.progressGreen
-                      : tokens.terminalRed,
-                  icon: Icons.track_changes_outlined,
-                ),
-                TerminalBadge(
-                  label: area?.name ?? 'Área',
-                  color: areaColor,
-                  icon: missionAreaIcon(area?.iconKey ?? ''),
-                ),
-                TerminalBadge(
-                  label: missionImportanceLabel(mission.importance),
-                  color: tokens.valueYellow,
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Text(
-              mission.title,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              missionDateLabel(mission.scheduledAtUtc),
-              style: const TextStyle(
-                color: Colors.white60,
-                fontFamily: 'JetBrains Mono',
+    final int total = mission.objectives.length;
+    final int completed = mission.objectives
+        .where((MissionObjective objective) => objective.isCompleted)
+        .length;
+    final bool active = mission.status == MissionStatus.active;
+    final bool isDone =
+        mission.status == MissionStatus.completed ||
+        mission.status == MissionStatus.partial;
+    return TerminalPanel(
+      padding: const EdgeInsets.all(TerminalSpace.md),
+      borderColor: active ? tokens.terminalRed : tokens.border,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final bool compact = constraints.maxWidth < 610;
+          final Widget identity = Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _MissionAreaIcon(
+                icon: missionAreaIcon(area?.iconKey ?? ''),
+                color: areaColor,
               ),
-            ),
-            if (mission.description?.trim().isNotEmpty == true) ...<Widget>[
-              const SizedBox(height: 10),
-              Text(
-                mission.description!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(width: TerminalSpace.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TerminalLabel(
+                      missionStatusLabel(mission.status),
+                      color: active ? tokens.terminalRed : areaColor,
+                    ),
+                    const SizedBox(height: TerminalSpace.xxs),
+                    Text(
+                      mission.title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: TerminalSpace.xxs),
+                    Text(
+                      '${area?.name ?? 'Área'} · '
+                      '${missionImportanceLabel(mission.importance)} · '
+                      '${missionDateLabel(mission.scheduledAtUtc)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: tokens.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
-            const SizedBox(height: 18),
-            Wrap(
-              alignment: compact
-                  ? WrapAlignment.start
-                  : WrapAlignment.spaceBetween,
-              spacing: 28,
-              runSpacing: 14,
-              children: <Widget>[
-                TerminalMetric(
-                  icon: Icons.bolt_outlined,
-                  value: '${mission.xpPlanned}',
-                  label: 'XP',
-                  color: tokens.infoCyan,
+          );
+          final Widget values = Wrap(
+            spacing: TerminalSpace.md,
+            runSpacing: TerminalSpace.xs,
+            children: <Widget>[
+              _MiniValue(
+                icon: Icons.bolt_outlined,
+                value: '${mission.xpPlanned}',
+                label: 'XP',
+                color: tokens.infoCyan,
+              ),
+              if (mission.estimatedMinutes != null)
+                _MiniValue(
+                  icon: Icons.schedule_outlined,
+                  value: '${mission.estimatedMinutes}',
+                  label: 'Min',
+                  color: tokens.valueYellow,
                 ),
-                if (mission.estimatedMinutes != null)
-                  TerminalMetric(
-                    icon: Icons.schedule,
-                    value: '${mission.estimatedMinutes}',
-                    label: 'Min',
-                    color: tokens.valueYellow,
-                  ),
-                if (mission.budgetMinor != null)
-                  TerminalMetric(
-                    icon: Icons.savings_outlined,
-                    value: missionMoneyLabel(mission.budgetMinor!),
-                    label: 'Bs',
+              if (mission.budgetMinor != null)
+                _MiniValue(
+                  icon: Icons.savings_outlined,
+                  value: missionMoneyLabel(mission.budgetMinor!),
+                  label: 'Bs',
+                  color: tokens.progressGreen,
+                ),
+            ],
+          );
+          final Widget progress = total == 0
+              ? const SizedBox.shrink()
+              : SizedBox(
+                  width: compact ? double.infinity : 118,
+                  child: TerminalProgress(
+                    value: completed / total,
+                    label: '$completed/$total progreso',
                     color: tokens.progressGreen,
                   ),
-              ],
+                );
+          final Widget action = TerminalPrimaryButton(
+            label: active
+                ? 'Continuar'
+                : isDone
+                ? 'Ver resultado'
+                : 'Abrir',
+            icon: Icons.arrow_forward,
+            onPressed: () => context.pushNamed(
+              active
+                  ? 'missionActive'
+                  : isDone
+                  ? 'missionResult'
+                  : 'missionDetail',
+              pathParameters: <String, String>{'missionId': mission.id},
             ),
-          ],
-        ),
+          );
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                identity,
+                const SizedBox(height: TerminalSpace.sm),
+                values,
+                if (total > 0) ...<Widget>[
+                  const SizedBox(height: TerminalSpace.sm),
+                  progress,
+                ],
+                const SizedBox(height: TerminalSpace.md),
+                action,
+              ],
+            );
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              identity,
+              const SizedBox(height: TerminalSpace.sm),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Expanded(child: values),
+                  if (total > 0) ...<Widget>[
+                    const SizedBox(width: TerminalSpace.md),
+                    progress,
+                  ],
+                  const SizedBox(width: TerminalSpace.md),
+                  action,
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
+}
+
+class _MissionAreaIcon extends StatelessWidget {
+  const _MissionAreaIcon({required this.icon, required this.color});
+
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: ShapeDecoration(
+      color: color.withValues(alpha: 0.08),
+      shape: TerminalCutCornerBorder(cut: 8, side: BorderSide(color: color)),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(TerminalSpace.sm),
+      child: Icon(icon, color: color, size: 23),
+    ),
+  );
+}
+
+class _MiniValue extends StatelessWidget {
+  const _MiniValue({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: <Widget>[
+      Icon(icon, size: 18, color: color),
+      const SizedBox(width: TerminalSpace.xxs),
+      Text(
+        value,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: color),
+      ),
+      const SizedBox(width: TerminalSpace.xxs),
+      TerminalLabel(label, color: color),
+    ],
+  );
+}
+
+class _MissionSummary extends StatelessWidget {
+  const _MissionSummary({required this.missions});
+
+  final List<Mission> missions;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final int active = missions
+        .where(
+          (Mission m) =>
+              m.status == MissionStatus.active ||
+              m.status == MissionStatus.paused,
+        )
+        .length;
+    final int xp = missions.fold<int>(
+      0,
+      (int total, Mission m) => total + m.xpPlanned,
+    );
+    return TerminalPanel(
+      borderColor: tokens.terminalRed,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TerminalLabel('Resumen', color: tokens.terminalRed),
+          const SizedBox(height: TerminalSpace.lg),
+          _SummaryValue(
+            icon: Icons.track_changes_outlined,
+            label: 'Activas',
+            value: '$active',
+            color: tokens.infoCyan,
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          _SummaryValue(
+            icon: Icons.today_outlined,
+            label: 'Para hoy',
+            value: '${missions.length}',
+            color: tokens.valueYellow,
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          _SummaryValue(
+            icon: Icons.bolt_outlined,
+            label: 'XP posible',
+            value: '+$xp',
+            color: tokens.progressGreen,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryValue extends StatelessWidget {
+  const _SummaryValue({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: <Widget>[
+      Icon(icon, color: color, size: 26),
+      const SizedBox(width: TerminalSpace.sm),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            TerminalLabel(label, color: color),
+            Text(value, style: Theme.of(context).textTheme.titleLarge),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 class _LoadingPanel extends StatelessWidget {
@@ -387,8 +729,12 @@ class _LoadingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const TerminalPanel(
-    padding: EdgeInsets.all(36),
-    child: Center(child: CircularProgressIndicator()),
+    child: Center(
+      child: Padding(
+        padding: EdgeInsets.all(TerminalSpace.xl),
+        child: CircularProgressIndicator(),
+      ),
+    ),
   );
 }
 
@@ -406,14 +752,16 @@ class _ErrorPanel extends StatelessWidget {
     return TerminalPanel(
       borderColor: tokens.terminalRed,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(Icons.error_outline, color: tokens.terminalRed, size: 42),
-          const SizedBox(height: 12),
+          Icon(Icons.error_outline, color: tokens.terminalRed, size: 40),
+          const SizedBox(height: TerminalSpace.sm),
           Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
+          const SizedBox(height: TerminalSpace.md),
           TerminalOutlineButton(
             label: 'Reintentar',
             icon: Icons.refresh,
+            color: tokens.infoCyan,
             onPressed: onRetry,
           ),
         ],

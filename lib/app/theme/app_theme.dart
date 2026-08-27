@@ -102,7 +102,7 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           minimumSize: const Size(144, 48),
           foregroundColor: tokens.background,
-          backgroundColor: tokens.infoCyan,
+          backgroundColor: tokens.primaryAction,
           disabledForegroundColor: tokens.textDisabled,
           disabledBackgroundColor: tokens.border,
           textStyle: const TextStyle(

@@ -107,6 +107,7 @@ class _AppPrivacyBoundaryState extends ConsumerState<AppPrivacyBoundary> {
   @override
   Widget build(BuildContext context) {
     ref.watch(persistenceAccessGuardProvider);
+    ref.watch(recurrenceGenerationGuardProvider);
     ref.listen<AccessSessionState>(accessSessionProvider, (previous, next) {
       if (next.canRevealPrivacyShield) {
         _scheduleReveal();

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/providers/persistence_providers.dart';
 import '../../../app/router/app_routes.dart';
 import '../../../core/result/result.dart';
+import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../settings/domain/models/app_preferences.dart';
 import '../application/access_session_controller.dart';
 import '../application/access_session_state.dart';
@@ -234,16 +235,11 @@ class _ChangePinPageState extends ConsumerState<ChangePinPage> {
           onSubmitted: (_) => _submit(),
         ),
         const SizedBox(height: 16),
-        FilledButton.icon(
+        TerminalCriticalButton(
           key: const Key('change-pin-button'),
+          label: 'Actualizar PIN',
+          icon: Icons.password,
           onPressed: session.isBusy ? null : _submit,
-          icon: session.isBusy
-              ? const SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.password),
-          label: const Text('Actualizar PIN'),
         ),
       ],
     );

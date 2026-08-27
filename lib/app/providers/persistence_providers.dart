@@ -9,10 +9,19 @@ import '../../features/economy/data/drift_economy_repository.dart';
 import '../../features/economy/domain/repositories/economy_repository.dart';
 import '../../features/journal/data/drift_journal_repository.dart';
 import '../../features/journal/domain/repositories/journal_repository.dart';
+import '../../features/missions/application/mission_application_service.dart'
+    show SecureMissionIdGenerator, SystemMissionClock;
 import '../../features/missions/data/drift_mission_repository.dart';
 import '../../features/missions/domain/repositories/mission_repository.dart';
+import '../../features/notifications/application/notification_reconciliation_service.dart';
+import '../../features/notifications/data/method_channel_mission_notification_platform.dart';
+import '../../features/notifications/domain/mission_notification_platform.dart';
 import '../../features/progress/data/drift_progress_repository.dart';
 import '../../features/progress/domain/repositories/progress_repository.dart';
+import '../../features/recurrences/application/recurrence_application_service.dart';
+import '../../features/recurrences/data/drift_recurrence_repository.dart';
+import '../../features/recurrences/data/method_channel_recurrence_civil_time.dart';
+import '../../features/recurrences/domain/repositories/recurrence_repository.dart';
 import '../../features/settings/data/drift_settings_repository.dart';
 import '../../features/settings/domain/repositories/settings_repository.dart';
 import '../../infrastructure/database/app_database.dart';
@@ -121,6 +130,41 @@ final Provider<void> persistenceAccessGuardProvider = Provider<void>((Ref ref) {
   );
 });
 
+/// Dispara la generación de ocurrencias recurrentes pendientes cada vez que
+/// la sesión pasa de bloqueada a desbloqueada. La generación es best-effort:
+/// un fallo no afecta la sesión ni bloquea la apertura de la app.
+final Provider<void> recurrenceGenerationGuardProvider = Provider<void>((
+  Ref ref,
+) {
+  ref.listen<bool>(
+    accessSessionProvider.select(
+      (AccessSessionState session) => session.canBuildProtected,
+    ),
+    (bool? previous, bool next) {
+      if (next && previous != true) {
+        Future.microtask(() async {
+          try {
+            final RecurrenceDao dao = ref.read(recurrenceDaoProvider);
+            final service = RecurrenceApplicationService(
+              repository: DriftRecurrenceRepository(dao),
+              dao: dao,
+              clock: const SystemMissionClock(),
+              idGenerator: SecureMissionIdGenerator(),
+              civilTime: const MethodChannelRecurrenceCivilTime(),
+            );
+            await service.generatePendingOccurrences();
+            await ref
+                .read(notificationReconciliationServiceProvider)
+                .reconcile();
+          } on Object {
+            // best-effort
+          }
+        });
+      }
+    },
+  );
+});
+
 final Provider<MissionDao> missionDaoProvider = Provider<MissionDao>(
   (Ref ref) => MissionDao(ref.watch(appDatabaseProvider)),
 );
@@ -132,6 +176,22 @@ final Provider<RecurrenceDao> recurrenceDaoProvider = Provider<RecurrenceDao>(
 final Provider<NotificationDao> notificationDaoProvider =
     Provider<NotificationDao>(
       (Ref ref) => NotificationDao(ref.watch(appDatabaseProvider)),
+    );
+
+final Provider<MissionNotificationPlatform>
+missionNotificationPlatformProvider = Provider<MissionNotificationPlatform>(
+  (Ref ref) => const MethodChannelMissionNotificationPlatform(),
+);
+
+final Provider<NotificationReconciliationService>
+notificationReconciliationServiceProvider =
+    Provider<NotificationReconciliationService>(
+      (Ref ref) => NotificationReconciliationService(
+        notificationDao: ref.watch(notificationDaoProvider),
+        settingsDao: ref.watch(settingsDaoProvider),
+        platform: ref.watch(missionNotificationPlatformProvider),
+        nowUtc: () => DateTime.now().toUtc(),
+      ),
     );
 
 final Provider<EconomyDao> economyDaoProvider = Provider<EconomyDao>(
@@ -159,6 +219,11 @@ final Provider<CompleteMissionUnitOfWork> completeMissionUnitOfWorkProvider =
 final Provider<MissionRepository> missionRepositoryProvider =
     Provider<MissionRepository>(
       (Ref ref) => DriftMissionRepository(ref.watch(missionDaoProvider)),
+    );
+
+final Provider<RecurrenceRepository> recurrenceRepositoryProvider =
+    Provider<RecurrenceRepository>(
+      (Ref ref) => DriftRecurrenceRepository(ref.watch(recurrenceDaoProvider)),
     );
 
 final Provider<EconomyRepository> economyRepositoryProvider =

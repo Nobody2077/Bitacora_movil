@@ -2,7 +2,7 @@
 
 Versión: 1.2
 Fecha: 25 de agosto de 2026
-Estado: vigente; A0, A1 y A2 completadas, A3 autorizada
+Estado: vigente; A0–A3 completadas, A4 autorizada
 
 ## 1. Propósito y precedencia
 
@@ -256,5 +256,6 @@ Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas espec�
 - A0: completada; gate G0 en verde el 24 de agosto de 2026.
 - A1: completada; gate G1 en verde el 24 de agosto de 2026.
 - A2: completada; gate G2 en verde el 25 de agosto de 2026.
-- A3: autorizada como única fase siguiente — Misiones.
-- A4–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.
+- A3: completada; gate G3 en verde el 26 de agosto de 2026.
+- A4: autorizada como única fase siguiente — Economía.
+- A5–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.

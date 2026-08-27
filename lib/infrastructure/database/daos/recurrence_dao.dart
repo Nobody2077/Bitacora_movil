@@ -101,6 +101,58 @@ final class RecurrenceDao {
     });
   }
 
+  Future<MissionTemplateBundle> updateTemplateAggregate({
+    required MissionTemplatesCompanion template,
+    required Iterable<MissionTemplateObjectivesCompanion> objectives,
+    required RecurrenceRulesCompanion rule,
+  }) {
+    if (!template.id.present) {
+      throw ArgumentError('Template id must be present.');
+    }
+    final String templateId = template.id.value;
+    _requireTemplateId(rule.templateId, templateId, 'recurrence rule');
+    final List<MissionTemplateObjectivesCompanion> objectiveList = objectives
+        .toList(growable: false);
+    for (final objective in objectiveList) {
+      _requireTemplateId(objective.templateId, templateId, 'objective');
+    }
+
+    return _database.transaction(() async {
+      final int updated = await (_database.update(
+        _database.missionTemplates,
+      )..where((table) => table.id.equals(templateId))).write(template);
+      if (updated != 1) {
+        throw RecordNotFoundException(
+          table: 'mission_templates',
+          key: templateId,
+        );
+      }
+
+      await (_database.delete(
+        _database.missionTemplateObjectives,
+      )..where((table) => table.templateId.equals(templateId))).go();
+      for (final objective in objectiveList) {
+        await _database
+            .into(_database.missionTemplateObjectives)
+            .insert(objective);
+      }
+      await _database
+          .into(_database.recurrenceRules)
+          .insertOnConflictUpdate(rule);
+
+      final MissionTemplateBundle? stored = await _findTemplateBundle(
+        templateId,
+      );
+      if (stored == null) {
+        throw RecordNotFoundException(
+          table: 'mission_templates',
+          key: templateId,
+        );
+      }
+      return stored;
+    });
+  }
+
   Future<RecurrenceRule> putRule(RecurrenceRulesCompanion rule) async {
     if (!rule.templateId.present) {
       throw ArgumentError('Recurrence rule template_id must be present.');
@@ -520,6 +572,54 @@ final class RecurrenceDao {
         );
       }
     });
+  }
+
+  // ── métodos de escritura de plantilla ──────────────────────────────────
+
+  /// Stream de todas las plantillas, activas y pausadas, ordenadas por título.
+  Stream<List<MissionTemplate>> watchAllTemplates() {
+    return (_database.select(_database.missionTemplates)
+          ..orderBy(<OrderingTerm Function(MissionTemplates)>[
+            (table) => OrderingTerm.asc(table.title),
+            (table) => OrderingTerm.asc(table.id),
+          ]))
+        .watch();
+  }
+
+  /// Actualiza los campos de una plantilla existente sin tocar objetivos ni
+  /// regla. Lanza [RecordNotFoundException] si no existe.
+  Future<void> updateTemplate(MissionTemplatesCompanion patch) async {
+    if (!patch.id.present) {
+      throw ArgumentError('Template id must be present.');
+    }
+    final updated = await (_database.update(
+      _database.missionTemplates,
+    )..where((table) => table.id.equals(patch.id.value))).write(patch);
+    if (updated != 1) {
+      throw RecordNotFoundException(
+        table: 'mission_templates',
+        key: patch.id.value,
+      );
+    }
+  }
+
+  /// Activa (`isActive = 1`) o pausa (`isActive = 0`) una plantilla.
+  Future<void> setTemplateActive(
+    String templateId, {
+    required bool isActive,
+  }) async {
+    final updated =
+        await (_database.update(
+          _database.missionTemplates,
+        )..where((table) => table.id.equals(templateId))).write(
+          MissionTemplatesCompanion(isActive: Value<int>(isActive ? 1 : 0)),
+        );
+    if (updated != 1) {
+      throw RecordNotFoundException(
+        table: 'mission_templates',
+        key: templateId,
+      );
+    }
   }
 
   void _requireTemplateId(

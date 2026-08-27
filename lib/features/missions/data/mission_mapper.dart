@@ -28,6 +28,7 @@ abstract final class MissionMapper {
     actualResult: value.actualResult,
     convenienceRating: _convenience(value.convenienceRating),
     completedAtUtc: _utc(value.completedAt),
+    archivedAtUtc: _utc(value.archivedAt),
     rowVersion: value.rowVersion,
     objectives: objectives.map(_objective).toList(growable: false),
     timeEntries: timeEntries.map(_timeEntry).toList(growable: false),

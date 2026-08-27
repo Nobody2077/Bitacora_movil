@@ -180,6 +180,8 @@ final class MissionDao {
     Iterable<MissionObjectivesCompanion> objectives =
         const <MissionObjectivesCompanion>[],
     Iterable<MissionEventsCompanion> events = const <MissionEventsCompanion>[],
+    Iterable<NotificationSchedulesCompanion> notifications =
+        const <NotificationSchedulesCompanion>[],
   }) {
     if (!mission.id.present) {
       throw ArgumentError('Mission id must be present.');
@@ -195,6 +197,12 @@ final class MissionDao {
       for (final event in events) {
         _requireMissionId(event.missionId, missionId, 'event');
         await _database.into(_database.missionEvents).insert(event);
+      }
+      for (final notification in notifications) {
+        _requireMissionId(notification.missionId, missionId, 'notification');
+        await _database
+            .into(_database.notificationSchedules)
+            .insert(notification);
       }
       return _getAggregate(missionId);
     });
@@ -248,6 +256,8 @@ final class MissionDao {
     required MissionsCompanion changes,
     required Iterable<MissionObjectivesCompanion> objectives,
     required MissionEventsCompanion event,
+    required NotificationSchedulesCompanion? startNotification,
+    required int notificationUpdatedAtUtcMs,
   }) {
     _requireMissionId(event.missionId, missionId, 'event');
     if (!event.id.present ||
@@ -274,8 +284,78 @@ final class MissionDao {
         await _database.into(_database.missionObjectives).insert(objective);
       }
       await _database.into(_database.missionEvents).insert(event);
+      await _replaceStartNotificationIntent(
+        missionId: missionId,
+        replacement: startNotification,
+        updatedAtUtcMs: notificationUpdatedAtUtcMs,
+      );
       return _getAggregate(missionId);
     });
+  }
+
+  Future<void> _replaceStartNotificationIntent({
+    required String missionId,
+    required NotificationSchedulesCompanion? replacement,
+    required int updatedAtUtcMs,
+  }) async {
+    if (replacement != null) {
+      _requireMissionId(replacement.missionId, missionId, 'notification');
+      if (!replacement.id.present ||
+          !replacement.notificationType.present ||
+          replacement.notificationType.value != 'START' ||
+          !replacement.notifyAt.present ||
+          !replacement.status.present ||
+          replacement.status.value != 'PENDING') {
+        throw ArgumentError('START notification replacement is incomplete.');
+      }
+    }
+
+    NotificationSchedule? matching;
+    if (replacement != null) {
+      matching =
+          await (_database.select(_database.notificationSchedules)..where(
+                (table) =>
+                    table.missionId.equals(missionId) &
+                    table.notificationType.equals('START') &
+                    table.notifyAt.equals(replacement.notifyAt.value),
+              ))
+              .getSingleOrNull();
+    }
+
+    await (_database.update(_database.notificationSchedules)..where((table) {
+          var predicate =
+              table.missionId.equals(missionId) &
+              table.status.isIn(const <String>{'PENDING', 'SCHEDULED'});
+          if (matching != null) {
+            predicate = predicate & table.id.equals(matching.id).not();
+          }
+          return predicate;
+        }))
+        .write(
+          NotificationSchedulesCompanion(
+            status: const Value<String>('CANCELLED'),
+            updatedAt: Value<int>(updatedAtUtcMs),
+          ),
+        );
+
+    if (replacement == null) {
+      return;
+    }
+    if (matching == null) {
+      await _database.into(_database.notificationSchedules).insert(replacement);
+      return;
+    }
+    if (!const <String>{'PENDING', 'SCHEDULED'}.contains(matching.status)) {
+      await (_database.update(
+        _database.notificationSchedules,
+      )..where((table) => table.id.equals(matching!.id))).write(
+        NotificationSchedulesCompanion(
+          status: const Value<String>('PENDING'),
+          systemNotificationId: const Value<int?>(null),
+          updatedAt: Value<int>(updatedAtUtcMs),
+        ),
+      );
+    }
   }
 
   Future<MissionAggregate> startWorkTimer({
@@ -538,6 +618,69 @@ final class MissionDao {
       expectedRowVersion: expectedRowVersion,
       changes: MissionsCompanion(archivedAt: Value<int>(archivedAtUtcMs)),
     );
+  }
+
+  Future<MissionAggregate> archiveAggregate({
+    required String missionId,
+    required int expectedRowVersion,
+    required int archivedAtUtcMs,
+    required MissionEventsCompanion event,
+  }) {
+    _requireMissionId(event.missionId, missionId, 'event');
+    if (!event.id.present ||
+        !event.eventType.present ||
+        event.eventType.value != 'ARCHIVED' ||
+        !event.occurredAt.present) {
+      throw ArgumentError(
+        'Archive event must include id, ARCHIVED type and occurred_at.',
+      );
+    }
+    return _database.transaction(() async {
+      final mission = await findById(missionId);
+      if (mission == null) {
+        throw RecordNotFoundException(table: 'missions', key: missionId);
+      }
+      if (mission.archivedAt != null || mission.status == 'ACTIVE') {
+        throw const DatabaseInvariantException(
+          'An archived or active mission cannot be archived.',
+        );
+      }
+      final openTimer =
+          await (_database.selectOnly(_database.timeEntries)
+                ..addColumns(<Expression<Object>>[_database.timeEntries.id])
+                ..where(
+                  _database.timeEntries.missionId.equals(missionId) &
+                      _database.timeEntries.source.equals('TIMER') &
+                      _database.timeEntries.segmentType.equals('WORK') &
+                      _database.timeEntries.endedAt.isNull(),
+                )
+                ..limit(1))
+              .getSingleOrNull();
+      if (openTimer != null) {
+        throw const DatabaseInvariantException(
+          'A mission with an open timer cannot be archived.',
+        );
+      }
+
+      await updateWithRowVersion(
+        missionId: missionId,
+        expectedRowVersion: expectedRowVersion,
+        changes: MissionsCompanion(archivedAt: Value<int>(archivedAtUtcMs)),
+      );
+      await _database.into(_database.missionEvents).insert(event);
+      await (_database.update(_database.notificationSchedules)..where(
+            (table) =>
+                table.missionId.equals(missionId) &
+                table.status.isIn(const <String>{'PENDING', 'SCHEDULED'}),
+          ))
+          .write(
+            NotificationSchedulesCompanion(
+              status: const Value<String>('CANCELLED'),
+              updatedAt: Value<int>(archivedAtUtcMs),
+            ),
+          );
+      return _getAggregate(missionId);
+    });
   }
 
   Future<void> appendEvent(MissionEventsCompanion event) async {

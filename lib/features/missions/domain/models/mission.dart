@@ -139,6 +139,7 @@ final class Mission {
     this.actualResult,
     this.convenienceRating,
     this.completedAtUtc,
+    this.archivedAtUtc,
     this.objectives = const <MissionObjective>[],
     this.timeEntries = const <MissionTimeEntry>[],
   });
@@ -163,6 +164,7 @@ final class Mission {
   final String? actualResult;
   final ConvenienceRating? convenienceRating;
   final DateTime? completedAtUtc;
+  final DateTime? archivedAtUtc;
   final int rowVersion;
   final List<MissionObjective> objectives;
   final List<MissionTimeEntry> timeEntries;
@@ -216,6 +218,7 @@ final class Mission {
     actualResult: actualResult,
     convenienceRating: convenienceRating,
     completedAtUtc: completedAtUtc,
+    archivedAtUtc: archivedAtUtc,
     rowVersion: rowVersion,
     objectives: objectives ?? this.objectives,
     timeEntries: timeEntries ?? this.timeEntries,

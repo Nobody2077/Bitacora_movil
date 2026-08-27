@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/application/command_providers.dart';
 import '../../../app/application/commands/complete_mission.dart';
+import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
@@ -27,6 +30,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _expenseController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
+  final TextEditingController _xpController = TextEditingController();
   final Set<String> _completedObjectiveIds = <String>{};
 
   MissionCompletionOutcome _outcome = MissionCompletionOutcome.completed;
@@ -42,6 +46,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
     _noteController.dispose();
     _expenseController.dispose();
     _categoryController.dispose();
+    _xpController.dispose();
     super.dispose();
   }
 
@@ -86,6 +91,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
           noteController: _noteController,
           expenseController: _expenseController,
           categoryController: _categoryController,
+          xpController: _xpController,
           convenienceRating: _convenienceRating,
           paymentMethod: _paymentMethod,
           movementType: _movementType,
@@ -94,10 +100,12 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
             setState(() {
               _outcome = value;
               if (value == MissionCompletionOutcome.completed) {
+                _xpController.text = mission.xpPlanned.toString();
                 _completedObjectiveIds
                   ..clear()
                   ..addAll(mission.objectives.map((objective) => objective.id));
               } else {
+                _xpController.text = '0';
                 _completedObjectiveIds
                   ..clear()
                   ..addAll(
@@ -113,6 +121,9 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
               if (selected) {
                 _completedObjectiveIds.add(id);
               } else {
+                if (_outcome == MissionCompletionOutcome.completed) {
+                  _xpController.text = '0';
+                }
                 _completedObjectiveIds.remove(id);
                 _outcome = MissionCompletionOutcome.partial;
               }
@@ -122,6 +133,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
               setState(() => _convenienceRating = value),
           onPaymentChanged: (value) => setState(() => _paymentMethod = value),
           onMovementChanged: (value) => setState(() => _movementType = value),
+          onXpChanged: (_) => setState(() {}),
           onCancel: _saving ? null : _backToMission,
           onSave: _saving ? null : () => _complete(mission),
         );
@@ -135,6 +147,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
     }
     _resultController.text = mission.actualResult ?? '';
     _convenienceRating = mission.convenienceRating;
+    _xpController.text = mission.xpPlanned.toString();
     _completedObjectiveIds.addAll(
       mission.objectives.map((objective) => objective.id),
     );
@@ -157,6 +170,7 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
             completedObjectiveIds: Set<String>.unmodifiable(
               _completedObjectiveIds,
             ),
+            xpAwarded: int.parse(_xpController.text.trim()),
             journalNote: _noteController.text,
             movementMinor: _moneyMinor(_expenseController.text),
             movementCategory: _categoryController.text,
@@ -171,6 +185,9 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
     }
     result.fold<void>(
       onSuccess: (MissionCompletionReceipt receipt) {
+        unawaited(
+          ref.read(notificationReconciliationServiceProvider).reconcile(),
+        );
         ref.invalidate(missionDetailProvider(mission.id));
         ref.invalidate(missionCompletionReceiptProvider(mission.id));
         ref.invalidate(todayMissionsProvider);
@@ -220,6 +237,7 @@ class _ReviewContent extends StatelessWidget {
     required this.noteController,
     required this.expenseController,
     required this.categoryController,
+    required this.xpController,
     required this.convenienceRating,
     required this.paymentMethod,
     required this.movementType,
@@ -229,6 +247,7 @@ class _ReviewContent extends StatelessWidget {
     required this.onConvenienceChanged,
     required this.onPaymentChanged,
     required this.onMovementChanged,
+    required this.onXpChanged,
     required this.onCancel,
     required this.onSave,
   });
@@ -241,6 +260,7 @@ class _ReviewContent extends StatelessWidget {
   final TextEditingController noteController;
   final TextEditingController expenseController;
   final TextEditingController categoryController;
+  final TextEditingController xpController;
   final ConvenienceRating? convenienceRating;
   final CompletionPaymentMethod paymentMethod;
   final CompletionMovementType movementType;
@@ -250,6 +270,7 @@ class _ReviewContent extends StatelessWidget {
   final ValueChanged<ConvenienceRating?> onConvenienceChanged;
   final ValueChanged<CompletionPaymentMethod> onPaymentChanged;
   final ValueChanged<CompletionMovementType> onMovementChanged;
+  final ValueChanged<String> onXpChanged;
   final VoidCallback? onCancel;
   final VoidCallback? onSave;
 
@@ -273,10 +294,12 @@ class _ReviewContent extends StatelessWidget {
         outcome: outcome,
         expenseController: expenseController,
         categoryController: categoryController,
+        xpController: xpController,
         paymentMethod: paymentMethod,
         movementType: movementType,
         onPaymentChanged: onPaymentChanged,
         onMovementChanged: onMovementChanged,
+        onXpChanged: onXpChanged,
       );
       return SingleChildScrollView(
         padding: EdgeInsets.all(compact ? 16 : 28),
@@ -421,11 +444,9 @@ class _ResultInputPanel extends StatelessWidget {
             maxLines: 7,
             maxLength: 2000,
             decoration: const InputDecoration(
-              labelText: '¿Qué resultado obtuviste?',
+              labelText: '¿Qué resultado obtuviste? (opcional)',
+              helperText: 'Puedes dejarlo vacío y finalizar directamente.',
             ),
-            validator: (value) => value == null || value.trim().isEmpty
-                ? 'Describe el resultado real.'
-                : null,
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<ConvenienceRating>(
@@ -464,29 +485,31 @@ class _CompletionEconomyPanel extends StatelessWidget {
     required this.outcome,
     required this.expenseController,
     required this.categoryController,
+    required this.xpController,
     required this.paymentMethod,
     required this.movementType,
     required this.onPaymentChanged,
     required this.onMovementChanged,
+    required this.onXpChanged,
   });
 
   final Mission mission;
   final MissionCompletionOutcome outcome;
   final TextEditingController expenseController;
   final TextEditingController categoryController;
+  final TextEditingController xpController;
   final CompletionPaymentMethod paymentMethod;
   final CompletionMovementType movementType;
   final ValueChanged<CompletionPaymentMethod> onPaymentChanged;
   final ValueChanged<CompletionMovementType> onMovementChanged;
+  final ValueChanged<String> onXpChanged;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
-    final int awardedXp = outcome == MissionCompletionOutcome.completed
-        ? mission.xpPlanned
-        : 0;
+    final int awardedXp = int.tryParse(xpController.text.trim()) ?? 0;
     return TerminalPanel(
       borderColor: tokens.valueYellow,
       child: Column(
@@ -505,6 +528,31 @@ class _CompletionEconomyPanel extends StatelessWidget {
             value: '$awardedXp',
             label: 'XP a otorgar',
             color: tokens.valueYellow,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: xpController,
+            readOnly: outcome == MissionCompletionOutcome.completed,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: outcome == MissionCompletionOutcome.completed
+                  ? 'XP completo'
+                  : 'XP parcial otorgado',
+              helperText: 'Rango permitido: 0–${mission.xpPlanned} XP',
+              suffixText: 'XP',
+            ),
+            onChanged: onXpChanged,
+            validator: (String? value) {
+              final int? parsed = int.tryParse(value?.trim() ?? '');
+              if (parsed == null || parsed < 0 || parsed > mission.xpPlanned) {
+                return 'Escribe un XP entre 0 y ${mission.xpPlanned}.';
+              }
+              if (outcome == MissionCompletionOutcome.completed &&
+                  parsed != mission.xpPlanned) {
+                return 'La misión completa otorga todo el XP.';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 16),
           Text(
@@ -660,12 +708,15 @@ class _MissionResultContent extends StatelessWidget {
                       color: tokens.progressGreen,
                     ),
                     const SizedBox(height: 18),
-                    Text(
-                      mission.actualResult ?? '',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 24),
+                    if (mission.actualResult case final result?
+                        when result.trim().isNotEmpty) ...<Widget>[
+                      Text(
+                        result,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
                     Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 28,

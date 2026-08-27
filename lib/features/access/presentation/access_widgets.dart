@@ -225,6 +225,14 @@ class AccessNoticeBanner extends StatelessWidget {
     final AppThemeTokens tokens =
         Theme.of(context).extension<AppThemeTokens>() ??
         AppThemeTokens.terminal;
+
+    final bool isSuccess = switch (value) {
+      AccessNotice.pinChanged ||
+      AccessNotice.biometricsEnabled ||
+      AccessNotice.biometricsDisabled => true,
+      _ => false,
+    };
+
     final String text = switch (value) {
       AccessNotice.pinMismatch => 'Los dos PIN no coinciden.',
       AccessNotice.pinPolicyRejected =>
@@ -248,13 +256,21 @@ class AccessNoticeBanner extends StatelessWidget {
       AccessNotice.sessionTimedOut =>
         'La sesión se bloqueó por permanecer fuera de la app.',
     };
+
+    final Color bgColor = isSuccess
+        ? tokens.progressGreen.withValues(alpha: 0.4)
+        : tokens.structuralRed.withValues(alpha: 0.4);
+    final Color borderColor = isSuccess
+        ? tokens.progressGreen
+        : tokens.attentionOrange;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: tokens.structuralRed.withValues(alpha: 0.4),
-        border: Border.all(color: tokens.attentionOrange),
+        color: bgColor,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(text),

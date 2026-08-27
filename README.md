@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** la base técnica, la persistencia cifrada y el acceso privado están terminados. A3 está en desarrollo: el flujo permite planificar, consultar hoy/próximas/todas, ejecutar, cambiar el cronómetro único y cerrar Misiones con tiempo, XP, Bitácora y economía; recurrencia y rutas avanzadas siguen pendientes.
+> **Estado actual:** A0–A3 están completadas. A4 — Economía está en validación: ledger, saldos derivados, movimientos, corrección/anulación, metas, reservas, análisis y rutas reales ya están implementados. El gate automatizado quedó verde el 27 de agosto de 2026 con 125 pruebas y APK debug `dev`/`prod`; falta la validación física del usuario para cerrar G4.
 
 ## Qué busca ofrecer
 
@@ -23,10 +23,11 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A0 — Base del proyecto | Completada | Flavors, tema, navegación, shell adaptable y arquitectura base |
 | A1 — Persistencia | Completada | Drift v1, 19 tablas, DAOs, repositorios y SQLite cifrado |
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
-| A3 — Misiones | En desarrollo | Flujo base, cambio atómico de cronómetro y `CompleteMission` conectados; recurrencia pendiente |
-| A4–A8 | Pendientes | Economía, Bitácora/progreso, copias, UI final y release |
+| A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
+| A4 — Economía | En validación | Funcionalidad y gate automatizado verdes; validación física G4 pendiente |
+| A5–A8 | Pendientes | Bitácora/progreso comienza después de G4; luego copias, UI final y release |
 
-La capa visual disponible cubre acceso, recuperación, ajustes de privacidad y el ciclo planificar–consultar–ejecutar–cambiar–cerrar de Misiones. De los 60 patrones de ruta registrados, 43 siguen conectados a `FeaturePlaceholderPage`; esto incluye Inicio, las rutas avanzadas de Misiones, Bitácora, Economía y Dashboard.
+La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones y las rutas canónicas de Economía. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
@@ -34,7 +35,11 @@ El estado del sistema visual real y las reglas para extenderlo sin romper la
 coherencia de tablet y móvil están en
 [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
 
-El próximo incremento propuesto es recurrencia: plantillas con una ventana móvil de 30 días y generación local idempotente. Las reglas exactas y el disparador de generación están descritos como decisión pendiente en `ESTADO_ACTUAL.md`.
+El incremento activo es validar físicamente A4 — Economía en teléfono/tablet:
+movimientos, corrección, anulación, metas, reservas y saldos derivados.
+Bitácora funcional (A5) solo comienza después de cerrar G4 y debe
+incluir entradas manuales/vinculadas, resumen diario, estado del día y XP
+registrado, no solo una pantalla visual.
 
 ## Arquitectura resumida
 
@@ -45,9 +50,10 @@ lib/
 ├── features/
 │   ├── access/          acceso y privacidad implementados
 │   ├── missions/        flujo base, cronómetro y cierre transaccional
-│   ├── economy/         dominio y datos preparados para A4
+│   ├── economy/         dominio, datos, aplicación y UI funcional de A4
 │   ├── journal/         dominio y datos preparados para A5
 │   ├── progress/        dominio y datos preparados para A5
+│   ├── profile/         nombre y avatar local de la barra de tablet
 │   └── settings/        preferencias y pantallas de privacidad
 ├── infrastructure/     Drift, esquema, DAOs, cifrado y seguridad
 └── shared/              shell adaptable y widgets compartidos

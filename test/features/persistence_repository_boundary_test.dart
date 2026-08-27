@@ -250,9 +250,17 @@ T _success<T>(Result<T> result) => result.fold<T>(
 
 final class _FakeMissionRepository implements MissionRepository {
   @override
+  Future<Result<Mission>> archive({
+    required Mission mission,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) async => Success<Mission>(mission);
+
+  @override
   Future<Result<Mission>> create(
     Mission mission, {
     required String eventId,
+    required String notificationId,
     required DateTime occurredAtUtc,
   }) async => Success<Mission>(mission);
 
@@ -278,6 +286,7 @@ final class _FakeMissionRepository implements MissionRepository {
   Future<Result<Mission>> update(
     Mission mission, {
     required String eventId,
+    required String notificationId,
     required DateTime occurredAtUtc,
   }) async => Success<Mission>(mission);
 

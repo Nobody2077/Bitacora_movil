@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
@@ -87,7 +91,9 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool compact = constraints.maxWidth < 850;
         return SingleChildScrollView(
-          padding: EdgeInsets.all(compact ? 16 : 28),
+          padding: compact
+              ? TerminalSpace.pageCompact
+              : TerminalSpace.pageTablet,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1180),
@@ -104,7 +110,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                           ? 'Actualiza el objetivo y su plan de ejecución'
                           : 'Configura el objetivo y su plan de ejecución',
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: TerminalSpace.lg),
                     if (compact) ...<Widget>[
                       _InformationPanel(
                         titleController: _titleController,
@@ -128,8 +134,11 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                             setState(() => _priority = value),
                         onRequiredChanged: (value) =>
                             setState(() => _isRequired = value),
+                        objectives: _objectives,
+                        onAddObjective: _addObjective,
+                        onRemoveObjective: _removeObjective,
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: TerminalSpace.md),
                       _PlanningPanel(
                         date: _date,
                         time: _time,
@@ -170,9 +179,12 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                                   setState(() => _priority = value),
                               onRequiredChanged: (value) =>
                                   setState(() => _isRequired = value),
+                              objectives: _objectives,
+                              onAddObjective: _addObjective,
+                              onRemoveObjective: _removeObjective,
                             ),
                           ),
-                          const SizedBox(width: 18),
+                          const SizedBox(width: TerminalSpace.md),
                           Expanded(
                             flex: 2,
                             child: _PlanningPanel(
@@ -187,13 +199,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 18),
-                    _ObjectivesPanel(
-                      objectives: _objectives,
-                      onAdd: _addObjective,
-                      onRemove: _removeObjective,
-                    ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: TerminalSpace.md),
                     _FormActions(
                       saving: _saving,
                       editing: widget.isEditing,
@@ -344,6 +350,9 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     setState(() => _saving = false);
     result.fold<void>(
       onSuccess: (mission) {
+        unawaited(
+          ref.read(notificationReconciliationServiceProvider).reconcile(),
+        );
         ref.invalidate(missionDetailProvider(mission.id));
         ref.invalidate(todayMissionsProvider);
         if (widget.isEditing) {
@@ -409,6 +418,9 @@ class _InformationPanel extends StatelessWidget {
     required this.onImportanceChanged,
     required this.onPriorityChanged,
     required this.onRequiredChanged,
+    required this.objectives,
+    required this.onAddObjective,
+    required this.onRemoveObjective,
   });
 
   final TextEditingController titleController;
@@ -424,6 +436,9 @@ class _InformationPanel extends StatelessWidget {
   final ValueChanged<MissionImportance> onImportanceChanged;
   final ValueChanged<MissionPriority> onPriorityChanged;
   final ValueChanged<bool> onRequiredChanged;
+  final List<_ObjectiveEditor> objectives;
+  final VoidCallback onAddObjective;
+  final ValueChanged<int> onRemoveObjective;
 
   @override
   Widget build(BuildContext context) {
@@ -523,6 +538,13 @@ class _InformationPanel extends StatelessWidget {
             title: const Text('Misión obligatoria'),
             value: isRequired,
             onChanged: onRequiredChanged,
+          ),
+          const TerminalDivider(),
+          const SizedBox(height: TerminalSpace.md),
+          _ObjectiveEditorPanel(
+            objectives: objectives,
+            onAdd: onAddObjective,
+            onRemove: onRemoveObjective,
           ),
         ],
       ),
@@ -627,8 +649,8 @@ class _PlanningPanel extends StatelessWidget {
   }
 }
 
-class _ObjectivesPanel extends StatelessWidget {
-  const _ObjectivesPanel({
+class _ObjectiveEditorPanel extends StatelessWidget {
+  const _ObjectiveEditorPanel({
     required this.objectives,
     required this.onAdd,
     required this.onRemove,
@@ -639,57 +661,55 @@ class _ObjectivesPanel extends StatelessWidget {
   final ValueChanged<int> onRemove;
 
   @override
-  Widget build(BuildContext context) => TerminalPanel(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const _PanelTitle(label: 'Objetivos', icon: Icons.checklist),
-        const SizedBox(height: 14),
-        if (objectives.isEmpty)
-          const Padding(
-            padding: EdgeInsets.only(bottom: 12),
-            child: Text(
-              'Puedes crear la misión sin objetivos o añadir una lista concreta.',
-              style: TextStyle(color: Colors.white54),
-            ),
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      const _PanelTitle(label: 'Objetivos', icon: Icons.checklist),
+      const SizedBox(height: 14),
+      if (objectives.isEmpty)
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Puedes crear la misión sin objetivos o añadir una lista concreta.',
+            style: TextStyle(color: Colors.white54),
           ),
-        for (var index = 0; index < objectives.length; index++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 14, right: 10),
-                  child: Text('${index + 1}'.padLeft(2, '0')),
-                ),
-                Expanded(
-                  child: TextFormField(
-                    controller: objectives[index].controller,
-                    maxLength: 240,
-                    decoration: const InputDecoration(
-                      labelText: 'Descripción del objetivo',
-                    ),
-                    validator: (value) => value == null || value.trim().isEmpty
-                        ? 'Escribe el objetivo o elimínalo.'
-                        : null,
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Eliminar objetivo',
-                  onPressed: () => onRemove(index),
-                  icon: const Icon(Icons.delete_outline),
-                ),
-              ],
-            ),
-          ),
-        TerminalOutlineButton(
-          label: 'Añadir objetivo',
-          icon: Icons.add,
-          onPressed: onAdd,
         ),
-      ],
-    ),
+      for (var index = 0; index < objectives.length; index++)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 14, right: 10),
+                child: Text('${index + 1}'.padLeft(2, '0')),
+              ),
+              Expanded(
+                child: TextFormField(
+                  controller: objectives[index].controller,
+                  maxLength: 240,
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción del objetivo',
+                  ),
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? 'Escribe el objetivo o elimínalo.'
+                      : null,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Eliminar objetivo',
+                onPressed: () => onRemove(index),
+                icon: const Icon(Icons.delete_outline),
+              ),
+            ],
+          ),
+        ),
+      TerminalOutlineButton(
+        label: 'Añadir objetivo',
+        icon: Icons.add,
+        onPressed: onAdd,
+      ),
+    ],
   );
 }
 
@@ -743,18 +763,21 @@ class _FormActions extends StatelessWidget {
         TerminalOutlineButton(
           label: 'Cancelar',
           icon: Icons.close,
-          color: Colors.white60,
+          color: Theme.of(context).extension<AppThemeTokens>()!.textSecondary,
           onPressed: onCancel,
         ),
-        TerminalPrimaryButton(
-          label: saving
-              ? 'Guardando'
-              : editing
-              ? 'Guardar cambios'
-              : 'Crear misión',
-          icon: saving ? Icons.hourglass_top : Icons.save_outlined,
-          onPressed: onSave,
-        ),
+        if (editing)
+          TerminalPrimaryButton(
+            label: saving ? 'Guardando' : 'Guardar cambios',
+            icon: saving ? Icons.hourglass_top : Icons.save_outlined,
+            onPressed: onSave,
+          )
+        else
+          TerminalCriticalButton(
+            label: saving ? 'Creando' : 'Crear misión',
+            icon: saving ? Icons.hourglass_top : Icons.track_changes_outlined,
+            onPressed: onSave,
+          ),
       ],
     ),
   );

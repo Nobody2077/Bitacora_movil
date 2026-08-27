@@ -25,6 +25,89 @@ void main() {
 
   tearDown(() => database.close());
 
+  test(
+    'mission and notification intent commit or roll back together',
+    () async {
+      final dao = MissionDao(database);
+      await database
+          .into(database.missions)
+          .insert(
+            _mission(
+              id: 'existing-mission',
+              status: 'SCHEDULED',
+              scheduledAt: _now + 3600000,
+            ),
+          );
+      await database
+          .into(database.notificationSchedules)
+          .insert(
+            NotificationSchedulesCompanion.insert(
+              id: 'duplicate-notification',
+              missionId: 'existing-mission',
+              notificationType: 'START',
+              notifyAt: _now + 3600000,
+              status: 'PENDING',
+              createdAt: _now,
+              updatedAt: _now,
+            ),
+          );
+
+      await expectLater(
+        dao.insertAggregate(
+          mission: _mission(
+            id: 'new-mission',
+            status: 'SCHEDULED',
+            scheduledAt: _now + 7200000,
+          ),
+          objectives: <MissionObjectivesCompanion>[
+            MissionObjectivesCompanion.insert(
+              id: 'new-objective',
+              missionId: 'new-mission',
+              description: 'Objetivo atómico',
+              position: 0,
+              createdAt: _now,
+            ),
+          ],
+          events: <MissionEventsCompanion>[
+            MissionEventsCompanion.insert(
+              id: 'new-event',
+              missionId: 'new-mission',
+              eventType: 'CREATED',
+              toStatus: const Value<String?>('SCHEDULED'),
+              occurredAt: _now,
+            ),
+          ],
+          notifications: <NotificationSchedulesCompanion>[
+            NotificationSchedulesCompanion.insert(
+              id: 'duplicate-notification',
+              missionId: 'new-mission',
+              notificationType: 'START',
+              notifyAt: _now + 7200000,
+              status: 'PENDING',
+              createdAt: _now,
+              updatedAt: _now,
+            ),
+          ],
+        ),
+        throwsA(anything),
+      );
+
+      expect(await dao.findById('new-mission'), null);
+      expect(
+        await (database.select(
+          database.missionObjectives,
+        )..where((table) => table.missionId.equals('new-mission'))).get(),
+        isEmpty,
+      );
+      expect(
+        await (database.select(
+          database.missionEvents,
+        )..where((table) => table.missionId.equals('new-mission'))).get(),
+        isEmpty,
+      );
+    },
+  );
+
   test('status and MissionEvent commit or roll back together', () async {
     final dao = MissionDao(database);
     await database.into(database.missions).insert(_mission(id: 'mission-1'));
@@ -349,6 +432,16 @@ void main() {
           createdAt: _now,
         ),
       );
+      await dao.writeTransaction(
+        const LedgerTransactionInput(
+          id: 'reserve-funds',
+          operationId: 'reserve-funds-operation',
+          transactionType: 'INCOME',
+          amountMinor: 1000,
+          occurredAtUtcMs: _now,
+          createdAtUtcMs: _now,
+        ),
+      );
       await dao.allocate(
         const GoalAllocationInput(
           id: 'reserve-1',
@@ -410,7 +503,7 @@ void main() {
         reversedAtUtcMs: _now + 2,
       );
       expect(retry.created, isFalse);
-      expect(await database.select(database.transactions).get(), hasLength(2));
+      expect(await database.select(database.transactions).get(), hasLength(3));
     },
   );
 

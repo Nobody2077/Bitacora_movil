@@ -194,6 +194,7 @@ final class DriftMissionRepository implements MissionRepository {
   Future<Result<Mission>> create(
     Mission mission, {
     required String eventId,
+    required String notificationId,
     required DateTime occurredAtUtc,
   }) async {
     final ValidationFailure? invalid = _validateWrite(
@@ -207,6 +208,11 @@ final class DriftMissionRepository implements MissionRepository {
     }
 
     try {
+      final startNotification = _startNotification(
+        mission: mission,
+        notificationId: notificationId,
+        updatedAtUtc: occurredAtUtc,
+      );
       final aggregate = await _dao.insertAggregate(
         mission: drift.MissionsCompanion.insert(
           id: mission.id,
@@ -238,6 +244,9 @@ final class DriftMissionRepository implements MissionRepository {
             occurredAt: occurredAtUtc.millisecondsSinceEpoch,
           ),
         ],
+        notifications: <drift.NotificationSchedulesCompanion>[
+          ?startNotification,
+        ],
       );
       return Success<Mission>(
         MissionMapper.fromDrift(
@@ -257,6 +266,7 @@ final class DriftMissionRepository implements MissionRepository {
   Future<Result<Mission>> update(
     Mission mission, {
     required String eventId,
+    required String notificationId,
     required DateTime occurredAtUtc,
   }) async {
     final ValidationFailure? invalid = _validateWrite(
@@ -270,6 +280,11 @@ final class DriftMissionRepository implements MissionRepository {
     }
 
     try {
+      final startNotification = _startNotification(
+        mission: mission,
+        notificationId: notificationId,
+        updatedAtUtc: occurredAtUtc,
+      );
       final aggregate = await _dao.updateAggregate(
         missionId: mission.id,
         expectedRowVersion: mission.rowVersion,
@@ -300,6 +315,8 @@ final class DriftMissionRepository implements MissionRepository {
           toStatus: Value<String?>(_status(mission.status)),
           occurredAt: occurredAtUtc.millisecondsSinceEpoch,
         ),
+        startNotification: startNotification,
+        notificationUpdatedAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
       );
       return Success<Mission>(
         MissionMapper.fromDrift(
@@ -323,6 +340,27 @@ final class DriftMissionRepository implements MissionRepository {
         StorageFailure('No se pudo actualizar la misión.', cause: error),
       );
     }
+  }
+
+  drift.NotificationSchedulesCompanion? _startNotification({
+    required Mission mission,
+    required String notificationId,
+    required DateTime updatedAtUtc,
+  }) {
+    final DateTime? scheduledAt = mission.scheduledAtUtc;
+    if (scheduledAt == null) {
+      return null;
+    }
+    final int nowMs = updatedAtUtc.millisecondsSinceEpoch;
+    return drift.NotificationSchedulesCompanion.insert(
+      id: notificationId,
+      missionId: mission.id,
+      notificationType: 'START',
+      notifyAt: scheduledAt.millisecondsSinceEpoch,
+      status: 'PENDING',
+      createdAt: nowMs,
+      updatedAt: nowMs,
+    );
   }
 
   @override
@@ -534,6 +572,65 @@ final class DriftMissionRepository implements MissionRepository {
     } on Object catch (error) {
       return Failure<Mission>(
         StorageFailure('No se pudo cambiar el cronómetro.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<Mission>> archive({
+    required Mission mission,
+    required String eventId,
+    required DateTime occurredAtUtc,
+  }) async {
+    if (mission.id.trim().isEmpty ||
+        eventId.trim().isEmpty ||
+        mission.rowVersion < 1 ||
+        mission.archivedAtUtc != null ||
+        mission.status == MissionStatus.active ||
+        mission.openWorkTimer != null ||
+        !occurredAtUtc.isUtc) {
+      return const Failure<Mission>(
+        ValidationFailure('Esta misión no se puede archivar.'),
+      );
+    }
+    try {
+      final aggregate = await _dao.archiveAggregate(
+        missionId: mission.id,
+        expectedRowVersion: mission.rowVersion,
+        archivedAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
+        event: drift.MissionEventsCompanion.insert(
+          id: eventId,
+          missionId: mission.id,
+          eventType: 'ARCHIVED',
+          fromStatus: Value<String?>(_status(mission.status)),
+          toStatus: Value<String?>(_status(mission.status)),
+          occurredAt: occurredAtUtc.millisecondsSinceEpoch,
+        ),
+      );
+      return Success<Mission>(
+        MissionMapper.fromDrift(
+          aggregate.mission,
+          objectives: aggregate.objectives,
+          timeEntries: aggregate.timeEntries,
+        ),
+      );
+    } on OptimisticLockException {
+      return const Failure<Mission>(
+        ConflictFailure(
+          'La misión cambió antes de archivarse. Vuelve a abrirla.',
+        ),
+      );
+    } on DatabaseInvariantException {
+      return const Failure<Mission>(
+        ConflictFailure('La misión ya no se puede archivar.'),
+      );
+    } on RecordNotFoundException {
+      return const Failure<Mission>(
+        ConflictFailure('La misión ya no está disponible.'),
+      );
+    } on Object catch (error) {
+      return Failure<Mission>(
+        StorageFailure('No se pudo archivar la misión.', cause: error),
       );
     }
   }

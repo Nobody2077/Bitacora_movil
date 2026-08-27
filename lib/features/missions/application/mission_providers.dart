@@ -87,6 +87,24 @@ final StreamProvider<List<Mission>> allMissionsProvider =
       );
     });
 
+typedef MissionCalendarRange = ({DateTime startUtc, DateTime endUtc});
+
+final calendarMissionsProvider =
+    StreamProvider.family<List<Mission>, MissionCalendarRange>((
+      Ref ref,
+      MissionCalendarRange range,
+    ) {
+      final MissionRepository repository = ref.watch(missionRepositoryProvider);
+      return repository
+          .watchScheduledBetween(startUtc: range.startUtc, endUtc: range.endUtc)
+          .map(
+            (result) => result.fold(
+              onSuccess: (missions) => missions,
+              onFailure: (failure) => throw failure,
+            ),
+          );
+    });
+
 final FutureProvider<Mission?> activeTimerMissionProvider =
     FutureProvider<Mission?>((Ref ref) async {
       final Result<Mission?> result = await ref

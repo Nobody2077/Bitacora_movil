@@ -155,9 +155,20 @@ final class MissionApplicationService {
           );
 
     final String eventId = _idGenerator.nextId();
+    final String notificationId = _idGenerator.nextId();
     return existing == null
-        ? _repository.create(mission, eventId: eventId, occurredAtUtc: nowUtc)
-        : _repository.update(mission, eventId: eventId, occurredAtUtc: nowUtc);
+        ? _repository.create(
+            mission,
+            eventId: eventId,
+            notificationId: notificationId,
+            occurredAtUtc: nowUtc,
+          )
+        : _repository.update(
+            mission,
+            eventId: eventId,
+            notificationId: notificationId,
+            occurredAtUtc: nowUtc,
+          );
   }
 
   Future<Result<Mission>> startTimer(Mission mission) {
@@ -227,6 +238,25 @@ final class MissionApplicationService {
       pauseEventId: _idGenerator.nextId(),
       timeEntryId: _idGenerator.nextId(),
       startEventId: _idGenerator.nextId(),
+      occurredAtUtc: _clock.nowUtc(),
+    );
+  }
+
+  Future<Result<Mission>> archiveMission(Mission mission) {
+    if (mission.archivedAtUtc != null ||
+        mission.status == MissionStatus.active ||
+        mission.openWorkTimer != null) {
+      return Future<Result<Mission>>.value(
+        const Failure<Mission>(
+          ValidationFailure(
+            'Pausa el cronómetro antes de archivar esta misión.',
+          ),
+        ),
+      );
+    }
+    return _repository.archive(
+      mission: mission,
+      eventId: _idGenerator.nextId(),
       occurredAtUtc: _clock.nowUtc(),
     );
   }

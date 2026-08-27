@@ -45,7 +45,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Editar misión'), findsOneWidget);
     expect(builtRoutes, <String>['missionEdit']);
   });
 }

@@ -40,6 +40,21 @@ final class NotificationDao {
         .get();
   }
 
+  Future<List<NotificationSchedule>> findReconciliationCandidates() {
+    return (_database.select(_database.notificationSchedules)
+          ..where(
+            (table) =>
+                table.status.isIn(const <String>{'PENDING', 'SCHEDULED'}) |
+                (table.status.isIn(const <String>{'CANCELLED', 'FAILED'}) &
+                    table.systemNotificationId.isNotNull()),
+          )
+          ..orderBy(<OrderingTerm Function(NotificationSchedules)>[
+            (table) => OrderingTerm.asc(table.notifyAt),
+            (table) => OrderingTerm.asc(table.id),
+          ]))
+        .get();
+  }
+
   Future<DaoWriteResult<NotificationSchedule>> scheduleIfAbsent(
     NotificationSchedulesCompanion schedule,
   ) {
@@ -146,7 +161,6 @@ final class NotificationDao {
           .write(
             NotificationSchedulesCompanion(
               status: const Value<String>('CANCELLED'),
-              systemNotificationId: const Value<int?>(null),
               updatedAt: Value<int>(updatedAtUtcMs),
             ),
           );

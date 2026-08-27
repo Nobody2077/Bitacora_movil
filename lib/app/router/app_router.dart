@@ -8,13 +8,22 @@ import '../../features/access/presentation/access_gate_page.dart';
 import '../../features/access/presentation/privacy_settings_pages.dart';
 import '../../features/access/presentation/protected_route_gate.dart';
 import '../../features/access/presentation/recovery_page.dart';
+import '../../features/economy/domain/models/economy_models.dart';
+import '../../features/economy/presentation/economy_analysis_page.dart';
+import '../../features/economy/presentation/economy_overview_page.dart';
+import '../../features/economy/presentation/economy_savings_pages.dart';
+import '../../features/economy/presentation/economy_transaction_pages.dart';
+import '../../features/home/presentation/home_operations_page.dart';
 import '../../features/missions/presentation/mission_active_page.dart';
+import '../../features/missions/presentation/mission_calendar_page.dart';
 import '../../features/missions/presentation/mission_collection_page.dart';
 import '../../features/missions/presentation/mission_completion_pages.dart';
 import '../../features/missions/presentation/mission_detail_page.dart';
 import '../../features/missions/presentation/mission_form_page.dart';
 import '../../features/missions/presentation/mission_switch_timer_page.dart';
 import '../../features/missions/presentation/missions_today_page.dart';
+import '../../features/recurrences/presentation/recurrence_form_page.dart';
+import '../../features/recurrences/presentation/recurrence_list_page.dart';
 import '../../features/settings/presentation/more_page.dart';
 import '../../shared/adaptive/adaptive_shell.dart';
 import '../../shared/widgets/feature_placeholder_page.dart';
@@ -100,6 +109,9 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
     return ProtectedRouteGate(
       builder: (context) {
         ref.read(protectedRouteBuildObserverProvider)(contract);
+        if (contract.path == AppRoutes.home) {
+          return const HomeOperationsPage();
+        }
         if (contract.path == AppRoutes.more) {
           return const MorePage();
         }
@@ -114,8 +126,26 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         if (contract.name == 'missionsAll') {
           return const MissionCollectionPage(collection: MissionCollection.all);
         }
+        if (contract.name == 'missionsRecurring') {
+          return const RecurrenceListPage();
+        }
+        if (contract.name == 'missionsCalendar') {
+          return const MissionCalendarPage();
+        }
         if (contract.name == 'missionNew') {
           return const MissionFormPage();
+        }
+        if (contract.name == 'missionTemplateNew') {
+          return const RecurrenceFormPage();
+        }
+        if (contract.name == 'missionTemplateEdit') {
+          final String? templateId = state.pathParameters['templateId'];
+          if (templateId != null) {
+            return RecurrenceFormPage(templateId: templateId);
+          }
+        }
+        if (contract.name == 'missionTemplatePause') {
+          return const RecurrenceListPage();
         }
         if (contract.name == 'missionEdit') {
           return MissionFormPage(missionId: state.pathParameters['missionId']);
@@ -149,6 +179,74 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
           if (missionId != null) {
             return MissionResultPage(missionId: missionId);
           }
+        }
+        if (contract.name == 'finance') {
+          return const EconomyOverviewPage();
+        }
+        if (contract.name == 'financeTransactions') {
+          return const EconomyTransactionsPage();
+        }
+        if (contract.name == 'financeNewExpense') {
+          return EconomyTransactionFormPage(
+            initialType: EconomyTransactionType.expense,
+            missionId: state.uri.queryParameters['missionId'],
+          );
+        }
+        if (contract.name == 'financeNewIncome') {
+          return EconomyTransactionFormPage(
+            initialType: EconomyTransactionType.income,
+            missionId: state.uri.queryParameters['missionId'],
+          );
+        }
+        if (contract.name == 'financeNewAdjustment') {
+          return const EconomyTransactionFormPage(
+            initialType: EconomyTransactionType.adjustmentCredit,
+          );
+        }
+        if (contract.name == 'financeTransactionCorrect') {
+          final String? transactionId = state.pathParameters['transactionId'];
+          if (transactionId != null) {
+            return EconomyTransactionFormPage(
+              initialType: EconomyTransactionType.adjustmentCredit,
+              transactionId: transactionId,
+            );
+          }
+        }
+        if (contract.name == 'financeTransactionVoid') {
+          final String? transactionId = state.pathParameters['transactionId'];
+          if (transactionId != null) {
+            return EconomyTransactionDetailPage(
+              transactionId: transactionId,
+              requestVoid: true,
+            );
+          }
+        }
+        if (contract.name == 'financeTransactionDetail') {
+          final String? transactionId = state.pathParameters['transactionId'];
+          if (transactionId != null) {
+            return EconomyTransactionDetailPage(transactionId: transactionId);
+          }
+        }
+        if (contract.name == 'financeSavings') {
+          return const EconomySavingsPage();
+        }
+        if (contract.name == 'financeSavingsNew') {
+          return const EconomyGoalFormPage();
+        }
+        if (contract.name == 'financeSavingsEdit') {
+          final String? goalId = state.pathParameters['goalId'];
+          if (goalId != null) {
+            return EconomyGoalFormPage(goalId: goalId);
+          }
+        }
+        if (contract.name == 'financeSavingsDetail') {
+          final String? goalId = state.pathParameters['goalId'];
+          if (goalId != null) {
+            return EconomyGoalDetailPage(goalId: goalId);
+          }
+        }
+        if (contract.name == 'financeAnalysis') {
+          return const EconomyAnalysisPage();
         }
         if (contract.path == AppRoutes.settings) {
           return const SettingsLandingPage();

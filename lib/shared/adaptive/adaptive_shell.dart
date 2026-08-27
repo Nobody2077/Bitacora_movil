@@ -11,7 +11,11 @@ import '../../core/result/result.dart';
 import '../../features/missions/application/mission_providers.dart';
 import '../../features/missions/domain/models/mission.dart';
 import '../../features/missions/presentation/mission_presentation_support.dart';
+import '../../features/profile/application/user_profile_providers.dart';
+import '../../features/profile/domain/models/user_profile.dart';
+import '../../features/profile/presentation/user_profile_edit_dialog.dart';
 import 'app_breakpoints.dart';
+import 'terminal_application_header.dart';
 import 'terminal_sidebar.dart';
 
 class AdaptiveShell extends StatelessWidget {
@@ -98,7 +102,7 @@ class _CompactShell extends StatelessWidget {
   );
 }
 
-class _RailShell extends StatelessWidget {
+class _RailShell extends ConsumerWidget {
   const _RailShell({
     required this.location,
     required this.navigationShell,
@@ -110,10 +114,13 @@ class _RailShell extends StatelessWidget {
   final bool extended;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
+    final UserProfile profile =
+        ref.watch(userProfileProvider).value ??
+        const UserProfile.localDefault();
 
     return Scaffold(
       body: Row(
@@ -121,6 +128,13 @@ class _RailShell extends StatelessWidget {
           TerminalSidebar(
             selectedIndex: _railIndex(location),
             extended: extended,
+            displayName: profile.displayName,
+            avatarPath: profile.avatarPath,
+            onProfilePressed: () => showDialog<void>(
+              context: context,
+              builder: (BuildContext context) =>
+                  UserProfileEditDialog(initialProfile: profile),
+            ),
             onSelected: (int index) {
               navigationShell.goBranch(
                 index,
@@ -132,6 +146,7 @@ class _RailShell extends StatelessWidget {
           Expanded(
             child: Column(
               children: <Widget>[
+                TerminalApplicationHeader(location: location),
                 Expanded(child: navigationShell),
                 const _GlobalActiveTimerBar(),
               ],

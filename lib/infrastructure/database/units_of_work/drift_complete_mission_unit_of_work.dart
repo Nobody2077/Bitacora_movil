@@ -159,7 +159,9 @@ final class DriftCompleteMissionUnitOfWork
             .write(
               MissionsCompanion(
                 status: Value<String>(targetStatus),
-                actualResult: Value<String>(request.actualResult.trim()),
+                actualResult: Value<String?>(
+                  _trimmedOrNull(request.actualResult),
+                ),
                 convenienceRating: Value<String?>(
                   _convenienceRating(request.convenienceRating),
                 ),
@@ -222,9 +224,7 @@ final class DriftCompleteMissionUnitOfWork
           ),
         );
 
-    final int xpAwarded = request.outcome == MissionCompletionOutcome.completed
-        ? current.xpPlanned
-        : 0;
+    final int xpAwarded = request.xpAwarded;
     if (xpAwarded > 0) {
       await _database
           .into(_database.xpTransactions)
@@ -236,7 +236,11 @@ final class DriftCompleteMissionUnitOfWork
               journalEntryId: Value<String?>(operation.journalEntryId),
               sourceType: 'MISSION',
               amount: xpAwarded,
-              reason: const Value<String?>('Misión completada'),
+              reason: Value<String?>(
+                request.outcome == MissionCompletionOutcome.completed
+                    ? 'Misión completada'
+                    : 'Misión completada parcialmente',
+              ),
               occurredAt: occurredAtMs,
             ),
           );
@@ -425,9 +429,12 @@ final class DriftCompleteMissionUnitOfWork
         CompletionPaymentMethod.wallet => 'WALLET',
       };
 
-  static String _journalBody(CompleteMissionRequest request) {
-    final String result = request.actualResult.trim();
+  static String? _journalBody(CompleteMissionRequest request) {
+    final String? result = _trimmedOrNull(request.actualResult);
     final String? note = _trimmedOrNull(request.journalNote);
+    if (result == null) {
+      return note;
+    }
     return note == null ? result : '$result\n\n$note';
   }
 

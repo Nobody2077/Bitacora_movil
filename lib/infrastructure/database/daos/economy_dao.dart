@@ -111,10 +111,51 @@ final class TransactionReversalResult {
   final bool created;
 }
 
+final class TransactionCorrectionResult {
+  const TransactionCorrectionResult({
+    required this.reversal,
+    required this.replacement,
+  });
+
+  final TransactionReversalResult reversal;
+  final Transaction replacement;
+}
+
+final class SavingsGoalBalance {
+  const SavingsGoalBalance({required this.goal, required this.reservedMinor});
+
+  final SavingsGoal goal;
+  final int reservedMinor;
+}
+
 final class EconomyDao {
   EconomyDao(this._database);
 
   final AppDatabase _database;
+
+  static const String _balanceSql = '''
+    SELECT
+      COALESCE((
+        SELECT SUM(
+          CASE
+            WHEN transaction_type IN (
+              'INCOME', 'REFUND', 'ADJUSTMENT_CREDIT'
+            ) THEN amount_minor
+            ELSE -amount_minor
+          END
+        )
+        FROM transactions
+      ), 0) AS total_minor,
+      COALESCE((
+        SELECT SUM(
+          CASE direction
+            WHEN 'RESERVE' THEN amount_minor
+            ELSE -amount_minor
+          END
+        )
+        FROM goal_allocations
+      ), 0) AS reserved_minor
+  ''';
 
   Stream<List<Transaction>> watchLedger({
     required int startUtcMs,
@@ -144,6 +185,12 @@ final class EconomyDao {
       ])
       ..limit(limit, offset: offset);
     return query.watch();
+  }
+
+  Future<Transaction?> findTransaction(String id) {
+    return (_database.select(
+      _database.transactions,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
   }
 
   Future<EconomyPeriodTotals> totalsForPeriod({
@@ -216,32 +263,9 @@ final class EconomyDao {
   }
 
   Stream<EconomyBalance> watchBalance() {
-    const sql = '''
-      SELECT
-        COALESCE((
-          SELECT SUM(
-            CASE
-              WHEN transaction_type IN (
-                'INCOME', 'REFUND', 'ADJUSTMENT_CREDIT'
-              ) THEN amount_minor
-              ELSE -amount_minor
-            END
-          )
-          FROM transactions
-        ), 0) AS total_minor,
-        COALESCE((
-          SELECT SUM(
-            CASE direction
-              WHEN 'RESERVE' THEN amount_minor
-              ELSE -amount_minor
-            END
-          )
-          FROM goal_allocations
-        ), 0) AS reserved_minor
-    ''';
     return _database
         .customSelect(
-          sql,
+          _balanceSql,
           readsFrom: <ResultSetImplementation<Table, Object?>>{
             _database.transactions,
             _database.goalAllocations,
@@ -255,6 +279,22 @@ final class EconomyDao {
           ),
         );
   }
+
+  Future<EconomyBalance> loadBalance() => _database
+      .customSelect(
+        _balanceSql,
+        readsFrom: <ResultSetImplementation<Table, Object?>>{
+          _database.transactions,
+          _database.goalAllocations,
+        },
+      )
+      .getSingle()
+      .then(
+        (row) => EconomyBalance(
+          totalMinor: row.read<int>('total_minor'),
+          reservedMinor: row.read<int>('reserved_minor'),
+        ),
+      );
 
   Future<DaoWriteResult<Transaction>> writeTransaction(
     LedgerTransactionInput input,
@@ -312,12 +352,38 @@ final class EconomyDao {
         return DaoWriteResult<GoalAllocation>(value: existing, created: false);
       }
 
+      final goal = await (_database.select(
+        _database.savingsGoals,
+      )..where((table) => table.id.equals(input.goalId))).getSingleOrNull();
+      if (goal == null || goal.archivedAt != null) {
+        throw RecordNotFoundException(
+          table: 'savings_goals',
+          key: input.goalId,
+        );
+      }
+      final reserved = await reservedForGoal(input.goalId);
       if (input.direction == 'RELEASE') {
-        final reserved = await reservedForGoal(input.goalId);
         if (input.amountMinor > reserved) {
           throw DatabaseInvariantException(
             'RELEASE ${input.amountMinor} exceeds reserved $reserved '
             'for goal ${input.goalId}.',
+          );
+        }
+      } else if (input.direction == 'RESERVE') {
+        if (goal.status == 'PAUSED') {
+          throw const DatabaseInvariantException(
+            'A paused savings goal cannot receive reservations.',
+          );
+        }
+        if (reserved + input.amountMinor > goal.targetMinor) {
+          throw const DatabaseInvariantException(
+            'A reservation cannot exceed the savings goal target.',
+          );
+        }
+        final balance = await loadBalance();
+        if (input.amountMinor > balance.availableMinor) {
+          throw const DatabaseInvariantException(
+            'A reservation cannot exceed the available balance.',
           );
         }
       }
@@ -329,6 +395,12 @@ final class EconomyDao {
             mode: InsertMode.insertOrIgnore,
           );
       if (inserted != null) {
+        await _syncGoalStatusAfterAllocation(
+          goal: goal,
+          direction: input.direction,
+          previousReservedMinor: reserved,
+          amountMinor: input.amountMinor,
+        );
         return DaoWriteResult<GoalAllocation>(value: inserted, created: true);
       }
 
@@ -385,8 +457,123 @@ final class EconomyDao {
     return query.watch();
   }
 
+  Stream<List<SavingsGoalBalance>> watchGoalBalances({
+    bool includeArchived = false,
+  }) {
+    final String archivedFilter = includeArchived
+        ? ''
+        : 'WHERE goal.archived_at IS NULL';
+    return _database
+        .customSelect(
+          '''
+            SELECT
+              goal.id,
+              goal.title,
+              goal.target_minor,
+              goal.status,
+              goal.due_date,
+              goal.created_at,
+              goal.archived_at,
+              COALESCE(SUM(
+                CASE allocation.direction
+                  WHEN 'RESERVE' THEN allocation.amount_minor
+                  WHEN 'RELEASE' THEN -allocation.amount_minor
+                  ELSE 0
+                END
+              ), 0) AS reserved_minor
+            FROM savings_goals AS goal
+            LEFT JOIN goal_allocations AS allocation
+              ON allocation.goal_id = goal.id
+            $archivedFilter
+            GROUP BY goal.id
+            ORDER BY goal.status, goal.due_date, goal.id
+          ''',
+          readsFrom: <ResultSetImplementation<Table, Object?>>{
+            _database.savingsGoals,
+            _database.goalAllocations,
+          },
+        )
+        .watch()
+        .map(
+          (rows) => rows
+              .map(
+                (row) => SavingsGoalBalance(
+                  goal: SavingsGoal(
+                    id: row.read<String>('id'),
+                    title: row.read<String>('title'),
+                    targetMinor: row.read<int>('target_minor'),
+                    status: row.read<String>('status'),
+                    dueDate: row.readNullable<String>('due_date'),
+                    createdAt: row.read<int>('created_at'),
+                    archivedAt: row.readNullable<int>('archived_at'),
+                  ),
+                  reservedMinor: row.read<int>('reserved_minor'),
+                ),
+              )
+              .toList(growable: false),
+        );
+  }
+
+  Future<SavingsGoalBalance?> findGoalBalance(String goalId) async {
+    final goal = await (_database.select(
+      _database.savingsGoals,
+    )..where((table) => table.id.equals(goalId))).getSingleOrNull();
+    if (goal == null) {
+      return null;
+    }
+    return SavingsGoalBalance(
+      goal: goal,
+      reservedMinor: await reservedForGoal(goalId),
+    );
+  }
+
   Future<SavingsGoal> insertGoal(SavingsGoalsCompanion goal) {
     return _database.into(_database.savingsGoals).insertReturning(goal);
+  }
+
+  Future<SavingsGoal> updateGoal({
+    required String goalId,
+    required SavingsGoalsCompanion changes,
+  }) async {
+    if (changes.id.present || changes.createdAt.present) {
+      throw ArgumentError('Goal identity and creation time cannot change.');
+    }
+    if (changes.targetMinor.present &&
+        changes.targetMinor.value < await reservedForGoal(goalId)) {
+      throw const DatabaseInvariantException(
+        'A savings goal target cannot be lower than its reservation.',
+      );
+    }
+    final affected = await (_database.update(
+      _database.savingsGoals,
+    )..where((table) => table.id.equals(goalId))).write(changes);
+    if (affected != 1) {
+      throw RecordNotFoundException(table: 'savings_goals', key: goalId);
+    }
+    return (_database.select(
+      _database.savingsGoals,
+    )..where((table) => table.id.equals(goalId))).getSingle();
+  }
+
+  Future<void> _syncGoalStatusAfterAllocation({
+    required SavingsGoal goal,
+    required String direction,
+    required int previousReservedMinor,
+    required int amountMinor,
+  }) async {
+    final int nextReserved = direction == 'RESERVE'
+        ? previousReservedMinor + amountMinor
+        : previousReservedMinor - amountMinor;
+    final String? nextStatus = switch (goal.status) {
+      'ACTIVE' when nextReserved == goal.targetMinor => 'ACHIEVED',
+      'ACHIEVED' when nextReserved < goal.targetMinor => 'ACTIVE',
+      _ => null,
+    };
+    if (nextStatus != null) {
+      await (_database.update(_database.savingsGoals)
+            ..where((table) => table.id.equals(goal.id)))
+          .write(SavingsGoalsCompanion(status: Value<String>(nextStatus)));
+    }
   }
 
   Future<TransactionReversalResult> reverseTransactionAtomically({
@@ -394,60 +581,95 @@ final class EconomyDao {
     required LedgerTransactionInput reversal,
     required int reversedAtUtcMs,
   }) {
+    return _database.transaction(
+      () => _reverseTransaction(
+        originalTransactionId: originalTransactionId,
+        reversal: reversal,
+        reversedAtUtcMs: reversedAtUtcMs,
+      ),
+    );
+  }
+
+  Future<TransactionCorrectionResult> correctTransactionAtomically({
+    required String originalTransactionId,
+    required LedgerTransactionInput reversal,
+    required LedgerTransactionInput replacement,
+    required int reversedAtUtcMs,
+  }) {
+    if (replacement.relatedTransactionId != null) {
+      throw ArgumentError('A corrected movement cannot be a compensation.');
+    }
     return _database.transaction(() async {
-      final original =
-          await (_database.select(_database.transactions)
-                ..where((table) => table.id.equals(originalTransactionId)))
-              .getSingleOrNull();
-      if (original == null) {
-        throw RecordNotFoundException(
-          table: 'transactions',
-          key: originalTransactionId,
-        );
-      }
-      _validateReversal(original, reversal, reversedAtUtcMs);
-
-      if (original.reversedAt != null) {
-        final existing = await _findTransactionByOperationId(
-          reversal.operationId,
-        );
-        if (existing == null || original.reversedAt != reversedAtUtcMs) {
-          throw const DatabaseInvariantException(
-            'Transaction was already reversed by another operation.',
-          );
-        }
-        _validateSameTransaction(existing, reversal);
-        return TransactionReversalResult(
-          original: original,
-          reversal: existing,
-          created: false,
-        );
-      }
-
-      final result = await _writeTransaction(reversal);
-      final affected =
-          await (_database.update(_database.transactions)..where(
-                (table) =>
-                    table.id.equals(originalTransactionId) &
-                    table.reversedAt.isNull(),
-              ))
-              .write(
-                TransactionsCompanion(reversedAt: Value<int?>(reversedAtUtcMs)),
-              );
-      if (affected != 1) {
-        throw const DatabaseInvariantException(
-          'Transaction reversal lost an atomicity race.',
-        );
-      }
-      final updatedOriginal = await (_database.select(
-        _database.transactions,
-      )..where((table) => table.id.equals(originalTransactionId))).getSingle();
-      return TransactionReversalResult(
-        original: updatedOriginal,
-        reversal: result.value,
-        created: result.created,
+      final reversalResult = await _reverseTransaction(
+        originalTransactionId: originalTransactionId,
+        reversal: reversal,
+        reversedAtUtcMs: reversedAtUtcMs,
+      );
+      final replacementResult = await _writeTransaction(replacement);
+      return TransactionCorrectionResult(
+        reversal: reversalResult,
+        replacement: replacementResult.value,
       );
     });
+  }
+
+  Future<TransactionReversalResult> _reverseTransaction({
+    required String originalTransactionId,
+    required LedgerTransactionInput reversal,
+    required int reversedAtUtcMs,
+  }) async {
+    final original =
+        await (_database.select(_database.transactions)
+              ..where((table) => table.id.equals(originalTransactionId)))
+            .getSingleOrNull();
+    if (original == null) {
+      throw RecordNotFoundException(
+        table: 'transactions',
+        key: originalTransactionId,
+      );
+    }
+    _validateReversal(original, reversal, reversedAtUtcMs);
+
+    if (original.reversedAt != null) {
+      final existing = await _findTransactionByOperationId(
+        reversal.operationId,
+      );
+      if (existing == null || original.reversedAt != reversedAtUtcMs) {
+        throw const DatabaseInvariantException(
+          'Transaction was already reversed by another operation.',
+        );
+      }
+      _validateSameTransaction(existing, reversal);
+      return TransactionReversalResult(
+        original: original,
+        reversal: existing,
+        created: false,
+      );
+    }
+
+    final result = await _writeTransaction(reversal);
+    final affected =
+        await (_database.update(_database.transactions)..where(
+              (table) =>
+                  table.id.equals(originalTransactionId) &
+                  table.reversedAt.isNull(),
+            ))
+            .write(
+              TransactionsCompanion(reversedAt: Value<int?>(reversedAtUtcMs)),
+            );
+    if (affected != 1) {
+      throw const DatabaseInvariantException(
+        'Transaction reversal lost an atomicity race.',
+      );
+    }
+    final updatedOriginal = await (_database.select(
+      _database.transactions,
+    )..where((table) => table.id.equals(originalTransactionId))).getSingle();
+    return TransactionReversalResult(
+      original: updatedOriginal,
+      reversal: result.value,
+      created: result.created,
+    );
   }
 
   void _validateReversal(

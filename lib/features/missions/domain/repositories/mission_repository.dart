@@ -25,12 +25,14 @@ abstract interface class MissionRepository {
   Future<Result<Mission>> create(
     Mission mission, {
     required String eventId,
+    required String notificationId,
     required DateTime occurredAtUtc,
   });
 
   Future<Result<Mission>> update(
     Mission mission, {
     required String eventId,
+    required String notificationId,
     required DateTime occurredAtUtc,
   });
 
@@ -56,6 +58,12 @@ abstract interface class MissionRepository {
     required String pauseEventId,
     required String timeEntryId,
     required String startEventId,
+    required DateTime occurredAtUtc,
+  });
+
+  Future<Result<Mission>> archive({
+    required Mission mission,
+    required String eventId,
     required DateTime occurredAtUtc,
   });
 }

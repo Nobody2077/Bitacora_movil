@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 26 de agosto de 2026
+Última actualización: 27 de agosto de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -9,19 +9,23 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A0 — Base del proyecto | **COMPLETADA** | G0 verde |
 | A1 — Persistencia | **COMPLETADA** | G1 verde |
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
-| A3 — Misiones | **EN DESARROLLO** | Ciclo base y cierre transaccional implementados; G3 pendiente |
-| A4 — Economía | BLOQUEADA | Requiere G3 |
+| A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
+| A4 — Economía | **EN VALIDACIÓN** | Gate automatizado verde; aprobación física G4 pendiente |
 | A5 — Bitácora y progreso | BLOQUEADA | Requiere G4 |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
 
-## Evidencia A3 en desarrollo
+## Evidencia G3 — A3 completada
 
 - Lista de hoy, creación, edición y detalle conectados a la persistencia cifrada.
 - Flujo de planificación encadenado: crear vuelve a la lista actualizada y detalle/cronómetro permiten crear otra misión sin cerrar la anterior.
 - Pantallas reactivas de Próximas desde mañana y Todas las misiones no archivadas, conectadas a sus rutas canónicas.
-- Próximo bloque A3 documentado: plantillas y recurrencias; la base Drift/DAO existe, pero aún falta conectar caso de uso y UI.
+- Plantillas y recurrencias conectadas y probadas: dominio, repositorio,
+  servicio, formulario, lista, rutas y generación post-unlock. La ventana usa
+  exactamente 30 fechas civiles, los intervalos permanecen anclados en la fecha
+  inicial, la zona IANA se resuelve en Android y la edición del agregado es
+  atómica.
 - Cronómetro por timestamps con inicio, pausa, reanudación y recuperación después de cerrar la app.
 - Transiciones, segmentos de tiempo y eventos escritos atómicamente con `row_version`.
 - Regla de un solo cronómetro activo validada dentro de la transacción.
@@ -33,13 +37,75 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 - Refresco visual limitado al primer plano; no se usa servicio Android permanente.
 - `CompleteMission` coordina misión, tiempo, objetivos, evento, XP, Bitácora, economía opcional y avisos en una sola transacción.
 - Revisión completa/parcial y resultado conectados a las rutas canónicas.
-- `flutter analyze`: cero problemas el 26 de agosto de 2026.
-- `assembleDevDebug`: compilado correctamente el 26 de agosto de 2026.
+- Calendario mensual conectado a su ruta canónica, con rango UTC derivado del
+  mes local, agrupación por día, agenda y acceso al detalle.
+- Cierre parcial con XP manual entre 0 y el planificado, validado antes de la
+  unidad de trabajo y persistido atómicamente en ledger XP, snapshot de evento
+  y recibo.
+- El campo “¿Qué resultado obtuviste?” es opcional. Si queda vacío, misión y
+  Bitácora conservan `NULL`; el límite de 2000 caracteres sigue validado.
+- Corrección posterior a G3: el detalle incorpora archivado lógico confirmado.
+  Misión, evento `ARCHIVED` y cancelación de avisos se confirman en una sola
+  transacción; no se borra historia y una misión con cronómetro activo se rechaza.
+- Cada misión manual o recurrente registra una intención `START` junto con su
+  agregado dentro de la misma transacción Drift.
+- Reconciliador post-commit conectado al desbloqueo, guardado, recurrencias y
+  cierre de misión. Programa alarmas Android, dispara vencidas sin duplicar,
+  cancela las obsoletas y respeta preferencia, sonido y permiso Android 13+.
+- Los avisos usan contenido genérico y visibilidad privada; no exponen títulos,
+  notas, importes ni identificadores en la pantalla bloqueada.
+- Tres pruebas específicas cubren programación/disparo/cancelación, preferencia
+  desactivada y permiso denegado. Otra prueba comprueba rollback conjunto de
+  misión, objetivos, evento e intención de notificación.
+- `tool/quality.ps1`: formato, generación Drift, `flutter analyze` y 113 pruebas
+  aprobados el 26 de agosto de 2026.
+- `assembleDevDebug` y `assembleProdDebug`: compilados correctamente el 26 de
+  agosto de 2026.
 - APK `devDebug` compilada, instalada y abierta manualmente en una Redmi Pad 2. ADB aún no detecta el dispositivo USB para instalaciones desde la terminal.
 
-## Punto de continuación de A3
+## Cierre físico de G3
 
-La propuesta pendiente de confirmación para recurrencias es: ventana móvil de 30 días, generación al abrir/desbloquear y al guardar plantilla, reglas diaria/semanal/días específicos/cada N días, y pausa no destructiva de plantilla. No se debe avanzar a generar apariciones sin cerrar este contrato de producto.
+El usuario aprobó la validación física completa el 26 de agosto de 2026. La
+evidencia visual confirma una notificación recibida en la pantalla bloqueada de
+la Redmi Pad con el texto genérico “Tienes una misión programada.”, sin título,
+notas, importes ni detalles privados. El primer intento sin aviso quedó resuelto
+al repetir la prueba con las condiciones Android correctas.
+
+G3 queda **VERDE**. A4 — Economía pasa a ser la única fase autorizada; A5
+permanece bloqueada hasta completar G4.
+
+## Evidencia parcial A4 — G4 todavía no cerrado
+
+- Dominio tipado para movimientos, medios de pago, metas y asignaciones.
+- Repositorio y DAO conectan ledger reactivo, totales por periodo, balance
+  derivado, metas y reservas sin crear saldos paralelos.
+- Servicio de aplicación valida ingresos, gastos, ajustes, anulaciones
+  compensatorias, corrección atómica, metas y reserva/liberación de fondos.
+- Providers Riverpod exponen resumen, ledger, detalle y metas a la UI real.
+- Las anulaciones conservan el movimiento original y escriben una compensación;
+  las reservas se derivan de asignaciones y no permiten liberar de más.
+- `flutter analyze`: cero problemas el 27 de agosto de 2026.
+- Corrección atómica: original, compensación y reemplazo se confirman o revierten
+  como una sola operación.
+- Reserva protegida por objetivo y saldo disponible tanto en aplicación como
+  dentro de la transacción SQLite.
+- Una meta pasa automáticamente a `ACHIEVED` al completar el objetivo y vuelve
+  a `ACTIVE` si se liberan fondos; una meta pausada no admite nuevas reservas.
+- Resumen, historial, ingreso, gasto, ajuste, detalle, corrección, anulación,
+  análisis, metas y reservas conectados a las rutas canónicas de Economía.
+- Inicio muestra el saldo disponible real y accesos de gasto/ingreso.
+- Verificación posterior del perfil/barra lateral: `flutter analyze` y 125
+  pruebas aprobados el 27 de agosto de 2026.
+- `assembleDevDebug` y `assembleProdDebug`: compilados correctamente el 27 de
+  agosto de 2026.
+- Ajuste transversal aprobado en código: barra lateral de tablet con destinos
+  inactivos rojos, selección cian, tipografía ampliada y perfil local editable.
+  El nombre vive en la base cifrada y la foto se copia al almacenamiento privado
+  mediante el selector del sistema; no hubo migración del esquema v1.
+- `assembleProdDebug` volvió a aprobar después de integrar el perfil y
+  `image_picker`.
+- Esta evidencia todavía no cierra G4: falta la prueba física y aprobación del
+  usuario. A5 permanece bloqueada hasta ese momento.
 
 ## Evidencia G0
 

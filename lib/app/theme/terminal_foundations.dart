@@ -27,4 +27,5 @@ abstract final class TerminalRadius {
 abstract final class TerminalMotion {
   static const Duration quick = Duration(milliseconds: 120);
   static const Duration standard = Duration(milliseconds: 180);
+  static const Duration deliberate = Duration(milliseconds: 240);
 }

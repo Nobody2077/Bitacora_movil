@@ -12,8 +12,9 @@ final class CompleteMissionRequest {
   const CompleteMissionRequest({
     required this.mission,
     required this.outcome,
-    required this.actualResult,
     required this.completedObjectiveIds,
+    required this.xpAwarded,
+    this.actualResult,
     this.convenienceRating,
     this.journalNote,
     this.movementMinor,
@@ -24,9 +25,10 @@ final class CompleteMissionRequest {
 
   final Mission mission;
   final MissionCompletionOutcome outcome;
-  final String actualResult;
+  final String? actualResult;
   final ConvenienceRating? convenienceRating;
   final Set<String> completedObjectiveIds;
+  final int xpAwarded;
   final String? journalNote;
   final int? movementMinor;
   final String? movementCategory;
@@ -131,10 +133,10 @@ final class CompleteMissionCommand {
         'El estado actual de la misión no permite completarla.',
       );
     }
-    final String actualResult = request.actualResult.trim();
-    if (actualResult.isEmpty || actualResult.length > 2000) {
+    final String? actualResult = request.actualResult?.trim();
+    if ((actualResult?.length ?? 0) > 2000) {
       return const ValidationFailure(
-        'Describe el resultado real en un máximo de 2000 caracteres.',
+        'El resultado real no puede superar 2000 caracteres.',
       );
     }
     final Set<String> knownObjectives = mission.objectives
@@ -149,6 +151,17 @@ final class CompleteMissionCommand {
         request.completedObjectiveIds.length != knownObjectives.length) {
       return const ValidationFailure(
         'Marca todos los objetivos para completar totalmente la misión.',
+      );
+    }
+    if (request.xpAwarded < 0 || request.xpAwarded > mission.xpPlanned) {
+      return const ValidationFailure(
+        'El XP otorgado debe estar entre 0 y el XP planificado.',
+      );
+    }
+    if (request.outcome == MissionCompletionOutcome.completed &&
+        request.xpAwarded != mission.xpPlanned) {
+      return const ValidationFailure(
+        'Una misión completa debe otorgar todo el XP planificado.',
       );
     }
     if (request.movementMinor != null && request.movementMinor! <= 0) {
