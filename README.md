@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A4 están completadas. A5 está en desarrollo: A5.1 fue aprobada físicamente y A5.2 ya implementa fotografías privadas normalizadas, sin EXIF y cifradas. El gate quedó verde con 141 pruebas y APK `prod-debug`; la validación física de A5.2, búsqueda/cierre diario y Progreso siguen pendientes.
+> **Estado actual:** A0–A4 están completadas. A5 está en desarrollo: A5.1 y A5.2 fueron aprobadas físicamente; A5.3 ya conecta búsqueda histórica y archivo/restauración. El gate quedó verde con 144 pruebas y APK `prod-debug`; A5.3 requiere validación física y después siguen cierre diario y Progreso.
 
 ## Qué busca ofrecer
 
@@ -25,7 +25,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
-| A5 — Bitácora y progreso | En desarrollo | A5.1 aprobada; A5.2 fotos cifradas implementada y pendiente de prueba física |
+| A5 — Bitácora y progreso | En desarrollo | A5.1/A5.2 aprobadas; A5.3 búsqueda y archivo implementada |
 | A6–A8 | Bloqueadas | Copias, UI final y release requieren el gate anterior |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
@@ -36,10 +36,10 @@ El estado del sistema visual real y las reglas para extenderlo sin romper la
 coherencia de tablet y móvil están en
 [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
 
-El incremento activo es A5.2: las entradas ya admiten fotografías privadas con
-orientación normalizada, recodificación sin EXIF, AES-256-GCM, hash de integridad,
-archivo opaco y retiro confirmado. Debe validarse físicamente en la tablet;
-después siguen búsqueda, archivo/cierre diario, XP, niveles y Dashboard.
+El incremento activo es A5.3: `/journal/search` busca por texto literal, rango,
+procedencia y presencia de fotografías; `/journal/archive` conserva entradas,
+vínculos y fotos fuera de la cronología y permite restaurarlas. Debe validarse
+físicamente en la tablet; después sigue el cierre diario y luego Progreso.
 
 ## Arquitectura resumida
 
@@ -51,7 +51,7 @@ lib/
 │   ├── access/          acceso y privacidad implementados
 │   ├── missions/        flujo base, cronómetro y cierre transaccional
 │   ├── economy/         dominio, datos, aplicación y UI funcional de A4
-│   ├── journal/         cronología, detalle, vínculos y fotos cifradas A5.1/A5.2
+│   ├── journal/         cronología, fotos, búsqueda y archivo A5.1–A5.3
 │   ├── progress/        dominio y datos preparados para A5
 │   ├── profile/         nombre y avatar local de la barra de tablet
 │   └── settings/        preferencias y pantallas de privacidad

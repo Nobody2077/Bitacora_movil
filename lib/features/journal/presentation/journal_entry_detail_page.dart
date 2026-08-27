@@ -53,19 +53,36 @@ class JournalEntryDetailPage extends ConsumerWidget {
           spacing: 12,
           runSpacing: 12,
           children: <Widget>[
-            TerminalPrimaryButton(
-              label: 'Editar entrada',
-              icon: Icons.edit_outlined,
-              onPressed: () => context.pushNamed(
-                'journalEdit',
-                pathParameters: <String, String>{'entryId': entry.id},
+            if (!entry.isArchived)
+              TerminalPrimaryButton(
+                label: 'Editar entrada',
+                icon: Icons.edit_outlined,
+                onPressed: () => context.pushNamed(
+                  'journalEdit',
+                  pathParameters: <String, String>{'entryId': entry.id},
+                ),
               ),
-            ),
+            if (entry.isArchived)
+              TerminalPrimaryButton(
+                label: 'Restaurar entrada',
+                icon: Icons.restore,
+                onPressed: () => _restore(context, ref, entry),
+              )
+            else
+              TerminalCriticalButton(
+                label: 'Archivar entrada',
+                icon: Icons.archive_outlined,
+                onPressed: () => _confirmArchive(context, ref, entry),
+              ),
             TerminalOutlineButton(
-              label: 'Volver a Bitácora',
+              label: entry.isArchived
+                  ? 'Volver al archivo'
+                  : 'Volver a Bitácora',
               icon: Icons.arrow_back,
               color: tokens.textSecondary,
-              onPressed: () => context.goNamed('journal'),
+              onPressed: () => context.goNamed(
+                entry.isArchived ? 'journalArchive' : 'journal',
+              ),
             ),
           ],
         ),
@@ -140,6 +157,90 @@ class JournalEntryDetailPage extends ConsumerWidget {
       ],
     );
   }
+
+  Future<void> _confirmArchive(
+    BuildContext context,
+    WidgetRef ref,
+    JournalEntry entry,
+  ) async {
+    final bool? accepted = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('¿Archivar entrada?'),
+        content: const Text(
+          'Se ocultará de la cronología y de las búsquedas normales. '
+          'El contenido, sus vínculos y fotografías se conservarán.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            icon: const Icon(Icons.archive_outlined),
+            label: const Text('Archivar'),
+          ),
+        ],
+      ),
+    );
+    if (accepted != true || !context.mounted) {
+      return;
+    }
+    final result = await ref
+        .read(journalApplicationServiceProvider)
+        .archive(entry);
+    if (!context.mounted) {
+      return;
+    }
+    result.fold<void>(
+      onSuccess: (_) {
+        _invalidateEntryLists(ref, entry.id);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Entrada archivada.')));
+        context.goNamed('journalArchive');
+      },
+      onFailure: (failure) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message))),
+    );
+  }
+
+  Future<void> _restore(
+    BuildContext context,
+    WidgetRef ref,
+    JournalEntry entry,
+  ) async {
+    final result = await ref
+        .read(journalApplicationServiceProvider)
+        .restore(entry);
+    if (!context.mounted) {
+      return;
+    }
+    result.fold<void>(
+      onSuccess: (_) {
+        _invalidateEntryLists(ref, entry.id);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Entrada restaurada.')));
+        context.goNamed(
+          'journalDetail',
+          pathParameters: <String, String>{'entryId': entry.id},
+        );
+      },
+      onFailure: (failure) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message))),
+    );
+  }
+
+  void _invalidateEntryLists(WidgetRef ref, String entryId) {
+    ref.invalidate(journalEntryDetailProvider(entryId));
+    ref.invalidate(journalEntriesProvider);
+    ref.invalidate(journalSearchProvider);
+    ref.invalidate(archivedJournalEntriesProvider);
+  }
 }
 
 class _JournalPhotosPanel extends ConsumerStatefulWidget {
@@ -176,13 +277,14 @@ class _JournalPhotosPanelState extends ConsumerState<_JournalPhotosPanel> {
                   title: 'Fotografías',
                 ),
               ),
-              TerminalOutlineButton(
-                label: _working ? 'Procesando' : 'Agregar foto',
-                icon: _working
-                    ? Icons.hourglass_top
-                    : Icons.add_photo_alternate_outlined,
-                onPressed: _working ? null : _addPhoto,
-              ),
+              if (!widget.entry.isArchived)
+                TerminalOutlineButton(
+                  label: _working ? 'Procesando' : 'Agregar foto',
+                  icon: _working
+                      ? Icons.hourglass_top
+                      : Icons.add_photo_alternate_outlined,
+                  onPressed: _working ? null : _addPhoto,
+                ),
             ],
           ),
           const SizedBox(height: TerminalSpace.sm),
@@ -214,7 +316,7 @@ class _JournalPhotosPanelState extends ConsumerState<_JournalPhotosPanel> {
                         itemBuilder: (BuildContext context, int index) =>
                             _PrivatePhotoTile(
                               photo: items[index],
-                              disabled: _working,
+                              disabled: _working || widget.entry.isArchived,
                               onRemove: () => _removePhoto(items[index]),
                             ),
                       );

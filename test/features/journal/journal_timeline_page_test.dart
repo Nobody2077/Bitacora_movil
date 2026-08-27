@@ -167,4 +167,28 @@ final class _JournalRepository implements JournalRepository {
   @override
   Future<Result<List<JournalPhoto>>> findPhotos(String entryId) async =>
       const Success<List<JournalPhoto>>(<JournalPhoto>[]);
+
+  @override
+  Future<Result<JournalEntry>> archiveEntry({
+    required String entryId,
+    required DateTime archivedAtUtc,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<JournalEntry>> restoreEntry({
+    required String entryId,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<List<JournalEntry>>> search(
+    JournalSearchCriteria criteria,
+  ) async => Success<List<JournalEntry>>(entries);
+
+  @override
+  Stream<Result<List<JournalEntry>>> watchArchived({int limit = 200}) =>
+      Stream<Result<List<JournalEntry>>>.value(
+        const Success<List<JournalEntry>>(<JournalEntry>[]),
+      );
 }

@@ -91,6 +91,25 @@ void main() {
       expect(find.text('NUEVA ENTRADA'), findsOneWidget);
       expect(find.text('Este día aún está en blanco'), findsOneWidget);
     });
+
+    testWidgets('conecta búsqueda y archivo de Bitácora a rutas reales', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 1000));
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.journal));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('BUSCAR'));
+      await tester.pumpAndSettle();
+      expect(find.text('BUSCAR EN BITÁCORA'), findsOneWidget);
+      expect(find.text('Sin coincidencias'), findsOneWidget);
+
+      await tester.pumpWidget(_testApp(initialLocation: '/journal/archive'));
+      await tester.pumpAndSettle();
+      expect(find.text('ARCHIVO DE BITÁCORA'), findsOneWidget);
+      expect(find.text('El archivo está vacío'), findsOneWidget);
+    });
   });
 }
 
@@ -180,6 +199,30 @@ final class _SmokeJournalRepository implements JournalRepository {
   @override
   Future<Result<List<JournalPhoto>>> findPhotos(String entryId) async =>
       const Success<List<JournalPhoto>>(<JournalPhoto>[]);
+
+  @override
+  Future<Result<JournalEntry>> archiveEntry({
+    required String entryId,
+    required DateTime archivedAtUtc,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<JournalEntry>> restoreEntry({
+    required String entryId,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<List<JournalEntry>>> search(
+    JournalSearchCriteria criteria,
+  ) async => const Success<List<JournalEntry>>(<JournalEntry>[]);
+
+  @override
+  Stream<Result<List<JournalEntry>>> watchArchived({int limit = 200}) =>
+      Stream<Result<List<JournalEntry>>>.value(
+        const Success<List<JournalEntry>>(<JournalEntry>[]),
+      );
 }
 
 void _ensureResumed(WidgetTester tester) {

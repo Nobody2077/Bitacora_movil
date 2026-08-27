@@ -21,6 +21,21 @@ abstract interface class JournalRepository {
 
   Future<Result<JournalEntry>> update(JournalEntry entry);
 
+  Future<Result<List<JournalEntry>>> search(JournalSearchCriteria criteria);
+
+  Stream<Result<List<JournalEntry>>> watchArchived({int limit = 200});
+
+  Future<Result<JournalEntry>> archiveEntry({
+    required String entryId,
+    required DateTime archivedAtUtc,
+    required DateTime updatedAtUtc,
+  });
+
+  Future<Result<JournalEntry>> restoreEntry({
+    required String entryId,
+    required DateTime updatedAtUtc,
+  });
+
   Future<Result<List<JournalPhoto>>> findPhotos(String entryId);
 
   Future<Result<JournalPhoto>> addPhoto(JournalPhoto photo);

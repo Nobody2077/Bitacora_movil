@@ -17,6 +17,7 @@ final class JournalEntry {
     this.transactionId,
     this.body,
     this.mood,
+    this.archivedAtUtc,
   });
 
   final String id;
@@ -31,8 +32,10 @@ final class JournalEntry {
   final DateTime createdAtUtc;
   final DateTime updatedAtUtc;
   final int attachmentCount;
+  final DateTime? archivedAtUtc;
 
   bool get isLinked => missionId != null || transactionId != null;
+  bool get isArchived => archivedAtUtc != null;
 
   JournalEntry copyWith({
     String? title,
@@ -54,5 +57,47 @@ final class JournalEntry {
     createdAtUtc: createdAtUtc,
     updatedAtUtc: updatedAtUtc ?? this.updatedAtUtc,
     attachmentCount: attachmentCount,
+    archivedAtUtc: archivedAtUtc,
   );
+}
+
+final class JournalSearchCriteria {
+  JournalSearchCriteria({
+    required this.startUtc,
+    required this.endUtc,
+    this.query = '',
+    Set<JournalOrigin> origins = const <JournalOrigin>{},
+    this.withPhotosOnly = false,
+    this.limit = 200,
+  }) : origins = Set<JournalOrigin>.unmodifiable(origins);
+
+  final DateTime startUtc;
+  final DateTime endUtc;
+  final String query;
+  final Set<JournalOrigin> origins;
+  final bool withPhotosOnly;
+  final int limit;
+
+  @override
+  bool operator ==(Object other) =>
+      other is JournalSearchCriteria &&
+      startUtc == other.startUtc &&
+      endUtc == other.endUtc &&
+      query == other.query &&
+      _sameOrigins(origins, other.origins) &&
+      withPhotosOnly == other.withPhotosOnly &&
+      limit == other.limit;
+
+  @override
+  int get hashCode => Object.hash(
+    startUtc,
+    endUtc,
+    query,
+    Object.hashAllUnordered(origins),
+    withPhotosOnly,
+    limit,
+  );
+
+  static bool _sameOrigins(Set<JournalOrigin> left, Set<JournalOrigin> right) =>
+      left.length == right.length && left.containsAll(right);
 }

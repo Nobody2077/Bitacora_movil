@@ -16,6 +16,7 @@ import '../../features/economy/presentation/economy_transaction_pages.dart';
 import '../../features/home/presentation/home_operations_page.dart';
 import '../../features/journal/presentation/journal_entry_detail_page.dart';
 import '../../features/journal/presentation/journal_entry_form_page.dart';
+import '../../features/journal/presentation/journal_search_archive_pages.dart';
 import '../../features/journal/presentation/journal_timeline_page.dart';
 import '../../features/missions/presentation/mission_active_page.dart';
 import '../../features/missions/presentation/mission_calendar_page.dart';
@@ -190,6 +191,12 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
           return JournalEntryFormPage(
             originHint: state.uri.queryParameters['origin'],
           );
+        }
+        if (contract.name == 'journalSearch') {
+          return const JournalSearchPage();
+        }
+        if (contract.name == 'journalArchive') {
+          return const JournalArchivePage();
         }
         if (contract.name == 'journalEdit') {
           final String? entryId = state.pathParameters['entryId'];

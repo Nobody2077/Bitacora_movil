@@ -20,6 +20,7 @@ abstract final class JournalMapper {
     createdAtUtc: _utc(value.createdAt),
     updatedAtUtc: _utc(value.updatedAt),
     attachmentCount: attachmentCount,
+    archivedAtUtc: value.archivedAt == null ? null : _utc(value.archivedAt!),
   );
 
   static DateTime _utc(int milliseconds) =>

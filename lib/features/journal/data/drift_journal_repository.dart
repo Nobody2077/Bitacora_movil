@@ -105,6 +105,86 @@ final class DriftJournalRepository implements JournalRepository {
   }
 
   @override
+  Future<Result<JournalEntry>> archiveEntry({
+    required String entryId,
+    required DateTime archivedAtUtc,
+    required DateTime updatedAtUtc,
+  }) async {
+    if (entryId.trim().isEmpty || !archivedAtUtc.isUtc || !updatedAtUtc.isUtc) {
+      return const Failure<JournalEntry>(
+        ValidationFailure('La entrada no es válida para archivar.'),
+      );
+    }
+    try {
+      final row = await _dao.archiveEntry(
+        entryId: entryId,
+        archivedAtUtcMs: archivedAtUtc.millisecondsSinceEpoch,
+        updatedAtUtcMs: updatedAtUtc.millisecondsSinceEpoch,
+      );
+      return Success<JournalEntry>(await _mapRow(row));
+    } on Object catch (error) {
+      return Failure<JournalEntry>(
+        StorageFailure('No se pudo archivar la entrada.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<JournalEntry>> restoreEntry({
+    required String entryId,
+    required DateTime updatedAtUtc,
+  }) async {
+    if (entryId.trim().isEmpty || !updatedAtUtc.isUtc) {
+      return const Failure<JournalEntry>(
+        ValidationFailure('La entrada no es válida para restaurar.'),
+      );
+    }
+    try {
+      final row = await _dao.restoreEntry(
+        entryId: entryId,
+        updatedAtUtcMs: updatedAtUtc.millisecondsSinceEpoch,
+      );
+      return Success<JournalEntry>(await _mapRow(row));
+    } on Object catch (error) {
+      return Failure<JournalEntry>(
+        StorageFailure('No se pudo restaurar la entrada.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<JournalEntry>>> search(
+    JournalSearchCriteria criteria,
+  ) async {
+    if (!criteria.startUtc.isUtc ||
+        !criteria.endUtc.isUtc ||
+        !criteria.endUtc.isAfter(criteria.startUtc) ||
+        criteria.query.trim().length > 160 ||
+        criteria.limit <= 0) {
+      return const Failure<List<JournalEntry>>(
+        ValidationFailure('Los filtros de búsqueda no son válidos.'),
+      );
+    }
+    try {
+      final rows = await _dao
+          .watchTimeline(
+            startUtcMs: criteria.startUtc.millisecondsSinceEpoch,
+            endUtcMs: criteria.endUtc.millisecondsSinceEpoch,
+            originTypes: criteria.origins.map(_originToDrift).toSet(),
+            searchText: criteria.query,
+            withAttachmentsOnly: criteria.withPhotosOnly,
+            limit: criteria.limit,
+          )
+          .first;
+      return Success<List<JournalEntry>>(await _mapRows(rows));
+    } on Object catch (error) {
+      return Failure<List<JournalEntry>>(
+        StorageFailure('No se pudo buscar en la Bitácora.', cause: error),
+      );
+    }
+  }
+
+  @override
   Future<Result<JournalPhoto>> addPhoto(JournalPhoto photo) async {
     final AppFailure? failure = _validatePhoto(photo);
     if (failure != null) {
@@ -228,6 +308,25 @@ final class DriftJournalRepository implements JournalRepository {
     }
   }
 
+  @override
+  Stream<Result<List<JournalEntry>>> watchArchived({int limit = 200}) async* {
+    if (limit <= 0) {
+      yield const Failure<List<JournalEntry>>(
+        ValidationFailure('El límite del archivo no es válido.'),
+      );
+      return;
+    }
+    try {
+      await for (final rows in _dao.watchArchived(limit: limit)) {
+        yield Success<List<JournalEntry>>(await _mapRows(rows));
+      }
+    } on Object catch (error) {
+      yield Failure<List<JournalEntry>>(
+        StorageFailure('No se pudo leer el archivo de Bitácora.', cause: error),
+      );
+    }
+  }
+
   Future<List<JournalEntry>> _mapRows(Iterable<drift.JournalEntry> rows) async {
     final mapped = await Future.wait<JournalEntry?>(
       rows.map((row) async {
@@ -241,6 +340,14 @@ final class DriftJournalRepository implements JournalRepository {
       }),
     );
     return mapped.nonNulls.toList(growable: false);
+  }
+
+  Future<JournalEntry> _mapRow(drift.JournalEntry row) async {
+    final aggregate = await _dao.findAggregate(row.id);
+    return JournalMapper.fromDrift(
+      row,
+      attachmentCount: aggregate?.attachments.length ?? 0,
+    );
   }
 
   AppFailure? _validateEntry(JournalEntry entry) {
@@ -289,4 +396,11 @@ final class DriftJournalRepository implements JournalRepository {
           isUtc: true,
         ),
       );
+
+  static String _originToDrift(JournalOrigin origin) => switch (origin) {
+    JournalOrigin.manual => 'MANUAL',
+    JournalOrigin.mission => 'MISSION',
+    JournalOrigin.transaction => 'TRANSACTION',
+    JournalOrigin.system => 'SYSTEM',
+  };
 }

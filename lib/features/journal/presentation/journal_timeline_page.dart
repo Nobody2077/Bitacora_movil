@@ -46,6 +46,16 @@ class _JournalTimelinePageState extends ConsumerState<JournalTimelinePage> {
               onPressed: () => context.pushNamed('journalNew'),
             ),
             TerminalOutlineButton(
+              label: 'Buscar',
+              icon: Icons.search,
+              onPressed: () => context.pushNamed('journalSearch'),
+            ),
+            TerminalOutlineButton(
+              label: 'Archivo',
+              icon: Icons.inventory_2_outlined,
+              onPressed: () => context.pushNamed('journalArchive'),
+            ),
+            TerminalOutlineButton(
               label: 'Hoy',
               icon: Icons.today_outlined,
               onPressed: journalSameDay(_selectedDay, DateTime.now())

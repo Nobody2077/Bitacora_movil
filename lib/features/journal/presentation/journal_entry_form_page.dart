@@ -58,7 +58,9 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
       return const Center(child: CircularProgressIndicator());
     }
     if (existingAsync?.hasError == true ||
-        (widget.isEditing && existingAsync?.value == null)) {
+        (widget.isEditing &&
+            (existingAsync?.value == null ||
+                existingAsync?.value?.isArchived == true))) {
       return const _JournalUnavailable(
         message: 'La entrada que deseas editar no está disponible.',
       );

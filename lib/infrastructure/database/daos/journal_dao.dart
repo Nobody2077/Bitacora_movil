@@ -46,6 +46,7 @@ final class JournalDao {
     required int endUtcMs,
     Set<String> originTypes = const <String>{},
     String? searchText,
+    bool withAttachmentsOnly = false,
     int limit = 100,
     int offset = 0,
   }) {
@@ -71,14 +72,48 @@ final class JournalDao {
           predicate = predicate & table.originType.isIn(originTypes);
         }
         if (normalizedSearch != null && normalizedSearch.isNotEmpty) {
-          final pattern = '%$normalizedSearch%';
+          final String escaped = normalizedSearch
+              .replaceAll(r'\', r'\\')
+              .replaceAll('%', r'\%')
+              .replaceAll('_', r'\_');
+          final pattern = '%$escaped%';
           predicate =
               predicate &
-              (table.title.like(pattern) | table.body.like(pattern));
+              (table.title.like(pattern, escapeChar: r'\') |
+                  table.body.like(pattern, escapeChar: r'\'));
+        }
+        if (withAttachmentsOnly) {
+          final attachmentQuery =
+              _database.selectOnly(_database.journalAttachments)
+                ..addColumns(<Expression<Object>>[
+                  _database.journalAttachments.id,
+                ])
+                ..where(
+                  _database.journalAttachments.journalEntryId.equalsExp(
+                        table.id,
+                      ) &
+                      _database.journalAttachments.archivedAt.isNull(),
+                );
+          predicate = predicate & existsQuery(attachmentQuery);
         }
         return predicate;
       })
       ..orderBy(<OrderingTerm Function(JournalEntries)>[
+        (table) => OrderingTerm.desc(table.occurredAt),
+        (table) => OrderingTerm.desc(table.id),
+      ])
+      ..limit(limit, offset: offset);
+    return query.watch();
+  }
+
+  Stream<List<JournalEntry>> watchArchived({int limit = 200, int offset = 0}) {
+    if (limit <= 0 || offset < 0) {
+      throw ArgumentError('Pagination values are invalid.');
+    }
+    final query = _database.select(_database.journalEntries)
+      ..where((table) => table.archivedAt.isNotNull())
+      ..orderBy(<OrderingTerm Function(JournalEntries)>[
+        (table) => OrderingTerm.desc(table.archivedAt),
         (table) => OrderingTerm.desc(table.occurredAt),
         (table) => OrderingTerm.desc(table.id),
       ])
@@ -202,6 +237,19 @@ final class JournalDao {
       entryId: entryId,
       changes: JournalEntriesCompanion(
         archivedAt: Value<int?>(archivedAtUtcMs),
+        updatedAt: Value<int>(updatedAtUtcMs),
+      ),
+    );
+  }
+
+  Future<JournalEntry> restoreEntry({
+    required String entryId,
+    required int updatedAtUtcMs,
+  }) {
+    return updateEntry(
+      entryId: entryId,
+      changes: JournalEntriesCompanion(
+        archivedAt: const Value<int?>(null),
         updatedAt: Value<int>(updatedAtUtcMs),
       ),
     );

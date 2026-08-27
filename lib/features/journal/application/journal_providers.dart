@@ -79,6 +79,33 @@ final journalEntryDetailProvider = FutureProvider.family<JournalEntry?, String>(
   },
 );
 
+final journalSearchProvider =
+    FutureProvider.family<List<JournalEntry>, JournalSearchCriteria>((
+      Ref ref,
+      JournalSearchCriteria criteria,
+    ) async {
+      final Result<List<JournalEntry>> result = await ref
+          .watch(journalRepositoryProvider)
+          .search(criteria);
+      return result.fold(
+        onSuccess: (entries) => entries,
+        onFailure: (failure) => throw failure,
+      );
+    });
+
+final StreamProvider<List<JournalEntry>> archivedJournalEntriesProvider =
+    StreamProvider<List<JournalEntry>>((Ref ref) {
+      return ref
+          .watch(journalRepositoryProvider)
+          .watchArchived()
+          .map(
+            (Result<List<JournalEntry>> result) => result.fold(
+              onSuccess: (entries) => entries,
+              onFailure: (failure) => throw failure,
+            ),
+          );
+    });
+
 final journalPhotosProvider = FutureProvider.family<List<JournalPhoto>, String>(
   (Ref ref, String entryId) async {
     final Result<List<JournalPhoto>> result = await ref

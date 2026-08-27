@@ -188,4 +188,25 @@ final class _PhotoRepository implements JournalRepository {
     required DateTime endUtc,
     int limit = 100,
   }) => throw UnimplementedError();
+
+  @override
+  Future<Result<JournalEntry>> archiveEntry({
+    required String entryId,
+    required DateTime archivedAtUtc,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<JournalEntry>> restoreEntry({
+    required String entryId,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Result<List<JournalEntry>>> search(JournalSearchCriteria criteria) =>
+      throw UnimplementedError();
+
+  @override
+  Stream<Result<List<JournalEntry>>> watchArchived({int limit = 200}) =>
+      throw UnimplementedError();
 }

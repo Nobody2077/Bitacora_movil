@@ -201,6 +201,109 @@ void main() {
       isEmpty,
     );
   });
+
+  test('busca texto literal, procedencia y presencia de fotografías', () async {
+    final JournalEntry withPhoto =
+        (await service.save(
+                  SaveJournalEntryRequest(
+                    title: 'Avance 100% real',
+                    body: 'Resultado verificable',
+                    isPrivate: true,
+                    occurredAtUtc: nowUtc,
+                  ),
+                )
+                as Success<JournalEntry>)
+            .value;
+    await service.save(
+      SaveJournalEntryRequest(
+        title: 'Otra entrada',
+        body: 'No debe coincidir con el porcentaje literal',
+        isPrivate: true,
+        occurredAtUtc: nowUtc.subtract(const Duration(minutes: 1)),
+      ),
+    );
+    await repository.addPhoto(
+      JournalPhoto(
+        id: 'photo-search',
+        journalEntryId: withPhoto.id,
+        storageName: '00000000-0000-4000-8000-000000000002.brpa',
+        mimeType: 'image/jpeg',
+        byteLength: 123,
+        cipherSha256: List<String>.filled(64, 'b').join(),
+        widthPx: 640,
+        heightPx: 480,
+        position: 0,
+        createdAtUtc: nowUtc,
+      ),
+    );
+
+    final Result<List<JournalEntry>> result = await repository.search(
+      JournalSearchCriteria(
+        startUtc: DateTime.utc(2026, 8, 27),
+        endUtc: DateTime.utc(2026, 8, 28),
+        query: '100%',
+        origins: const <JournalOrigin>{JournalOrigin.manual},
+        withPhotosOnly: true,
+      ),
+    );
+
+    expect(result, isA<Success<List<JournalEntry>>>());
+    final List<JournalEntry> entries =
+        (result as Success<List<JournalEntry>>).value;
+    expect(entries, hasLength(1));
+    expect(entries.single.id, withPhoto.id);
+    expect(entries.single.attachmentCount, 1);
+  });
+
+  test('archiva fuera de la cronología y permite restaurar', () async {
+    final JournalEntry created =
+        (await service.save(
+                  SaveJournalEntryRequest(
+                    title: 'Memoria archivable',
+                    isPrivate: true,
+                    occurredAtUtc: nowUtc,
+                  ),
+                )
+                as Success<JournalEntry>)
+            .value;
+
+    final Result<JournalEntry> archivedResult = await service.archive(created);
+
+    expect(archivedResult, isA<Success<JournalEntry>>());
+    final JournalEntry archived =
+        (archivedResult as Success<JournalEntry>).value;
+    expect(archived.isArchived, isTrue);
+    expect(
+      (await repository.findRecent(
+                startUtc: DateTime.utc(2026, 8, 27),
+                endUtc: DateTime.utc(2026, 8, 28),
+              )
+              as Success<List<JournalEntry>>)
+          .value,
+      isEmpty,
+    );
+    expect(
+      (await repository.watchArchived().first as Success<List<JournalEntry>>)
+          .value
+          .single
+          .id,
+      created.id,
+    );
+
+    final Result<JournalEntry> restoredResult = await service.restore(archived);
+
+    expect(restoredResult, isA<Success<JournalEntry>>());
+    expect((restoredResult as Success<JournalEntry>).value.isArchived, isFalse);
+    expect(
+      (await repository.findRecent(
+                startUtc: DateTime.utc(2026, 8, 27),
+                endUtc: DateTime.utc(2026, 8, 28),
+              )
+              as Success<List<JournalEntry>>)
+          .value,
+      hasLength(1),
+    );
+  });
 }
 
 Future<void> _insertMission(drift.AppDatabase database, DateTime nowUtc) async {

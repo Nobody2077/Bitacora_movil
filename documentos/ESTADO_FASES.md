@@ -11,7 +11,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
-| A5 — Bitácora y progreso | **EN DESARROLLO** | A5.1 aprobada; A5.2 fotos cifradas pendiente de validación física |
+| A5 — Bitácora y progreso | **EN DESARROLLO** | A5.1/A5.2 aprobadas; A5.3 búsqueda/archivo implementada |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
@@ -149,8 +149,22 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   de huérfanos, compensación, archivado y persistencia de metadatos.
 - `flutter analyze`: cero problemas; `flutter test`: 141 pruebas aprobadas.
 - `assembleProdDebug`: compilada correctamente con A5.2 el 27 de agosto de 2026.
-- A5 todavía no cierra G5: A5.2 requiere validación física; después faltan
-  búsqueda, archivo/cierre diario, XP, niveles y Dashboard diario/semanal.
+- El usuario aprobó físicamente A5.2 el 27 de agosto de 2026: agregar, abrir,
+  persistir y retirar fotografías funciona correctamente en la tablet.
+- A5.3 conecta las rutas canónicas `NAV-BIT-04 /journal/search` y
+  `NAV-BIT-06 /journal/archive` con pantallas reales sobre Terminal V2.
+- La búsqueda consulta SQLite por texto literal en título/cuerpo, rango civil,
+  procedencias y adjuntos activos; conserva orden cronológico y limita a 200
+  resultados. Los caracteres `%`, `_` y `\` se escapan antes de `LIKE`.
+- Archivar usa `journal_entries.archived_at`: excluye la entrada de cronología y
+  búsqueda sin borrar vínculos ni fotografías. Archivo permite ver y restaurar;
+  el detalle archivado es de solo lectura.
+- Pruebas nuevas verifican filtros combinados, texto literal, adjuntos,
+  exclusión de cronología, stream de archivo, restauración y rutas reales.
+- `flutter analyze`: cero problemas; `flutter test`: 144 pruebas aprobadas.
+- `assembleProdDebug`: compilada correctamente con A5.3 el 27 de agosto de 2026.
+- A5 todavía no cierra G5: A5.3 requiere validación física; después faltan
+  cierre diario, XP, niveles y Dashboard diario/semanal.
 
 ## Evidencia G0
 

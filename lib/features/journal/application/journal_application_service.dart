@@ -119,6 +119,36 @@ final class JournalApplicationService {
         : _repository.update(entry);
   }
 
+  Future<Result<JournalEntry>> archive(JournalEntry entry) {
+    if (entry.isArchived) {
+      return Future<Result<JournalEntry>>.value(
+        const Failure<JournalEntry>(
+          ValidationFailure('La entrada ya está archivada.'),
+        ),
+      );
+    }
+    final DateTime nowUtc = _clock.nowUtc();
+    return _repository.archiveEntry(
+      entryId: entry.id,
+      archivedAtUtc: nowUtc,
+      updatedAtUtc: nowUtc,
+    );
+  }
+
+  Future<Result<JournalEntry>> restore(JournalEntry entry) {
+    if (!entry.isArchived) {
+      return Future<Result<JournalEntry>>.value(
+        const Failure<JournalEntry>(
+          ValidationFailure('La entrada no está archivada.'),
+        ),
+      );
+    }
+    return _repository.restoreEntry(
+      entryId: entry.id,
+      updatedAtUtc: _clock.nowUtc(),
+    );
+  }
+
   AppFailure? _validate({
     required String title,
     required DateTime occurredAtUtc,

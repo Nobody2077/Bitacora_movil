@@ -48,6 +48,10 @@ decisiones de producto.
 - Bitácora A5.2 añade al detalle una galería adaptable de fotografías privadas,
   indicador de cifrado, vista ampliada, acción de agregar y retiro confirmado.
   El formulario guía al usuario a guardar la entrada antes de adjuntar.
+- Bitácora A5.3 incorpora formulario adaptable de búsqueda, chips de procedencia,
+  rango de fechas, filtro de fotografías y resultados operativos. El Archivo
+  muestra entradas ocultas con acciones de restaurar/ver; el detalle usa rojo
+  crítico para archivar y modo lectura cuando la entrada ya está archivada.
 - `FeaturePlaceholderPage` y el contenedor «Más» ya usan las superficies
   terminales. Las rutas aún pendientes siguen siendo funcionalmente
   identificables, pero ahora respetan el sistema visual común.
@@ -112,7 +116,7 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 
 ## Verificación de este incremento
 
-El gate automatizado está limpio con 141 pruebas y `flutter analyze` sin
-incidencias. La APK `prod-debug` se recompiló correctamente con Bitácora A5.2 el
-27 de agosto de 2026. A5.1 fue aprobada físicamente; A5.2 todavía debe validarse
-en la Redmi Pad. A5 continúa en desarrollo y aún no cumple G5.
+El gate automatizado está limpio con 144 pruebas y `flutter analyze` sin
+incidencias. La APK `prod-debug` se recompiló correctamente con Bitácora A5.3 el
+27 de agosto de 2026. A5.1 y A5.2 fueron aprobadas físicamente; A5.3 todavía
+debe validarse en la Redmi Pad. A5 continúa en desarrollo y aún no cumple G5.
