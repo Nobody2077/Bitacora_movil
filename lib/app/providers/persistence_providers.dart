@@ -7,7 +7,9 @@ import '../../features/access/application/access_session_controller.dart';
 import '../../features/access/application/access_session_state.dart';
 import '../../features/economy/data/drift_economy_repository.dart';
 import '../../features/economy/domain/repositories/economy_repository.dart';
+import '../../features/journal/data/drift_daily_close_repository.dart';
 import '../../features/journal/data/drift_journal_repository.dart';
+import '../../features/journal/domain/repositories/daily_close_repository.dart';
 import '../../features/journal/domain/repositories/journal_repository.dart';
 import '../../features/missions/application/mission_application_service.dart'
     show SecureMissionIdGenerator, SystemMissionClock;
@@ -26,6 +28,7 @@ import '../../features/settings/data/drift_settings_repository.dart';
 import '../../features/settings/domain/repositories/settings_repository.dart';
 import '../../infrastructure/database/app_database.dart';
 import '../../infrastructure/database/connection/encrypted_database_connection.dart';
+import '../../infrastructure/database/daos/daily_close_dao.dart';
 import '../../infrastructure/database/daos/economy_dao.dart';
 import '../../infrastructure/database/daos/journal_dao.dart';
 import '../../infrastructure/database/daos/mission_dao.dart';
@@ -198,6 +201,10 @@ final Provider<EconomyDao> economyDaoProvider = Provider<EconomyDao>(
   (Ref ref) => EconomyDao(ref.watch(appDatabaseProvider)),
 );
 
+final Provider<DailyCloseDao> dailyCloseDaoProvider = Provider<DailyCloseDao>(
+  (Ref ref) => DailyCloseDao(ref.watch(appDatabaseProvider)),
+);
+
 final Provider<JournalDao> journalDaoProvider = Provider<JournalDao>(
   (Ref ref) => JournalDao(ref.watch(appDatabaseProvider)),
 );
@@ -234,6 +241,11 @@ final Provider<EconomyRepository> economyRepositoryProvider =
 final Provider<JournalRepository> journalRepositoryProvider =
     Provider<JournalRepository>(
       (Ref ref) => DriftJournalRepository(ref.watch(journalDaoProvider)),
+    );
+
+final Provider<DailyCloseRepository> dailyCloseRepositoryProvider =
+    Provider<DailyCloseRepository>(
+      (Ref ref) => DriftDailyCloseRepository(ref.watch(dailyCloseDaoProvider)),
     );
 
 final Provider<ProgressRepository> progressRepositoryProvider =

@@ -47,14 +47,12 @@ void main() {
     ) async {
       _ensureResumed(tester);
       _setSurface(tester, const Size(1280, 800));
-      await tester.pumpWidget(
-        _testApp(initialLocation: AppRoutes.dashboardDaily),
-      );
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.journal));
       await tester.pumpAndSettle();
 
       expect(find.byType(TerminalSidebar), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
-      expect(find.text('Dashboard diario'), findsOneWidget);
+      expect(find.text('Bitácora'), findsWidgets);
       expect(find.text('Progreso'), findsOneWidget);
       expect(find.text('Ajustes'), findsOneWidget);
       expect(find.text('Usuario local'), findsOneWidget);
@@ -67,10 +65,15 @@ void main() {
         sidebarContext,
       ).extension<AppThemeTokens>()!;
       final Text missionsLabel = tester.widget<Text>(find.text('Misiones'));
-      final Text progressLabel = tester.widget<Text>(find.text('Progreso'));
+      final Text journalLabel = tester.widget<Text>(
+        find.descendant(
+          of: find.byType(TerminalSidebar),
+          matching: find.text('Bitácora'),
+        ),
+      );
       expect(missionsLabel.style?.color, tokens.terminalRed);
       expect(missionsLabel.style?.fontSize, 16);
-      expect(progressLabel.style?.color, tokens.infoCyan);
+      expect(journalLabel.style?.color, tokens.infoCyan);
 
       await tester.tap(find.text('Usuario local'));
       await tester.pumpAndSettle();

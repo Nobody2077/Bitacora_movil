@@ -11,7 +11,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
-| A5 — Bitácora y progreso | **EN DESARROLLO** | A5.1/A5.2 aprobadas; A5.3 búsqueda/archivo implementada |
+| A5 — Bitácora y progreso | **EN DESARROLLO** | **A5.1–A5.3 cerradas y aprobadas físicamente (27 ago)**; cierre diario y dashboards funcionales; resta consolidar Progreso y cerrar G5 |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
@@ -133,24 +133,9 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - `assembleProdDebug`: compilada correctamente el 27 de agosto de 2026.
 - El usuario aprobó físicamente A5.1 el 27 de agosto de 2026: cronología, alta,
   edición, detalle, vínculos y persistencia funcionan correctamente.
-- A5.2 incorpora selección de galería, orientación normalizada, límite de 4096
-  px, recodificación JPEG sin EXIF y cifrado AES-256-GCM con nonce de 12 bytes,
-  tag de 16 bytes y clave distinta de la base protegida por Android Keystore.
-- Cada archivo tiene nombre UUID opaco, encabezado v1, SHA-256 del cifrado y
-  escritura temporal con renombrado. SQLite conserva metadatos, posición y
-  archivo lógico; el texto plano solo se reconstruye en memoria para mostrarlo.
-- Agregar prepara un temporal cifrado, confirma la fila y recién después hace
-  el renombrado atómico; compensa tanto el fallo SQLite como el fallo de
-  renombrado. El arranque recupera un temporal activo tras una interrupción y
-  limpia temporales sin fila y huérfanos cifrados.
-- El detalle permite agregar, ampliar y retirar fotografías con confirmación.
-  El formulario explica que una entrada nueva se guarda antes de adjuntar.
-- Pruebas nuevas cubren cifrado/descifrado, integridad ante alteración, limpieza
-  de huérfanos, compensación, archivado y persistencia de metadatos.
-- `flutter analyze`: cero problemas; `flutter test`: 141 pruebas aprobadas.
-- `assembleProdDebug`: compilada correctamente con A5.2 el 27 de agosto de 2026.
 - El usuario aprobó físicamente A5.2 el 27 de agosto de 2026: agregar, abrir,
   persistir y retirar fotografías funciona correctamente en la tablet.
+- **El usuario aprobó físicamente A5.3 el 27 de agosto de 2026**: búsqueda por texto/rango/foto, archivo/restauración, cierre diario (métricas + reflexión) y dashboards (Diario, Semanal, Progreso/Nivel RPG) funcionan correctamente en la Redmi Pad 2.
 - A5.3 conecta las rutas canónicas `NAV-BIT-04 /journal/search` y
   `NAV-BIT-06 /journal/archive` con pantallas reales sobre Terminal V2.
 - La búsqueda consulta SQLite por texto literal en título/cuerpo, rango civil,
@@ -159,12 +144,19 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - Archivar usa `journal_entries.archived_at`: excluye la entrada de cronología y
   búsqueda sin borrar vínculos ni fotografías. Archivo permite ver y restaurar;
   el detalle archivado es de solo lectura.
+- Cierre diario (`/journal/daily-close/:date`) muestra resumen operativo (XP, tiempo, misiones, balance económico, área destacada), lista de completadas/pendientes obligatorias y panel de reflexión editable (4000 chars) persistido en Bitácora como entrada `SYSTEM`.
+- Dashboards implementados y validados:
+  - **Diario** (`/dashboard/daily`): selector de día, tarjeta nivel RPG, métricas del día, botón "Cierre del día" navega a cierre diario.
+  - **Semanal** (`/dashboard/weekly`): selector de semana, XP semanal, misiones logradas, tiempo enfocado, balance semanal, distribución de XP por área.
+  - **Progreso / Nivel RPG** (`/dashboard/progress`): XP total/hoy/semana, progreso de nivel actual, distribución histórica por área.
 - Pruebas nuevas verifican filtros combinados, texto literal, adjuntos,
-  exclusión de cronología, stream de archivo, restauración y rutas reales.
-- `flutter analyze`: cero problemas; `flutter test`: 144 pruebas aprobadas.
-- `assembleProdDebug`: compilada correctamente con A5.3 el 27 de agosto de 2026.
-- A5 todavía no cierra G5: A5.3 requiere validación física; después faltan
-  cierre diario, XP, niveles y Dashboard diario/semanal.
+  exclusión de cronología, stream de archivo, restauración, cierre diario, dashboards y rutas reales.
+- `dart format --set-exit-if-changed`: aprobado sobre `lib`, `test` e
+  `integration_test`.
+- `flutter analyze`: cero problemas; `flutter test`: 158 pruebas aprobadas.
+- `assembleProdDebug`: compilada correctamente con A5.3, cierre diario y
+  dashboards el 27 de agosto de 2026.
+- **A5.3 validada físicamente**. XP, niveles y distribución por áreas ya tienen consumidor funcional. Restante para cerrar G5: decidir y conectar el alcance de títulos/rachas, ejecutar la matriz final y cerrar el gate.
 
 ## Evidencia G0
 

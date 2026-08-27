@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A4 están completadas. A5 está en desarrollo: A5.1 y A5.2 fueron aprobadas físicamente; A5.3 ya conecta búsqueda histórica y archivo/restauración. El gate quedó verde con 144 pruebas y APK `prod-debug`; A5.3 requiere validación física y después siguen cierre diario y Progreso.
+> **Estado actual:** A0–A4 están completadas. A5 está en desarrollo y A5.1–A5.3 están cerradas: cronología, fotografías privadas, búsqueda, archivo/restauración y cierre diario fueron validados físicamente. Los dashboards diario, semanal y de nivel RPG están conectados; el siguiente paso es consolidar Progreso y cerrar formalmente G5.
 
 ## Qué busca ofrecer
 
@@ -25,7 +25,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
-| A5 — Bitácora y progreso | En desarrollo | A5.1/A5.2 aprobadas; A5.3 búsqueda y archivo implementada |
+| A5 — Bitácora y progreso | En desarrollo | A5.1–A5.3 cerradas; cierre diario y dashboards funcionales; resta el cierre formal de G5 |
 | A6–A8 | Bloqueadas | Copias, UI final y release requieren el gate anterior |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
@@ -36,10 +36,11 @@ El estado del sistema visual real y las reglas para extenderlo sin romper la
 coherencia de tablet y móvil están en
 [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
 
-El incremento activo es A5.3: `/journal/search` busca por texto literal, rango,
-procedencia y presencia de fotografías; `/journal/archive` conserva entradas,
-vínculos y fotos fuera de la cronología y permite restaurarlas. Debe validarse
-físicamente en la tablet; después sigue el cierre diario y luego Progreso.
+El último incremento cerrado es A5.3: `/journal/search` busca por texto literal,
+rango, procedencia y presencia de fotografías; `/journal/archive` conserva
+entradas, vínculos y fotos fuera de la cronología y permite restaurarlas. El
+cierre diario y los dashboards diario, semanal y de nivel RPG también están
+conectados. El siguiente paso es consolidar Progreso y cerrar formalmente G5.
 
 ## Arquitectura resumida
 

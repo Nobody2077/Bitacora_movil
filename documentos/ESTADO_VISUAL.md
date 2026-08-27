@@ -52,6 +52,9 @@ decisiones de producto.
   rango de fechas, filtro de fotografías y resultados operativos. El Archivo
   muestra entradas ocultas con acciones de restaurar/ver; el detalle usa rojo
   crítico para archivar y modo lectura cuando la entrada ya está archivada.
+- El cierre diario presenta métricas, misiones completadas y pendientes, área
+  destacada y reflexión persistida. Dashboard diario, semanal y de nivel RPG
+  usan el mismo sistema Terminal V2 y navegación canónica.
 - `FeaturePlaceholderPage` y el contenedor «Más» ya usan las superficies
   terminales. Las rutas aún pendientes siguen siendo funcionalmente
   identificables, pero ahora respetan el sistema visual común.
@@ -108,15 +111,16 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 2. Revisar físicamente Detalle y Nueva/Editar misión en tablet y terminar la
    migración de diálogos secundarios. Inicio, el resumen de Misiones, Detalle
    y Nueva/Editar ya usan la composición de operaciones del Documento 13.
-3. Rutas de Bitácora y Progreso a medida que se implementen
-   funcionalmente: cada una debe nacer sobre este sistema, no como una pantalla
-   Material genérica que luego requiera una reescritura visual.
+3. Consolidar los estados restantes de Progreso —incluidos títulos/rachas si
+   forman parte del cierre de G5— sobre este sistema, sin introducir pantallas
+   Material genéricas que requieran una reescritura posterior.
 4. Estados de carga, vacío y error por módulo, con mensajes accionables y el
    mismo orden: contexto → título → explicación → información → acción.
 
 ## Verificación de este incremento
 
-El gate automatizado está limpio con 144 pruebas y `flutter analyze` sin
-incidencias. La APK `prod-debug` se recompiló correctamente con Bitácora A5.3 el
-27 de agosto de 2026. A5.1 y A5.2 fueron aprobadas físicamente; A5.3 todavía
-debe validarse en la Redmi Pad. A5 continúa en desarrollo y aún no cumple G5.
+A5.1–A5.3 fueron aprobadas físicamente en la Redmi Pad el 27 de agosto de 2026.
+La APK `prod-debug` se recompiló con búsqueda, archivo, cierre diario y
+dashboards integrados. Formato, `flutter analyze` y 158 pruebas quedaron verdes.
+A5 continúa en desarrollo hasta consolidar Progreso y cerrar formalmente G5; el
+resultado automatizado vigente se registra en `documentos/ESTADO_FASES.md`.

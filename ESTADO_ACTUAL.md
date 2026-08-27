@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **27 de agosto de 2026** (A5.1/A5.2 aprobadas; A5.3 implementada)
+- Última revisión: **27 de agosto de 2026** (A5.1–A5.3 cerradas; cierre diario y dashboards funcionales)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -11,17 +11,15 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La aplicación es Flutter Android, local-first, privada y de un solo usuario.
 - A0–A4 están completadas. G3 quedó verde el 26 de agosto de 2026 y G4 fue
   aprobado físicamente el 27 de agosto de 2026.
-- A5 — Bitácora y progreso está en desarrollo como única fase activa. A5.1 y
-  A5.2 fueron aprobadas físicamente; A5.3 tiene búsqueda y archivo funcionales
-  pendientes de prueba física. A6 continúa bloqueada hasta cerrar G5.
+- A5 — Bitácora y progreso está en desarrollo como única fase activa. A5.1, A5.2 y **A5.3 fueron aprobadas físicamente el 27 de agosto de 2026**. Búsqueda, archivo/restauración, cierre diario y dashboards diario/semanal/nivel RPG están conectados. A6 continúa bloqueada hasta cerrar formalmente G5.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
-- El gate automatizado actual ejecutó `flutter analyze` y 144 pruebas sin fallos;
-  la APK `prod-debug` se recompiló el 27 de agosto de 2026 con A5.3 integrada.
+- La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
+  compilación de la APK `prod-debug` el 27 de agosto de 2026.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Incremento actual: A5.3 — búsqueda histórica y archivo/restauración lógica
-  implementados. El siguiente paso es su validación física; después se conecta
-  el cierre diario y luego Progreso.
+- Último incremento: **A5.3 cerrada y validada físicamente**. Siguiente paso:
+  consolidar Progreso —incluido el alcance pendiente de títulos/rachas— y cerrar
+  formalmente G5.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -51,10 +49,8 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 ### Antes de continuar o generar APK
 
 1. No limpiar datos de la app: es almacenamiento local cifrado.
-2. A5.1 y A5.2 ya fueron validadas físicamente por el usuario el 27 de agosto
-   de 2026, incluidas fotografías persistentes y su retiro.
-3. Validar A5.3 buscando por palabra/rango/foto, archivando una entrada y
-   restaurándola. No limpiar datos durante esta prueba.
+2. A5.1, A5.2 y **A5.3 fueron validadas físicamente por el usuario el 27 de agosto de 2026**, incluidas fotografías, búsqueda, archivo/restauración y cierre diario.
+3. Los dashboards diario, semanal y de nivel RPG están funcionales. Siguiente incremento: consolidar Progreso y cerrar G5.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -267,11 +263,10 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 - `/journal/archive` muestra entradas ocultas de la cronología, conserva
   contenido, vínculos y fotografías, y permite restaurarlas. El detalle exige
   confirmación antes de archivar y queda en modo lectura mientras está archivado.
-- El cierre diario y Progreso todavía pertenecen a los siguientes incrementos
-  de A5. A5.3 requiere validación física en la tablet.
-- Progreso tiene modelo, repositorio y DAO, pero no Dashboard funcional.
-- El orden recomendado es Bitácora funcional primero; después XP, niveles y
-  Dashboard diario/semanal dentro de la misma A5.
+- **Cierre diario implementado y validado** (`/journal/daily-close/:date`) con métricas, lista de misiones y reflexión persistida.
+- **Dashboards implementados**: Diario (`/dashboard/daily`), Semanal (`/dashboard/weekly`) y Progreso/Nivel RPG (`/dashboard/progress`).
+- Progreso tiene modelo, repositorio, DAO y **Dashboard funcional**.
+- XP, niveles y distribución por áreas ya tienen consumidor funcional. La infraestructura adelantada de títulos/rachas todavía no está expuesta por el repositorio de dominio ni por la UI.
 - Copia/restauración, UI v2 final, accesibilidad completa y release pertenecen a A6–A8.
 
 ---
@@ -350,10 +345,9 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-El punto de entrada inmediato es validar A5.3 en la tablet sin borrar datos:
-buscar una palabra, cambiar el rango, activar “solo con fotografías”, archivar
-una entrada y restaurarla desde Archivo. Después se implementa cierre diario y
-finalmente Progreso para cerrar G5.
+El punto de entrada inmediato es consolidar Progreso: definir y conectar el
+alcance restante de títulos/rachas, ejecutar la matriz completa de G5 y cerrar
+la fase. A5.3, el cierre diario y los dashboards ya no son trabajo pendiente.
 
 ---
 
@@ -365,7 +359,7 @@ finalmente Progreso para cerrar G5.
 | `notificationDaoProvider` | Consumido por el reconciliador Android post-commit | A3 ✓ conectado |
 | `economyRepositoryProvider` | Consumido por providers, servicio, Inicio y UI de Economía | A4 ✓ conectado |
 | `journalRepositoryProvider` | Entradas, fotos, búsqueda y archivo/restauración | A5.1–A5.3 ✓ conectado |
-| `progressRepositoryProvider` | Solo declaración en `lib` | A5 |
+| `progressRepositoryProvider` | Dashboards Diario, Semanal, Progreso (consumen snapshot, XP, niveles) | A5 ✓ conectado |
 | Rutas de negocio con placeholder restantes | Contrato de navegación ya congelado | A3–A7 |
 
 ---

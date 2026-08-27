@@ -264,7 +264,8 @@ Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas espec�
 - A2: completada; gate G2 en verde el 25 de agosto de 2026.
 - A3: completada; gate G3 en verde el 26 de agosto de 2026.
 - A4: completada; gate G4 en verde el 27 de agosto de 2026.
-- A5: en desarrollo como única fase activa — Bitácora y progreso; A5.1 y A5.2
-  aprobadas físicamente, y A5.3 búsqueda/archivo implementada el 27 de agosto
-  de 2026, pendiente de validación física.
+- A5: en desarrollo como única fase activa — Bitácora y progreso; A5.1–A5.3
+  están cerradas y fueron aprobadas físicamente el 27 de agosto de 2026.
+  Cierre diario, XP, niveles y dashboards diario/semanal están conectados; resta
+  consolidar el alcance de Progreso y cerrar formalmente G5.
 - A6–A8: bloqueadas hasta completar el gate de la fase inmediatamente anterior.

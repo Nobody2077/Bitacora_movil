@@ -10,6 +10,7 @@ import '../data/encrypted_journal_photo_store.dart';
 import '../domain/models/journal_entry.dart';
 import '../domain/models/journal_photo.dart';
 import '../domain/repositories/journal_repository.dart';
+import 'daily_close_application_service.dart';
 import 'journal_application_service.dart';
 import 'journal_photo_application_service.dart';
 
@@ -28,6 +29,28 @@ final Provider<JournalApplicationService> journalApplicationServiceProvider =
         idGenerator: ref.watch(journalIdGeneratorProvider),
       ),
     );
+
+final Provider<DailyCloseApplicationService>
+dailyCloseApplicationServiceProvider = Provider<DailyCloseApplicationService>(
+  (Ref ref) => DailyCloseApplicationService(
+    dailyCloseRepository: ref.watch(dailyCloseRepositoryProvider),
+    journalRepository: ref.watch(journalRepositoryProvider),
+    clock: ref.watch(journalClockProvider),
+  ),
+);
+
+final dailyCloseProvider = FutureProvider.family<DailyCloseViewData, DateTime>((
+  Ref ref,
+  DateTime localDay,
+) async {
+  final result = await ref
+      .watch(dailyCloseApplicationServiceProvider)
+      .load(localDay);
+  return result.fold(
+    onSuccess: (value) => value,
+    onFailure: (failure) => throw failure,
+  );
+});
 
 final Provider<JournalPhotoStore> journalPhotoStoreProvider =
     Provider<JournalPhotoStore>(

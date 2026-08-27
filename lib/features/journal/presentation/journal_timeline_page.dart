@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../application/daily_close_application_service.dart';
 import '../application/journal_providers.dart';
 import '../domain/models/journal_entry.dart';
 import 'journal_presentation_support.dart';
@@ -54,6 +55,16 @@ class _JournalTimelinePageState extends ConsumerState<JournalTimelinePage> {
               label: 'Archivo',
               icon: Icons.inventory_2_outlined,
               onPressed: () => context.pushNamed('journalArchive'),
+            ),
+            TerminalOutlineButton(
+              label: 'Cierre del día',
+              icon: Icons.assignment_turned_in_outlined,
+              onPressed: () => context.pushNamed(
+                'journalDailyClose',
+                pathParameters: <String, String>{
+                  'date': dailyCloseDateKey(_selectedDay),
+                },
+              ),
             ),
             TerminalOutlineButton(
               label: 'Hoy',

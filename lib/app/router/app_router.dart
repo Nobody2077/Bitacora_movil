@@ -14,6 +14,8 @@ import '../../features/economy/presentation/economy_overview_page.dart';
 import '../../features/economy/presentation/economy_savings_pages.dart';
 import '../../features/economy/presentation/economy_transaction_pages.dart';
 import '../../features/home/presentation/home_operations_page.dart';
+import '../../features/journal/application/daily_close_application_service.dart';
+import '../../features/journal/presentation/daily_close_page.dart';
 import '../../features/journal/presentation/journal_entry_detail_page.dart';
 import '../../features/journal/presentation/journal_entry_form_page.dart';
 import '../../features/journal/presentation/journal_search_archive_pages.dart';
@@ -26,6 +28,9 @@ import '../../features/missions/presentation/mission_detail_page.dart';
 import '../../features/missions/presentation/mission_form_page.dart';
 import '../../features/missions/presentation/mission_switch_timer_page.dart';
 import '../../features/missions/presentation/missions_today_page.dart';
+import '../../features/progress/presentation/dashboard_daily_page.dart';
+import '../../features/progress/presentation/dashboard_progress_page.dart';
+import '../../features/progress/presentation/dashboard_weekly_page.dart';
 import '../../features/recurrences/presentation/recurrence_form_page.dart';
 import '../../features/recurrences/presentation/recurrence_list_page.dart';
 import '../../features/settings/presentation/more_page.dart';
@@ -198,6 +203,15 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         if (contract.name == 'journalArchive') {
           return const JournalArchivePage();
         }
+        if (contract.name == 'journalDailyClose') {
+          final String? date = state.pathParameters['date'];
+          final DateTime? parsedDate = date != null
+              ? parseDailyCloseDate(date)
+              : null;
+          if (parsedDate != null) {
+            return DailyClosePage(localDay: parsedDate);
+          }
+        }
         if (contract.name == 'journalEdit') {
           final String? entryId = state.pathParameters['entryId'];
           if (entryId != null) {
@@ -277,6 +291,15 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         }
         if (contract.name == 'financeAnalysis') {
           return const EconomyAnalysisPage();
+        }
+        if (contract.name == 'dashboardDaily') {
+          return const DashboardDailyPage();
+        }
+        if (contract.name == 'dashboardWeekly') {
+          return const DashboardWeeklyPage();
+        }
+        if (contract.name == 'dashboardProgress') {
+          return const DashboardProgressPage();
         }
         if (contract.path == AppRoutes.settings) {
           return const SettingsLandingPage();
