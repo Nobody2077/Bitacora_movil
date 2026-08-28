@@ -53,25 +53,15 @@ class _DashboardWeeklyPageState extends ConsumerState<DashboardWeeklyPage> {
           weeklyData.when(
             data: (WeeklyDashboardViewData data) =>
                 _WeeklyContent(data: data, tokens: tokens),
-            loading: () => const TerminalPanel(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: CircularProgressIndicator(),
-                ),
-              ),
+            loading: () => const TerminalLoadingState(
+              message: 'Cargando dashboard semanal…',
             ),
-            error: (_, _) => TerminalEmptyState(
+            error: (_, _) => TerminalErrorState(
               title: 'No se pudo cargar el dashboard semanal',
               description:
                   'Ocurrió un error al consultar las métricas semanales.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () =>
-                    ref.invalidate(weeklyDashboardProvider(_selectedDay)),
-              ),
+              onRetry: () =>
+                  ref.invalidate(weeklyDashboardProvider(_selectedDay)),
             ),
           ),
         ],

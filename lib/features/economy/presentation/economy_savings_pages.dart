@@ -53,16 +53,13 @@ class EconomySavingsPage extends ConsumerWidget {
                       ],
                     ],
                   ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, _) => TerminalEmptyState(
+            loading: () => const TerminalLoadingState(
+              message: 'Cargando metas de ahorro…',
+            ),
+            error: (_, _) => TerminalErrorState(
               title: 'No se pudieron leer las metas',
               description: 'Reintenta la consulta local.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () => ref.invalidate(savingsGoalsProvider),
-              ),
+              onRetry: () => ref.invalidate(savingsGoalsProvider),
             ),
           ),
         ],

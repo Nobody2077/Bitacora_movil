@@ -27,7 +27,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
 | A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
 | A6 — Copia y restauración | Diferida / pendiente | G6 no ejecutada; debe retomarse antes de A8 |
-| A7 — UI v2 y accesibilidad | En curso por excepción | Apariencia global y matriz adaptable/accesible con 3 goldens canónicos y 174 pruebas |
+| A7 — UI v2 y accesibilidad | En curso por excepción | Apariencia, estados asíncronos accesibles, 3 goldens canónicos y 178 pruebas |
 | A8 — Release | Bloqueada | Requiere G6 y G7 verdes |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
@@ -46,7 +46,8 @@ conectados. Progreso añade niveles por área, rachas y títulos con historial. 
 trabajo actual es A7: su primer incremento conecta `/settings/appearance` con
 preferencias persistentes y reactivas. A7.2 añade composición exacta en los
 breakpoints, equivalencia teléfono/tablet, texto 2.0× y goldens compactos y
-expandidos. A6 continúa pendiente según ADR-004.
+expandidos. A7.3 unifica carga, vacío, error y reintento con semántica y foco en
+las rutas principales. A6 continúa pendiente según ADR-004.
 
 ## Arquitectura resumida
 

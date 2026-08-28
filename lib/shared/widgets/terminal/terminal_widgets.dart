@@ -526,20 +526,143 @@ class TerminalEmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(icon, color: tokens.infoCyan, size: 36),
-              const SizedBox(height: TerminalSpace.md),
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: TerminalSpace.xs),
-              Text(
-                description,
-                textAlign: TextAlign.center,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: tokens.textSecondary),
+              Semantics(
+                container: true,
+                liveRegion: true,
+                label: '$title. $description',
+                child: ExcludeSemantics(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Icon(icon, color: tokens.infoCyan, size: 36),
+                      const SizedBox(height: TerminalSpace.md),
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: TerminalSpace.xs),
+                      Text(
+                        description,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: tokens.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               if (action != null) ...<Widget>[
                 const SizedBox(height: TerminalSpace.lg),
                 action!,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TerminalLoadingState extends StatelessWidget {
+  const TerminalLoadingState({super.key, this.message = 'Cargando datos…'});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    liveRegion: true,
+    label: message,
+    child: ExcludeSemantics(
+      child: TerminalPanel(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: TerminalSpace.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const CircularProgressIndicator(),
+                const SizedBox(height: TerminalSpace.md),
+                Text(message, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class TerminalErrorState extends StatelessWidget {
+  const TerminalErrorState({
+    required this.title,
+    required this.description,
+    super.key,
+    this.onRetry,
+    this.retryLabel = 'Reintentar',
+    this.retryButtonKey,
+  });
+
+  final String title;
+  final String description;
+  final VoidCallback? onRetry;
+  final String retryLabel;
+  final Key? retryButtonKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return TerminalPanel(
+      borderColor: tokens.criticalAction,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: TerminalSpace.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Semantics(
+                container: true,
+                liveRegion: true,
+                label: '$title. $description',
+                child: ExcludeSemantics(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Icon(
+                        Icons.error_outline,
+                        color: tokens.criticalAction,
+                        size: 40,
+                      ),
+                      const SizedBox(height: TerminalSpace.sm),
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: TerminalSpace.xs),
+                      Text(
+                        description,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: tokens.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (onRetry != null) ...<Widget>[
+                const SizedBox(height: TerminalSpace.lg),
+                TerminalOutlineButton(
+                  key: retryButtonKey,
+                  label: retryLabel,
+                  icon: Icons.refresh,
+                  color: tokens.infoCyan,
+                  onPressed: onRetry,
+                ),
               ],
             ],
           ),

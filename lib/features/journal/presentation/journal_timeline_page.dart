@@ -98,18 +98,12 @@ class _JournalTimelinePageState extends ConsumerState<JournalTimelinePage> {
         const SizedBox(height: TerminalSpace.md),
         entries.when(
           data: (List<JournalEntry> items) => _JournalDayContent(items: items),
-          loading: () => const TerminalPanel(
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (_, _) => TerminalEmptyState(
+          loading: () =>
+              const TerminalLoadingState(message: 'Cargando entradas del día…'),
+          error: (_, _) => TerminalErrorState(
             title: 'No se pudo abrir este día',
             description: 'Reintenta la lectura desde la base local cifrada.',
-            icon: Icons.error_outline,
-            action: TerminalOutlineButton(
-              label: 'Reintentar',
-              icon: Icons.refresh,
-              onPressed: () => ref.invalidate(journalEntriesProvider(range)),
-            ),
+            onRetry: () => ref.invalidate(journalEntriesProvider(range)),
           ),
         ),
       ],

@@ -34,17 +34,13 @@ class EconomyAnalysisPage extends ConsumerWidget {
                 const SizedBox(height: TerminalSpace.md),
                 snapshot.when(
                   data: (value) => _Analysis(value: value),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (_, _) => TerminalEmptyState(
+                  loading: () => const TerminalLoadingState(
+                    message: 'Calculando análisis financiero…',
+                  ),
+                  error: (_, _) => TerminalErrorState(
                     title: 'Análisis no disponible',
                     description: 'No se pudo calcular el resumen local.',
-                    icon: Icons.error_outline,
-                    action: TerminalOutlineButton(
-                      label: 'Reintentar',
-                      icon: Icons.refresh,
-                      onPressed: () => ref.invalidate(economySnapshotProvider),
-                    ),
+                    onRetry: () => ref.invalidate(economySnapshotProvider),
                   ),
                 ),
                 const SizedBox(height: TerminalSpace.md),

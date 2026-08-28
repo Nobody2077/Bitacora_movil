@@ -22,11 +22,11 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La ampliación final de Progreso aprobó formato, `flutter analyze`, 161 pruebas
   y `assembleProdDebug` el 27 de agosto de 2026.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Último incremento: **A7.2**. Apariencia y accesibilidad aplican
-  preferencias persistentes de texto grande, movimiento reducido, alto
-  contraste e importes ocultos. La composición responde exactamente en 600 y
-  840 px y cuenta con goldens compactos, expandidos y texto 2.0×. La matriz está
-  verde con 174 pruebas y APK `prod-debug`; G7 todavía no está cerrada.
+- Último incremento: **A7.3**. Además de Apariencia y su matriz adaptable, los
+  estados de carga, vacío y error/reintento usan componentes Terminal accesibles
+  en las rutas principales. Son regiones vivas, conservan orden de foco y pasan
+  las guías de toque, etiqueta y contraste con texto 2.0×. La matriz está verde
+  con 178 pruebas y APK `prod-debug`; G7 todavía no está cerrada.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -301,10 +301,17 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 - Tres goldens protegen compacto, expandido con alto contraste y compacto con
   texto 2.0×. Las guías Flutter de toque Android, etiquetado y contraste pasan;
   teléfono y tablet construyen la misma ruta y el mismo estado lógico.
-- `flutter analyze`: limpio; `flutter test`: **174/174**; `assembleProdDebug`:
+- A7.3 incorpora `TerminalLoadingState` y `TerminalErrorState`, y convierte
+  `TerminalEmptyState` en región viva. Misiones de hoy/colecciones/recurrencias,
+  Economía resumen/movimientos/ahorros/análisis, Bitácora cronología/búsqueda/
+  archivo/cierre y los tres dashboards comparten ahora el mismo patrón con
+  reintento recuperable.
+- Las pruebas verifican anuncio semántico de carga/vacío/error, entrada del
+  reintento en el orden de foco y accesibilidad con texto 2.0×.
+- `flutter analyze`: limpio; `flutter test`: **178/178**; `assembleProdDebug`:
   aprobado el 28 de agosto de 2026.
-- Pendiente de A7: auditoría del resto de pantallas, estados por módulo,
-  ampliación de goldens, foco, semántica completa y validación física.
+- Pendiente de A7: auditoría de detalles/formularios y diálogos secundarios,
+  ampliación de goldens y validación física.
 
 ---
 

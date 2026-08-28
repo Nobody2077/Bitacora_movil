@@ -13,7 +13,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
 | A6 — Copia y restauración | **DIFERIDA / PENDIENTE** | G6 no ejecutada; ADR-004 |
-| A7 — UI v2 y accesibilidad | **EN CURSO POR EXCEPCIÓN** | A7.1–A7.2 técnicas verdes; G7 pendiente |
+| A7 — UI v2 y accesibilidad | **EN CURSO POR EXCEPCIÓN** | A7.1–A7.3 técnicas verdes; G7 pendiente |
 | A8 — Release | BLOQUEADA | Requiere G6 y G7 |
 
 ## Evidencia G3 — A3 completada
@@ -198,11 +198,16 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   y tablet.
 - Tres goldens canónicos cubren compacto, expandido con alto contraste y texto
   2.0×. Las guías automáticas de toque Android, etiquetado y contraste pasan.
+- A7.3 centraliza carga y error/reintento, y añade anuncio de región viva al
+  estado vacío. El reintento entra en el orden de foco y los tres estados pasan
+  accesibilidad automática con texto 2.0×.
+- El patrón compartido ya se usa en las rutas principales de Misiones,
+  Recurrencias, Economía, Bitácora y Progreso.
 - `flutter analyze`: cero problemas.
-- `flutter test`: **174/174 pruebas aprobadas**.
+- `flutter test`: **178/178 pruebas aprobadas**.
 - `assembleProdDebug`: APK compilada correctamente el 28 de agosto de 2026.
 - A7 continúa en curso: faltan la auditoría completa del resto de pantallas,
-  estados por módulo, ampliación de goldens, foco y validación física.
+  detalles/formularios secundarios, ampliación de goldens y validación física.
 - A8 sigue bloqueada hasta completar G6 y G7.
 
 ## Evidencia G0

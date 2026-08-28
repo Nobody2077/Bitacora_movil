@@ -27,23 +27,12 @@ class DashboardProgressPage extends ConsumerWidget {
       child: overallData.when(
         data: (OverallProgressViewData data) =>
             _ProgressContent(data: data, tokens: tokens),
-        loading: () => const TerminalPanel(
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(24),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ),
-        error: (_, _) => TerminalEmptyState(
+        loading: () =>
+            const TerminalLoadingState(message: 'Calculando progreso RPG…'),
+        error: (_, _) => TerminalErrorState(
           title: 'No se pudo cargar el progreso',
           description: 'Ocurrió un error al calcular los datos RPG.',
-          icon: Icons.error_outline,
-          action: TerminalOutlineButton(
-            label: 'Reintentar',
-            icon: Icons.refresh,
-            onPressed: () => ref.invalidate(overallProgressProvider),
-          ),
+          onRetry: () => ref.invalidate(overallProgressProvider),
         ),
       ),
     );

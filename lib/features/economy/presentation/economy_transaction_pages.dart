@@ -66,16 +66,13 @@ class EconomyTransactionsPage extends ConsumerWidget {
                       ],
                     ],
                   ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, _) => TerminalEmptyState(
+            loading: () => const TerminalLoadingState(
+              message: 'Cargando ledger económico…',
+            ),
+            error: (_, _) => TerminalErrorState(
               title: 'No se pudo leer el ledger',
               description: 'Reintenta la consulta local.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () => ref.invalidate(economyTransactionsProvider),
-              ),
+              onRetry: () => ref.invalidate(economyTransactionsProvider),
             ),
           ),
         ],

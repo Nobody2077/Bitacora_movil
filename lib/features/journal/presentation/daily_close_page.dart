@@ -70,24 +70,14 @@ class _DailyClosePageState extends ConsumerState<DailyClosePage> {
               }
               return _buildContent(context, tokens, data);
             },
-            loading: () => const TerminalPanel(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: CircularProgressIndicator(),
-                ),
-              ),
+            loading: () => const TerminalLoadingState(
+              message: 'Calculando cierre del día…',
             ),
-            error: (error, _) => TerminalEmptyState(
+            error: (error, _) => TerminalErrorState(
               title: 'No se pudo cargar el cierre',
               description: 'Ocurrió un error al consultar los datos del día.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () =>
-                    ref.invalidate(dailyCloseProvider(widget.localDay)),
-              ),
+              onRetry: () =>
+                  ref.invalidate(dailyCloseProvider(widget.localDay)),
             ),
           ),
         ],

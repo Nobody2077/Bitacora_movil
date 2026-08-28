@@ -82,10 +82,13 @@ class MissionCollectionPage extends ConsumerWidget {
                           ? 'Las misiones que programes para otra fecha aparecerán aquí.'
                           : 'Crea una misión para iniciar tu historial.',
                     ),
-                    loading: () => const _CollectionLoading(),
+                    loading: () => const TerminalLoadingState(
+                      message: 'Cargando colección de misiones…',
+                    ),
                     error: (Object error, StackTrace stackTrace) =>
-                        _CollectionError(
-                          message: 'No se pudieron cargar las misiones.',
+                        TerminalErrorState(
+                          title: 'Colección no disponible',
+                          description: 'No se pudieron cargar las misiones.',
                           onRetry: () => ref.invalidate(
                             _isUpcoming
                                 ? upcomingMissionsProvider
@@ -296,46 +299,6 @@ class _CollectionMissionCard extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CollectionLoading extends StatelessWidget {
-  const _CollectionLoading();
-
-  @override
-  Widget build(BuildContext context) => const TerminalPanel(
-    padding: EdgeInsets.all(36),
-    child: Center(child: CircularProgressIndicator()),
-  );
-}
-
-class _CollectionError extends StatelessWidget {
-  const _CollectionError({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    return TerminalPanel(
-      borderColor: tokens.terminalRed,
-      child: Column(
-        children: <Widget>[
-          Icon(Icons.error_outline, color: tokens.terminalRed, size: 42),
-          const SizedBox(height: 12),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          TerminalOutlineButton(
-            label: 'Reintentar',
-            icon: Icons.refresh,
-            onPressed: onRetry,
-          ),
-        ],
       ),
     );
   }

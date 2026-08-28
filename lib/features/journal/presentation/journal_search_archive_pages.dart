@@ -158,19 +158,12 @@ class _JournalSearchPageState extends ConsumerState<JournalSearchPage> {
               entries: entries,
               onBack: () => context.goNamed('journal'),
             ),
-            loading: () => const TerminalPanel(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (_, _) => TerminalEmptyState(
+            loading: () =>
+                const TerminalLoadingState(message: 'Buscando en la Bitácora…'),
+            error: (_, _) => TerminalErrorState(
               title: 'No se pudo completar la búsqueda',
               description: 'Revisa los filtros e inténtalo nuevamente.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () =>
-                    ref.invalidate(journalSearchProvider(criteria)),
-              ),
+              onRetry: () => ref.invalidate(journalSearchProvider(criteria)),
             ),
           ),
         ],
@@ -309,18 +302,13 @@ class JournalArchivePage extends ConsumerWidget {
                       ],
                     ],
                   ),
-            loading: () => const TerminalPanel(
-              child: Center(child: CircularProgressIndicator()),
+            loading: () => const TerminalLoadingState(
+              message: 'Cargando archivo de Bitácora…',
             ),
-            error: (_, _) => TerminalEmptyState(
+            error: (_, _) => TerminalErrorState(
               title: 'No se pudo abrir el archivo',
               description: 'Reintenta la lectura desde la base local.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () => ref.invalidate(archivedJournalEntriesProvider),
-              ),
+              onRetry: () => ref.invalidate(archivedJournalEntriesProvider),
             ),
           ),
         ],

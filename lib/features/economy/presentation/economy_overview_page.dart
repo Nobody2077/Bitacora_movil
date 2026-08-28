@@ -59,9 +59,12 @@ class EconomyOverviewPage extends ConsumerWidget {
                   const SizedBox(height: TerminalSpace.md),
                   snapshot.when(
                     data: (value) => _BalanceSummary(value: value),
-                    loading: () => const _LoadingPanel(),
-                    error: (_, _) => _ErrorPanel(
-                      label: 'No se pudo calcular el saldo.',
+                    loading: () => const TerminalLoadingState(
+                      message: 'Calculando saldo…',
+                    ),
+                    error: (_, _) => TerminalErrorState(
+                      title: 'Saldo no disponible',
+                      description: 'No se pudo calcular el saldo.',
                       onRetry: () => ref.invalidate(economySnapshotProvider),
                     ),
                   ),
@@ -76,9 +79,12 @@ class EconomyOverviewPage extends ConsumerWidget {
                   transactions.when(
                     data: (items) =>
                         _RecentTransactions(items: items.take(6).toList()),
-                    loading: () => const _LoadingPanel(),
-                    error: (_, _) => _ErrorPanel(
-                      label: 'No se pudieron leer los movimientos.',
+                    loading: () => const TerminalLoadingState(
+                      message: 'Cargando movimientos…',
+                    ),
+                    error: (_, _) => TerminalErrorState(
+                      title: 'Movimientos no disponibles',
+                      description: 'No se pudieron leer los movimientos.',
                       onRetry: () =>
                           ref.invalidate(economyTransactionsProvider),
                     ),
@@ -286,33 +292,4 @@ class EconomyTransactionCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _LoadingPanel extends StatelessWidget {
-  const _LoadingPanel();
-
-  @override
-  Widget build(BuildContext context) => const TerminalPanel(
-    padding: EdgeInsets.all(36),
-    child: Center(child: CircularProgressIndicator()),
-  );
-}
-
-class _ErrorPanel extends StatelessWidget {
-  const _ErrorPanel({required this.label, required this.onRetry});
-
-  final String label;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => TerminalEmptyState(
-    title: 'Datos no disponibles',
-    description: label,
-    icon: Icons.error_outline,
-    action: TerminalOutlineButton(
-      label: 'Reintentar',
-      icon: Icons.refresh,
-      onPressed: onRetry,
-    ),
-  );
 }

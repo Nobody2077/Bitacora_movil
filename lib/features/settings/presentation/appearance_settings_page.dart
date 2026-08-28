@@ -81,9 +81,17 @@ class _AppearanceSettingsPageState
                     ),
                     const SizedBox(height: TerminalSpace.lg),
                     preferences.when(
-                      loading: () => const _AppearanceLoadingState(),
+                      loading: () => const TerminalLoadingState(
+                        message: 'Cargando preferencias…',
+                      ),
                       error: (Object error, StackTrace stackTrace) =>
-                          _AppearanceErrorState(
+                          TerminalErrorState(
+                            title: 'Preferencias no disponibles',
+                            description:
+                                'No fue posible leer los ajustes locales.',
+                            retryButtonKey: const Key(
+                              'appearance-retry-button',
+                            ),
                             onRetry: () =>
                                 ref.invalidate(appPreferencesProvider),
                           ),
@@ -255,57 +263,6 @@ class _PreferenceSwitchCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _AppearanceLoadingState extends StatelessWidget {
-  const _AppearanceLoadingState();
-
-  @override
-  Widget build(BuildContext context) => const TerminalPanel(
-    child: Row(
-      children: <Widget>[
-        SizedBox.square(
-          dimension: 22,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        SizedBox(width: TerminalSpace.md),
-        Expanded(child: Text('Cargando preferencias…')),
-      ],
-    ),
-  );
-}
-
-class _AppearanceErrorState extends StatelessWidget {
-  const _AppearanceErrorState({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    return TerminalPanel(
-      borderColor: tokens.criticalAction,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const TerminalSectionTitle(
-            title: 'Preferencias no disponibles',
-            description:
-                'No fue posible leer los ajustes locales. Puedes volver a intentarlo.',
-          ),
-          const SizedBox(height: TerminalSpace.md),
-          TerminalOutlineButton(
-            key: const Key('appearance-retry-button'),
-            label: 'Reintentar',
-            icon: Icons.refresh,
-            onPressed: onRetry,
-          ),
-        ],
       ),
     );
   }

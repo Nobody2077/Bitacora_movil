@@ -48,9 +48,11 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
                 _searchController.text.trim().isNotEmpty,
             onClearFilters: _clearFilters,
           ),
-          loading: () => const _LoadingPanel(),
-          error: (Object _, StackTrace _) => _ErrorPanel(
-            message: 'No se pudieron cargar las misiones de hoy.',
+          loading: () =>
+              const TerminalLoadingState(message: 'Cargando misiones de hoy…'),
+          error: (Object _, StackTrace _) => TerminalErrorState(
+            title: 'Misiones no disponibles',
+            description: 'No se pudieron cargar las misiones de hoy.',
             onRetry: () => ref.invalidate(todayMissionsProvider),
           ),
         );
@@ -722,50 +724,4 @@ class _SummaryValue extends StatelessWidget {
       ),
     ],
   );
-}
-
-class _LoadingPanel extends StatelessWidget {
-  const _LoadingPanel();
-
-  @override
-  Widget build(BuildContext context) => const TerminalPanel(
-    child: Center(
-      child: Padding(
-        padding: EdgeInsets.all(TerminalSpace.xl),
-        child: CircularProgressIndicator(),
-      ),
-    ),
-  );
-}
-
-class _ErrorPanel extends StatelessWidget {
-  const _ErrorPanel({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    return TerminalPanel(
-      borderColor: tokens.terminalRed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(Icons.error_outline, color: tokens.terminalRed, size: 40),
-          const SizedBox(height: TerminalSpace.sm),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: TerminalSpace.md),
-          TerminalOutlineButton(
-            label: 'Reintentar',
-            icon: Icons.refresh,
-            color: tokens.infoCyan,
-            onPressed: onRetry,
-          ),
-        ],
-      ),
-    );
-  }
 }

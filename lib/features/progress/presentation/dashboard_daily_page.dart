@@ -69,25 +69,15 @@ class _DashboardDailyPageState extends ConsumerState<DashboardDailyPage> {
                 },
               ),
             ),
-            loading: () => const TerminalPanel(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: CircularProgressIndicator(),
-                ),
-              ),
+            loading: () => const TerminalLoadingState(
+              message: 'Cargando dashboard diario…',
             ),
-            error: (_, _) => TerminalEmptyState(
+            error: (_, _) => TerminalErrorState(
               title: 'No se pudo cargar el dashboard diario',
               description:
                   'Ocurrió un error al consultar las métricas locales.',
-              icon: Icons.error_outline,
-              action: TerminalOutlineButton(
-                label: 'Reintentar',
-                icon: Icons.refresh,
-                onPressed: () =>
-                    ref.invalidate(dailyDashboardProvider(_selectedDay)),
-              ),
+              onRetry: () =>
+                  ref.invalidate(dailyDashboardProvider(_selectedDay)),
             ),
           ),
         ],

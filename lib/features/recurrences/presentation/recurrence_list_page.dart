@@ -52,9 +52,12 @@ class RecurrenceListPage extends ConsumerWidget {
                       onResume: (id) => _resume(context, ref, id),
                       onDelete: (id) => _confirmDelete(context, ref, id),
                     ),
-                    loading: () => const _ListLoading(),
-                    error: (Object error, _) => _ListError(
-                      message: 'No se pudieron cargar las plantillas.',
+                    loading: () => const TerminalLoadingState(
+                      message: 'Cargando plantillas recurrentes…',
+                    ),
+                    error: (Object error, _) => TerminalErrorState(
+                      title: 'Plantillas no disponibles',
+                      description: 'No se pudieron cargar las plantillas.',
                       onRetry: () => ref.invalidate(allTemplatesProvider),
                     ),
                   ),
@@ -429,45 +432,4 @@ class _TemplateCard extends StatelessWidget {
       RecurrenceFrequency.everyNDays => 'Cada N días',
     };
   }
-}
-
-// ── Estados de carga / error ────────────────────────────────────────────────
-
-class _ListLoading extends StatelessWidget {
-  const _ListLoading();
-
-  @override
-  Widget build(BuildContext context) => const TerminalPanel(
-    child: Center(
-      child: Padding(
-        padding: EdgeInsets.all(32),
-        child: CircularProgressIndicator(),
-      ),
-    ),
-  );
-}
-
-class _ListError extends StatelessWidget {
-  const _ListError({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => TerminalPanel(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        const Icon(Icons.error_outline, size: 40, color: Colors.redAccent),
-        const SizedBox(height: 12),
-        Text(message, textAlign: TextAlign.center),
-        const SizedBox(height: 16),
-        TerminalOutlineButton(
-          label: 'Reintentar',
-          icon: Icons.refresh,
-          onPressed: onRetry,
-        ),
-      ],
-    ),
-  );
 }
