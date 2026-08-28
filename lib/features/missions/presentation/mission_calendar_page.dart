@@ -57,6 +57,10 @@ class _MissionCalendarPageState extends ConsumerState<MissionCalendarPage> {
           day: _selectedDay,
           missions: missions,
           areas: areas.value ?? const <MissionArea>[],
+          onRetry: () {
+            ref.invalidate(calendarMissionsProvider(range));
+            ref.invalidate(missionAreasProvider);
+          },
         );
         return SingleChildScrollView(
           padding: wide ? TerminalSpace.pageTablet : TerminalSpace.pageCompact,
@@ -356,11 +360,13 @@ class _DayAgenda extends StatelessWidget {
     required this.day,
     required this.missions,
     required this.areas,
+    required this.onRetry,
   });
 
   final DateTime day;
   final AsyncValue<List<Mission>> missions;
   final List<MissionArea> areas;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -406,11 +412,14 @@ class _DayAgenda extends StatelessWidget {
                 ],
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (Object error, StackTrace stackTrace) => Text(
-              'No se pudo cargar el calendario.',
-              style: TextStyle(color: tokens.terminalRed),
+            loading: () => const TerminalInlineLoadingState(
+              message: 'Cargando agenda del día…',
             ),
+            error: (Object error, StackTrace stackTrace) =>
+                TerminalInlineErrorState(
+                  message: 'No se pudo cargar el calendario.',
+                  onRetry: onRetry,
+                ),
           ),
         ],
       ),

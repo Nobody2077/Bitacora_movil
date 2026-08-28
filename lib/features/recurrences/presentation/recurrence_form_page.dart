@@ -78,12 +78,24 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
         : null;
 
     if (areas.isLoading || existing?.isLoading == true) {
-      return const Center(child: CircularProgressIndicator());
+      return const TerminalAsyncStatePage(
+        child: TerminalLoadingState(
+          message: 'Preparando plantilla recurrente…',
+        ),
+      );
     }
     if (areas.hasError || existing?.hasError == true) {
-      return _FormUnavailable(
-        message: 'No se pudieron cargar los datos de la plantilla.',
-        onBack: _cancel,
+      return TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Plantilla no disponible',
+          description: 'No se pudieron cargar los datos de la plantilla.',
+          onRetry: () {
+            ref.invalidate(missionAreasProvider);
+            if (widget.templateId case final String templateId) {
+              ref.invalidate(templateDetailProvider(templateId));
+            }
+          },
+        ),
       );
     }
 

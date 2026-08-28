@@ -68,12 +68,24 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
         : ref.watch(missionDetailProvider(widget.missionId!));
 
     if (areas.isLoading || mission?.isLoading == true) {
-      return const Center(child: CircularProgressIndicator());
+      return const TerminalAsyncStatePage(
+        child: TerminalLoadingState(
+          message: 'Preparando formulario de misión…',
+        ),
+      );
     }
     if (areas.hasError || mission?.hasError == true) {
-      return _FormUnavailable(
-        message: 'No se pudieron preparar los datos de la misión.',
-        onBack: _cancel,
+      return TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Formulario no disponible',
+          description: 'No se pudieron preparar los datos de la misión.',
+          onRetry: () {
+            ref.invalidate(missionAreasProvider);
+            if (widget.missionId case final String missionId) {
+              ref.invalidate(missionDetailProvider(missionId));
+            }
+          },
+        ),
       );
     }
 

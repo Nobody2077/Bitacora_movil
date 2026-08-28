@@ -57,10 +57,16 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
       missionDetailProvider(widget.missionId),
     );
     return loaded.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (Object error, StackTrace stackTrace) => _ReviewUnavailable(
-        message: 'No se pudo preparar la revisión.',
-        onBack: _backToMission,
+      loading: () => const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Preparando revisión de misión…'),
+      ),
+      error: (Object error, StackTrace stackTrace) => TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Revisión no disponible',
+          description: 'No se pudo preparar la revisión.',
+          onRetry: () =>
+              ref.invalidate(missionDetailProvider(widget.missionId)),
+        ),
       ),
       data: (Mission? mission) {
         if (mission == null) {
@@ -651,10 +657,16 @@ class MissionResultPage extends ConsumerWidget {
       missionCompletionReceiptProvider(missionId),
     );
     return result.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (Object error, StackTrace stackTrace) => _ReviewUnavailable(
-        message: 'No se pudo recuperar el resultado.',
-        onBack: () => context.goNamed('missionsToday'),
+      loading: () => const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Cargando resultado de misión…'),
+      ),
+      error: (Object error, StackTrace stackTrace) => TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Resultado no disponible',
+          description: 'No se pudo recuperar el resultado.',
+          onRetry: () =>
+              ref.invalidate(missionCompletionReceiptProvider(missionId)),
+        ),
       ),
       data: (receipt) => receipt == null
           ? _ReviewUnavailable(

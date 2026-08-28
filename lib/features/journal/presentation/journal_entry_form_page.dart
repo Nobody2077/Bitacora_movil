@@ -55,12 +55,23 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
         ? null
         : ref.watch(journalEntryDetailProvider(widget.entryId!));
     if (existingAsync?.isLoading == true) {
-      return const Center(child: CircularProgressIndicator());
+      return const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Preparando entrada de Bitácora…'),
+      );
     }
-    if (existingAsync?.hasError == true ||
-        (widget.isEditing &&
-            (existingAsync?.value == null ||
-                existingAsync?.value?.isArchived == true))) {
+    if (existingAsync?.hasError == true) {
+      return TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Entrada no disponible',
+          description: 'No se pudo preparar la entrada para editarla.',
+          onRetry: () =>
+              ref.invalidate(journalEntryDetailProvider(widget.entryId!)),
+        ),
+      );
+    }
+    if (widget.isEditing &&
+        (existingAsync?.value == null ||
+            existingAsync?.value?.isArchived == true)) {
       return const _JournalUnavailable(
         message: 'La entrada que deseas editar no está disponible.',
       );
@@ -239,6 +250,7 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
                       _MissionSourceField(
                         value: _sourceId,
                         missions: missions!,
+                        onRetry: () => ref.invalidate(allMissionsProvider),
                         onChanged: (String? value) =>
                             setState(() => _sourceId = value),
                       ),
@@ -248,6 +260,8 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
                       _TransactionSourceField(
                         value: _sourceId,
                         transactions: transactions!,
+                        onRetry: () =>
+                            ref.invalidate(economyTransactionsProvider),
                         onChanged: (String? value) =>
                             setState(() => _sourceId = value),
                       ),
@@ -427,11 +441,13 @@ class _MissionSourceField extends StatelessWidget {
   const _MissionSourceField({
     required this.value,
     required this.missions,
+    required this.onRetry,
     required this.onChanged,
   });
 
   final String? value;
   final AsyncValue<List<Mission>> missions;
+  final VoidCallback onRetry;
   final ValueChanged<String?> onChanged;
 
   @override
@@ -458,8 +474,13 @@ class _MissionSourceField extends StatelessWidget {
           selected == null ? 'Selecciona una misión.' : null,
       onChanged: onChanged,
     ),
-    loading: () => const LinearProgressIndicator(),
-    error: (_, _) => const Text('No se pudieron cargar las misiones.'),
+    loading: () => const TerminalInlineLoadingState(
+      message: 'Cargando misiones disponibles…',
+    ),
+    error: (_, _) => TerminalInlineErrorState(
+      message: 'No se pudieron cargar las misiones.',
+      onRetry: onRetry,
+    ),
   );
 }
 
@@ -467,11 +488,13 @@ class _TransactionSourceField extends StatelessWidget {
   const _TransactionSourceField({
     required this.value,
     required this.transactions,
+    required this.onRetry,
     required this.onChanged,
   });
 
   final String? value;
   final AsyncValue<List<EconomyTransaction>> transactions;
+  final VoidCallback onRetry;
   final ValueChanged<String?> onChanged;
 
   @override
@@ -499,8 +522,13 @@ class _TransactionSourceField extends StatelessWidget {
           selected == null ? 'Selecciona un movimiento.' : null,
       onChanged: onChanged,
     ),
-    loading: () => const LinearProgressIndicator(),
-    error: (_, _) => const Text('No se pudieron cargar los movimientos.'),
+    loading: () => const TerminalInlineLoadingState(
+      message: 'Cargando movimientos disponibles…',
+    ),
+    error: (_, _) => TerminalInlineErrorState(
+      message: 'No se pudieron cargar los movimientos.',
+      onRetry: onRetry,
+    ),
   );
 }
 

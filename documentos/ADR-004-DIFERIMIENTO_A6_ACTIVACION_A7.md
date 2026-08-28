@@ -1,8 +1,12 @@
 # ADR-004 — Diferimiento de A6 y activación excepcional de A7
 
-- Estado: aceptado
+- Estado: superado por ADR-005
 - Fecha: 27 de agosto de 2026
 - Alcance: secuencia A6–A8
+
+> Conservado como registro histórico. Desde el 28 de agosto de 2026,
+> `ADR-005-RETIRO-A6-MVP.md` retira A6 del MVP y elimina G6 como requisito de
+> A8.
 
 ## Contexto
 

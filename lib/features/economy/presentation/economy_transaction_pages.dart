@@ -128,10 +128,24 @@ class _EconomyTransactionFormPageState
         ? null
         : ref.watch(economyTransactionDetailProvider(widget.transactionId!));
     if (original?.isLoading == true) {
-      return const Center(child: CircularProgressIndicator());
+      return const TerminalAsyncStatePage(
+        child: TerminalLoadingState(
+          message: 'Preparando corrección del movimiento…',
+        ),
+      );
     }
-    if (original?.hasError == true ||
-        (widget.isCorrection && original?.value == null)) {
+    if (original?.hasError == true) {
+      return TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Movimiento no disponible',
+          description: 'No se pudo preparar la corrección del movimiento.',
+          onRetry: () => ref.invalidate(
+            economyTransactionDetailProvider(widget.transactionId!),
+          ),
+        ),
+      );
+    }
+    if (widget.isCorrection && original?.value == null) {
       return const _Unavailable(
         message: 'El movimiento que deseas corregir no está disponible.',
       );
@@ -418,9 +432,18 @@ class _EconomyTransactionDetailPageState
         }
         return _EconomyPageFrame(child: _detail(context, value));
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) =>
-          const _Unavailable(message: 'No se pudo leer el movimiento.'),
+      loading: () => const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Cargando movimiento…'),
+      ),
+      error: (_, _) => TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Movimiento no disponible',
+          description: 'No se pudo leer el movimiento.',
+          onRetry: () => ref.invalidate(
+            economyTransactionDetailProvider(widget.transactionId),
+          ),
+        ),
+      ),
     );
   }
 

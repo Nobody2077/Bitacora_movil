@@ -47,25 +47,34 @@ class _UserProfileEditDialogState extends ConsumerState<UserProfileEditDialog> {
     final bool busy = _savingName || _updatingAvatar;
 
     return AlertDialog(
+      scrollable: true,
       title: const Text('Tu perfil local'),
       content: SizedBox(
         width: 380,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            CircleAvatar(
-              radius: 48,
-              backgroundColor: tokens.terminalRed.withValues(alpha: 0.14),
-              foregroundImage: avatarPath == null
-                  ? null
-                  : FileImage(File(avatarPath)),
-              child: avatarPath == null
-                  ? Icon(
-                      Icons.person_outline,
-                      color: tokens.terminalRed,
-                      size: 48,
-                    )
-                  : null,
+            Semantics(
+              image: true,
+              label: avatarPath == null
+                  ? 'Perfil local sin fotografía'
+                  : 'Fotografía del perfil local',
+              child: ExcludeSemantics(
+                child: CircleAvatar(
+                  radius: 48,
+                  backgroundColor: tokens.terminalRed.withValues(alpha: 0.14),
+                  foregroundImage: avatarPath == null
+                      ? null
+                      : FileImage(File(avatarPath)),
+                  child: avatarPath == null
+                      ? Icon(
+                          Icons.person_outline,
+                          color: tokens.terminalRed,
+                          size: 48,
+                        )
+                      : null,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -81,7 +90,9 @@ class _UserProfileEditDialogState extends ConsumerState<UserProfileEditDialog> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.photo_library_outlined),
-                  label: const Text('Elegir foto'),
+                  label: Text(
+                    _updatingAvatar ? 'Actualizando foto' : 'Elegir foto',
+                  ),
                 ),
                 if (avatarPath != null)
                   TextButton.icon(
@@ -131,7 +142,7 @@ class _UserProfileEditDialogState extends ConsumerState<UserProfileEditDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save_outlined),
-          label: const Text('Guardar nombre'),
+          label: Text(_savingName ? 'Guardando nombre' : 'Guardar nombre'),
         ),
       ],
     );

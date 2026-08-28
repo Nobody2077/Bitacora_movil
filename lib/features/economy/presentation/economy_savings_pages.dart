@@ -165,9 +165,21 @@ class _EconomyGoalFormPageState extends ConsumerState<EconomyGoalFormPage> {
         ? null
         : ref.watch(savingsGoalDetailProvider(widget.goalId!));
     if (goal?.isLoading == true) {
-      return const Center(child: CircularProgressIndicator());
+      return const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Preparando meta de ahorro…'),
+      );
     }
-    if (goal?.hasError == true || (widget.isEditing && goal?.value == null)) {
+    if (goal?.hasError == true) {
+      return TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Meta no disponible',
+          description: 'No se pudo preparar la meta de ahorro.',
+          onRetry: () =>
+              ref.invalidate(savingsGoalDetailProvider(widget.goalId!)),
+        ),
+      );
+    }
+    if (widget.isEditing && goal?.value == null) {
       return const _GoalUnavailable();
     }
     _initialize(goal?.value);
@@ -346,8 +358,17 @@ class _EconomyGoalDetailPageState extends ConsumerState<EconomyGoalDetailPage> {
       data: (value) => value == null
           ? const _GoalUnavailable()
           : _SavingsFrame(child: _content(value)),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) => const _GoalUnavailable(),
+      loading: () => const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Cargando meta de ahorro…'),
+      ),
+      error: (_, _) => TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Meta no disponible',
+          description: 'No se pudo leer esta meta de ahorro.',
+          onRetry: () =>
+              ref.invalidate(savingsGoalDetailProvider(widget.goalId)),
+        ),
+      ),
     );
   }
 

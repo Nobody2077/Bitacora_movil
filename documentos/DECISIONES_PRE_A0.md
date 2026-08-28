@@ -1,8 +1,8 @@
 # Bitácora RPG Personal — decisiones vinculantes de construcción
 
-Versión: 1.3
-Fecha: 27 de agosto de 2026
-Estado: vigente; A0–A5 completadas, A6 diferida y A7 activa por la excepción ADR-004
+Versión: 1.4
+Fecha: 28 de agosto de 2026
+Estado: vigente; A0–A5 completadas, A6 retirada por ADR-005 y A7 lista para G7
 
 ## 1. Propósito y precedencia
 
@@ -218,6 +218,10 @@ Pruebas Drift en memoria pueden usar SQLite sin cifrar; toda prueba de integraci
 
 ### 9.3 Copia portátil
 
+> Alcance retirado del MVP por ADR-005. El contrato siguiente se conserva solo
+> como antecedente de seguridad para una eventual decisión futura y no autoriza
+> implementar ni almacenar copias en la versión 1.0.
+
 Toda exportación portable solicita una contraseña o frase de recuperación; no depende de una clave que solo exista en el teléfono. El contenedor v1 contiene manifiesto versionado, salt, parámetros KDF, nonces, bloques cifrados, tags y hashes.
 
 La clave de copia deriva con PBKDF2-HMAC-SHA256, salt aleatorio de 16 bytes, al menos 600.000 iteraciones y salida de 32 bytes. El contenido usa AES-256-GCM por bloques con nonce único. A6 medirá el costo en dispositivo y solo podrá aumentar el trabajo, nunca reducirlo por debajo del mínimo registrado.
@@ -249,11 +253,14 @@ Variantes obligatorias: `412×915`, `1280×800`, texto `2.0×`, alto contraste y
 | A3 | Misiones, tiempo, recurrencia, avisos y CompleteMission | hay duplicación o escritura parcial |
 | A4 | Ledger, reservas y saldos derivados | ledger y resúmenes divergen |
 | A5 | Bitácora, adjuntos, XP, niveles y Dashboard diario/semanal | read models o navegación a fuente fallan |
-| A6 | Exportación/restauración cifrada y portable | una copia alterada toca datos activos |
+| A6 | Retirada del MVP por ADR-005 | G6 retirada / no aplica |
 | A7 | UI v2 adaptativa, accesible y goldens canónicos | compacto, expandido o texto 2.0 fallan |
 | A8 | Rendimiento, regresión, APK/AAB y firma de producción | queda un caso bloqueante o evidencia incompleta |
 
-Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas específicas, build pertinente y actualización de este estado. No se inicia una fase nueva con el gate anterior rojo, salvo una excepción explícita registrada en un ADR. ADR-004 permite ejecutar A7 antes de A6, pero no desbloquea A8 sin G6 y G7 verdes.
+Cada fase activa termina con formato, `flutter analyze`, `flutter test`, pruebas
+específicas, build pertinente y actualización de este estado. No se inicia una
+fase nueva con el gate anterior rojo, salvo una excepción explícita registrada
+en un ADR. ADR-005 retira A6/G6 del MVP; A8 queda condicionada únicamente a G7.
 
 ## 12. Estado actual
 
@@ -266,6 +273,6 @@ Cada fase termina con formato, `flutter analyze`, `flutter test`, pruebas espec�
 - A4: completada; gate G4 en verde el 27 de agosto de 2026.
 - A5: completada; G5 quedó verde el 27 de agosto de 2026 después de aprobar la
   matriz automatizada y la validación física final de Progreso.
-- A6: diferida y pendiente por decisión explícita; G6 no está ejecutada.
-- A7: en curso por excepción según ADR-004; G7 todavía pendiente.
-- A8: bloqueada hasta que G6 y G7 estén verdes.
+- A6: retirada del MVP por decisión explícita; G6 retirada / no aplica.
+- A7: lista técnicamente para la validación física; G7 todavía pendiente.
+- A8: bloqueada hasta que G7 esté verde.

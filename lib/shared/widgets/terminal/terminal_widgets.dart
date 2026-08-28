@@ -594,6 +594,106 @@ class TerminalLoadingState extends StatelessWidget {
   );
 }
 
+class TerminalAsyncStatePage extends StatelessWidget {
+  const TerminalAsyncStatePage({
+    required this.child,
+    super.key,
+    this.maxWidth = 720,
+  });
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints constraints) =>
+        SingleChildScrollView(
+          padding: constraints.maxWidth < 700
+              ? TerminalSpace.pageCompact
+              : TerminalSpace.pageTablet,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: child,
+            ),
+          ),
+        ),
+  );
+}
+
+class TerminalInlineLoadingState extends StatelessWidget {
+  const TerminalInlineLoadingState({required this.message, super.key});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    liveRegion: true,
+    label: message,
+    child: ExcludeSemantics(
+      child: Row(
+        children: <Widget>[
+          const SizedBox.square(
+            dimension: 22,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          const SizedBox(width: TerminalSpace.sm),
+          Expanded(child: Text(message)),
+        ],
+      ),
+    ),
+  );
+}
+
+class TerminalInlineErrorState extends StatelessWidget {
+  const TerminalInlineErrorState({
+    required this.message,
+    super.key,
+    this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Semantics(
+          container: true,
+          liveRegion: true,
+          label: message,
+          child: ExcludeSemantics(
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.error_outline, color: tokens.criticalAction),
+                const SizedBox(width: TerminalSpace.xs),
+                Expanded(child: Text(message)),
+              ],
+            ),
+          ),
+        ),
+        if (onRetry != null)
+          Padding(
+            padding: const EdgeInsets.only(top: TerminalSpace.sm),
+            child: TerminalOutlineButton(
+              label: 'Reintentar',
+              icon: Icons.refresh,
+              color: tokens.infoCyan,
+              onPressed: onRetry,
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class TerminalErrorState extends StatelessWidget {
   const TerminalErrorState({
     required this.title,

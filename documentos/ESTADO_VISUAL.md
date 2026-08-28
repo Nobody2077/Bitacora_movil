@@ -118,27 +118,24 @@ Todos los estados combinan color con texto, icono o forma. Los controles
 mantienen un objetivo táctil mínimo de 48 × 48 y las transiciones usan 120,
 180 o 240 ms.
 
-## Migración pendiente
+## Cierre técnico A7
 
-El sistema base está operativo, pero no todas las rutas funcionales han sido
-migradas a componentes específicos todavía. Los siguientes incrementos deben
-migrar, sin alterar sus casos de uso ni sus pruebas:
+La auditoría transversal está cerrada técnicamente. Se conservan las siguientes
+decisiones para la validación física y mejoras posteriores:
 
-1. Acceso y ajustes de privacidad: sustituir las combinaciones restantes de
-   `Card` y `ListTile` por tarjetas de configuración terminales.
-2. Revisar físicamente Detalle y Nueva/Editar misión en tablet y terminar la
-   migración de diálogos secundarios. Inicio, el resumen de Misiones, Detalle
-   y Nueva/Editar ya usan la composición de operaciones del Documento 13.
-3. Extender a las demás pantallas la auditoría de texto 2.0×, foco, semántica,
-   contraste y objetivos táctiles. Apariencia ya cuenta con goldens compactos,
-   expandidos, alto contraste y texto 2.0×.
-4. Extender los estados compartidos a detalles, formularios y diálogos
-   secundarios; las listas y resúmenes principales ya usan el patrón común.
+1. Acceso y privacidad conservan sus controles Material validados en G2; una
+   futura sustitución visual de `Card`/`ListTile` no bloquea G7.
+2. Detalles y formularios usan estados de página accesibles; cargas de
+   selectores, calendario, vínculos y fotos privadas usan estados en línea.
+3. El diálogo de perfil es desplazable con texto 2.0× y sus operaciones cambian
+   de etiqueta mientras están activas. Los diálogos Material mantienen su
+   contención y orden de foco nativos.
+4. Los tres goldens de Apariencia siguen siendo la matriz canónica contractual.
+   La comprobación final pendiente es física, no otra migración de código.
 
 ## Verificación de este incremento
 
 A5 y G5 fueron aprobadas técnica y físicamente en la Redmi Pad el 27 de agosto
-de 2026. A7.3 aprobó `flutter analyze`, 178 pruebas, tres goldens canónicos y la
-APK `prod-debug`; G7 permanece abierto hasta completar detalles/formularios,
-ampliar la cobertura visual y realizar la validación física. A6 está diferida
-según ADR-004 y debe cerrarse antes de A8.
+de 2026. A7.4 aprobó `flutter analyze`, 182 pruebas, tres goldens canónicos y la
+APK `prod-debug`; G7 permanece abierto únicamente hasta realizar la validación
+física. A6/G6 fueron retiradas del MVP por ADR-005 y A8 dependerá solo de G7.

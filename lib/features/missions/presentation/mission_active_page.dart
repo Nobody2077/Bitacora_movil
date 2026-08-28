@@ -74,12 +74,22 @@ class _MissionActivePageState extends ConsumerState<MissionActivePage>
     final Mission? mission = _currentMission ?? loaded.value;
     if (mission == null) {
       if (loaded.isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return const TerminalAsyncStatePage(
+          child: TerminalLoadingState(message: 'Cargando cronómetro activo…'),
+        );
+      }
+      if (loaded.hasError) {
+        return TerminalAsyncStatePage(
+          child: TerminalErrorState(
+            title: 'Cronómetro no disponible',
+            description: 'No se pudo recuperar el cronómetro.',
+            onRetry: () =>
+                ref.invalidate(missionDetailProvider(widget.missionId)),
+          ),
+        );
       }
       return _UnavailableMission(
-        message: loaded.hasError
-            ? 'No se pudo recuperar el cronómetro.'
-            : 'La misión ya no está disponible.',
+        message: 'La misión ya no está disponible.',
         onBack: () => context.goNamed('missionsToday'),
       );
     }

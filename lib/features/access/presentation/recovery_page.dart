@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router/app_routes.dart';
+import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/access_session_controller.dart';
 import '../application/access_session_state.dart';
 import 'access_widgets.dart';
@@ -101,7 +102,9 @@ class _RecoveryPageState extends ConsumerState<RecoveryPage> {
           onPressed: _cancel,
           icon: const Icon(Icons.arrow_back),
         ),
-        child: const Center(child: CircularProgressIndicator()),
+        child: const TerminalInlineLoadingState(
+          message: 'Preparando recuperación segura…',
+        ),
       );
     }
 
@@ -138,7 +141,11 @@ class _RecoveryPageState extends ConsumerState<RecoveryPage> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.restart_alt),
-              label: const Text('Rotar credenciales y abrir'),
+              label: Text(
+                session.isBusy
+                    ? 'Rotando credenciales…'
+                    : 'Rotar credenciales y abrir',
+              ),
             ),
           ],
         ),
@@ -193,7 +200,11 @@ class _RecoveryPageState extends ConsumerState<RecoveryPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.key_outlined),
-            label: const Text('Validar y preparar rotación'),
+            label: Text(
+              session.isBusy
+                  ? 'Validando recuperación…'
+                  : 'Validar y preparar rotación',
+            ),
           ),
         ],
       ),

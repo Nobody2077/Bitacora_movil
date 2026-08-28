@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router/app_routes.dart';
+import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/access_session_controller.dart';
 import '../application/access_session_state.dart';
 import '../domain/biometric_authenticator.dart';
@@ -78,7 +79,9 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
         title: 'Verificando acceso',
         subtitle:
             'La base privada permanece cerrada durante esta comprobación.',
-        child: Center(child: CircularProgressIndicator()),
+        child: TerminalInlineLoadingState(
+          message: 'Verificando acceso privado…',
+        ),
       ),
       AccessSessionPhase.setupRequired => _buildSetup(session),
       AccessSessionPhase.locked ||
@@ -102,12 +105,16 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
       AccessSessionPhase.recovering => const AccessScaffold(
         title: 'Abriendo recuperación',
         subtitle: 'Preparando la puerta de recuperación local.',
-        child: Center(child: CircularProgressIndicator()),
+        child: TerminalInlineLoadingState(
+          message: 'Abriendo recuperación local…',
+        ),
       ),
       AccessSessionPhase.unlocked => const AccessScaffold(
         title: 'Acceso confirmado',
         subtitle: 'Restaurando el destino interno de forma segura.',
-        child: Center(child: CircularProgressIndicator()),
+        child: TerminalInlineLoadingState(
+          message: 'Restaurando destino protegido…',
+        ),
       ),
     };
   }
@@ -142,7 +149,11 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.verified_user_outlined),
-              label: const Text('Confirmar y abrir Bitácora'),
+              label: Text(
+                session.isBusy
+                    ? 'Confirmando acceso…'
+                    : 'Confirmar y abrir Bitácora',
+              ),
             ),
           ],
         ),
@@ -183,7 +194,7 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.key_outlined),
-            label: const Text('Crear acceso'),
+            label: Text(session.isBusy ? 'Creando acceso…' : 'Crear acceso'),
           ),
         ],
       ),
@@ -219,7 +230,7 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.lock_open_outlined),
-          label: const Text('Abrir Bitácora'),
+          label: Text(session.isBusy ? 'Abriendo Bitácora…' : 'Abrir Bitácora'),
         ),
         if (session.biometricsEnabled &&
             session.biometricAvailability ==

@@ -32,8 +32,16 @@ class JournalEntryDetailPage extends ConsumerWidget {
       data: (JournalEntry? value) => value == null
           ? const _Unavailable()
           : JournalPageFrame(child: _detail(context, ref, value)),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) => const _Unavailable(),
+      loading: () => const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Cargando entrada de Bitácora…'),
+      ),
+      error: (_, _) => TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Entrada no disponible',
+          description: 'No se pudo leer la entrada desde la base local.',
+          onRetry: () => ref.invalidate(journalEntryDetailProvider(entryId)),
+        ),
+      ),
     );
   }
 
@@ -322,9 +330,14 @@ class _JournalPhotosPanelState extends ConsumerState<_JournalPhotosPanel> {
                       );
                     },
                   ),
-            loading: () => const LinearProgressIndicator(),
-            error: (_, _) =>
-                const Text('No se pudieron leer las fotografías privadas.'),
+            loading: () => const TerminalInlineLoadingState(
+              message: 'Cargando fotografías privadas…',
+            ),
+            error: (_, _) => TerminalInlineErrorState(
+              message: 'No se pudieron leer las fotografías privadas.',
+              onRetry: () =>
+                  ref.invalidate(journalPhotosProvider(widget.entry.id)),
+            ),
           ),
         ],
       ),
@@ -442,9 +455,20 @@ class _PrivatePhotoTile extends ConsumerWidget {
                   gaplessPlayback: true,
                 ),
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => const Center(
-                child: Icon(Icons.broken_image_outlined, size: 36),
+              loading: () => Semantics(
+                liveRegion: true,
+                label: 'Cargando fotografía privada',
+                child: ExcludeSemantics(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+              error: (_, _) => Semantics(
+                label: 'Fotografía privada no disponible',
+                child: ExcludeSemantics(
+                  child: Center(
+                    child: Icon(Icons.broken_image_outlined, size: 36),
+                  ),
+                ),
               ),
             ),
             Positioned(
@@ -526,9 +550,12 @@ class _SourcePanel extends ConsumerWidget {
                       pathParameters: <String, String>{'missionId': id},
                     ),
                   ),
-            loading: () => const LinearProgressIndicator(),
-            error: (_, _) => const _MissingSource(
-              label: 'No se pudo leer la misión vinculada.',
+            loading: () => const TerminalInlineLoadingState(
+              message: 'Cargando misión vinculada…',
+            ),
+            error: (_, _) => TerminalInlineErrorState(
+              message: 'No se pudo leer la misión vinculada.',
+              onRetry: () => ref.invalidate(missionDetailProvider(id)),
             ),
           );
     }
@@ -564,9 +591,12 @@ class _SourcePanel extends ConsumerWidget {
                     pathParameters: <String, String>{'transactionId': id},
                   ),
                 ),
-          loading: () => const LinearProgressIndicator(),
-          error: (_, _) => const _MissingSource(
-            label: 'No se pudo leer el movimiento vinculado.',
+          loading: () => const TerminalInlineLoadingState(
+            message: 'Cargando movimiento vinculado…',
+          ),
+          error: (_, _) => TerminalInlineErrorState(
+            message: 'No se pudo leer el movimiento vinculado.',
+            onRetry: () => ref.invalidate(economyTransactionDetailProvider(id)),
           ),
         );
   }

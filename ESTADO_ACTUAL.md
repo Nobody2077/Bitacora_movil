@@ -13,8 +13,8 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   aprobado físicamente el 27 de agosto de 2026.
 - A5.1–A5.3 y la ampliación final de Progreso fueron aprobadas físicamente el
   27 de agosto de 2026. A5 está completada y G5 está verde.
-- ADR-004 difiere A6 sin eliminarla del MVP y autoriza trabajar A7 antes de G6.
-  A8 permanece bloqueada hasta tener G6 y G7 verdes.
+- ADR-005 retira A6 del MVP y deja G6 sin aplicación. No habrá exportación,
+  restauración ni historial local de copias. A8 permanece bloqueada hasta G7.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
@@ -22,11 +22,11 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La ampliación final de Progreso aprobó formato, `flutter analyze`, 161 pruebas
   y `assembleProdDebug` el 27 de agosto de 2026.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Último incremento: **A7.3**. Además de Apariencia y su matriz adaptable, los
-  estados de carga, vacío y error/reintento usan componentes Terminal accesibles
-  en las rutas principales. Son regiones vivas, conservan orden de foco y pasan
-  las guías de toque, etiqueta y contraste con texto 2.0×. La matriz está verde
-  con 178 pruebas y APK `prod-debug`; G7 todavía no está cerrada.
+- Último incremento: **A7.4**. Los estados accesibles se extendieron a detalles,
+  formularios, selectores en línea, fotografías privadas y acceso. El diálogo
+  de perfil admite desplazamiento con texto 2.0× y comunica sus operaciones.
+  La matriz está verde con 182 pruebas y APK `prod-debug`; A7 está lista
+  técnicamente y G7 solo espera la validación física.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -58,8 +58,7 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 1. No limpiar datos de la app: es almacenamiento local cifrado.
 2. A5 y G5 están cerradas, incluida la validación física de títulos, rachas y
    niveles por área el 27 de agosto de 2026.
-3. A6 está diferida, no completada. Continuar A7 según ADR-004 y no iniciar A8
-   hasta cerrar G6 y G7.
+3. A6 fue retirada del MVP según ADR-005. No iniciar A8 hasta cerrar G7.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -281,12 +280,13 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   contrato y el alcance temporal están documentados en ADR-003.
 - La matriz automatizada final aprobó formato, análisis, **161 pruebas** y APK
   `prod-debug`; la validación física final fue aprobada el 27 de agosto de 2026.
-- Copia/restauración, UI v2 final, accesibilidad completa y release pertenecen a A6–A8.
+- UI v2, accesibilidad y release pertenecen a A7–A8. Copia/restauración fue
+  retirada del MVP por ADR-005.
 
-### A6 diferida y A7 en curso por excepción
+### A6 retirada y A7 lista para G7
 
-- ADR-004 conserva A6 como pendiente y permite ejecutar A7 antes de G6. A8
-  continúa bloqueada hasta completar G6 y G7.
+- ADR-005 retira A6 y G6 del MVP. La aplicación no crea copias ni reserva
+  espacio para un historial de exportaciones. A8 depende ahora solo de G7.
 - `/settings/appearance` es una ruta funcional con estados de carga, error y
   guardado para las cuatro preferencias visuales persistidas.
 - La raíz observa Ajustes únicamente con la sesión desbloqueada. Texto grande
@@ -308,10 +308,14 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   reintento recuperable.
 - Las pruebas verifican anuncio semántico de carga/vacío/error, entrada del
   reintento en el orden de foco y accesibilidad con texto 2.0×.
-- `flutter analyze`: limpio; `flutter test`: **178/178**; `assembleProdDebug`:
+- A7.4 incorpora estados de página e internos en detalles y formularios de
+  Misiones, Recurrencias, Economía y Bitácora. Acceso anuncia sus transiciones;
+  el diálogo de perfil es desplazable y accesible en compacto con texto 2.0×.
+- Los tres goldens canónicos existentes cubren las variantes contractuales; la
+  auditoría no encontró necesario duplicarlos por cada ruta secundaria.
+- `flutter analyze`: limpio; `flutter test`: **182/182**; `assembleProdDebug`:
   aprobado el 28 de agosto de 2026.
-- Pendiente de A7: auditoría de detalles/formularios y diálogos secundarios,
-  ampliación de goldens y validación física.
+- Pendiente de A7: únicamente la validación física G7.
 
 ---
 
@@ -389,10 +393,9 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-Continuar A7 con la auditoría de adaptación, estados y accesibilidad por módulo.
-Después completar la auditoría y los goldens del resto de módulos, más la
-validación física de G7. A6 debe retomarse y cerrar G6 antes de A8; sus pantallas
-reutilizarán el contrato visual consolidado en A7.
+Ejecutar `documentos/G7-VALIDACION-FISICA.md` sobre la APK `prod-debug`. Con G7
+verde, iniciar A8 para regresión, rendimiento, versionado, firma y artefactos
+release. A6/G6 no forman parte del MVP según ADR-005.
 
 ---
 

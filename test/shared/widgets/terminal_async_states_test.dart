@@ -101,15 +101,75 @@ void main() {
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     await expectLater(tester, meetsGuideline(textContrastGuideline));
   });
+
+  testWidgets('página de estado se adapta en compacto con texto 2.0x', (
+    WidgetTester tester,
+  ) async {
+    await _pumpState(
+      tester,
+      TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Formulario no disponible',
+          description: 'No se pudieron preparar los datos locales.',
+          onRetry: () {},
+        ),
+      ),
+      size: const Size(320, 568),
+      textScale: 2,
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Formulario no disponible'), findsOneWidget);
+    expect(find.text('REINTENTAR'), findsOneWidget);
+  });
+
+  testWidgets('estado de carga en línea anuncia la operación', (
+    WidgetTester tester,
+  ) async {
+    await _pumpState(
+      tester,
+      const TerminalInlineLoadingState(
+        message: 'Cargando fotografías privadas…',
+      ),
+    );
+
+    final SemanticsNode node = tester.getSemantics(
+      find.bySemanticsLabel('Cargando fotografías privadas…'),
+    );
+    expect(node.flagsCollection.isLiveRegion, isTrue);
+  });
+
+  testWidgets('error en línea anuncia y permite reintentar', (
+    WidgetTester tester,
+  ) async {
+    var retryCount = 0;
+    await _pumpState(
+      tester,
+      TerminalInlineErrorState(
+        message: 'No se pudieron cargar las opciones.',
+        onRetry: () => retryCount += 1,
+      ),
+      textScale: 2,
+    );
+
+    final SemanticsNode node = tester.getSemantics(
+      find.bySemanticsLabel('No se pudieron cargar las opciones.'),
+    );
+    expect(node.flagsCollection.isLiveRegion, isTrue);
+    await tester.tap(find.text('REINTENTAR'));
+    expect(retryCount, 1);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpState(
   WidgetTester tester,
   Widget state, {
+  Size size = const Size(412, 915),
   double textScale = 1,
 }) async {
   tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = const Size(412, 915);
+  tester.view.physicalSize = size;
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
   await tester.pumpWidget(

@@ -31,9 +31,25 @@ class _MissionSwitchTimerPageState
     );
     final AsyncValue<Mission?> active = ref.watch(activeTimerMissionProvider);
     if (target.isLoading || active.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const TerminalAsyncStatePage(
+        child: TerminalLoadingState(
+          message: 'Preparando cambio de cronómetro…',
+        ),
+      );
     }
-    if (target.hasError || active.hasError || target.value == null) {
+    if (target.hasError || active.hasError) {
+      return TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Cronómetro no disponible',
+          description: 'No se pudo preparar el cambio de cronómetro.',
+          onRetry: () {
+            ref.invalidate(missionDetailProvider(widget.missionId));
+            ref.invalidate(activeTimerMissionProvider);
+          },
+        ),
+      );
+    }
+    if (target.value == null) {
       return _SwitchUnavailable(onBack: () => context.goNamed('missionsToday'));
     }
 

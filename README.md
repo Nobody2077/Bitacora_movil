@@ -4,7 +4,9 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A5 están completadas y G5 está verde. A6 queda diferida y pendiente por decisión explícita del usuario. A7 está en curso por excepción, con Apariencia y su matriz adaptable/accesible conectadas; A8 requiere G6 y G7 verdes.
+> **Estado actual:** A0–A5 están completadas y G5 está verde. A6 fue retirada
+> del MVP por decisión explícita del usuario y G6 ya no aplica. A7 está lista
+> técnicamente para la validación física G7; A8 requiere G7 verde.
 
 ## Qué busca ofrecer
 
@@ -26,9 +28,9 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
 | A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
-| A6 — Copia y restauración | Diferida / pendiente | G6 no ejecutada; debe retomarse antes de A8 |
-| A7 — UI v2 y accesibilidad | En curso por excepción | Apariencia, estados asíncronos accesibles, 3 goldens canónicos y 178 pruebas |
-| A8 — Release | Bloqueada | Requiere G6 y G7 verdes |
+| A6 — Copia y restauración | Retirada del MVP | ADR-005; G6 retirada / no aplica |
+| A7 — UI v2 y accesibilidad | Lista para G7 | Auditoría adaptable/accesible, 3 goldens canónicos y 182 pruebas |
+| A8 — Release | Bloqueada | Requiere G7 verde |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
 
@@ -47,7 +49,8 @@ trabajo actual es A7: su primer incremento conecta `/settings/appearance` con
 preferencias persistentes y reactivas. A7.2 añade composición exacta en los
 breakpoints, equivalencia teléfono/tablet, texto 2.0× y goldens compactos y
 expandidos. A7.3 unifica carga, vacío, error y reintento con semántica y foco en
-las rutas principales. A6 continúa pendiente según ADR-004.
+las rutas principales. A7.4 extiende el patrón a detalles, formularios,
+contenido en línea y el diálogo de perfil. ADR-005 retira A6 del MVP.
 
 ## Arquitectura resumida
 
@@ -78,10 +81,12 @@ Orden recomendado de lectura:
 3. [`documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md`](documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md): persistencia y cifrado.
 4. [`documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`](documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md): acceso y privacidad.
 5. [`documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md`](documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md): reglas de títulos, rachas y niveles.
-6. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): excepción de secuencia A6–A8.
-7. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
-8. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
-9. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
+6. [`documentos/ADR-005-RETIRO-A6-MVP.md`](documentos/ADR-005-RETIRO-A6-MVP.md): retiro de A6 y secuencia vigente hacia A8.
+7. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): antecedente histórico superado por ADR-005.
+8. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
+9. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico pendiente para cerrar A7.
+10. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
+11. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.
 
 Cuando un documento fuente contradiga una decisión posterior, prevalecen `DECISIONES_PRE_A0.md` y los ADR aplicables.

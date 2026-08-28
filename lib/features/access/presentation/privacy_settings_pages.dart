@@ -129,7 +129,9 @@ class _PrivacySettingsPageState extends ConsumerState<PrivacySettingsPage> {
         ),
         if (_saving) ...<Widget>[
           const SizedBox(height: 10),
-          const LinearProgressIndicator(),
+          const TerminalInlineLoadingState(
+            message: 'Guardando tiempo de autobloqueo…',
+          ),
         ],
         const SizedBox(height: 24),
         Card(
@@ -330,7 +332,13 @@ class _BiometricsSettingsPageState
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.fingerprint),
-          label: Text(enabled ? 'Desactivar biometría' : 'Activar biometría'),
+          label: Text(
+            session.isBusy
+                ? 'Actualizando biometría…'
+                : enabled
+                ? 'Desactivar biometría'
+                : 'Activar biometría',
+          ),
         ),
       ],
     );

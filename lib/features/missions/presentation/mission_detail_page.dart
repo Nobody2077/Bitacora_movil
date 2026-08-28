@@ -51,10 +51,15 @@ class MissionDetailPage extends ConsumerWidget {
           onArchive: () => _confirmArchive(context, ref, value),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (Object error, StackTrace stackTrace) => _MissingMission(
-        message: 'No se pudo abrir la misión.',
-        onBack: () => context.goNamed('missionsToday'),
+      loading: () => const TerminalAsyncStatePage(
+        child: TerminalLoadingState(message: 'Cargando detalle de misión…'),
+      ),
+      error: (Object error, StackTrace stackTrace) => TerminalAsyncStatePage(
+        child: TerminalErrorState(
+          title: 'Misión no disponible',
+          description: 'No se pudo abrir la misión desde la base local.',
+          onRetry: () => ref.invalidate(missionDetailProvider(missionId)),
+        ),
       ),
     );
   }
@@ -596,10 +601,9 @@ class _ActivityPanel extends StatelessWidget {
 }
 
 class _MissingMission extends StatelessWidget {
-  const _MissingMission({required this.onBack, this.message});
+  const _MissingMission({required this.onBack});
 
   final VoidCallback onBack;
-  final String? message;
 
   @override
   Widget build(BuildContext context) => Center(
@@ -611,7 +615,7 @@ class _MissingMission extends StatelessWidget {
           children: <Widget>[
             const Icon(Icons.search_off, size: 48, color: Colors.white38),
             const SizedBox(height: 12),
-            Text(message ?? 'La misión no existe.'),
+            const Text('La misión no existe.'),
             const SizedBox(height: 16),
             TerminalPrimaryButton(
               label: 'Volver a misiones',

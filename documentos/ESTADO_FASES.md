@@ -12,9 +12,9 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
-| A6 — Copia y restauración | **DIFERIDA / PENDIENTE** | G6 no ejecutada; ADR-004 |
-| A7 — UI v2 y accesibilidad | **EN CURSO POR EXCEPCIÓN** | A7.1–A7.3 técnicas verdes; G7 pendiente |
-| A8 — Release | BLOQUEADA | Requiere G6 y G7 |
+| A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
+| A7 — UI v2 y accesibilidad | **LISTA PARA VALIDACIÓN FÍSICA** | A7.1–A7.4 técnicas verdes; G7 pendiente |
+| A8 — Release | BLOQUEADA | Requiere G7 verde |
 
 ## Evidencia G3 — A3 completada
 
@@ -180,10 +180,10 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - El usuario aprobó físicamente títulos, rachas y niveles por área el 27 de
   agosto de 2026. **A5 queda completada y G5 queda verde.**
 
-## Excepción de secuencia y evidencia inicial A7
+## Retiro de A6 y evidencia técnica A7
 
-- `ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md` registra la decisión explícita de
-  diferir A6 sin marcarla completada y activar A7 antes de G6.
+- `ADR-005-RETIRO-A6-MVP.md` registra la decisión explícita de retirar A6 del
+  MVP. G6 deja de aplicar y A8 queda condicionada únicamente a G7.
 - `/settings/appearance` dejó de ser placeholder y persiste Texto grande,
   Reducir movimiento, Alto contraste y Ocultar importes.
 - La raíz observa los ajustes solo con sesión desbloqueada y aplica texto de
@@ -203,12 +203,18 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   accesibilidad automática con texto 2.0×.
 - El patrón compartido ya se usa en las rutas principales de Misiones,
   Recurrencias, Economía, Bitácora y Progreso.
+- A7.4 extiende estados de página e internos a detalles y formularios de
+  Misiones, Recurrencias, Economía y Bitácora, incluido calendario, fuentes
+  vinculadas y fotografías privadas.
+- Las transiciones de Acceso tienen mensajes anunciables. El diálogo de perfil
+  es desplazable y pasa su variante compacta con texto 2.0×.
+- Los tres goldens canónicos existentes cubren compacto, expandido/alto
+  contraste y texto 2.0×; la auditoría secundaria no exige duplicarlos por ruta.
 - `flutter analyze`: cero problemas.
-- `flutter test`: **178/178 pruebas aprobadas**.
+- `flutter test`: **182/182 pruebas aprobadas**.
 - `assembleProdDebug`: APK compilada correctamente el 28 de agosto de 2026.
-- A7 continúa en curso: faltan la auditoría completa del resto de pantallas,
-  detalles/formularios secundarios, ampliación de goldens y validación física.
-- A8 sigue bloqueada hasta completar G6 y G7.
+- A7 está lista técnicamente; solo falta la validación física G7.
+- A8 sigue bloqueada hasta completar G7.
 
 ## Evidencia G0
 
