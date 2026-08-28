@@ -13,8 +13,8 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
-| A7 — UI v2 y accesibilidad | **LISTA PARA VALIDACIÓN FÍSICA** | A7.1–A7.4 técnicas verdes; G7 pendiente |
-| A8 — Release | BLOQUEADA | Requiere G7 verde |
+| A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
+| A8 — Release | **AUTORIZADA** | Siguiente fase |
 
 ## Evidencia G3 — A3 completada
 
@@ -213,8 +213,10 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - `flutter analyze`: cero problemas.
 - `flutter test`: **182/182 pruebas aprobadas**.
 - `assembleProdDebug`: APK compilada correctamente el 28 de agosto de 2026.
-- A7 está lista técnicamente; solo falta la validación física G7.
-- A8 sigue bloqueada hasta completar G7.
+- El usuario aprobó el recorrido físico el 28 de agosto de 2026. Este mensaje no
+  volvió a especificar modelo ni versión Android; la referencia de los gates
+  físicos anteriores es una Redmi Pad 2. No declaró bloqueos.
+- **A7 queda completada y G7 queda verde. A8 está autorizada.**
 
 ## Evidencia G0
 

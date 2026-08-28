@@ -1,6 +1,9 @@
 # G7 — Validación física de UI v2 y accesibilidad
 
-Estado: pendiente de ejecución en dispositivo Android real.
+Estado: **APROBADA** por el usuario el 28 de agosto de 2026.
+
+Dispositivo de esta aprobación: modelo y versión Android no reiterados por el
+usuario. Referencia de los gates físicos anteriores: Redmi Pad 2.
 
 ## Preparación
 
@@ -35,3 +38,9 @@ del usuario en `ESTADO_FASES.md`.
 Las cargas y errores difíciles de provocar físicamente ya están cubiertos por
 pruebas automatizadas; el objetivo del recorrido real es validar Android,
 TalkBack, teclado, toque, orientación y escala del sistema.
+
+## Resultado
+
+El usuario aprobó el recorrido físico sin declarar bloqueos el 28 de agosto de
+2026. Con la evidencia técnica de A7.1–A7.4, **G7 queda verde y A7 completada**.
+A8 queda autorizada como siguiente fase.

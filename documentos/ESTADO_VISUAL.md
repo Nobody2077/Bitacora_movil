@@ -118,24 +118,24 @@ Todos los estados combinan color con texto, icono o forma. Los controles
 mantienen un objetivo táctil mínimo de 48 × 48 y las transiciones usan 120,
 180 o 240 ms.
 
-## Cierre técnico A7
+## Cierre A7
 
-La auditoría transversal está cerrada técnicamente. Se conservan las siguientes
-decisiones para la validación física y mejoras posteriores:
+La auditoría transversal y su validación física están cerradas. Se conservan
+las siguientes decisiones para mejoras posteriores:
 
 1. Acceso y privacidad conservan sus controles Material validados en G2; una
-   futura sustitución visual de `Card`/`ListTile` no bloquea G7.
+   futura sustitución visual de `Card`/`ListTile` no bloqueó G7.
 2. Detalles y formularios usan estados de página accesibles; cargas de
    selectores, calendario, vínculos y fotos privadas usan estados en línea.
 3. El diálogo de perfil es desplazable con texto 2.0× y sus operaciones cambian
    de etiqueta mientras están activas. Los diálogos Material mantienen su
    contención y orden de foco nativos.
 4. Los tres goldens de Apariencia siguen siendo la matriz canónica contractual.
-   La comprobación final pendiente es física, no otra migración de código.
 
 ## Verificación de este incremento
 
 A5 y G5 fueron aprobadas técnica y físicamente en la Redmi Pad el 27 de agosto
 de 2026. A7.4 aprobó `flutter analyze`, 182 pruebas, tres goldens canónicos y la
-APK `prod-debug`; G7 permanece abierto únicamente hasta realizar la validación
-física. A6/G6 fueron retiradas del MVP por ADR-005 y A8 dependerá solo de G7.
+APK `prod-debug`. El usuario aprobó la validación física el 28 de agosto de 2026;
+A7 queda completada y G7 verde. A6/G6 fueron retiradas del MVP por ADR-005 y A8
+queda autorizada.

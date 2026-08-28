@@ -4,9 +4,9 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A5 están completadas y G5 está verde. A6 fue retirada
-> del MVP por decisión explícita del usuario y G6 ya no aplica. A7 está lista
-> técnicamente para la validación física G7; A8 requiere G7 verde.
+> **Estado actual:** A0–A5 y A7 están completadas; G7 quedó verde con la
+> aprobación física del usuario el 28 de agosto de 2026. A6 fue retirada del
+> MVP y G6 no aplica. A8 está autorizada como siguiente fase.
 
 ## Qué busca ofrecer
 
@@ -29,8 +29,8 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
 | A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
 | A6 — Copia y restauración | Retirada del MVP | ADR-005; G6 retirada / no aplica |
-| A7 — UI v2 y accesibilidad | Lista para G7 | Auditoría adaptable/accesible, 3 goldens canónicos y 182 pruebas |
-| A8 — Release | Bloqueada | Requiere G7 verde |
+| A7 — UI v2 y accesibilidad | Completada | G7 verde: auditoría, 3 goldens, 182 pruebas y validación física |
+| A8 — Release | Autorizada | Siguiente fase: rendimiento, regresión y artefactos release |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
 
@@ -51,6 +51,7 @@ breakpoints, equivalencia teléfono/tablet, texto 2.0× y goldens compactos y
 expandidos. A7.3 unifica carga, vacío, error y reintento con semántica y foco en
 las rutas principales. A7.4 extiende el patrón a detalles, formularios,
 contenido en línea y el diálogo de perfil. ADR-005 retira A6 del MVP.
+La aprobación física cerró G7; el trabajo siguiente es A8.
 
 ## Arquitectura resumida
 
@@ -84,7 +85,7 @@ Orden recomendado de lectura:
 6. [`documentos/ADR-005-RETIRO-A6-MVP.md`](documentos/ADR-005-RETIRO-A6-MVP.md): retiro de A6 y secuencia vigente hacia A8.
 7. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): antecedente histórico superado por ADR-005.
 8. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
-9. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico pendiente para cerrar A7.
+9. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico aprobado que cerró A7.
 10. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
 11. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.

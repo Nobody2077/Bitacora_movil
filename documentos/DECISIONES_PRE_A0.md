@@ -1,8 +1,8 @@
 # Bitácora RPG Personal — decisiones vinculantes de construcción
 
-Versión: 1.4
+Versión: 1.5
 Fecha: 28 de agosto de 2026
-Estado: vigente; A0–A5 completadas, A6 retirada por ADR-005 y A7 lista para G7
+Estado: vigente; A0–A5 y A7 completadas, A6 retirada y A8 autorizada
 
 ## 1. Propósito y precedencia
 
@@ -274,5 +274,5 @@ en un ADR. ADR-005 retira A6/G6 del MVP; A8 queda condicionada únicamente a G7.
 - A5: completada; G5 quedó verde el 27 de agosto de 2026 después de aprobar la
   matriz automatizada y la validación física final de Progreso.
 - A6: retirada del MVP por decisión explícita; G6 retirada / no aplica.
-- A7: lista técnicamente para la validación física; G7 todavía pendiente.
-- A8: bloqueada hasta que G7 esté verde.
+- A7: completada; G7 verde el 28 de agosto de 2026.
+- A8: autorizada como siguiente fase.

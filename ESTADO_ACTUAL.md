@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **28 de agosto de 2026** (G5 verde; A7 activa por excepción)
+- Última revisión: **28 de agosto de 2026** (G7 verde; A8 autorizada)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -14,7 +14,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - A5.1–A5.3 y la ampliación final de Progreso fueron aprobadas físicamente el
   27 de agosto de 2026. A5 está completada y G5 está verde.
 - ADR-005 retira A6 del MVP y deja G6 sin aplicación. No habrá exportación,
-  restauración ni historial local de copias. A8 permanece bloqueada hasta G7.
+  restauración ni historial local de copias.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
@@ -25,8 +25,8 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - Último incremento: **A7.4**. Los estados accesibles se extendieron a detalles,
   formularios, selectores en línea, fotografías privadas y acceso. El diálogo
   de perfil admite desplazamiento con texto 2.0× y comunica sus operaciones.
-  La matriz está verde con 182 pruebas y APK `prod-debug`; A7 está lista
-  técnicamente y G7 solo espera la validación física.
+  La matriz está verde con 182 pruebas y APK `prod-debug`. El usuario aprobó la
+  validación física el 28 de agosto de 2026: A7 está completada y G7 verde.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -58,7 +58,7 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 1. No limpiar datos de la app: es almacenamiento local cifrado.
 2. A5 y G5 están cerradas, incluida la validación física de títulos, rachas y
    niveles por área el 27 de agosto de 2026.
-3. A6 fue retirada del MVP según ADR-005. No iniciar A8 hasta cerrar G7.
+3. A6 fue retirada del MVP según ADR-005. G7 está verde y A8 autorizada.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -283,10 +283,10 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 - UI v2, accesibilidad y release pertenecen a A7–A8. Copia/restauración fue
   retirada del MVP por ADR-005.
 
-### A6 retirada y A7 lista para G7
+### A6 retirada y A7 completada
 
 - ADR-005 retira A6 y G6 del MVP. La aplicación no crea copias ni reserva
-  espacio para un historial de exportaciones. A8 depende ahora solo de G7.
+  espacio para un historial de exportaciones.
 - `/settings/appearance` es una ruta funcional con estados de carga, error y
   guardado para las cuatro preferencias visuales persistidas.
 - La raíz observa Ajustes únicamente con la sesión desbloqueada. Texto grande
@@ -315,7 +315,10 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   auditoría no encontró necesario duplicarlos por cada ruta secundaria.
 - `flutter analyze`: limpio; `flutter test`: **182/182**; `assembleProdDebug`:
   aprobado el 28 de agosto de 2026.
-- Pendiente de A7: únicamente la validación física G7.
+- El usuario aprobó el recorrido físico G7 el 28 de agosto de 2026. Este mensaje
+  no volvió a especificar modelo ni versión Android; la referencia registrada
+  en los gates físicos anteriores es una Redmi Pad 2. **A7 queda completada y
+  G7 verde.**
 
 ---
 
@@ -393,9 +396,8 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-Ejecutar `documentos/G7-VALIDACION-FISICA.md` sobre la APK `prod-debug`. Con G7
-verde, iniciar A8 para regresión, rendimiento, versionado, firma y artefactos
-release. A6/G6 no forman parte del MVP según ADR-005.
+Iniciar A8 para regresión, rendimiento, versionado, firma y artefactos release.
+A6/G6 no forman parte del MVP según ADR-005.
 
 ---
 
