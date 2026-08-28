@@ -89,6 +89,7 @@ void main() {
       expect(data.areaBreakdown.first.areaName, 'Personal');
       expect(data.areaBreakdown.first.amount, 1000);
       expect(data.areaBreakdown.first.percentage, closeTo(66.6, 0.1));
+      expect(data.areaBreakdown.first.rpgLevel.level, 4);
     },
   );
 
@@ -114,6 +115,124 @@ void main() {
       expect(data.areaBreakdown.first.areaName, 'Proyectos');
       expect(data.areaBreakdown.first.percentage, 100.0);
     },
+  );
+
+  test(
+    'activa, desactiva y recupera el título dinámico preservando la mejor racha',
+    () async {
+      for (int day = 21; day <= 27; day += 1) {
+        await _insertCompletedMission(
+          database,
+          id: 'streak-a-$day',
+          completedAt: DateTime(2026, 8, day, 12).toUtc(),
+        );
+      }
+
+      final first = await service.loadOverallProgress();
+      final firstData = (first as Success<OverallProgressViewData>).value;
+      expect(firstData.currentStreak, 7);
+      expect(firstData.bestStreak, 7);
+      expect(firstData.activeTitles, hasLength(1));
+      expect(firstData.activeTitles.single.name, 'Ritmo constante');
+      expect(firstData.activeTitles.single.status, ProgressTitleStatus.active);
+      expect(firstData.activeTitles.single.recoveryCount, 0);
+
+      final DateTime brokenUtc = DateTime(2026, 8, 29, 18).toUtc();
+      final brokenService = ProgressApplicationService(
+        progressRepository: progressRepository,
+        dailyCloseRepository: dailyCloseRepository,
+        missionRepository: missionRepository,
+        clock: _FixedProgressClock(brokenUtc),
+      );
+      final broken = await brokenService.loadOverallProgress();
+      expect(
+        (broken as Success<OverallProgressViewData>).value.activeTitles,
+        isEmpty,
+      );
+
+      for (int day = 30; day <= 36; day += 1) {
+        await _insertCompletedMission(
+          database,
+          id: 'streak-b-$day',
+          completedAt: DateTime(2026, 8, day, 12).toUtc(),
+        );
+      }
+      final DateTime recoveredUtc = DateTime(2026, 9, 5, 18).toUtc();
+      final recoveredService = ProgressApplicationService(
+        progressRepository: progressRepository,
+        dailyCloseRepository: dailyCloseRepository,
+        missionRepository: missionRepository,
+        clock: _FixedProgressClock(recoveredUtc),
+      );
+      final recovered = await recoveredService.loadOverallProgress();
+      final recoveredData =
+          (recovered as Success<OverallProgressViewData>).value;
+      expect(recoveredData.currentStreak, 7);
+      expect(recoveredData.bestStreak, 7);
+      expect(recoveredData.activeTitles, hasLength(1));
+      expect(recoveredData.activeTitles.single.recoveryCount, 1);
+
+      final history = await database.customSelect('''
+        SELECT status, best_streak, recovery_count
+        FROM title_history
+        WHERE title_id = '${DefaultSeedV1.dailyStreakTitleId}'
+        ORDER BY activated_at ASC
+      ''').get();
+      expect(history, hasLength(2));
+      expect(history.first.read<String>('status'), 'INACTIVE');
+      expect(history.first.read<int>('best_streak'), 7);
+      expect(history.last.read<String>('status'), 'ACTIVE');
+      expect(history.last.read<int>('recovery_count'), 1);
+    },
+  );
+
+  test('gana permanentemente Centinela del hogar con 100 misiones', () async {
+    await database.transaction(() async {
+      for (int index = 0; index < 100; index += 1) {
+        await _insertCompletedMission(
+          database,
+          id: 'home-$index',
+          completedAt: DateTime(2026, 8, 27, 8).toUtc(),
+          areaId: DefaultSeedV1.homeAreaId,
+        );
+      }
+    });
+
+    final result = await service.loadOverallProgress();
+    final data = (result as Success<OverallProgressViewData>).value;
+    final title = data.activeTitles.singleWhere(
+      (item) => item.id == DefaultSeedV1.homeCentinelTitleId,
+    );
+    expect(title.status, ProgressTitleStatus.earned);
+
+    final laterService = ProgressApplicationService(
+      progressRepository: progressRepository,
+      dailyCloseRepository: dailyCloseRepository,
+      missionRepository: missionRepository,
+      clock: _FixedProgressClock(DateTime.utc(2027, 1, 1)),
+    );
+    final later = await laterService.loadOverallProgress();
+    expect(
+      (later as Success<OverallProgressViewData>).value.activeTitles,
+      contains(predicate<TitleProgressItem>((item) => item.id == title.id)),
+    );
+  });
+}
+
+Future<void> _insertCompletedMission(
+  drift.AppDatabase database, {
+  required String id,
+  required DateTime completedAt,
+  String areaId = DefaultSeedV1.personalAreaId,
+}) async {
+  await database.customStatement(
+    '''
+      INSERT INTO missions (
+        id, area_id, title, mission_type, is_required, status,
+        xp_planned, completed_at, row_version
+      ) VALUES (?, ?, ?, 'DAILY', 0, 'COMPLETED', 0, ?, 1)
+    ''',
+    <Object?>[id, areaId, 'Misión $id', completedAt.millisecondsSinceEpoch],
   );
 }
 

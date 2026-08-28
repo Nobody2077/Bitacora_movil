@@ -213,6 +213,18 @@ class _WeeklyContent extends StatelessWidget {
                         ? tokens.progressGreen
                         : tokens.attentionOrange,
                   ),
+                  TerminalMetric(
+                    icon: Icons.local_fire_department_outlined,
+                    value: '${data.currentStreak} días',
+                    label: 'Racha activa',
+                    color: tokens.attentionOrange,
+                  ),
+                  TerminalMetric(
+                    icon: Icons.emoji_events_outlined,
+                    value: '${data.bestStreak} días',
+                    label: 'Mejor racha',
+                    color: tokens.valueYellow,
+                  ),
                 ],
               ),
             ],

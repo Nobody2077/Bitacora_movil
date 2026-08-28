@@ -284,7 +284,8 @@ class _AreaProgressTile extends StatelessWidget {
                 ],
               ),
               Text(
-                '${item.amount} XP (${item.percentage.toStringAsFixed(1)}%)',
+                'Nivel ${item.rpgLevel.level} · ${item.amount} XP '
+                '(${item.percentage.toStringAsFixed(1)}%)',
                 style: TextStyle(
                   color: areaColor,
                   fontWeight: FontWeight.w700,

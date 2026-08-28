@@ -172,6 +172,11 @@ Las cinco áreas iniciales usan identificadores deterministas y no se duplican a
 | 3 | `00000000-0000-4000-8000-000000000004` | Hogar | `home` | `#F59E0B` | no |
 | 4 | `00000000-0000-4000-8000-000000000005` | Personal | `person` | `#FF3B3B` | sí |
 
+El mismo seed registra de forma idempotente las definiciones canónicas de
+títulos `Centinela del hogar` (permanente, 100 misiones de Hogar) y `Ritmo
+constante` (dinámico, 7 días). Sus reglas operativas están cerradas en
+`ADR-003-CONTRATO_TITULOS_RACHAS_V1.md`.
+
 `schema_metadata` nace con `schema_version=1`, `seed_version=1` y `created_with=0.1.0+1`. El último valor conserva la versión que creó la base.
 
 ### 11. Clave de base de datos

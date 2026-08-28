@@ -129,6 +129,15 @@ final class ProgressApplicationService {
       areas: areas,
       totalXp: snapshot.totalXp,
     );
+    final titleSummaryResult = await _loadTitleSummary(
+      nowUtc: nowUtc,
+      localDay: nowUtc.toLocal(),
+    );
+    if (titleSummaryResult is Failure<_TitleSummary>) {
+      return Failure<WeeklyDashboardViewData>(titleSummaryResult.failure);
+    }
+    final _TitleSummary titleSummary =
+        (titleSummaryResult as Success<_TitleSummary>).value;
 
     return Success<WeeklyDashboardViewData>(
       WeeklyDashboardViewData(
@@ -142,6 +151,8 @@ final class ProgressApplicationService {
         totalWorkSeconds: summary.workSeconds,
         weekIncomeMinor: summary.incomeMinor,
         weekExpenseMinor: summary.expenseMinor,
+        currentStreak: titleSummary.currentStreak,
+        bestStreak: titleSummary.bestStreak,
       ),
     );
   }
@@ -183,6 +194,15 @@ final class ProgressApplicationService {
       areas: areas,
       totalXp: snapshot.totalXp,
     );
+    final titleSummaryResult = await _loadTitleSummary(
+      nowUtc: nowUtc,
+      localDay: localNow,
+    );
+    if (titleSummaryResult is Failure<_TitleSummary>) {
+      return Failure<OverallProgressViewData>(titleSummaryResult.failure);
+    }
+    final _TitleSummary titleSummary =
+        (titleSummaryResult as Success<_TitleSummary>).value;
 
     return Success<OverallProgressViewData>(
       OverallProgressViewData(
@@ -191,6 +211,9 @@ final class ProgressApplicationService {
         todayXp: snapshot.todayXp,
         weekXp: snapshot.weekXp,
         areaBreakdown: breakdown,
+        activeTitles: titleSummary.activeTitles,
+        currentStreak: titleSummary.currentStreak,
+        bestStreak: titleSummary.bestStreak,
       ),
     );
   }
@@ -228,9 +251,122 @@ final class ProgressApplicationService {
           iconKey: iconKey,
           amount: areaXp.amount,
           percentage: pct,
+          rpgLevel: RpgLevel.fromTotalXp(areaXp.amount),
         ),
       );
     }
     return items;
   }
+
+  Future<Result<_TitleSummary>> _loadTitleSummary({
+    required DateTime nowUtc,
+    required DateTime localDay,
+  }) async {
+    final factsResult = await _progressRepository.loadTitleRuleFacts();
+    if (factsResult is Failure<ProgressTitleRuleFacts>) {
+      return Failure<_TitleSummary>(factsResult.failure);
+    }
+    final ProgressTitleRuleFacts facts =
+        (factsResult as Success<ProgressTitleRuleFacts>).value;
+    final ({int current, int best}) streaks = _calculateDailyStreaks(
+      completionInstantsUtc: facts.completionInstantsUtc,
+      localDay: localDay,
+    );
+    final List<ProgressTitleDecision> decisions = <ProgressTitleDecision>[];
+    for (final definition in facts.definitions) {
+      switch (definition.ruleKey) {
+        case 'missions.completed.area.hogar':
+          decisions.add(
+            ProgressTitleDecision(
+              titleId: definition.id,
+              achieved:
+                  definition.threshold > 0 &&
+                  facts.completedHomeMissions >= definition.threshold,
+              bestStreak: 0,
+            ),
+          );
+        case 'missions.completed.daily_streak':
+          decisions.add(
+            ProgressTitleDecision(
+              titleId: definition.id,
+              achieved:
+                  definition.threshold > 0 &&
+                  streaks.current >= definition.threshold,
+              bestStreak: streaks.best,
+            ),
+          );
+      }
+    }
+
+    final titlesResult = await _progressRepository.synchronizeTitles(
+      decisions: decisions,
+      evaluatedAtUtc: nowUtc,
+    );
+    if (titlesResult is Failure<List<TitleProgressItem>>) {
+      return Failure<_TitleSummary>(titlesResult.failure);
+    }
+    return Success<_TitleSummary>(
+      _TitleSummary(
+        activeTitles: (titlesResult as Success<List<TitleProgressItem>>).value,
+        currentStreak: streaks.current,
+        bestStreak: streaks.best,
+      ),
+    );
+  }
+
+  ({int current, int best}) _calculateDailyStreaks({
+    required List<DateTime> completionInstantsUtc,
+    required DateTime localDay,
+  }) {
+    final Set<DateTime> completionDays = completionInstantsUtc
+        .map((instant) => instant.toLocal())
+        .map(
+          (instant) => DateTime.utc(instant.year, instant.month, instant.day),
+        )
+        .toSet();
+    if (completionDays.isEmpty) {
+      return (current: 0, best: 0);
+    }
+
+    final List<DateTime> orderedDays = completionDays.toList()..sort();
+    int best = 1;
+    int running = 1;
+    for (int index = 1; index < orderedDays.length; index += 1) {
+      if (orderedDays[index].difference(orderedDays[index - 1]).inDays == 1) {
+        running += 1;
+        if (running > best) {
+          best = running;
+        }
+      } else {
+        running = 1;
+      }
+    }
+
+    final DateTime today = DateTime.utc(
+      localDay.year,
+      localDay.month,
+      localDay.day,
+    );
+    DateTime cursor = completionDays.contains(today)
+        ? today
+        : today.subtract(const Duration(days: 1));
+    int current = 0;
+    while (completionDays.contains(cursor)) {
+      current += 1;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return (current: current, best: best);
+  }
+}
+
+final class _TitleSummary {
+  const _TitleSummary({
+    required this.activeTitles,
+    required this.currentStreak,
+    required this.bestStreak,
+  });
+
+  final List<TitleProgressItem> activeTitles;
+  final int currentStreak;
+  final int bestStreak;
 }

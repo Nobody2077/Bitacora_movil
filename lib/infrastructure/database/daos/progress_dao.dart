@@ -55,6 +55,37 @@ final class AreaXpTotal {
   int get effectiveTotal => rawTotal < 0 ? 0 : rawTotal;
 }
 
+final class TitleRuleFactsData {
+  const TitleRuleFactsData({
+    required this.definitions,
+    required this.completedHomeMissions,
+    required this.completionInstantsUtcMs,
+  });
+
+  final List<TitleDefinition> definitions;
+  final int completedHomeMissions;
+  final List<int> completionInstantsUtcMs;
+}
+
+final class TitleStateDecisionInput {
+  const TitleStateDecisionInput({
+    required this.titleId,
+    required this.achieved,
+    required this.bestStreak,
+  });
+
+  final String titleId;
+  final bool achieved;
+  final int bestStreak;
+}
+
+final class CurrentTitleData {
+  const CurrentTitleData({required this.definition, required this.history});
+
+  final TitleDefinition definition;
+  final TitleHistoryData history;
+}
+
 final class ProgressDao {
   ProgressDao(this._database);
 
@@ -189,6 +220,203 @@ final class ProgressDao {
               )
               .toList(growable: false),
         );
+  }
+
+  Future<TitleRuleFactsData> loadTitleRuleFacts({required String homeAreaId}) {
+    return _database.transaction(() async {
+      final definitions =
+          await (_database.select(_database.titleDefinitions)
+                ..where((table) => table.isActive.equals(1))
+                ..orderBy(<OrderingTerm Function(TitleDefinitions)>[
+                  (table) => OrderingTerm.asc(table.titleKind),
+                  (table) => OrderingTerm.asc(table.name),
+                ]))
+              .get();
+      final completionRows = await _database
+          .customSelect(
+            '''
+              SELECT area_id, completed_at
+              FROM missions
+              WHERE status IN ('COMPLETED', 'PARTIAL')
+                AND completed_at IS NOT NULL
+              ORDER BY completed_at ASC, id ASC
+            ''',
+            readsFrom: <ResultSetImplementation<Table, Object?>>{
+              _database.missions,
+            },
+          )
+          .get();
+      return TitleRuleFactsData(
+        definitions: definitions,
+        completedHomeMissions: completionRows
+            .where((row) => row.read<String>('area_id') == homeAreaId)
+            .length,
+        completionInstantsUtcMs: completionRows
+            .map((row) => row.read<int>('completed_at'))
+            .toList(growable: false),
+      );
+    });
+  }
+
+  Future<List<CurrentTitleData>> synchronizeTitleStates({
+    required List<TitleStateDecisionInput> decisions,
+    required int evaluatedAtUtcMs,
+  }) {
+    return _database.transaction(() async {
+      for (final decision in decisions) {
+        final definition =
+            await (_database.select(_database.titleDefinitions)..where(
+                  (table) =>
+                      table.id.equals(decision.titleId) &
+                      table.isActive.equals(1),
+                ))
+                .getSingleOrNull();
+        if (definition == null) {
+          continue;
+        }
+
+        final histories = await (_database.select(
+          _database.titleHistory,
+        )..where((table) => table.titleId.equals(decision.titleId))).get();
+        TitleHistoryData? current;
+        for (final history in histories) {
+          if (history.deactivatedAt == null &&
+              const <String>{'ACTIVE', 'EARNED'}.contains(history.status)) {
+            current = history;
+            break;
+          }
+        }
+        final int historicalBest = histories.fold<int>(
+          0,
+          (best, history) =>
+              history.bestStreak > best ? history.bestStreak : best,
+        );
+        final int bestStreak = decision.bestStreak > historicalBest
+            ? decision.bestStreak
+            : historicalBest;
+
+        if (!decision.achieved) {
+          if (current != null && current.status == 'ACTIVE') {
+            final int deactivatedAt = evaluatedAtUtcMs < current.activatedAt
+                ? current.activatedAt
+                : evaluatedAtUtcMs;
+            await (_database.update(
+              _database.titleHistory,
+            )..where((table) => table.id.equals(current!.id))).write(
+              TitleHistoryCompanion(
+                status: const Value<String>('INACTIVE'),
+                deactivatedAt: Value<int?>(deactivatedAt),
+                bestStreak: Value<int>(bestStreak),
+              ),
+            );
+          }
+          continue;
+        }
+
+        final String desiredStatus = definition.titleKind == 'PERMANENT'
+            ? 'EARNED'
+            : 'ACTIVE';
+        if (current != null && current.status == desiredStatus) {
+          if (bestStreak > current.bestStreak) {
+            await (_database.update(
+              _database.titleHistory,
+            )..where((table) => table.id.equals(current!.id))).write(
+              TitleHistoryCompanion(bestStreak: Value<int>(bestStreak)),
+            );
+          }
+          continue;
+        }
+        if (current != null && current.status == 'EARNED') {
+          continue;
+        }
+        if (current != null) {
+          final int deactivatedAt = evaluatedAtUtcMs < current.activatedAt
+              ? current.activatedAt
+              : evaluatedAtUtcMs;
+          await (_database.update(
+            _database.titleHistory,
+          )..where((table) => table.id.equals(current!.id))).write(
+            TitleHistoryCompanion(
+              status: const Value<String>('INACTIVE'),
+              deactivatedAt: Value<int?>(deactivatedAt),
+              bestStreak: Value<int>(bestStreak),
+            ),
+          );
+        }
+
+        final int previousRecoveryCount = histories.fold<int>(
+          0,
+          (highest, history) =>
+              history.recoveryCount > highest ? history.recoveryCount : highest,
+        );
+        final int recoveryCount = histories.isEmpty
+            ? 0
+            : previousRecoveryCount + 1;
+        await _database
+            .into(_database.titleHistory)
+            .insert(
+              TitleHistoryCompanion.insert(
+                id: 'title-history:${definition.id}:$evaluatedAtUtcMs:$recoveryCount',
+                titleId: definition.id,
+                status: desiredStatus,
+                activatedAt: evaluatedAtUtcMs,
+                bestStreak: Value<int>(bestStreak),
+                recoveryCount: Value<int>(recoveryCount),
+              ),
+            );
+      }
+
+      return _loadCurrentTitleData();
+    });
+  }
+
+  Future<List<CurrentTitleData>> _loadCurrentTitleData() async {
+    final query = _database.select(_database.titleHistory).join([
+      innerJoin(
+        _database.titleDefinitions,
+        _database.titleDefinitions.id.equalsExp(_database.titleHistory.titleId),
+      ),
+    ]);
+    query
+      ..where(
+        _database.titleHistory.deactivatedAt.isNull() &
+            _database.titleHistory.status.isIn(const <String>{
+              'ACTIVE',
+              'EARNED',
+            }) &
+            _database.titleDefinitions.isActive.equals(1),
+      )
+      ..orderBy(<OrderingTerm>[
+        OrderingTerm.desc(_database.titleHistory.activatedAt),
+        OrderingTerm.asc(_database.titleDefinitions.name),
+      ]);
+    final rows = await query.get();
+    return rows
+        .map(
+          (row) => CurrentTitleData(
+            definition: row.readTable(_database.titleDefinitions),
+            history: row.readTable(_database.titleHistory),
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  Stream<void> watchChanges() {
+    return _database
+        .tableUpdates(
+          TableUpdateQuery.onAllTables(
+            <ResultSetImplementation<dynamic, dynamic>>[
+              _database.lifeAreas,
+              _database.missions,
+              _database.timeEntries,
+              _database.transactions,
+              _database.xpTransactions,
+              _database.titleDefinitions,
+              _database.titleHistory,
+            ],
+          ),
+        )
+        .map((_) {});
   }
 
   Future<TitleDefinition> putTitleDefinition(

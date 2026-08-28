@@ -6,6 +6,8 @@ abstract final class DefaultSeedV1 {
   static const projectsAreaId = '00000000-0000-4000-8000-000000000003';
   static const homeAreaId = '00000000-0000-4000-8000-000000000004';
   static const personalAreaId = '00000000-0000-4000-8000-000000000005';
+  static const homeCentinelTitleId = '10000000-0000-4000-8000-000000000001';
+  static const dailyStreakTitleId = '10000000-0000-4000-8000-000000000002';
 }
 
 /// Inserts the mandatory, deterministic records for a fresh schema v1.
@@ -90,6 +92,59 @@ Future<void> insertDefaultSeedV1(
         area.colorHex,
         area.isDefault,
         area.sortOrder,
+      ],
+    );
+  }
+
+  const defaultTitles =
+      <
+        ({
+          String id,
+          String name,
+          String description,
+          String kind,
+          String ruleKey,
+          int threshold,
+        })
+      >[
+        (
+          id: DefaultSeedV1.homeCentinelTitleId,
+          name: 'Centinela del hogar',
+          description: 'Completa 100 misiones del área Hogar.',
+          kind: 'PERMANENT',
+          ruleKey: 'missions.completed.area.hogar',
+          threshold: 100,
+        ),
+        (
+          id: DefaultSeedV1.dailyStreakTitleId,
+          name: 'Ritmo constante',
+          description: 'Completa al menos una misión durante 7 días seguidos.',
+          kind: 'DYNAMIC',
+          ruleKey: 'missions.completed.daily_streak',
+          threshold: 7,
+        ),
+      ];
+
+  for (final title in defaultTitles) {
+    await database.customStatement(
+      '''
+        INSERT OR IGNORE INTO title_definitions (
+          id,
+          name,
+          description,
+          title_kind,
+          rule_key,
+          threshold,
+          is_active
+        ) VALUES (?, ?, ?, ?, ?, ?, 1)
+      ''',
+      <Object?>[
+        title.id,
+        title.name,
+        title.description,
+        title.kind,
+        title.ruleKey,
+        title.threshold,
       ],
     );
   }

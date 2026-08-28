@@ -55,6 +55,9 @@ decisiones de producto.
 - El cierre diario presenta métricas, misiones completadas y pendientes, área
   destacada y reflexión persistida. Dashboard diario, semanal y de nivel RPG
   usan el mismo sistema Terminal V2 y navegación canónica.
+- Progreso muestra títulos vigentes, racha actual, mejor racha y nivel
+  independiente por área. El semanal completa sus seis bloques con las dos
+  métricas de constancia; los read models se refrescan por cambios persistidos.
 - `FeaturePlaceholderPage` y el contenedor «Más» ya usan las superficies
   terminales. Las rutas aún pendientes siguen siendo funcionalmente
   identificables, pero ahora respetan el sistema visual común.
@@ -111,9 +114,8 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 2. Revisar físicamente Detalle y Nueva/Editar misión en tablet y terminar la
    migración de diálogos secundarios. Inicio, el resumen de Misiones, Detalle
    y Nueva/Editar ya usan la composición de operaciones del Documento 13.
-3. Consolidar los estados restantes de Progreso —incluidos títulos/rachas si
-   forman parte del cierre de G5— sobre este sistema, sin introducir pantallas
-   Material genéricas que requieran una reescritura posterior.
+3. Validar físicamente en teléfono/tablet los títulos, rachas y niveles por área
+   ya integrados, sin reescribir su contrato visual Terminal V2.
 4. Estados de carga, vacío y error por módulo, con mensajes accionables y el
    mismo orden: contexto → título → explicación → información → acción.
 
@@ -121,6 +123,6 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 
 A5.1–A5.3 fueron aprobadas físicamente en la Redmi Pad el 27 de agosto de 2026.
 La APK `prod-debug` se recompiló con búsqueda, archivo, cierre diario y
-dashboards integrados. Formato, `flutter analyze` y 158 pruebas quedaron verdes.
-A5 continúa en desarrollo hasta consolidar Progreso y cerrar formalmente G5; el
-resultado automatizado vigente se registra en `documentos/ESTADO_FASES.md`.
+dashboards integrados. La ampliación final de Progreso recompiló la APK con
+formato limpio, `flutter analyze` sin problemas y 161 pruebas verdes. G5 está
+completo técnicamente y espera validación física antes del cierre formal.

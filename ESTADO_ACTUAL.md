@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **27 de agosto de 2026** (A5.1–A5.3 cerradas; cierre diario y dashboards funcionales)
+- Última revisión: **27 de agosto de 2026** (G5 técnico verde; validación física final pendiente)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -11,15 +11,16 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La aplicación es Flutter Android, local-first, privada y de un solo usuario.
 - A0–A4 están completadas. G3 quedó verde el 26 de agosto de 2026 y G4 fue
   aprobado físicamente el 27 de agosto de 2026.
-- A5 — Bitácora y progreso está en desarrollo como única fase activa. A5.1, A5.2 y **A5.3 fueron aprobadas físicamente el 27 de agosto de 2026**. Búsqueda, archivo/restauración, cierre diario y dashboards diario/semanal/nivel RPG están conectados. A6 continúa bloqueada hasta cerrar formalmente G5.
+- A5.1, A5.2 y **A5.3 fueron aprobadas físicamente el 27 de agosto de 2026**. La ampliación final de Progreso ya conecta títulos, rachas, niveles por área y actualización reactiva; G5 está verde técnicamente. A6 continúa bloqueada hasta la validación física y el cierre formal de G5.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
   compilación de la APK `prod-debug` el 27 de agosto de 2026.
+- La ampliación final de Progreso aprobó formato, `flutter analyze`, 161 pruebas
+  y `assembleProdDebug` el 27 de agosto de 2026.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Último incremento: **A5.3 cerrada y validada físicamente**. Siguiente paso:
-  consolidar Progreso —incluido el alcance pendiente de títulos/rachas— y cerrar
-  formalmente G5.
+- Último incremento: **G5 técnico completo**. Siguiente paso: validar físicamente
+  títulos, rachas y niveles por área en la tablet y cerrar formalmente A5/G5.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -50,7 +51,7 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 
 1. No limpiar datos de la app: es almacenamiento local cifrado.
 2. A5.1, A5.2 y **A5.3 fueron validadas físicamente por el usuario el 27 de agosto de 2026**, incluidas fotografías, búsqueda, archivo/restauración y cierre diario.
-3. Los dashboards diario, semanal y de nivel RPG están funcionales. Siguiente incremento: consolidar Progreso y cerrar G5.
+3. Los dashboards diario, semanal y de nivel RPG están funcionales y reactivos; Progreso ya muestra títulos, rachas y niveles por área. Falta validar físicamente esta ampliación para cerrar G5.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -237,7 +238,7 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 - Validación física aprobada por el usuario el 27 de agosto de 2026, incluida
   persistencia correcta después de salir de la aplicación. G4 está verde.
 
-### A5 — Bitácora y progreso en desarrollo
+### A5 — Cierre técnico completo; validación física pendiente
 
 - Bitácora tiene cronología diaria reactiva, resumen/estado del día, creación,
   edición, detalle y vínculos navegables con misiones o movimientos.
@@ -265,8 +266,15 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   confirmación antes de archivar y queda en modo lectura mientras está archivado.
 - **Cierre diario implementado y validado** (`/journal/daily-close/:date`) con métricas, lista de misiones y reflexión persistida.
 - **Dashboards implementados**: Diario (`/dashboard/daily`), Semanal (`/dashboard/weekly`) y Progreso/Nivel RPG (`/dashboard/progress`).
-- Progreso tiene modelo, repositorio, DAO y **Dashboard funcional**.
-- XP, niveles y distribución por áreas ya tienen consumidor funcional. La infraestructura adelantada de títulos/rachas todavía no está expuesta por el repositorio de dominio ni por la UI.
+- Progreso tiene modelo, repositorio, DAO y **Dashboard funcional y reactivo**.
+- XP global y por área usan la fórmula cuadrática de nivel. El semanal muestra
+  racha actual/mejor racha y Progreso expone títulos vigentes con historial de
+  activación, desactivación y recuperación.
+- `Centinela del hogar` queda ganado al completar 100 misiones de Hogar;
+  `Ritmo constante` permanece activo con una racha diaria de siete días. El
+  contrato y el alcance temporal están documentados en ADR-003.
+- La matriz automatizada final aprobó formato, análisis, **161 pruebas** y APK
+  `prod-debug`. Solo resta validación física del incremento final.
 - Copia/restauración, UI v2 final, accesibilidad completa y release pertenecen a A6–A8.
 
 ---
@@ -298,7 +306,7 @@ main_dev/main_prod
 
 | Área | Rutas principales | Razón |
 |---|---|---|
-| Decisiones | `documentos/DECISIONES_PRE_A0.md`, `ADR-001`, `ADR-002` | Son la fuente de verdad vigente |
+| Decisiones | `documentos/DECISIONES_PRE_A0.md`, `ADR-001`, `ADR-002`, `ADR-003` | Son la fuente de verdad vigente |
 | Esquema v1 | `lib/infrastructure/database/schema.drift` | Cambiarlo exige migración, snapshot y revisión de contrato |
 | Código Drift generado | `lib/infrastructure/database/app_database.g.dart` | Se regenera; no se edita manualmente |
 | Snapshots Drift | `drift_schemas/` | Evidencia y base de migraciones |
@@ -345,9 +353,10 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-El punto de entrada inmediato es consolidar Progreso: definir y conectar el
-alcance restante de títulos/rachas, ejecutar la matriz completa de G5 y cerrar
-la fase. A5.3, el cierre diario y los dashboards ya no son trabajo pendiente.
+El punto de entrada inmediato es validar físicamente en la tablet la ampliación
+final de Progreso: rachas, títulos y niveles por área. Si resulta correcta,
+registrar G5 como cerrado y desbloquear A6. A5.3 y la matriz automatizada de G5
+ya no son trabajo pendiente.
 
 ---
 
@@ -359,7 +368,7 @@ la fase. A5.3, el cierre diario y los dashboards ya no son trabajo pendiente.
 | `notificationDaoProvider` | Consumido por el reconciliador Android post-commit | A3 ✓ conectado |
 | `economyRepositoryProvider` | Consumido por providers, servicio, Inicio y UI de Economía | A4 ✓ conectado |
 | `journalRepositoryProvider` | Entradas, fotos, búsqueda y archivo/restauración | A5.1–A5.3 ✓ conectado |
-| `progressRepositoryProvider` | Dashboards Diario, Semanal, Progreso (consumen snapshot, XP, niveles) | A5 ✓ conectado |
+| `progressRepositoryProvider` | Dashboards reactivos, XP, niveles, títulos y rachas | A5 ✓ conectado |
 | Rutas de negocio con placeholder restantes | Contrato de navegación ya congelado | A3–A7 |
 
 ---
@@ -404,6 +413,7 @@ powershell -ExecutionPolicy Bypass -File tool/quality.ps1
 2. `documentos/DECISIONES_PRE_A0.md`.
 3. ADR-001 si se toca base, DAOs, cifrado, claves o esquema.
 4. ADR-002 si se toca acceso, sesión, router protegido, autobloqueo o privacidad.
-5. El documento fuente específico de UX, navegación o datos cuando se implemente una pantalla.
+5. ADR-003 si se tocan títulos, rachas, niveles por área o sus reglas.
+6. El documento fuente específico de UX, navegación o datos cuando se implemente una pantalla.
 
 Si una pieza parece no usada, buscar referencias tanto en `lib/` como en `test/` e `integration_test/` y revisar su fase prevista antes de eliminarla.

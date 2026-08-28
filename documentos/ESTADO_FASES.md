@@ -11,7 +11,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
-| A5 — Bitácora y progreso | **EN DESARROLLO** | **A5.1–A5.3 cerradas y aprobadas físicamente (27 ago)**; cierre diario y dashboards funcionales; resta consolidar Progreso y cerrar G5 |
+| A5 — Bitácora y progreso | **VALIDACIÓN FÍSICA PENDIENTE** | **G5 técnico verde**: A5.1–A5.3 aprobadas; títulos, rachas, niveles por área y dashboards reactivos conectados |
 | A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
 | A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
 | A8 — Release | BLOQUEADA | Requiere G7 |
@@ -156,7 +156,29 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - `flutter analyze`: cero problemas; `flutter test`: 158 pruebas aprobadas.
 - `assembleProdDebug`: compilada correctamente con A5.3, cierre diario y
   dashboards el 27 de agosto de 2026.
-- **A5.3 validada físicamente**. XP, niveles y distribución por áreas ya tienen consumidor funcional. Restante para cerrar G5: decidir y conectar el alcance de títulos/rachas, ejecutar la matriz final y cerrar el gate.
+- **A5.3 validada físicamente**. La ampliación final de Progreso conecta el
+  alcance de títulos/rachas y niveles por área sin cambiar el esquema v1.
+
+## Evidencia técnica final A5 / G5
+
+- `ADR-003-CONTRATO_TITULOS_RACHAS_V1.md` fija las reglas canónicas y deja los
+  títulos temporales sin seed hasta disponer de períodos configurables.
+- El seed v1 incorpora idempotentemente `Centinela del hogar` (100 misiones de
+  Hogar, permanente) y `Ritmo constante` (racha diaria de 7 días, dinámico).
+- El servicio de Progreso evalúa días civiles locales, conserva mejor racha,
+  desactiva el título dinámico y registra recuperaciones sin reducir XP.
+- El Dashboard semanal muestra racha actual y mejor racha. Progreso muestra
+  niveles independientes por área y títulos vigentes.
+- Los providers escuchan cambios de las tablas fuente y recalculan los read
+  models sin reconstrucción global.
+- Las pruebas nuevas cubren seed idempotente, nivel por área, activación,
+  pérdida, recuperación, permanencia y refresco reactivo.
+- `dart format --set-exit-if-changed`: 193 archivos, sin cambios pendientes.
+- `flutter analyze`: cero problemas.
+- `flutter test`: **161/161 pruebas aprobadas**.
+- `assembleProdDebug`: APK compilada correctamente el 27 de agosto de 2026.
+- **G5 está verde técnicamente**. Resta validar físicamente títulos, rachas y
+  niveles por área antes de declarar A5 cerrada y desbloquear A6.
 
 ## Evidencia G0
 

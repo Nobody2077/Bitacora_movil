@@ -18,11 +18,16 @@ final Provider<ProgressApplicationService> progressApplicationServiceProvider =
       ),
     );
 
+final progressDataChangesProvider = StreamProvider.autoDispose<void>((Ref ref) {
+  return ref.watch(progressRepositoryProvider).watchChanges();
+});
+
 final dailyDashboardProvider = FutureProvider.autoDispose
     .family<DailyDashboardViewData, DateTime>((
       Ref ref,
       DateTime localDay,
     ) async {
+      ref.watch(progressDataChangesProvider);
       final result = await ref
           .watch(progressApplicationServiceProvider)
           .loadDailyDashboard(localDay);
@@ -37,6 +42,7 @@ final weeklyDashboardProvider = FutureProvider.autoDispose
       Ref ref,
       DateTime localDay,
     ) async {
+      ref.watch(progressDataChangesProvider);
       final result = await ref
           .watch(progressApplicationServiceProvider)
           .loadWeeklyDashboard(localDay);
@@ -48,6 +54,7 @@ final weeklyDashboardProvider = FutureProvider.autoDispose
 
 final overallProgressProvider =
     FutureProvider.autoDispose<OverallProgressViewData>((Ref ref) async {
+      ref.watch(progressDataChangesProvider);
       final result = await ref
           .watch(progressApplicationServiceProvider)
           .loadOverallProgress();

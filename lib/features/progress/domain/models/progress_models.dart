@@ -9,6 +9,7 @@ final class AreaProgressItem {
     required this.iconKey,
     required this.amount,
     required this.percentage,
+    required this.rpgLevel,
   });
 
   final String areaId;
@@ -17,20 +18,103 @@ final class AreaProgressItem {
   final String iconKey;
   final int amount;
   final double percentage;
+  final RpgLevel rpgLevel;
+}
+
+enum ProgressTitleKind {
+  permanent('PERMANENT'),
+  dynamic('DYNAMIC'),
+  temporary('TEMPORARY');
+
+  const ProgressTitleKind(this.storageValue);
+
+  final String storageValue;
+
+  static ProgressTitleKind fromStorage(String value) => switch (value) {
+    'PERMANENT' => ProgressTitleKind.permanent,
+    'DYNAMIC' => ProgressTitleKind.dynamic,
+    'TEMPORARY' => ProgressTitleKind.temporary,
+    _ => throw ArgumentError.value(value, 'value', 'Unknown title kind.'),
+  };
+}
+
+enum ProgressTitleStatus {
+  active('ACTIVE'),
+  earned('EARNED');
+
+  const ProgressTitleStatus(this.storageValue);
+
+  final String storageValue;
+
+  static ProgressTitleStatus fromStorage(String value) => switch (value) {
+    'ACTIVE' => ProgressTitleStatus.active,
+    'EARNED' => ProgressTitleStatus.earned,
+    _ => throw ArgumentError.value(value, 'value', 'Unknown title status.'),
+  };
+}
+
+final class ProgressTitleDefinition {
+  const ProgressTitleDefinition({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.kind,
+    required this.ruleKey,
+    required this.threshold,
+  });
+
+  final String id;
+  final String name;
+  final String? description;
+  final ProgressTitleKind kind;
+  final String ruleKey;
+  final int threshold;
+}
+
+final class ProgressTitleRuleFacts {
+  const ProgressTitleRuleFacts({
+    required this.definitions,
+    required this.completedHomeMissions,
+    required this.completionInstantsUtc,
+  });
+
+  final List<ProgressTitleDefinition> definitions;
+  final int completedHomeMissions;
+  final List<DateTime> completionInstantsUtc;
+}
+
+final class ProgressTitleDecision {
+  const ProgressTitleDecision({
+    required this.titleId,
+    required this.achieved,
+    required this.bestStreak,
+  });
+
+  final String titleId;
+  final bool achieved;
+  final int bestStreak;
 }
 
 final class TitleProgressItem {
   const TitleProgressItem({
     required this.id,
     required this.name,
-    required this.titleKind,
+    required this.description,
+    required this.kind,
+    required this.status,
+    required this.activatedAtUtc,
     this.bestStreak = 0,
+    this.recoveryCount = 0,
   });
 
   final String id;
   final String name;
-  final String titleKind;
+  final String? description;
+  final ProgressTitleKind kind;
+  final ProgressTitleStatus status;
+  final DateTime activatedAtUtc;
   final int bestStreak;
+  final int recoveryCount;
 }
 
 final class DailyDashboardViewData {
@@ -61,6 +145,8 @@ final class WeeklyDashboardViewData {
     required this.totalWorkSeconds,
     required this.weekIncomeMinor,
     required this.weekExpenseMinor,
+    this.currentStreak = 0,
+    this.bestStreak = 0,
   });
 
   final DateTime weekStart;
@@ -73,6 +159,8 @@ final class WeeklyDashboardViewData {
   final int totalWorkSeconds;
   final int weekIncomeMinor;
   final int weekExpenseMinor;
+  final int currentStreak;
+  final int bestStreak;
 
   int get weekBalanceMinor => weekIncomeMinor - weekExpenseMinor;
 }
@@ -85,6 +173,8 @@ final class OverallProgressViewData {
     required this.weekXp,
     required this.areaBreakdown,
     this.activeTitles = const <TitleProgressItem>[],
+    this.currentStreak = 0,
+    this.bestStreak = 0,
   });
 
   final RpgLevel rpgLevel;
@@ -93,4 +183,6 @@ final class OverallProgressViewData {
   final int weekXp;
   final List<AreaProgressItem> areaBreakdown;
   final List<TitleProgressItem> activeTitles;
+  final int currentStreak;
+  final int bestStreak;
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme.dart';
 import 'package:bitacora_rpg_personal/core/result/result.dart';
@@ -5,6 +7,7 @@ import 'package:bitacora_rpg_personal/features/journal/domain/models/daily_close
 import 'package:bitacora_rpg_personal/features/journal/domain/repositories/daily_close_repository.dart';
 import 'package:bitacora_rpg_personal/features/missions/domain/models/mission.dart';
 import 'package:bitacora_rpg_personal/features/missions/domain/repositories/mission_repository.dart';
+import 'package:bitacora_rpg_personal/features/progress/domain/models/progress_models.dart';
 import 'package:bitacora_rpg_personal/features/progress/domain/models/progress_snapshot.dart';
 import 'package:bitacora_rpg_personal/features/progress/domain/repositories/progress_repository.dart';
 import 'package:bitacora_rpg_personal/features/progress/presentation/dashboard_daily_page.dart';
@@ -31,7 +34,19 @@ void main() {
           AreaXp(areaId: 'area-sal', amount: 760),
         ],
       ),
+      titles: <TitleProgressItem>[
+        TitleProgressItem(
+          id: 'title-streak',
+          name: 'Ritmo constante',
+          description: 'Siete días de misiones completadas.',
+          kind: ProgressTitleKind.dynamic,
+          status: ProgressTitleStatus.active,
+          activatedAtUtc: DateTime.utc(2026, 8, 27),
+          bestStreak: 7,
+        ),
+      ],
     );
+    addTearDown(progressRepo.dispose);
     dailyCloseRepo = _FakeDailyCloseRepository(
       const DailyCloseSummary(
         completedMissions: <DailyCloseMission>[
@@ -158,13 +173,61 @@ void main() {
     expect(find.text('4450 XP'), findsOneWidget);
     expect(find.text('850 / 1300'), findsOneWidget);
     expect(find.text('Proyectos'), findsWidgets);
+    expect(find.text('Ritmo constante'), findsOneWidget);
+    expect(find.textContaining('Nivel 5 · 2150 XP'), findsOneWidget);
+  });
+
+  testWidgets('DashboardProgressPage reacciona a cambios persistidos', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 1400);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressRepositoryProvider.overrideWithValue(progressRepo),
+          dailyCloseRepositoryProvider.overrideWithValue(dailyCloseRepo),
+          missionRepositoryProvider.overrideWithValue(missionRepo),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const Scaffold(body: DashboardProgressPage()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('4450 XP'), findsOneWidget);
+
+    progressRepo.snapshot = const ProgressSnapshot(
+      totalXp: 5000,
+      todayXp: 675,
+      weekXp: 875,
+      byArea: <AreaXp>[AreaXp(areaId: 'area-proj', amount: 5000)],
+    );
+    progressRepo.notifyChanged();
+    await tester.pumpAndSettle();
+
+    expect(find.text('5000 XP'), findsOneWidget);
+    expect(find.text('+675 XP'), findsOneWidget);
   });
 }
 
 final class _FakeProgressRepository implements ProgressRepository {
-  _FakeProgressRepository(this.snapshot);
+  _FakeProgressRepository(
+    this.snapshot, {
+    this.titles = const <TitleProgressItem>[],
+  });
 
-  final ProgressSnapshot snapshot;
+  ProgressSnapshot snapshot;
+  final List<TitleProgressItem> titles;
+  final StreamController<void> _changes = StreamController<void>.broadcast();
+
+  void notifyChanged() => _changes.add(null);
+
+  void dispose() => _changes.close();
 
   @override
   Future<Result<ProgressSnapshot>> loadSnapshot({
@@ -172,6 +235,25 @@ final class _FakeProgressRepository implements ProgressRepository {
     required DateTime dayEndUtc,
     required DateTime weekStartUtc,
   }) async => Success<ProgressSnapshot>(snapshot);
+
+  @override
+  Future<Result<ProgressTitleRuleFacts>> loadTitleRuleFacts() async =>
+      const Success<ProgressTitleRuleFacts>(
+        ProgressTitleRuleFacts(
+          definitions: <ProgressTitleDefinition>[],
+          completedHomeMissions: 0,
+          completionInstantsUtc: <DateTime>[],
+        ),
+      );
+
+  @override
+  Future<Result<List<TitleProgressItem>>> synchronizeTitles({
+    required List<ProgressTitleDecision> decisions,
+    required DateTime evaluatedAtUtc,
+  }) async => Success<List<TitleProgressItem>>(titles);
+
+  @override
+  Stream<void> watchChanges() => _changes.stream;
 }
 
 final class _FakeDailyCloseRepository implements DailyCloseRepository {

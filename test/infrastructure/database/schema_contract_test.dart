@@ -333,6 +333,49 @@ void main() {
           ],
         );
 
+        final titleRows = await database.customSelect('''
+        SELECT name, title_kind, rule_key, threshold, is_active
+        FROM title_definitions
+        ORDER BY rule_key
+      ''').get();
+        expect(
+          titleRows
+              .map(
+                (row) => (
+                  name: row.read<String>('name'),
+                  kind: row.read<String>('title_kind'),
+                  ruleKey: row.read<String>('rule_key'),
+                  threshold: row.read<int>('threshold'),
+                  isActive: row.read<int>('is_active'),
+                ),
+              )
+              .toList(),
+          <
+            ({
+              String name,
+              String kind,
+              String ruleKey,
+              int threshold,
+              int isActive,
+            })
+          >[
+            (
+              name: 'Centinela del hogar',
+              kind: 'PERMANENT',
+              ruleKey: 'missions.completed.area.hogar',
+              threshold: 100,
+              isActive: 1,
+            ),
+            (
+              name: 'Ritmo constante',
+              kind: 'DYNAMIC',
+              ruleKey: 'missions.completed.daily_streak',
+              threshold: 7,
+              isActive: 1,
+            ),
+          ],
+        );
+
         final settings = await database
             .customSelect('SELECT * FROM app_settings WHERE id = 1')
             .getSingle();
@@ -376,6 +419,7 @@ void main() {
         utcNowMilliseconds: () => _seedTime,
       );
       expect(await _count(first, 'life_areas'), 5);
+      expect(await _count(first, 'title_definitions'), 2);
       expect(await _count(first, 'schema_metadata'), 3);
       await first.close();
       first = null;
@@ -385,6 +429,7 @@ void main() {
         utcNowMilliseconds: () => _seedTime + 86400000,
       );
       expect(await _count(reopened, 'life_areas'), 5);
+      expect(await _count(reopened, 'title_definitions'), 2);
       expect(await _count(reopened, 'app_settings'), 1);
       expect(await _count(reopened, 'schema_metadata'), 3);
 
