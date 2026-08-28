@@ -1,10 +1,12 @@
 import 'package:bitacora_rpg_personal/app/app.dart';
 import 'package:bitacora_rpg_personal/app/config/app_environment.dart';
+import 'package:bitacora_rpg_personal/app/providers/app_preferences_provider.dart';
 import 'package:bitacora_rpg_personal/app/router/app_route_contract.dart';
 import 'package:bitacora_rpg_personal/app/router/app_router.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_controller.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
 import 'package:bitacora_rpg_personal/features/access/domain/biometric_authenticator.dart';
+import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/widgets/feature_placeholder_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,6 +66,9 @@ Widget _app({
         enableRouterDiagnostics: false,
         initialLocation: initialLocation,
       ),
+    ),
+    appPreferencesProvider.overrideWith(
+      (ref) => Stream<AppPreferences>.value(AppPreferences.defaults),
     ),
   ],
   child: const BitacoraApp(),

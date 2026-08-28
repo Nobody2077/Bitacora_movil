@@ -2,6 +2,20 @@
 final class AppPreferences {
   static const Set<int> supportedAutoLockMinutes = <int>{0, 1, 5, 15};
 
+  static final AppPreferences defaults = AppPreferences(
+    themeKey: 'terminal_reinforced',
+    primaryColorHex: '#FF3B3B',
+    largeText: false,
+    reduceMotion: false,
+    highContrast: false,
+    hideAmounts: false,
+    missionNotifications: true,
+    dailySummary: true,
+    soundEnabled: true,
+    autoLockMinutes: 5,
+    updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+  );
+
   const AppPreferences({
     required this.themeKey,
     required this.primaryColorHex,

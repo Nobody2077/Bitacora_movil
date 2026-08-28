@@ -28,4 +28,7 @@ abstract final class TerminalMotion {
   static const Duration quick = Duration(milliseconds: 120);
   static const Duration standard = Duration(milliseconds: 180);
   static const Duration deliberate = Duration(milliseconds: 240);
+
+  static Duration resolve(BuildContext context, Duration duration) =>
+      MediaQuery.disableAnimationsOf(context) ? Duration.zero : duration;
 }

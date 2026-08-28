@@ -553,6 +553,7 @@ class _SourcePanel extends ConsumerWidget {
                       transaction.category ??
                       economyTransactionTypeLabel(transaction.type),
                   description: economyMoney(
+                    context,
                     transaction.isCredit
                         ? transaction.amountMinor
                         : -transaction.amountMinor,

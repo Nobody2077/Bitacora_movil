@@ -226,7 +226,10 @@ class _SidebarDestination extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: AnimatedContainer(
-              duration: TerminalMotion.standard,
+              duration: TerminalMotion.resolve(
+                context,
+                TerminalMotion.standard,
+              ),
               curve: Curves.easeOut,
               height: 52,
               decoration: BoxDecoration(

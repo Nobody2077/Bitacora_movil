@@ -1,5 +1,6 @@
 import 'package:bitacora_rpg_personal/app/app.dart';
 import 'package:bitacora_rpg_personal/app/config/app_environment.dart';
+import 'package:bitacora_rpg_personal/app/providers/app_preferences_provider.dart';
 import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
 import 'package:bitacora_rpg_personal/app/router/app_routes.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme_tokens.dart';
@@ -13,6 +14,7 @@ import 'package:bitacora_rpg_personal/features/missions/application/mission_prov
 import 'package:bitacora_rpg_personal/features/missions/domain/models/mission.dart';
 import 'package:bitacora_rpg_personal/features/profile/application/user_profile_providers.dart';
 import 'package:bitacora_rpg_personal/features/profile/domain/models/user_profile.dart';
+import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -128,6 +130,9 @@ Widget _testApp({required String initialLocation}) => ProviderScope(
         enableRouterDiagnostics: false,
         initialLocation: initialLocation,
       ),
+    ),
+    appPreferencesProvider.overrideWith(
+      (ref) => Stream<AppPreferences>.value(AppPreferences.defaults),
     ),
     todayMissionsProvider.overrideWith(
       (ref) => Stream<List<Mission>>.value(const <Mission>[]),

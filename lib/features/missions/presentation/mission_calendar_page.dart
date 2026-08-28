@@ -304,7 +304,7 @@ class _CalendarDay extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: TerminalMotion.quick,
+          duration: TerminalMotion.resolve(context, TerminalMotion.quick),
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: selected

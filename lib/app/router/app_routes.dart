@@ -10,6 +10,7 @@ abstract final class AppRoutes {
   static const String finance = '/finance';
   static const String dashboardDaily = '/dashboard/daily';
   static const String settings = '/settings';
+  static const String settingsAppearance = '/settings/appearance';
   static const String settingsPrivacy = '/settings/privacy';
   static const String settingsPrivacyPin = '/settings/privacy/pin';
   static const String settingsPrivacyBiometrics =
@@ -292,7 +293,7 @@ abstract final class AppRoutes {
     ),
     AppRouteContract(
       name: 'settingsAppearance',
-      path: '/settings/appearance',
+      path: settingsAppearance,
       title: 'Apariencia',
       area: AppArea.settings,
     ),

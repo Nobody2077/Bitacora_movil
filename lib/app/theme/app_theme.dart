@@ -4,8 +4,10 @@ import 'app_theme_tokens.dart';
 import 'terminal_foundations.dart';
 
 abstract final class AppTheme {
-  static ThemeData dark() {
-    const AppThemeTokens tokens = AppThemeTokens.terminal;
+  static ThemeData dark({bool highContrast = false}) {
+    final AppThemeTokens tokens = highContrast
+        ? AppThemeTokens.terminalHighContrast
+        : AppThemeTokens.terminal;
     final ColorScheme colors = ColorScheme.dark(
       primary: tokens.infoCyan,
       onPrimary: tokens.background,
@@ -59,7 +61,7 @@ abstract final class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
-      extensions: const <ThemeExtension<dynamic>>[tokens],
+      extensions: <ThemeExtension<dynamic>>[tokens],
       focusColor: tokens.borderFocused,
       dividerColor: tokens.border,
       appBarTheme: AppBarTheme(

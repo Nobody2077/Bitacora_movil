@@ -81,19 +81,19 @@ class _Analysis extends StatelessWidget {
             children: <Widget>[
               TerminalMetric(
                 icon: Icons.account_balance_wallet_outlined,
-                value: economyMoney(value.totalMinor),
+                value: economyMoney(context, value.totalMinor),
                 label: 'Saldo total',
                 color: tokens.infoCyan,
               ),
               TerminalMetric(
                 icon: Icons.lock_outline,
-                value: economyMoney(value.reservedMinor),
+                value: economyMoney(context, value.reservedMinor),
                 label: 'Reservado',
                 color: tokens.valueYellow,
               ),
               TerminalMetric(
                 icon: Icons.payments_outlined,
-                value: economyMoney(value.availableMinor),
+                value: economyMoney(context, value.availableMinor),
                 label: 'Disponible',
                 color: value.availableMinor < 0
                     ? tokens.terminalRed
@@ -156,19 +156,19 @@ class _PeriodPanel extends StatelessWidget {
             children: <Widget>[
               TerminalMetric(
                 icon: Icons.south_west,
-                value: economyMoney(income),
+                value: economyMoney(context, income),
                 label: 'Entradas',
                 color: tokens.progressGreen,
               ),
               TerminalMetric(
                 icon: Icons.north_east,
-                value: economyMoney(expense),
+                value: economyMoney(context, expense),
                 label: 'Salidas',
                 color: tokens.attentionOrange,
               ),
               TerminalMetric(
                 icon: Icons.balance_outlined,
-                value: economyMoney(net, signed: true),
+                value: economyMoney(context, net, signed: true),
                 label: 'Neto',
                 color: net < 0 ? tokens.terminalRed : tokens.infoCyan,
               ),

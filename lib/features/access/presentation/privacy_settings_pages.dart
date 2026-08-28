@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers/persistence_providers.dart';
 import '../../../app/router/app_routes.dart';
+import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../settings/domain/models/app_preferences.dart';
@@ -21,16 +23,20 @@ class SettingsLandingPage extends StatelessWidget {
     title: 'Ajustes',
     subtitle: 'Control local de apariencia, privacidad y continuidad.',
     children: <Widget>[
-      Card(
-        child: ListTile(
-          key: const Key('open-privacy-settings'),
-          minTileHeight: 72,
-          leading: const Icon(Icons.shield_outlined),
-          title: const Text('Privacidad y acceso'),
-          subtitle: const Text('PIN, biometría, bloqueo y cubierta segura.'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.go(AppRoutes.settingsPrivacy),
-        ),
+      _SettingsDestination(
+        key: const Key('open-appearance-settings'),
+        icon: Icons.palette_outlined,
+        title: 'Apariencia y accesibilidad',
+        description: 'Texto, movimiento, contraste e importes privados.',
+        onTap: () => context.go(AppRoutes.settingsAppearance),
+      ),
+      const SizedBox(height: TerminalSpace.sm),
+      _SettingsDestination(
+        key: const Key('open-privacy-settings'),
+        icon: Icons.shield_outlined,
+        title: 'Privacidad y acceso',
+        description: 'PIN, biometría, bloqueo y cubierta segura.',
+        onTap: () => context.go(AppRoutes.settingsPrivacy),
       ),
     ],
   );
@@ -344,16 +350,61 @@ class _SettingsSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.all(24),
-        children: <Widget>[
-          Text(title, style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          Text(subtitle),
-          const SizedBox(height: 24),
-          ...children,
-        ],
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) => ListView(
+          padding: constraints.maxWidth < 600
+              ? TerminalSpace.pageCompact
+              : TerminalSpace.pageTablet,
+          children: <Widget>[
+            TerminalPageHeader(title: title, subtitle: subtitle),
+            const SizedBox(height: TerminalSpace.lg),
+            ...children,
+          ],
+        ),
       ),
     ),
   );
+}
+
+class _SettingsDestination extends StatelessWidget {
+  const _SettingsDestination({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.onTap,
+    super.key,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return TerminalCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(TerminalSpace.md),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Row(
+          children: <Widget>[
+            Icon(icon, color: tokens.infoCyan, size: 30),
+            const SizedBox(width: TerminalSpace.md),
+            Expanded(
+              child: TerminalSectionTitle(
+                title: title,
+                description: description,
+              ),
+            ),
+            const SizedBox(width: TerminalSpace.sm),
+            Icon(Icons.chevron_right, color: tokens.infoCyan),
+          ],
+        ),
+      ),
+    );
+  }
 }

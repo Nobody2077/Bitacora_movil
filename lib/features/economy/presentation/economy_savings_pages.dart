@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/app_ui_preferences.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
@@ -111,10 +112,12 @@ class _GoalCard extends StatelessWidget {
           Row(
             children: <Widget>[
               Expanded(
-                child: Text('${economyMoney(goal.reservedMinor)} reservados'),
+                child: Text(
+                  '${economyMoney(context, goal.reservedMinor)} reservados',
+                ),
               ),
               Text(
-                'Meta ${economyMoney(goal.targetMinor)}',
+                'Meta ${economyMoney(context, goal.targetMinor)}',
                 style: TextStyle(color: tokens.textSecondary),
               ),
             ],
@@ -199,6 +202,8 @@ class _EconomyGoalFormPageState extends ConsumerState<EconomyGoalFormPage> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _target,
+                    obscureText: context.uiPreferences.hideAmounts,
+                    obscuringCharacter: '•',
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -370,19 +375,19 @@ class _EconomyGoalDetailPageState extends ConsumerState<EconomyGoalDetailPage> {
                 children: <Widget>[
                   TerminalMetric(
                     icon: Icons.lock_outline,
-                    value: economyMoney(goal.reservedMinor),
+                    value: economyMoney(context, goal.reservedMinor),
                     label: 'Reservado',
                     color: tokens.valueYellow,
                   ),
                   TerminalMetric(
                     icon: Icons.flag_outlined,
-                    value: economyMoney(goal.targetMinor),
+                    value: economyMoney(context, goal.targetMinor),
                     label: 'Objetivo',
                     color: tokens.infoCyan,
                   ),
                   TerminalMetric(
                     icon: Icons.trending_up,
-                    value: economyMoney(goal.remainingMinor),
+                    value: economyMoney(context, goal.remainingMinor),
                     label: 'Faltante',
                     color: tokens.progressGreen,
                   ),
@@ -458,6 +463,8 @@ class _EconomyGoalDetailPageState extends ConsumerState<EconomyGoalDetailPage> {
             TextField(
               controller: amount,
               autofocus: true,
+              obscureText: context.uiPreferences.hideAmounts,
+              obscuringCharacter: '•',
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
               ),

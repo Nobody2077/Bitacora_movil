@@ -42,6 +42,26 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     textDisabled: Color(0xFF657080),
   );
 
+  static const AppThemeTokens terminalHighContrast = AppThemeTokens(
+    background: Color(0xFF000000),
+    surfaceLow: Color(0xFF080A0D),
+    surfaceHigh: Color(0xFF10141A),
+    surfaceOverlay: Color(0xFF18202A),
+    border: Color(0xFFA7B5C5),
+    borderFocused: Color(0xFF80FFFF),
+    terminalRed: Color(0xFFFF6B6B),
+    criticalAction: Color(0xFFFF4D4D),
+    structuralRed: Color(0xFFB74655),
+    infoCyan: Color(0xFF80FFFF),
+    primaryAction: Color(0xFF4DE7EA),
+    valueYellow: Color(0xFFFFE66D),
+    progressGreen: Color(0xFF66F2A3),
+    attentionOrange: Color(0xFFFFB86B),
+    textPrimary: Color(0xFFFFFFFF),
+    textSecondary: Color(0xFFE2E8F0),
+    textDisabled: Color(0xFFA0AEC0),
+  );
+
   final Color background;
   final Color surfaceLow;
   final Color surfaceHigh;

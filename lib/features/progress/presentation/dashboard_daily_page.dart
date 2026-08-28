@@ -229,7 +229,11 @@ class _DailyContent extends StatelessWidget {
                   ),
                   TerminalMetric(
                     icon: Icons.account_balance_wallet_outlined,
-                    value: economyMoney(summary.balanceMinor, signed: true),
+                    value: economyMoney(
+                      context,
+                      summary.balanceMinor,
+                      signed: true,
+                    ),
                     label: 'Balance económico',
                     color: summary.balanceMinor >= 0
                         ? tokens.progressGreen

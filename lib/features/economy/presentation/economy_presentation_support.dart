@@ -1,6 +1,12 @@
+import 'package:flutter/material.dart';
+
+import '../../../app/theme/app_ui_preferences.dart';
 import '../domain/models/economy_models.dart';
 
-String economyMoney(int minor, {bool signed = false}) {
+String economyMoney(BuildContext context, int minor, {bool signed = false}) {
+  if (context.uiPreferences.hideAmounts) {
+    return 'Bs •••';
+  }
   final bool negative = minor < 0;
   final int absolute = minor.abs();
   final String whole = (absolute ~/ 100).toString();

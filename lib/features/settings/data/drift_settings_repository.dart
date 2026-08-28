@@ -32,6 +32,28 @@ final class DriftSettingsRepository implements SettingsRepository {
   }
 
   @override
+  Stream<Result<AppPreferences>> watch() async* {
+    try {
+      await for (final value in _dao.watchSettings()) {
+        final AppPreferences preferences = SettingsMapper.fromDrift(value);
+        if (!AppPreferences.supportedAutoLockMinutes.contains(
+          preferences.autoLockMinutes,
+        )) {
+          yield const Failure<AppPreferences>(
+            ValidationFailure('El autobloqueo persistido no está soportado.'),
+          );
+          continue;
+        }
+        yield Success<AppPreferences>(preferences);
+      }
+    } on Object catch (error) {
+      yield Failure<AppPreferences>(
+        StorageFailure('No se pudieron observar los ajustes.', cause: error),
+      );
+    }
+  }
+
+  @override
   Future<Result<void>> save(AppPreferences preferences) async {
     if (!preferences.updatedAtUtc.isUtc ||
         preferences.themeKey.trim().isEmpty ||

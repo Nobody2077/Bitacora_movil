@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A4 están completadas. A5.1–A5.3 están cerradas y validadas físicamente. El cierre técnico de A5 también está completo: dashboards reactivos, XP, niveles globales/por área, títulos y rachas superan G5 automatizado; resta validar físicamente esta última ampliación para cerrar formalmente la fase.
+> **Estado actual:** A0–A5 están completadas y G5 está verde. A6 queda diferida y pendiente por decisión explícita del usuario. A7 está en curso por excepción, con su primer incremento de apariencia y accesibilidad conectado; A8 requiere G6 y G7 verdes.
 
 ## Qué busca ofrecer
 
@@ -25,8 +25,10 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
-| A5 — Bitácora y progreso | Validación física pendiente | G5 técnico verde con 161 pruebas; títulos, rachas, niveles y dashboards conectados |
-| A6–A8 | Bloqueadas | Copias, UI final y release requieren el gate anterior |
+| A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
+| A6 — Copia y restauración | Diferida / pendiente | G6 no ejecutada; debe retomarse antes de A8 |
+| A7 — UI v2 y accesibilidad | En curso por excepción | Preferencias globales, Apariencia, alto contraste, texto grande, movimiento reducido e importes ocultos conectados |
+| A8 — Release | Bloqueada | Requiere G6 y G7 verdes |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
 
@@ -36,12 +38,13 @@ El estado del sistema visual real y las reglas para extenderlo sin romper la
 coherencia de tablet y móvil están en
 [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
 
-El último incremento validado físicamente es A5.3: `/journal/search` busca por texto literal,
+El último gate validado físicamente es G5: `/journal/search` busca por texto literal,
 rango, procedencia y presencia de fotografías; `/journal/archive` conserva
 entradas, vínculos y fotos fuera de la cronología y permite restaurarlas. El
 cierre diario y los dashboards diario, semanal y de nivel RPG también están
-conectados. Progreso ya añade niveles por área, rachas y títulos con historial;
-el siguiente paso es validar esta ampliación en dispositivo y cerrar G5.
+conectados. Progreso añade niveles por área, rachas y títulos con historial. El
+trabajo actual es A7: su primer incremento conecta `/settings/appearance` con
+preferencias persistentes y reactivas. A6 continúa pendiente según ADR-004.
 
 ## Arquitectura resumida
 
@@ -56,7 +59,7 @@ lib/
 │   ├── journal/         cronología, fotos, búsqueda y archivo A5.1–A5.3
 │   ├── progress/        XP, niveles, títulos, rachas y dashboards reactivos
 │   ├── profile/         nombre y avatar local de la barra de tablet
-│   └── settings/        preferencias y pantallas de privacidad
+│   └── settings/        preferencias, apariencia accesible y privacidad
 ├── infrastructure/     Drift, esquema, DAOs, cifrado y seguridad
 └── shared/              shell adaptable y widgets compartidos
 ```
@@ -72,9 +75,10 @@ Orden recomendado de lectura:
 3. [`documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md`](documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md): persistencia y cifrado.
 4. [`documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`](documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md): acceso y privacidad.
 5. [`documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md`](documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md): reglas de títulos, rachas y niveles.
-6. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
-7. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
-8. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
+6. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): excepción de secuencia A6–A8.
+7. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
+8. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
+9. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.
 
 Cuando un documento fuente contradiga una decisión posterior, prevalecen `DECISIONES_PRE_A0.md` y los ADR aplicables.

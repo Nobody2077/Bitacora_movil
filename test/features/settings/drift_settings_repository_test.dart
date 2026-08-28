@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/settings/data/drift_settings_repository.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
@@ -47,5 +49,37 @@ void main() {
     );
 
     expect(await repository.load(), isA<Failure<AppPreferences>>());
+  });
+
+  test('watch publica los cambios de accesibilidad persistidos', () async {
+    final StreamIterator<Result<AppPreferences>> changes = StreamIterator(
+      repository.watch(),
+    );
+    expect(await changes.moveNext(), isTrue);
+    final AppPreferences baseline =
+        (changes.current as Success<AppPreferences>).value;
+
+    final Result<void> saved = await repository.save(
+      baseline.copyWith(
+        largeText: true,
+        reduceMotion: true,
+        highContrast: true,
+        hideAmounts: true,
+        updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(
+          1787600000001,
+          isUtc: true,
+        ),
+      ),
+    );
+
+    expect(saved, isA<Success<void>>());
+    expect(await changes.moveNext(), isTrue);
+    final AppPreferences updated =
+        (changes.current as Success<AppPreferences>).value;
+    expect(updated.largeText, isTrue);
+    expect(updated.reduceMotion, isTrue);
+    expect(updated.highContrast, isTrue);
+    expect(updated.hideAmounts, isTrue);
+    await changes.cancel();
   });
 }

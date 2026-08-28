@@ -33,6 +33,7 @@ import '../../features/progress/presentation/dashboard_progress_page.dart';
 import '../../features/progress/presentation/dashboard_weekly_page.dart';
 import '../../features/recurrences/presentation/recurrence_form_page.dart';
 import '../../features/recurrences/presentation/recurrence_list_page.dart';
+import '../../features/settings/presentation/appearance_settings_page.dart';
 import '../../features/settings/presentation/more_page.dart';
 import '../../shared/adaptive/adaptive_shell.dart';
 import '../../shared/widgets/feature_placeholder_page.dart';
@@ -303,6 +304,9 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         }
         if (contract.path == AppRoutes.settings) {
           return const SettingsLandingPage();
+        }
+        if (contract.path == AppRoutes.settingsAppearance) {
+          return const AppearanceSettingsPage();
         }
         if (contract.path == AppRoutes.settingsPrivacy) {
           return const PrivacySettingsPage();

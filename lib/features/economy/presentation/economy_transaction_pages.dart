@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/app_ui_preferences.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
@@ -181,6 +182,8 @@ class _EconomyTransactionFormPageState
                   TextFormField(
                     controller: _amount,
                     autofocus: !widget.isCorrection,
+                    obscureText: context.uiPreferences.hideAmounts,
+                    obscuringCharacter: '•',
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -464,6 +467,7 @@ class _EconomyTransactionDetailPageState
               const SizedBox(height: 20),
               Text(
                 economyMoney(
+                  context,
                   value.isCredit ? value.amountMinor : -value.amountMinor,
                   signed: true,
                 ),

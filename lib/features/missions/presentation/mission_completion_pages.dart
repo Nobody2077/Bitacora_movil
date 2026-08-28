@@ -8,6 +8,7 @@ import '../../../app/application/command_providers.dart';
 import '../../../app/application/commands/complete_mission.dart';
 import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/app_ui_preferences.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
@@ -558,7 +559,7 @@ class _CompletionEconomyPanel extends StatelessWidget {
           Text(
             mission.budgetMinor == null
                 ? 'Sin presupuesto estimado'
-                : 'Presupuesto: Bs ${missionMoneyLabel(mission.budgetMinor!)}',
+                : 'Presupuesto: ${missionMoneyDisplay(context, mission.budgetMinor!)}',
             style: const TextStyle(color: Colors.white60),
           ),
           const SizedBox(height: 16),
@@ -583,6 +584,8 @@ class _CompletionEconomyPanel extends StatelessWidget {
           const SizedBox(height: 12),
           TextFormField(
             controller: expenseController,
+            obscureText: context.uiPreferences.hideAmounts,
+            obscuringCharacter: '•',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
               labelText: movementType == CompletionMovementType.expense
@@ -747,7 +750,7 @@ class _MissionResultContent extends StatelessWidget {
                     Text(
                       receipt.movementMinor == null
                           ? 'Sin movimiento económico durante el cierre.'
-                          : '${receipt.movementType == CompletionMovementType.income ? 'Ingreso' : 'Gasto'} registrado: Bs ${missionMoneyLabel(receipt.movementMinor!)}',
+                          : '${receipt.movementType == CompletionMovementType.income ? 'Ingreso' : 'Gasto'} registrado: ${missionMoneyDisplay(context, receipt.movementMinor!)}',
                       style: const TextStyle(color: Colors.white60),
                     ),
                     if (mission.convenienceRating != null) ...<Widget>[

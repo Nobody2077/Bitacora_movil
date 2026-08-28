@@ -302,7 +302,7 @@ class _FilterTab extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: TerminalMotion.quick,
+          duration: TerminalMotion.resolve(context, TerminalMotion.quick),
           padding: const EdgeInsets.symmetric(
             horizontal: TerminalSpace.md,
             vertical: TerminalSpace.xs,
@@ -347,7 +347,7 @@ class _AreaChip extends StatelessWidget {
     child: InkWell(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: TerminalMotion.quick,
+        duration: TerminalMotion.resolve(context, TerminalMotion.quick),
         padding: const EdgeInsets.symmetric(
           horizontal: TerminalSpace.sm,
           vertical: TerminalSpace.xs,
@@ -518,8 +518,8 @@ class _MissionCard extends StatelessWidget {
               if (mission.budgetMinor != null)
                 _MiniValue(
                   icon: Icons.savings_outlined,
-                  value: missionMoneyLabel(mission.budgetMinor!),
-                  label: 'Bs',
+                  value: missionMoneyDisplay(context, mission.budgetMinor!),
+                  label: 'Presupuesto',
                   color: tokens.progressGreen,
                 ),
             ],

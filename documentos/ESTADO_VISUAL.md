@@ -1,6 +1,6 @@
 # Estado visual — Sistema Terminal V2
 
-Actualizado: 27 de agosto de 2026.
+Actualizado: 28 de agosto de 2026.
 
 Este documento complementa `ESTADO_ACTUAL.md`. Describe exclusivamente el
 estado de la interfaz; no sustituye los ADR, el contrato de persistencia ni las
@@ -61,6 +61,14 @@ decisiones de producto.
 - `FeaturePlaceholderPage` y el contenedor «Más» ya usan las superficies
   terminales. Las rutas aún pendientes siguen siendo funcionalmente
   identificables, pero ahora respetan el sistema visual común.
+- A7 conecta `/settings/appearance` como superficie Terminal V2 adaptable con
+  controles persistentes para texto grande, movimiento reducido, alto
+  contraste e importes ocultos. Ajustes dejó de usar un destino genérico para
+  Apariencia y sus controles declaran estado, etiqueta y objetivo táctil.
+- La política visual es global: texto grande fija un mínimo de 1.3× sin reducir
+  escalas del sistema de 2.0×, movimiento reducido elimina las transiciones
+  Terminal instrumentadas, alto contraste cambia a una paleta reforzada e
+  importes ocultos enmascara valores y campos monetarios.
 
 ## Reglas que se deben conservar
 
@@ -114,15 +122,14 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 2. Revisar físicamente Detalle y Nueva/Editar misión en tablet y terminar la
    migración de diálogos secundarios. Inicio, el resumen de Misiones, Detalle
    y Nueva/Editar ya usan la composición de operaciones del Documento 13.
-3. Validar físicamente en teléfono/tablet los títulos, rachas y niveles por área
-   ya integrados, sin reescribir su contrato visual Terminal V2.
+3. Auditar texto 2.0×, foco, semántica, contraste y objetivos táctiles en todas
+   las pantallas; generar goldens compactos y expandidos canónicos.
 4. Estados de carga, vacío y error por módulo, con mensajes accionables y el
    mismo orden: contexto → título → explicación → información → acción.
 
 ## Verificación de este incremento
 
-A5.1–A5.3 fueron aprobadas físicamente en la Redmi Pad el 27 de agosto de 2026.
-La APK `prod-debug` se recompiló con búsqueda, archivo, cierre diario y
-dashboards integrados. La ampliación final de Progreso recompiló la APK con
-formato limpio, `flutter analyze` sin problemas y 161 pruebas verdes. G5 está
-completo técnicamente y espera validación física antes del cierre formal.
+A5 y G5 fueron aprobadas técnica y físicamente en la Redmi Pad el 27 de agosto
+de 2026. El primer incremento A7 aprobó `flutter analyze`, 167 pruebas y la APK
+`prod-debug`; G7 permanece abierto hasta completar la auditoría, los goldens y
+la validación física. A6 está diferida según ADR-004 y debe cerrarse antes de A8.

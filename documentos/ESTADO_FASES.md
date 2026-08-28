@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 27 de agosto de 2026
+Última actualización: 28 de agosto de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -11,10 +11,10 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A2 — Acceso y privacidad | **COMPLETADA** | G2 verde |
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
-| A5 — Bitácora y progreso | **VALIDACIÓN FÍSICA PENDIENTE** | **G5 técnico verde**: A5.1–A5.3 aprobadas; títulos, rachas, niveles por área y dashboards reactivos conectados |
-| A6 — Copia y restauración | BLOQUEADA | Requiere G5 |
-| A7 — UI v2 y accesibilidad | BLOQUEADA | Requiere G6 |
-| A8 — Release | BLOQUEADA | Requiere G7 |
+| A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
+| A6 — Copia y restauración | **DIFERIDA / PENDIENTE** | G6 no ejecutada; ADR-004 |
+| A7 — UI v2 y accesibilidad | **EN CURSO POR EXCEPCIÓN** | Primer incremento técnico verde; G7 pendiente |
+| A8 — Release | BLOQUEADA | Requiere G6 y G7 |
 
 ## Evidencia G3 — A3 completada
 
@@ -177,8 +177,28 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - `flutter analyze`: cero problemas.
 - `flutter test`: **161/161 pruebas aprobadas**.
 - `assembleProdDebug`: APK compilada correctamente el 27 de agosto de 2026.
-- **G5 está verde técnicamente**. Resta validar físicamente títulos, rachas y
-  niveles por área antes de declarar A5 cerrada y desbloquear A6.
+- El usuario aprobó físicamente títulos, rachas y niveles por área el 27 de
+  agosto de 2026. **A5 queda completada y G5 queda verde.**
+
+## Excepción de secuencia y evidencia inicial A7
+
+- `ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md` registra la decisión explícita de
+  diferir A6 sin marcarla completada y activar A7 antes de G6.
+- `/settings/appearance` dejó de ser placeholder y persiste Texto grande,
+  Reducir movimiento, Alto contraste y Ocultar importes.
+- La raíz observa los ajustes solo con sesión desbloqueada y aplica texto de
+  al menos 1.3× conservando escalas del sistema de 2.0×, movimiento reducido y
+  paleta reforzada de alto contraste.
+- Los importes monetarios se enmascaran en Economía, Inicio, Bitácora, Progreso
+  y Misiones; los campos de edición monetaria usan ocultación visual.
+- Ajustes usa composición Terminal V2 adaptable y controles con objetivo táctil
+  mínimo de 48 × 48, semántica de estado y estados de carga/error/guardado.
+- `flutter analyze`: cero problemas.
+- `flutter test`: **167/167 pruebas aprobadas**.
+- `assembleProdDebug`: APK compilada correctamente el 28 de agosto de 2026.
+- A7 continúa en curso: faltan la auditoría completa de pantallas, goldens
+  compact/expanded/large text/high contrast, foco, contraste y validación física.
+- A8 sigue bloqueada hasta completar G6 y G7.
 
 ## Evidencia G0
 

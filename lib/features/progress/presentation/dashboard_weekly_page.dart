@@ -207,7 +207,11 @@ class _WeeklyContent extends StatelessWidget {
                   ),
                   TerminalMetric(
                     icon: Icons.account_balance_wallet_outlined,
-                    value: economyMoney(data.weekBalanceMinor, signed: true),
+                    value: economyMoney(
+                      context,
+                      data.weekBalanceMinor,
+                      signed: true,
+                    ),
                     label: 'Balance semanal',
                     color: data.weekBalanceMinor >= 0
                         ? tokens.progressGreen

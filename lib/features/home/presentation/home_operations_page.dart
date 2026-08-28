@@ -376,7 +376,8 @@ class _EconomyMetric extends StatelessWidget {
                   TerminalLabel('Economía', color: tokens.progressGreen),
                   Text(
                     economy.when(
-                      data: (value) => economyMoney(value.availableMinor),
+                      data: (value) =>
+                          economyMoney(context, value.availableMinor),
                       loading: () => '…',
                       error: (_, _) => '—',
                     ),

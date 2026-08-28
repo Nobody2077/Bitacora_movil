@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/app_ui_preferences.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
@@ -605,6 +606,8 @@ class _PlanningPanel extends StatelessWidget {
           const SizedBox(height: 12),
           TextFormField(
             controller: budgetController,
+            obscureText: context.uiPreferences.hideAmounts,
+            obscuringCharacter: '•',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               labelText: 'Presupuesto',

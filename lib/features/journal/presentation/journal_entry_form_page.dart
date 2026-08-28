@@ -489,7 +489,7 @@ class _TransactionSourceField extends StatelessWidget {
             value: item.id,
             child: Text(
               '${item.category ?? economyTransactionTypeLabel(item.type)} · '
-              '${economyMoney(item.isCredit ? item.amountMinor : -item.amountMinor, signed: true)}',
+              '${economyMoney(context, item.isCredit ? item.amountMinor : -item.amountMinor, signed: true)}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

@@ -405,7 +405,7 @@ class _ExecutionPanel extends StatelessWidget {
             label: 'Presupuesto',
             value: mission.budgetMinor == null
                 ? 'Sin presupuesto'
-                : 'Bs ${missionMoneyLabel(mission.budgetMinor!)}',
+                : missionMoneyDisplay(context, mission.budgetMinor!),
           ),
           const TerminalDivider(),
           _PlanRow(

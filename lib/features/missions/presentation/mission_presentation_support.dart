@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/application/commands/complete_mission.dart';
+import '../../../app/theme/app_ui_preferences.dart';
 import '../domain/models/mission.dart';
 
 Color missionAreaColor(String colorHex, Color fallback) {
@@ -76,6 +77,11 @@ String missionMoneyLabel(int minor) {
       ? value.toStringAsFixed(0)
       : value.toStringAsFixed(2);
 }
+
+String missionMoneyDisplay(BuildContext context, int minor) =>
+    context.uiPreferences.hideAmounts
+    ? 'Bs •••'
+    : 'Bs ${missionMoneyLabel(minor)}';
 
 String missionDurationLabel(int totalSeconds) {
   final int safeSeconds = totalSeconds < 0 ? 0 : totalSeconds;

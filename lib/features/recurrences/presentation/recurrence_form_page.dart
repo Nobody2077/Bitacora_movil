@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../app/theme/app_ui_preferences.dart';
+import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../features/missions/application/mission_providers.dart';
@@ -834,6 +836,8 @@ class _RecurrencePanel extends StatelessWidget {
           const SizedBox(height: 12),
           TextFormField(
             controller: budgetController,
+            obscureText: context.uiPreferences.hideAmounts,
+            obscuringCharacter: '•',
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               labelText: 'Presupuesto',
@@ -890,7 +894,7 @@ class _DayToggle extends StatelessWidget {
       onTap: onToggle,
       customBorder: const CircleBorder(),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: TerminalMotion.resolve(context, TerminalMotion.quick),
         width: 40,
         height: 40,
         decoration: BoxDecoration(

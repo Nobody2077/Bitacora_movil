@@ -136,19 +136,19 @@ class _BalanceSummary extends StatelessWidget {
             children: <Widget>[
               TerminalMetric(
                 icon: Icons.account_balance_wallet_outlined,
-                value: economyMoney(value.totalMinor),
+                value: economyMoney(context, value.totalMinor),
                 label: 'Saldo total',
                 color: tokens.infoCyan,
               ),
               TerminalMetric(
                 icon: Icons.lock_outline,
-                value: economyMoney(value.reservedMinor),
+                value: economyMoney(context, value.reservedMinor),
                 label: 'Reservado',
                 color: tokens.valueYellow,
               ),
               TerminalMetric(
                 icon: Icons.payments_outlined,
-                value: economyMoney(value.availableMinor),
+                value: economyMoney(context, value.availableMinor),
                 label: 'Disponible',
                 color: value.availableMinor < 0
                     ? tokens.terminalRed
@@ -165,7 +165,7 @@ class _BalanceSummary extends StatelessWidget {
             children: <Widget>[
               TerminalMetric(
                 icon: Icons.today_outlined,
-                value: economyMoney(value.dayNetMinor, signed: true),
+                value: economyMoney(context, value.dayNetMinor, signed: true),
                 label: 'Neto de hoy',
                 color: value.dayNetMinor < 0
                     ? tokens.attentionOrange
@@ -173,7 +173,7 @@ class _BalanceSummary extends StatelessWidget {
               ),
               TerminalMetric(
                 icon: Icons.calendar_month_outlined,
-                value: economyMoney(value.monthNetMinor, signed: true),
+                value: economyMoney(context, value.monthNetMinor, signed: true),
                 label: 'Neto del mes',
                 color: value.monthNetMinor < 0
                     ? tokens.attentionOrange
@@ -263,6 +263,7 @@ class EconomyTransactionCard extends StatelessWidget {
             children: <Widget>[
               Text(
                 economyMoney(
+                  context,
                   transaction.isCredit
                       ? transaction.amountMinor
                       : -transaction.amountMinor,

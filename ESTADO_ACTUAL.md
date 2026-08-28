@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **27 de agosto de 2026** (G5 técnico verde; validación física final pendiente)
+- Última revisión: **28 de agosto de 2026** (G5 verde; A7 activa por excepción)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -9,9 +9,12 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 ## Resumen ejecutivo
 
 - La aplicación es Flutter Android, local-first, privada y de un solo usuario.
-- A0–A4 están completadas. G3 quedó verde el 26 de agosto de 2026 y G4 fue
+- A0–A5 están completadas. G3 quedó verde el 26 de agosto de 2026 y G4 fue
   aprobado físicamente el 27 de agosto de 2026.
-- A5.1, A5.2 y **A5.3 fueron aprobadas físicamente el 27 de agosto de 2026**. La ampliación final de Progreso ya conecta títulos, rachas, niveles por área y actualización reactiva; G5 está verde técnicamente. A6 continúa bloqueada hasta la validación física y el cierre formal de G5.
+- A5.1–A5.3 y la ampliación final de Progreso fueron aprobadas físicamente el
+  27 de agosto de 2026. A5 está completada y G5 está verde.
+- ADR-004 difiere A6 sin eliminarla del MVP y autoriza trabajar A7 antes de G6.
+  A8 permanece bloqueada hasta tener G6 y G7 verdes.
 - La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
@@ -19,8 +22,10 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La ampliación final de Progreso aprobó formato, `flutter analyze`, 161 pruebas
   y `assembleProdDebug` el 27 de agosto de 2026.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Último incremento: **G5 técnico completo**. Siguiente paso: validar físicamente
-  títulos, rachas y niveles por área en la tablet y cerrar formalmente A5/G5.
+- Último incremento: **A7 inicial**. Apariencia y accesibilidad aplican
+  preferencias persistentes de texto grande, movimiento reducido, alto
+  contraste e importes ocultos. La matriz está verde con 167 pruebas y APK
+  `prod-debug`; G7 todavía no está cerrada.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -50,15 +55,15 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 ### Antes de continuar o generar APK
 
 1. No limpiar datos de la app: es almacenamiento local cifrado.
-2. A5.1, A5.2 y **A5.3 fueron validadas físicamente por el usuario el 27 de agosto de 2026**, incluidas fotografías, búsqueda, archivo/restauración y cierre diario.
-3. Los dashboards diario, semanal y de nivel RPG están funcionales y reactivos; Progreso ya muestra títulos, rachas y niveles por área. Falta validar físicamente esta ampliación para cerrar G5.
+2. A5 y G5 están cerradas, incluida la validación física de títulos, rachas y
+   niveles por área el 27 de agosto de 2026.
+3. A6 está diferida, no completada. Continuar A7 según ADR-004 y no iniciar A8
+   hasta cerrar G6 y G7.
 
 ### Cambios locales ajenos que se deben preservar
 
-Además del rediseño y recurrencias hay modificaciones locales de iconos Android,
-`assets/` y `pubspec.yaml`/`pubspec.lock`. Su origen no fue este incremento.
-No añadirlas, revertirlas ni combinarlas con commits de UI sin revisarlas con el
-usuario.
+El árbol estaba limpio al iniciar A7. Cualquier cambio local futuro que no esté
+descrito en este relevo debe considerarse del usuario y preservarse.
 
 ---
 
@@ -238,7 +243,7 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 - Validación física aprobada por el usuario el 27 de agosto de 2026, incluida
   persistencia correcta después de salir de la aplicación. G4 está verde.
 
-### A5 — Cierre técnico completo; validación física pendiente
+### A5 — Completada; G5 verde
 
 - Bitácora tiene cronología diaria reactiva, resumen/estado del día, creación,
   edición, detalle y vínculos navegables con misiones o movimientos.
@@ -274,8 +279,29 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
   `Ritmo constante` permanece activo con una racha diaria de siete días. El
   contrato y el alcance temporal están documentados en ADR-003.
 - La matriz automatizada final aprobó formato, análisis, **161 pruebas** y APK
-  `prod-debug`. Solo resta validación física del incremento final.
+  `prod-debug`; la validación física final fue aprobada el 27 de agosto de 2026.
 - Copia/restauración, UI v2 final, accesibilidad completa y release pertenecen a A6–A8.
+
+### A6 diferida y A7 en curso por excepción
+
+- ADR-004 conserva A6 como pendiente y permite ejecutar A7 antes de G6. A8
+  continúa bloqueada hasta completar G6 y G7.
+- `/settings/appearance` es una ruta funcional con estados de carga, error y
+  guardado para las cuatro preferencias visuales persistidas.
+- La raíz observa Ajustes únicamente con la sesión desbloqueada. Texto grande
+  garantiza al menos 1.3× y conserva una escala del sistema de 2.0×; reducir
+  movimiento alimenta `MediaQuery.disableAnimations` y las animaciones
+  Terminal consultan esa política.
+- Alto contraste selecciona una paleta Terminal reforzada. Ocultar importes
+  enmascara saldos, movimientos, presupuestos y métricas monetarias, y oscurece
+  los campos de edición de importes.
+- Ajustes usa espaciado compacto `<600` y tablet `>=600`, controles de al menos
+  48 × 48 y semántica redundante de los switches.
+- `flutter analyze`: limpio; `flutter test`: **167/167**; `assembleProdDebug`:
+  aprobado el 28 de agosto de 2026.
+- Pendiente de A7: auditoría del resto de pantallas, estados por módulo,
+  goldens compact/expanded/large text/high contrast, foco, contraste, semántica
+  completa y validación física.
 
 ---
 
@@ -353,10 +379,9 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-El punto de entrada inmediato es validar físicamente en la tablet la ampliación
-final de Progreso: rachas, títulos y niveles por área. Si resulta correcta,
-registrar G5 como cerrado y desbloquear A6. A5.3 y la matriz automatizada de G5
-ya no son trabajo pendiente.
+Continuar A7 con la auditoría de adaptación, estados y accesibilidad por módulo.
+Después completar goldens y validación física de G7. A6 debe retomarse y cerrar
+G6 antes de A8; sus pantallas reutilizarán el contrato visual consolidado en A7.
 
 ---
 
@@ -369,6 +394,7 @@ ya no son trabajo pendiente.
 | `economyRepositoryProvider` | Consumido por providers, servicio, Inicio y UI de Economía | A4 ✓ conectado |
 | `journalRepositoryProvider` | Entradas, fotos, búsqueda y archivo/restauración | A5.1–A5.3 ✓ conectado |
 | `progressRepositoryProvider` | Dashboards reactivos, XP, niveles, títulos y rachas | A5 ✓ conectado |
+| `settingsRepositoryProvider` | Preferencias reactivas en raíz y `/settings/appearance` | A7 ✓ conectado |
 | Rutas de negocio con placeholder restantes | Contrato de navegación ya congelado | A3–A7 |
 
 ---
