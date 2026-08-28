@@ -4,7 +4,7 @@ Aplicación Android privada, local-first y sin dependencia de red para convertir
 
 El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una base SQLite cifrada. Los datos y las credenciales permanecen en el dispositivo; el acceso se protege con PIN, recuperación y biometría opcional.
 
-> **Estado actual:** A0–A5 están completadas y G5 está verde. A6 queda diferida y pendiente por decisión explícita del usuario. A7 está en curso por excepción, con su primer incremento de apariencia y accesibilidad conectado; A8 requiere G6 y G7 verdes.
+> **Estado actual:** A0–A5 están completadas y G5 está verde. A6 queda diferida y pendiente por decisión explícita del usuario. A7 está en curso por excepción, con Apariencia y su matriz adaptable/accesible conectadas; A8 requiere G6 y G7 verdes.
 
 ## Qué busca ofrecer
 
@@ -27,7 +27,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
 | A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
 | A6 — Copia y restauración | Diferida / pendiente | G6 no ejecutada; debe retomarse antes de A8 |
-| A7 — UI v2 y accesibilidad | En curso por excepción | Preferencias globales, Apariencia, alto contraste, texto grande, movimiento reducido e importes ocultos conectados |
+| A7 — UI v2 y accesibilidad | En curso por excepción | Apariencia global y matriz adaptable/accesible con 3 goldens canónicos y 174 pruebas |
 | A8 — Release | Bloqueada | Requiere G6 y G7 verdes |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
@@ -44,7 +44,9 @@ entradas, vínculos y fotos fuera de la cronología y permite restaurarlas. El
 cierre diario y los dashboards diario, semanal y de nivel RPG también están
 conectados. Progreso añade niveles por área, rachas y títulos con historial. El
 trabajo actual es A7: su primer incremento conecta `/settings/appearance` con
-preferencias persistentes y reactivas. A6 continúa pendiente según ADR-004.
+preferencias persistentes y reactivas. A7.2 añade composición exacta en los
+breakpoints, equivalencia teléfono/tablet, texto 2.0× y goldens compactos y
+expandidos. A6 continúa pendiente según ADR-004.
 
 ## Arquitectura resumida
 

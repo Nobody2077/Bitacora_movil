@@ -7,6 +7,7 @@ import '../../../app/router/app_routes.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/result/result.dart';
+import '../../../shared/adaptive/app_breakpoints.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../settings/domain/models/app_preferences.dart';
 import '../application/access_session_controller.dart';
@@ -352,7 +353,7 @@ class _SettingsSurface extends StatelessWidget {
     body: SafeArea(
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) => ListView(
-          padding: constraints.maxWidth < 600
+          padding: constraints.maxWidth < AppBreakpoints.compact
               ? TerminalSpace.pageCompact
               : TerminalSpace.pageTablet,
           children: <Widget>[

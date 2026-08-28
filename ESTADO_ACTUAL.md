@@ -22,10 +22,11 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 - La ampliación final de Progreso aprobó formato, `flutter analyze`, 161 pruebas
   y `assembleProdDebug` el 27 de agosto de 2026.
 - La prioridad del usuario es construir funcionalidad real. No se deben borrar las pruebas existentes, pero tampoco convertir cada avance en una fase dedicada únicamente a pruebas.
-- Último incremento: **A7 inicial**. Apariencia y accesibilidad aplican
+- Último incremento: **A7.2**. Apariencia y accesibilidad aplican
   preferencias persistentes de texto grande, movimiento reducido, alto
-  contraste e importes ocultos. La matriz está verde con 167 pruebas y APK
-  `prod-debug`; G7 todavía no está cerrada.
+  contraste e importes ocultos. La composición responde exactamente en 600 y
+  840 px y cuenta con goldens compactos, expandidos y texto 2.0×. La matriz está
+  verde con 174 pruebas y APK `prod-debug`; G7 todavía no está cerrada.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -295,13 +296,15 @@ pantalla bloqueada con contenido genérico y privado, como exige ADR-002.
 - Alto contraste selecciona una paleta Terminal reforzada. Ocultar importes
   enmascara saldos, movimientos, presupuestos y métricas monetarias, y oscurece
   los campos de edición de importes.
-- Ajustes usa espaciado compacto `<600` y tablet `>=600`, controles de al menos
-  48 × 48 y semántica redundante de los switches.
-- `flutter analyze`: limpio; `flutter test`: **167/167**; `assembleProdDebug`:
+- Ajustes usa una columna compacta/media, dos columnas desde 840 px, contenido
+  limitado a 1120 px, controles de al menos 48 × 48 y semántica redundante.
+- Tres goldens protegen compacto, expandido con alto contraste y compacto con
+  texto 2.0×. Las guías Flutter de toque Android, etiquetado y contraste pasan;
+  teléfono y tablet construyen la misma ruta y el mismo estado lógico.
+- `flutter analyze`: limpio; `flutter test`: **174/174**; `assembleProdDebug`:
   aprobado el 28 de agosto de 2026.
 - Pendiente de A7: auditoría del resto de pantallas, estados por módulo,
-  goldens compact/expanded/large text/high contrast, foco, contraste, semántica
-  completa y validación física.
+  ampliación de goldens, foco, semántica completa y validación física.
 
 ---
 
@@ -380,8 +383,9 @@ main_dev/main_prod
 ### Secuencia recomendada para continuar (próxima sesión)
 
 Continuar A7 con la auditoría de adaptación, estados y accesibilidad por módulo.
-Después completar goldens y validación física de G7. A6 debe retomarse y cerrar
-G6 antes de A8; sus pantallas reutilizarán el contrato visual consolidado en A7.
+Después completar la auditoría y los goldens del resto de módulos, más la
+validación física de G7. A6 debe retomarse y cerrar G6 antes de A8; sus pantallas
+reutilizarán el contrato visual consolidado en A7.
 
 ---
 

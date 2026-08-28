@@ -69,6 +69,8 @@ decisiones de producto.
   escalas del sistema de 2.0×, movimiento reducido elimina las transiciones
   Terminal instrumentadas, alto contraste cambia a una paleta reforzada e
   importes ocultos enmascara valores y campos monetarios.
+- La superficie de Apariencia mantiene una columna en compacto/medio, cambia a
+  dos columnas exactamente desde 840 px y limita el ancho de lectura a 1120 px.
 
 ## Reglas que se deben conservar
 
@@ -122,14 +124,16 @@ migrar, sin alterar sus casos de uso ni sus pruebas:
 2. Revisar físicamente Detalle y Nueva/Editar misión en tablet y terminar la
    migración de diálogos secundarios. Inicio, el resumen de Misiones, Detalle
    y Nueva/Editar ya usan la composición de operaciones del Documento 13.
-3. Auditar texto 2.0×, foco, semántica, contraste y objetivos táctiles en todas
-   las pantallas; generar goldens compactos y expandidos canónicos.
+3. Extender a las demás pantallas la auditoría de texto 2.0×, foco, semántica,
+   contraste y objetivos táctiles. Apariencia ya cuenta con goldens compactos,
+   expandidos, alto contraste y texto 2.0×.
 4. Estados de carga, vacío y error por módulo, con mensajes accionables y el
    mismo orden: contexto → título → explicación → información → acción.
 
 ## Verificación de este incremento
 
 A5 y G5 fueron aprobadas técnica y físicamente en la Redmi Pad el 27 de agosto
-de 2026. El primer incremento A7 aprobó `flutter analyze`, 167 pruebas y la APK
-`prod-debug`; G7 permanece abierto hasta completar la auditoría, los goldens y
-la validación física. A6 está diferida según ADR-004 y debe cerrarse antes de A8.
+de 2026. A7.2 aprobó `flutter analyze`, 174 pruebas, tres goldens canónicos y la
+APK `prod-debug`; G7 permanece abierto hasta completar la auditoría transversal
+y la validación física. A6 está diferida según ADR-004 y debe cerrarse antes de
+A8.

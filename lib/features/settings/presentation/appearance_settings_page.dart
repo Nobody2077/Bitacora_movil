@@ -7,6 +7,7 @@ import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
+import '../../../shared/adaptive/app_breakpoints.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../domain/models/app_preferences.dart';
 
@@ -64,26 +65,40 @@ class _AppearanceSettingsPageState
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final EdgeInsets padding = constraints.maxWidth < 600
+            final EdgeInsets padding =
+                constraints.maxWidth < AppBreakpoints.compact
                 ? TerminalSpace.pageCompact
                 : TerminalSpace.pageTablet;
-            return ListView(
-              padding: padding,
-              children: <Widget>[
-                const TerminalPageHeader(
-                  title: 'Apariencia',
-                  subtitle: 'Lectura, movimiento, contraste y privacidad',
-                ),
-                const SizedBox(height: TerminalSpace.lg),
-                preferences.when(
-                  loading: () => const _AppearanceLoadingState(),
-                  error: (Object error, StackTrace stackTrace) =>
-                      _AppearanceErrorState(
-                        onRetry: () => ref.invalidate(appPreferencesProvider),
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1120),
+                child: ListView(
+                  padding: padding,
+                  children: <Widget>[
+                    const TerminalPageHeader(
+                      title: 'Apariencia',
+                      subtitle: 'Lectura, movimiento, contraste y privacidad',
+                    ),
+                    const SizedBox(height: TerminalSpace.lg),
+                    preferences.when(
+                      loading: () => const _AppearanceLoadingState(),
+                      error: (Object error, StackTrace stackTrace) =>
+                          _AppearanceErrorState(
+                            onRetry: () =>
+                                ref.invalidate(appPreferencesProvider),
+                          ),
+                      data: (AppPreferences value) => _buildPreferences(
+                        value,
+                        expanded:
+                            constraints.maxWidth >= AppBreakpoints.expanded,
+                        availableWidth:
+                            constraints.maxWidth.clamp(0, 1120).toDouble() -
+                            padding.horizontal,
                       ),
-                  data: _buildPreferences,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         ),
@@ -91,8 +106,79 @@ class _AppearanceSettingsPageState
     );
   }
 
-  Widget _buildPreferences(AppPreferences preferences) {
+  Widget _buildPreferences(
+    AppPreferences preferences, {
+    required bool expanded,
+    required double availableWidth,
+  }) {
     final bool saving = _savingPreference != null;
+    final List<Widget> cards = <Widget>[
+      _PreferenceSwitchCard(
+        switchKey: const Key('large-text-switch'),
+        icon: Icons.text_increase,
+        title: 'Texto grande',
+        description:
+            'Eleva el texto como mínimo a 1.3× sin reducir el tamaño del sistema.',
+        value: preferences.largeText,
+        enabled: !saving,
+        onChanged: (bool value) =>
+            _save('largeText', preferences.copyWith(largeText: value)),
+      ),
+      _PreferenceSwitchCard(
+        switchKey: const Key('reduce-motion-switch'),
+        icon: Icons.motion_photos_off_outlined,
+        title: 'Reducir movimiento',
+        description:
+            'Elimina transiciones decorativas y conserva la respuesta inmediata.',
+        value: preferences.reduceMotion,
+        enabled: !saving,
+        onChanged: (bool value) =>
+            _save('reduceMotion', preferences.copyWith(reduceMotion: value)),
+      ),
+      _PreferenceSwitchCard(
+        switchKey: const Key('high-contrast-switch'),
+        icon: Icons.contrast,
+        title: 'Alto contraste',
+        description:
+            'Refuerza bordes, texto y estados sin depender solo del color.',
+        value: preferences.highContrast,
+        enabled: !saving,
+        onChanged: (bool value) =>
+            _save('highContrast', preferences.copyWith(highContrast: value)),
+      ),
+      _PreferenceSwitchCard(
+        switchKey: const Key('hide-amounts-switch'),
+        icon: Icons.visibility_off_outlined,
+        title: 'Ocultar importes',
+        description:
+            'Sustituye importes monetarios por una máscara en todas las pantallas.',
+        value: preferences.hideAmounts,
+        enabled: !saving,
+        onChanged: (bool value) =>
+            _save('hideAmounts', preferences.copyWith(hideAmounts: value)),
+      ),
+    ];
+    final Widget content = expanded
+        ? Wrap(
+            spacing: TerminalSpace.md,
+            runSpacing: TerminalSpace.md,
+            children: <Widget>[
+              for (final Widget card in cards)
+                SizedBox(
+                  width: (availableWidth - TerminalSpace.md) / 2,
+                  child: card,
+                ),
+            ],
+          )
+        : Column(
+            children: <Widget>[
+              for (int index = 0; index < cards.length; index++) ...<Widget>[
+                cards[index],
+                if (index != cards.length - 1)
+                  const SizedBox(height: TerminalSpace.sm),
+              ],
+            ],
+          );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -102,53 +188,7 @@ class _AppearanceSettingsPageState
           ),
           const SizedBox(height: TerminalSpace.sm),
         ],
-        _PreferenceSwitchCard(
-          switchKey: const Key('large-text-switch'),
-          icon: Icons.text_increase,
-          title: 'Texto grande',
-          description:
-              'Eleva el texto como mínimo a 1.3× sin reducir el tamaño del sistema.',
-          value: preferences.largeText,
-          enabled: !saving,
-          onChanged: (bool value) =>
-              _save('largeText', preferences.copyWith(largeText: value)),
-        ),
-        const SizedBox(height: TerminalSpace.sm),
-        _PreferenceSwitchCard(
-          switchKey: const Key('reduce-motion-switch'),
-          icon: Icons.motion_photos_off_outlined,
-          title: 'Reducir movimiento',
-          description:
-              'Elimina transiciones decorativas y conserva la respuesta inmediata.',
-          value: preferences.reduceMotion,
-          enabled: !saving,
-          onChanged: (bool value) =>
-              _save('reduceMotion', preferences.copyWith(reduceMotion: value)),
-        ),
-        const SizedBox(height: TerminalSpace.sm),
-        _PreferenceSwitchCard(
-          switchKey: const Key('high-contrast-switch'),
-          icon: Icons.contrast,
-          title: 'Alto contraste',
-          description:
-              'Refuerza bordes, texto y estados sin depender solo del color.',
-          value: preferences.highContrast,
-          enabled: !saving,
-          onChanged: (bool value) =>
-              _save('highContrast', preferences.copyWith(highContrast: value)),
-        ),
-        const SizedBox(height: TerminalSpace.sm),
-        _PreferenceSwitchCard(
-          switchKey: const Key('hide-amounts-switch'),
-          icon: Icons.visibility_off_outlined,
-          title: 'Ocultar importes',
-          description:
-              'Sustituye importes monetarios por una máscara en todas las pantallas.',
-          value: preferences.hideAmounts,
-          enabled: !saving,
-          onChanged: (bool value) =>
-              _save('hideAmounts', preferences.copyWith(hideAmounts: value)),
-        ),
+        content,
       ],
     );
   }

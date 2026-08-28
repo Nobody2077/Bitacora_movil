@@ -13,7 +13,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
 | A6 — Copia y restauración | **DIFERIDA / PENDIENTE** | G6 no ejecutada; ADR-004 |
-| A7 — UI v2 y accesibilidad | **EN CURSO POR EXCEPCIÓN** | Primer incremento técnico verde; G7 pendiente |
+| A7 — UI v2 y accesibilidad | **EN CURSO POR EXCEPCIÓN** | A7.1–A7.2 técnicas verdes; G7 pendiente |
 | A8 — Release | BLOQUEADA | Requiere G6 y G7 |
 
 ## Evidencia G3 — A3 completada
@@ -193,11 +193,16 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   y Misiones; los campos de edición monetaria usan ocultación visual.
 - Ajustes usa composición Terminal V2 adaptable y controles con objetivo táctil
   mínimo de 48 × 48, semántica de estado y estados de carga/error/guardado.
+- A7.2 fija una columna entre compacto y medio y dos columnas desde 840 px, con
+  ancho de lectura máximo de 1120 px y equivalencia lógica de ruta entre phone
+  y tablet.
+- Tres goldens canónicos cubren compacto, expandido con alto contraste y texto
+  2.0×. Las guías automáticas de toque Android, etiquetado y contraste pasan.
 - `flutter analyze`: cero problemas.
-- `flutter test`: **167/167 pruebas aprobadas**.
+- `flutter test`: **174/174 pruebas aprobadas**.
 - `assembleProdDebug`: APK compilada correctamente el 28 de agosto de 2026.
-- A7 continúa en curso: faltan la auditoría completa de pantallas, goldens
-  compact/expanded/large text/high contrast, foco, contraste y validación física.
+- A7 continúa en curso: faltan la auditoría completa del resto de pantallas,
+  estados por módulo, ampliación de goldens, foco y validación física.
 - A8 sigue bloqueada hasta completar G6 y G7.
 
 ## Evidencia G0

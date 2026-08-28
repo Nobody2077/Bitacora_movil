@@ -115,6 +115,32 @@ void main() {
       expect(find.text('ARCHIVO DE BITÁCORA'), findsOneWidget);
       expect(find.text('El archivo está vacío'), findsOneWidget);
     });
+
+    testWidgets(
+      'Apariencia conserva el mismo estado lógico en phone y tablet',
+      (WidgetTester tester) async {
+        _ensureResumed(tester);
+        for (final Size size in <Size>[
+          const Size(412, 915),
+          const Size(1280, 800),
+        ]) {
+          tester.view.devicePixelRatio = 1;
+          tester.view.physicalSize = size;
+          await tester.pumpWidget(
+            _testApp(initialLocation: AppRoutes.settingsAppearance),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.byKey(const Key('large-text-switch')), findsOneWidget);
+          expect(find.byKey(const Key('reduce-motion-switch')), findsOneWidget);
+          expect(find.byKey(const Key('high-contrast-switch')), findsOneWidget);
+          expect(find.byKey(const Key('hide-amounts-switch')), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        }
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
+      },
+    );
   });
 }
 
