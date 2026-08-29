@@ -17,9 +17,13 @@ class MissionAlarmReceiver : BroadcastReceiver() {
         const val EXTRA_SCHEDULE_ID = "schedule_id"
         const val EXTRA_SYSTEM_ID = "system_notification_id"
         const val EXTRA_SOUND_ENABLED = "sound_enabled"
+        const val EXTRA_SHOW_DETAILS = "show_details"
+        const val EXTRA_MISSION_TITLE = "mission_title"
 
         private const val CHANNEL_SOUND = "mission_reminders"
         private const val CHANNEL_SILENT = "mission_reminders_silent"
+        private const val CHANNEL_SOUND_DETAILS = "mission_reminders_details"
+        private const val CHANNEL_SILENT_DETAILS = "mission_reminders_silent_details"
         private const val DELIVERED_PREFERENCES = "mission_notifications_delivered"
 
         fun deliver(
@@ -27,6 +31,8 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             scheduleId: String,
             systemNotificationId: Int,
             soundEnabled: Boolean,
+            showDetails: Boolean,
+            missionTitle: String?,
         ) {
             if (scheduleId.isBlank() || systemNotificationId <= 0) return
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -43,8 +49,14 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             if (preferences.getBoolean(scheduleId, false)) return
 
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val channelId = if (soundEnabled) CHANNEL_SOUND else CHANNEL_SILENT
-            ensureChannel(manager, channelId, soundEnabled)
+            val detailsVisible = showDetails && !missionTitle.isNullOrBlank()
+            val channelId = when {
+                detailsVisible && soundEnabled -> CHANNEL_SOUND_DETAILS
+                detailsVisible -> CHANNEL_SILENT_DETAILS
+                soundEnabled -> CHANNEL_SOUND
+                else -> CHANNEL_SILENT
+            }
+            ensureChannel(manager, channelId, soundEnabled, detailsVisible)
             val launchIntent = Intent(context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
@@ -63,8 +75,16 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             val notification = builder
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(context.getString(R.string.app_name))
-                .setContentText("Tienes una misión programada.")
-                .setVisibility(Notification.VISIBILITY_PRIVATE)
+                .setContentText(
+                    if (detailsVisible) missionTitle else "Tienes una misión programada.",
+                )
+                .setVisibility(
+                    if (detailsVisible) {
+                        Notification.VISIBILITY_PUBLIC
+                    } else {
+                        Notification.VISIBILITY_PRIVATE
+                    },
+                )
                 .setCategory(Notification.CATEGORY_REMINDER)
                 .setAutoCancel(true)
                 .setContentIntent(contentIntent)
@@ -82,6 +102,7 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             manager: NotificationManager,
             channelId: String,
             soundEnabled: Boolean,
+            detailsVisible: Boolean,
         ) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
                 manager.getNotificationChannel(channelId) != null
@@ -92,8 +113,16 @@ class MissionAlarmReceiver : BroadcastReceiver() {
                 name,
                 NotificationManager.IMPORTANCE_DEFAULT,
             ).apply {
-                description = "Avisos privados de misiones programadas"
-                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                description = if (detailsVisible) {
+                    "Avisos de misiones con título visible"
+                } else {
+                    "Avisos privados de misiones programadas"
+                }
+                lockscreenVisibility = if (detailsVisible) {
+                    Notification.VISIBILITY_PUBLIC
+                } else {
+                    Notification.VISIBILITY_PRIVATE
+                }
                 if (!soundEnabled) {
                     setSound(null, null)
                     enableVibration(false)
@@ -109,6 +138,8 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             scheduleId = intent.getStringExtra(EXTRA_SCHEDULE_ID).orEmpty(),
             systemNotificationId = intent.getIntExtra(EXTRA_SYSTEM_ID, 0),
             soundEnabled = intent.getBooleanExtra(EXTRA_SOUND_ENABLED, true),
+            showDetails = intent.getBooleanExtra(EXTRA_SHOW_DETAILS, false),
+            missionTitle = intent.getStringExtra(EXTRA_MISSION_TITLE),
         )
     }
 }

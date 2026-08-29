@@ -4,7 +4,20 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme/app_theme_tokens.dart';
 import '../../app/theme/terminal_foundations.dart';
+import '../../features/progress/domain/models/rpg_level.dart';
 import '../widgets/terminal/terminal_widgets.dart';
+
+final class SidebarMissionVitals {
+  const SidebarMissionVitals({
+    required this.healthCompleted,
+    required this.healthTotal,
+  });
+
+  final int healthCompleted;
+  final int healthTotal;
+  double? get healthRatio =>
+      healthTotal == 0 ? null : (healthCompleted / healthTotal).clamp(0.0, 1.0);
+}
 
 /// Navegación persistente para superficies de tablet y escritorio.
 ///
@@ -19,6 +32,9 @@ class TerminalSidebar extends StatelessWidget {
     required this.avatarPath,
     required this.onProfilePressed,
     super.key,
+    this.globalLevel,
+    this.missionVitals,
+    this.batteryLevel,
   });
 
   final int selectedIndex;
@@ -26,6 +42,9 @@ class TerminalSidebar extends StatelessWidget {
   final bool extended;
   final String displayName;
   final String? avatarPath;
+  final RpgLevel? globalLevel;
+  final SidebarMissionVitals? missionVitals;
+  final int? batteryLevel;
   final VoidCallback onProfilePressed;
 
   static const List<_TerminalNavigationItem> _items = <_TerminalNavigationItem>[
@@ -61,6 +80,8 @@ class TerminalSidebar extends StatelessWidget {
                   extended: extended,
                   displayName: displayName,
                   avatarPath: avatarPath,
+                  missionVitals: missionVitals,
+                  batteryLevel: batteryLevel,
                   onPressed: onProfilePressed,
                 ),
               ),
@@ -88,16 +109,142 @@ class TerminalSidebar extends StatelessWidget {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(TerminalSpace.md),
-                child: TerminalLabel(
-                  extended ? 'BITÁCORA · V2' : 'V2',
-                  color: tokens.textDisabled,
+              if (extended)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    TerminalSpace.sm,
+                    TerminalSpace.xs,
+                    TerminalSpace.sm,
+                    0,
+                  ),
+                  child: _GlobalLevelPanel(level: globalLevel),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GlobalLevelPanel extends StatelessWidget {
+  const _GlobalLevelPanel({required this.level});
+
+  final RpgLevel? level;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final String levelLabel = level == null
+        ? '--'
+        : level!.level.toString().padLeft(2, '0');
+    final String xpLabel = level == null
+        ? '-- / --'
+        : '${level!.currentLevelXp} / ${level!.levelSpan}';
+    final String percentageLabel = level == null
+        ? '--%'
+        : '${level!.progressPercentage}%';
+
+    return TerminalPanel(
+      key: const ValueKey<String>('sidebar-global-level-panel'),
+      padding: const EdgeInsets.all(TerminalSpace.sm),
+      borderColor: tokens.structuralRed,
+      backgroundColor: Colors.black,
+      cut: 10,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text(
+                'NIVEL GLOBAL',
+                style: TextStyle(
+                  color: tokens.terminalRed,
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(width: TerminalSpace.xs),
+              Text(
+                levelLabel,
+                key: const ValueKey<String>('sidebar-global-level-value'),
+                style: TextStyle(
+                  color: tokens.infoCyan,
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: TerminalSpace.sm),
+          Row(
+            children: <Widget>[
+              Text(
+                'XP',
+                style: TextStyle(
+                  color: tokens.infoCyan,
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(width: TerminalSpace.xs),
+              Expanded(
+                child: Text(
+                  xpLabel,
+                  key: const ValueKey<String>('sidebar-global-xp-value'),
+                  style: TextStyle(
+                    color: tokens.textSecondary,
+                    fontFamily: 'JetBrains Mono',
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: TerminalSpace.xs),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  height: 10,
+                  padding: const EdgeInsets.all(1),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    border: Border.all(color: tokens.border),
+                  ),
+                  child: LinearProgressIndicator(
+                    key: const ValueKey<String>(
+                      'sidebar-global-level-progress',
+                    ),
+                    value: level?.progressRatio ?? 0,
+                    backgroundColor: Colors.black,
+                    valueColor: AlwaysStoppedAnimation<Color>(tokens.infoCyan),
+                  ),
+                ),
+              ),
+              const SizedBox(width: TerminalSpace.xs),
+              SizedBox(
+                width: 34,
+                child: Text(
+                  percentageLabel,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    color: tokens.infoCyan,
+                    fontFamily: 'JetBrains Mono',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -108,12 +255,16 @@ class _TerminalProfileHeader extends StatelessWidget {
     required this.extended,
     required this.displayName,
     required this.avatarPath,
+    required this.missionVitals,
+    required this.batteryLevel,
     required this.onPressed,
   });
 
   final bool extended;
   final String displayName;
   final String? avatarPath;
+  final SidebarMissionVitals? missionVitals;
+  final int? batteryLevel;
   final VoidCallback onPressed;
 
   @override
@@ -164,33 +315,183 @@ class _TerminalProfileHeader extends StatelessWidget {
                 if (extended) ...<Widget>[
                   const SizedBox(width: TerminalSpace.sm),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        Text(
-                          displayName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(
-                                color: tokens.textPrimary,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                displayName,
+                                key: const ValueKey<String>(
+                                  'sidebar-profile-name',
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      color: tokens.valueYellow,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                    ),
                               ),
+                              const SizedBox(height: TerminalSpace.xxs),
+                              _ProfileHealthBar(vitals: missionVitals),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 2),
-                        TerminalLabel('PERFIL LOCAL', color: tokens.infoCyan),
+                        const SizedBox(width: TerminalSpace.xs),
+                        _VerticalDeviceBattery(level: batteryLevel),
                       ],
                     ),
-                  ),
-                  Icon(
-                    Icons.edit_outlined,
-                    size: 17,
-                    color: tokens.terminalRed,
                   ),
                 ],
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileHealthBar extends StatelessWidget {
+  const _ProfileHealthBar({required this.vitals});
+
+  final SidebarMissionVitals? vitals;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final double? ratio = vitals?.healthRatio;
+    final String value = vitals == null || vitals!.healthTotal == 0
+        ? '—'
+        : '${vitals!.healthCompleted}/${vitals!.healthTotal}';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Icon(
+              Icons.favorite,
+              key: const ValueKey<String>('sidebar-health-icon'),
+              semanticLabel: 'Salud',
+              color: tokens.terminalRed,
+              size: 11,
+            ),
+            Text(
+              value,
+              key: const ValueKey<String>('sidebar-health-value'),
+              style: TextStyle(
+                color: ratio == null ? tokens.textDisabled : tokens.terminalRed,
+                fontFamily: 'JetBrains Mono',
+                fontSize: 8,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Container(
+          height: 6,
+          padding: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            border: Border.all(
+              color: tokens.terminalRed.withValues(alpha: 0.65),
+            ),
+          ),
+          child: LinearProgressIndicator(
+            key: const ValueKey<String>('sidebar-health-progress'),
+            value: ratio ?? 0,
+            backgroundColor: Colors.black,
+            valueColor: AlwaysStoppedAnimation<Color>(tokens.terminalRed),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _VerticalDeviceBattery extends StatelessWidget {
+  const _VerticalDeviceBattery({required this.level});
+
+  final int? level;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final int? safeLevel = level?.clamp(0, 100).toInt();
+    final Color color = safeLevel == null
+        ? tokens.textDisabled
+        : safeLevel <= 20
+        ? tokens.terminalRed
+        : safeLevel <= 50
+        ? tokens.valueYellow
+        : tokens.infoCyan;
+    final String label = safeLevel == null
+        ? 'Batería no disponible'
+        : 'Batería del dispositivo: $safeLevel%';
+
+    return Semantics(
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: SizedBox(
+          key: const ValueKey<String>('sidebar-device-battery'),
+          width: 18,
+          height: 42,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                width: 8,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: color, width: 1),
+                ),
+              ),
+              Container(
+                width: 18,
+                height: 37,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: color, width: 1.2),
+                ),
+                child: safeLevel == null
+                    ? Center(
+                        child: Text(
+                          '?',
+                          style: TextStyle(
+                            color: color,
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      )
+                    : Align(
+                        alignment: Alignment.bottomCenter,
+                        child: FractionallySizedBox(
+                          key: const ValueKey<String>(
+                            'sidebar-device-battery-fill',
+                          ),
+                          widthFactor: 1,
+                          heightFactor: safeLevel / 100,
+                          child: ColoredBox(color: color),
+                        ),
+                      ),
+              ),
+            ],
           ),
         ),
       ),
@@ -268,7 +569,7 @@ class _SidebarDestination extends StatelessWidget {
                       const SizedBox(width: TerminalSpace.sm),
                       Expanded(
                         child: Text(
-                          item.label,
+                          item.label.toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.labelLarge

@@ -70,8 +70,14 @@ void main() {
       );
       expect(
         await database.select(database.notificationSchedules).get(),
-        hasLength(30),
+        isEmpty,
       );
+      final occurrences = await database.select(database.missions).get();
+      expect(
+        occurrences.every((mission) => mission.availableFrom != null),
+        isTrue,
+      );
+      expect(occurrences.every((mission) => mission.expiresAt != null), isTrue);
 
       final Result<int> retried = await service.generatePendingOccurrences(
         localTodayOverride: '2026-08-26',
@@ -110,6 +116,27 @@ void main() {
       missions.map((mission) => mission.scheduledAt).toSet(),
       hasLength(missions.length),
     );
+  });
+
+  test('una recurrencia con hora fija crea avisos de inicio', () async {
+    await service.saveTemplate(
+      _request(
+        frequency: RecurrenceFrequency.daily,
+        startDate: '2026-08-26',
+        localTimeMinutes: 8 * 60 + 30,
+      ),
+    );
+
+    await service.generatePendingOccurrences(localTodayOverride: '2026-08-26');
+
+    final missions = await database.select(database.missions).get();
+    final notifications = await database
+        .select(database.notificationSchedules)
+        .get();
+    expect(missions, hasLength(30));
+    expect(notifications, hasLength(30));
+    expect(missions.every((mission) => mission.availableFrom == null), isTrue);
+    expect(missions.every((mission) => mission.expiresAt == null), isTrue);
   });
 
   test('editar una plantilla pausada no la reactiva', () async {
@@ -178,6 +205,7 @@ SaveTemplateRequest _request({
   RecurrenceTemplate? existing,
   String title = 'Rutina recurrente',
   int intervalValue = 1,
+  int? localTimeMinutes,
   List<RecurrenceObjectiveDraft> objectives = const <RecurrenceObjectiveDraft>[
     RecurrenceObjectiveDraft(description: 'Objetivo base'),
   ],
@@ -192,6 +220,7 @@ SaveTemplateRequest _request({
   xpReward: 25,
   frequency: frequency,
   intervalValue: intervalValue,
+  localTimeMinutes: localTimeMinutes,
   startDate: startDate,
   timezoneId: 'UTC',
   objectives: objectives,

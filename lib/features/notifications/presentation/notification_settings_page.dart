@@ -223,6 +223,19 @@ class _NotificationSettingsPageState
           onPickEnd: () => _pickQuietTime(preferences: reminder, start: false),
         ),
         const SizedBox(height: TerminalSpace.md),
+        _NotificationSwitchCard(
+          switchKey: const Key('notification-details-switch'),
+          icon: Icons.visibility_outlined,
+          title: 'Mostrar detalles de la misión',
+          description: app.showNotificationDetails
+              ? 'El aviso muestra el título de la misión, incluso en la pantalla bloqueada si Android lo permite.'
+              : 'El aviso oculta el título y usa un mensaje genérico.',
+          value: app.showNotificationDetails,
+          enabled: enabled,
+          onChanged: (bool value) =>
+              _saveAppPreferences(app.copyWith(showNotificationDetails: value)),
+        ),
+        const SizedBox(height: TerminalSpace.md),
         TerminalPanel(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,11 +244,12 @@ class _NotificationSettingsPageState
               const SizedBox(width: TerminalSpace.sm),
               Expanded(
                 child: TerminalSectionTitle(
-                  title: 'Privacidad por defecto',
-                  description:
-                      'La pantalla bloqueada nunca muestra el título, las '
-                      'notas ni otros datos de la misión. El aviso solo indica '
-                      'que existe una misión programada.',
+                  title: app.showNotificationDetails
+                      ? 'Detalles visibles'
+                      : 'Privacidad por defecto',
+                  description: app.showNotificationDetails
+                      ? 'Se muestra únicamente el título. Las notas y otros datos siguen ocultos; Android conserva el control final de la pantalla bloqueada.'
+                      : 'La pantalla bloqueada no recibe el título, las notas ni otros datos de la misión. El aviso solo indica que existe una misión programada.',
                 ),
               ),
             ],

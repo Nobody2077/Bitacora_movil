@@ -11,10 +11,15 @@ import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../recurrences/application/recurrence_application_service.dart';
+import '../../recurrences/application/recurrence_providers.dart';
+import '../../recurrences/domain/models/recurrence_template.dart';
 import '../application/mission_application_service.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
 import 'mission_presentation_support.dart';
+
+enum _PlanningMode { anytime, dateOnly, dateTime }
 
 class MissionFormPage extends ConsumerStatefulWidget {
   const MissionFormPage({
@@ -49,6 +54,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
   MissionImportance _importance = MissionImportance.normal;
   MissionPriority _priority = MissionPriority.normal;
   bool _isRequired = false;
+  _PlanningMode _planningMode = _PlanningMode.dateOnly;
   DateTime _date = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
   bool _initialized = false;
@@ -141,9 +147,10 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                         importance: _importance,
                         priority: _priority,
                         isRequired: _isRequired,
+                        editing: widget.isEditing,
                         onAreaChanged: (value) =>
                             setState(() => _areaId = value),
-                        onTypeChanged: (value) => setState(() => _type = value),
+                        onTypeChanged: _changeType,
                         onImportanceChanged: (value) => setState(() {
                           _importance = value;
                           if (!widget.isEditing) {
@@ -160,11 +167,16 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                       ),
                       const SizedBox(height: TerminalSpace.md),
                       _PlanningPanel(
+                        mode: _planningMode,
+                        isDaily:
+                            !widget.isEditing && _type == MissionType.daily,
                         date: _date,
                         time: _time,
                         durationController: _durationController,
                         budgetController: _budgetController,
                         xpController: _xpController,
+                        onModeChanged: (value) =>
+                            setState(() => _planningMode = value),
                         onPickDate: _pickDate,
                         onPickTime: _pickTime,
                       ),
@@ -183,10 +195,10 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                               importance: _importance,
                               priority: _priority,
                               isRequired: _isRequired,
+                              editing: widget.isEditing,
                               onAreaChanged: (value) =>
                                   setState(() => _areaId = value),
-                              onTypeChanged: (value) =>
-                                  setState(() => _type = value),
+                              onTypeChanged: _changeType,
                               onImportanceChanged: (value) => setState(() {
                                 _importance = value;
                                 if (!widget.isEditing) {
@@ -208,11 +220,17 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                           Expanded(
                             flex: 2,
                             child: _PlanningPanel(
+                              mode: _planningMode,
+                              isDaily:
+                                  !widget.isEditing &&
+                                  _type == MissionType.daily,
                               date: _date,
                               time: _time,
                               durationController: _durationController,
                               budgetController: _budgetController,
                               xpController: _xpController,
+                              onModeChanged: (value) =>
+                                  setState(() => _planningMode = value),
                               onPickDate: _pickDate,
                               onPickTime: _pickTime,
                             ),
@@ -261,6 +279,11 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
           existing.scheduledAtUtc?.toLocal() ?? DateTime.now();
       _date = localDate;
       _time = TimeOfDay.fromDateTime(localDate);
+      _planningMode = existing.isUnscheduled
+          ? _PlanningMode.anytime
+          : existing.isDateOnly
+          ? _PlanningMode.dateOnly
+          : _PlanningMode.dateTime;
       _objectives.addAll(
         existing.objectives.map(
           (objective) => _ObjectiveEditor(
@@ -275,6 +298,17 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
       _date = DateTime(initial.year, initial.month, initial.day);
     }
     _initialized = true;
+  }
+
+  void _changeType(MissionType value) {
+    setState(() {
+      _type = value;
+      if (!widget.isEditing &&
+          value == MissionType.daily &&
+          _planningMode == _PlanningMode.anytime) {
+        _planningMode = _PlanningMode.dateOnly;
+      }
+    });
   }
 
   MissionArea? _defaultArea(List<MissionArea> areas) {
@@ -327,17 +361,21 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     if (!_formKey.currentState!.validate() || _areaId == null) {
       return;
     }
-    final DateTime scheduledLocal = DateTime(
-      _date.year,
-      _date.month,
-      _date.day,
-      _time.hour,
-      _time.minute,
-    );
     final int? duration = _optionalInt(_durationController.text);
     final int? budgetMinor = _optionalMoneyMinor(_budgetController.text);
     final int xp = int.parse(_xpController.text.trim());
     setState(() => _saving = true);
+
+    if (!widget.isEditing && _type == MissionType.daily) {
+      await _saveDailyTemplate(
+        duration: duration,
+        budgetMinor: budgetMinor,
+        xp: xp,
+      );
+      return;
+    }
+
+    final schedule = _missionSchedule();
 
     final Result<Mission> result = await ref
         .read(missionApplicationServiceProvider)
@@ -351,7 +389,9 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
             importance: _importance,
             priority: _priority,
             isRequired: _isRequired,
-            scheduledAtUtc: scheduledLocal.toUtc(),
+            scheduledAtUtc: schedule.scheduledAtUtc,
+            availableFromUtc: schedule.availableFromUtc,
+            expiresAtUtc: schedule.expiresAtUtc,
             estimatedMinutes: duration,
             budgetMinor: budgetMinor,
             xpPlanned: xp,
@@ -401,6 +441,123 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     );
   }
 
+  Future<void> _saveDailyTemplate({
+    required int? duration,
+    required int? budgetMinor,
+    required int xp,
+  }) async {
+    late final String timezone;
+    try {
+      timezone = await ref
+          .read(recurrenceCivilTimeProvider)
+          .currentTimeZoneId();
+    } on Object {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo determinar la zona horaria del equipo.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    final Result<RecurrenceTemplate> saved = await ref
+        .read(recurrenceApplicationServiceProvider)
+        .saveTemplate(
+          SaveTemplateRequest(
+            areaId: _areaId!,
+            title: _titleController.text,
+            description: _descriptionController.text,
+            missionType: MissionType.daily,
+            importance: _importance,
+            priority: _priority,
+            isRequired: _isRequired,
+            xpReward: xp,
+            estimatedMinutes: duration,
+            budgetMinor: budgetMinor,
+            frequency: RecurrenceFrequency.daily,
+            intervalValue: 1,
+            localTimeMinutes: _planningMode == _PlanningMode.dateTime
+                ? _time.hour * 60 + _time.minute
+                : null,
+            startDate: _dateParameter(_date),
+            timezoneId: timezone,
+            objectives: <RecurrenceObjectiveDraft>[
+              for (final objective in _objectives)
+                RecurrenceObjectiveDraft(
+                  id: objective.id,
+                  description: objective.controller.text,
+                ),
+            ],
+          ),
+        );
+    if (!mounted) return;
+    if (saved case Failure<RecurrenceTemplate>(:final failure)) {
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message)));
+      return;
+    }
+
+    final Result<int> generated = await ref
+        .read(recurrenceApplicationServiceProvider)
+        .generatePendingOccurrences();
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (generated case Failure<int>(:final failure)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message)));
+      context.goNamed('missionsRecurring');
+      return;
+    }
+    unawaited(ref.read(notificationReconciliationServiceProvider).reconcile());
+    ref.invalidate(allTemplatesProvider);
+    ref.invalidate(activeTemplatesProvider);
+    ref.invalidate(todayMissionsProvider);
+    context.goNamed('missionsToday');
+  }
+
+  ({
+    DateTime? scheduledAtUtc,
+    DateTime? availableFromUtc,
+    DateTime? expiresAtUtc,
+  })
+  _missionSchedule() {
+    if (_planningMode == _PlanningMode.anytime) {
+      return (scheduledAtUtc: null, availableFromUtc: null, expiresAtUtc: null);
+    }
+    final DateTime dayStartLocal = DateTime(_date.year, _date.month, _date.day);
+    if (_planningMode == _PlanningMode.dateOnly) {
+      final DateTime nextDayLocal = DateTime(
+        _date.year,
+        _date.month,
+        _date.day + 1,
+      );
+      return (
+        scheduledAtUtc: dayStartLocal.toUtc(),
+        availableFromUtc: dayStartLocal.toUtc(),
+        expiresAtUtc: nextDayLocal.toUtc().subtract(
+          const Duration(milliseconds: 1),
+        ),
+      );
+    }
+    return (
+      scheduledAtUtc: DateTime(
+        _date.year,
+        _date.month,
+        _date.day,
+        _time.hour,
+        _time.minute,
+      ).toUtc(),
+      availableFromUtc: null,
+      expiresAtUtc: null,
+    );
+  }
+
   void _cancel() {
     if (context.canPop()) {
       context.pop();
@@ -447,6 +604,7 @@ class _InformationPanel extends StatelessWidget {
     required this.importance,
     required this.priority,
     required this.isRequired,
+    required this.editing,
     required this.onAreaChanged,
     required this.onTypeChanged,
     required this.onImportanceChanged,
@@ -465,6 +623,7 @@ class _InformationPanel extends StatelessWidget {
   final MissionImportance importance;
   final MissionPriority priority;
   final bool isRequired;
+  final bool editing;
   final ValueChanged<String?> onAreaChanged;
   final ValueChanged<MissionType> onTypeChanged;
   final ValueChanged<MissionImportance> onImportanceChanged;
@@ -555,10 +714,11 @@ class _InformationPanel extends StatelessWidget {
             decoration: const InputDecoration(labelText: 'Tipo'),
             items: <DropdownMenuItem<MissionType>>[
               for (final value in MissionType.values)
-                DropdownMenuItem<MissionType>(
-                  value: value,
-                  child: Text(missionTypeLabel(value)),
-                ),
+                if (editing || value != MissionType.recurring)
+                  DropdownMenuItem<MissionType>(
+                    value: value,
+                    child: Text(missionTypeLabel(value)),
+                  ),
             ],
             onChanged: (value) {
               if (value != null) {
@@ -566,6 +726,13 @@ class _InformationPanel extends StatelessWidget {
               }
             },
           ),
+          if (!editing && type == MissionType.daily) ...<Widget>[
+            const SizedBox(height: 10),
+            Text(
+              'Se creará una plantilla activa que generará una misión cada día.',
+              style: TextStyle(color: tokens.infoCyan),
+            ),
+          ],
           const SizedBox(height: 8),
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
@@ -588,20 +755,26 @@ class _InformationPanel extends StatelessWidget {
 
 class _PlanningPanel extends StatelessWidget {
   const _PlanningPanel({
+    required this.mode,
+    required this.isDaily,
     required this.date,
     required this.time,
     required this.durationController,
     required this.budgetController,
     required this.xpController,
+    required this.onModeChanged,
     required this.onPickDate,
     required this.onPickTime,
   });
 
+  final _PlanningMode mode;
+  final bool isDaily;
   final DateTime date;
   final TimeOfDay time;
   final TextEditingController durationController;
   final TextEditingController budgetController;
   final TextEditingController xpController;
+  final ValueChanged<_PlanningMode> onModeChanged;
   final VoidCallback onPickDate;
   final VoidCallback onPickTime;
 
@@ -615,17 +788,58 @@ class _PlanningPanel extends StatelessWidget {
         children: <Widget>[
           _PanelTitle(label: 'Planificación', icon: Icons.calendar_month),
           const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: onPickDate,
-            icon: const Icon(Icons.calendar_today_outlined),
-            label: Text('$day/$month/${date.year}'),
+          DropdownButtonFormField<_PlanningMode>(
+            initialValue: mode,
+            decoration: const InputDecoration(labelText: 'Cuándo'),
+            items: <DropdownMenuItem<_PlanningMode>>[
+              if (!isDaily)
+                const DropdownMenuItem<_PlanningMode>(
+                  value: _PlanningMode.anytime,
+                  child: Text('Sin fecha'),
+                ),
+              const DropdownMenuItem<_PlanningMode>(
+                value: _PlanningMode.dateOnly,
+                child: Text('Solo fecha'),
+              ),
+              const DropdownMenuItem<_PlanningMode>(
+                value: _PlanningMode.dateTime,
+                child: Text('Fecha y hora'),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) onModeChanged(value);
+            },
           ),
-          const SizedBox(height: 10),
-          OutlinedButton.icon(
-            onPressed: onPickTime,
-            icon: const Icon(Icons.schedule),
-            label: Text(time.format(context)),
-          ),
+          if (mode != _PlanningMode.anytime) ...<Widget>[
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: onPickDate,
+              icon: const Icon(Icons.calendar_today_outlined),
+              label: Text('$day/$month/${date.year}'),
+            ),
+          ],
+          if (mode == _PlanningMode.dateTime) ...<Widget>[
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              onPressed: onPickTime,
+              icon: const Icon(Icons.schedule),
+              label: Text(time.format(context)),
+            ),
+          ],
+          if (mode == _PlanningMode.dateOnly) ...<Widget>[
+            const SizedBox(height: 10),
+            const Text(
+              'Disponible durante el día, sin hora fija ni recordatorio automático.',
+              style: TextStyle(color: Colors.white54, fontSize: 12),
+            ),
+          ],
+          if (mode == _PlanningMode.anytime) ...<Widget>[
+            const SizedBox(height: 10),
+            const Text(
+              'Quedará en Sin planificar y no generará recordatorios.',
+              style: TextStyle(color: Colors.white54, fontSize: 12),
+            ),
+          ],
           const SizedBox(height: 12),
           TextFormField(
             controller: durationController,

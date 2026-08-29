@@ -27,6 +27,9 @@ class MainActivity : FlutterFragmentActivity() {
         RecurrenceCivilTimeBridge().register(
             flutterEngine.dartExecutor.binaryMessenger,
         )
+        DeviceBatteryBridge(applicationContext).register(
+            flutterEngine.dartExecutor.binaryMessenger,
+        )
         missionNotificationBridge = MissionNotificationBridge(this)
         missionNotificationBridge.register(
             flutterEngine.dartExecutor.binaryMessenger,

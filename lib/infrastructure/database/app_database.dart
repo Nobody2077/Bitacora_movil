@@ -14,7 +14,7 @@ final class AppDatabase extends _$AppDatabase {
   final UtcNowMilliseconds _utcNowMilliseconds;
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -22,17 +22,35 @@ final class AppDatabase extends _$AppDatabase {
       await customStatement('PRAGMA foreign_keys = ON');
       await migrator.createAll();
       await insertDefaultSeedV1(this, nowUtcMs: _utcNowMilliseconds());
+      await _syncSchemaVersionMirror();
     },
-    onUpgrade: (Migrator migrator, int from, int to) {
-      throw UnsupportedError(
-        'No schema upgrade exists for v1 (requested $from -> $to).',
-      );
+    onUpgrade: (Migrator migrator, int from, int to) async {
+      if (from == 1 && to == 2) {
+        await migrator.addColumn(journalEntries, journalEntries.moodDetail);
+        await _syncSchemaVersionMirror();
+        return;
+      }
+      throw UnsupportedError('No schema upgrade exists for $from -> $to.');
     },
     beforeOpen: (OpeningDetails _) async {
       await customStatement('PRAGMA foreign_keys = ON');
       await insertDefaultSeedV1(this, nowUtcMs: _utcNowMilliseconds());
+      await _syncSchemaVersionMirror();
       await _verifyConnectionIntegrity();
     },
+  );
+
+  Future<void> _syncSchemaVersionMirror() => customStatement(
+    '''
+      UPDATE schema_metadata
+      SET value = ?, updated_at = ?
+      WHERE "key" = 'schema_version' AND value <> ?
+    ''',
+    <Object?>[
+      schemaVersion.toString(),
+      _utcNowMilliseconds(),
+      schemaVersion.toString(),
+    ],
   );
 
   Future<void> _verifyConnectionIntegrity() async {
@@ -41,7 +59,7 @@ final class AppDatabase extends _$AppDatabase {
     ).get();
     if (foreignKeyViolations.isNotEmpty) {
       throw StateError(
-        'Database v1 failed foreign_key_check '
+        'Database failed foreign_key_check '
         '(${foreignKeyViolations.length} violation(s)).',
       );
     }
@@ -51,7 +69,7 @@ final class AppDatabase extends _$AppDatabase {
         integrityRows.length == 1 &&
         integrityRows.single.data.values.single == 'ok';
     if (!integrityIsValid) {
-      throw StateError('Database v1 failed integrity_check.');
+      throw StateError('Database failed integrity_check.');
     }
   }
 

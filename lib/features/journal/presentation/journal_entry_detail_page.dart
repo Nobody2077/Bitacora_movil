@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
@@ -345,10 +346,18 @@ class _JournalPhotosPanelState extends ConsumerState<_JournalPhotosPanel> {
   }
 
   Future<void> _addPhoto() async {
+    bool useCamera = false;
+    final bool allowCamera =
+        ref.read(appPreferencesProvider).value?.allowCameraAttachments ?? false;
+    if (allowCamera) {
+      final bool? selectedSource = await _pickPhotoSource();
+      if (selectedSource == null || !mounted) return;
+      useCamera = selectedSource;
+    }
     setState(() => _working = true);
     final result = await ref
         .read(journalPhotoApplicationServiceProvider)
-        .pickAndAdd(widget.entry.id);
+        .pickAndAdd(widget.entry.id, useCamera: useCamera);
     if (!mounted) {
       return;
     }
@@ -363,6 +372,29 @@ class _JournalPhotosPanelState extends ConsumerState<_JournalPhotosPanel> {
       onFailure: (failure) => _showMessage(failure.message),
     );
   }
+
+  Future<bool?> _pickPhotoSource() => showModalBottomSheet<bool>(
+    context: context,
+    builder: (BuildContext sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            key: const Key('attach-from-camera'),
+            leading: const Icon(Icons.photo_camera_outlined),
+            title: const Text('Sacar foto'),
+            onTap: () => Navigator.of(sheetContext).pop(true),
+          ),
+          ListTile(
+            key: const Key('attach-from-gallery'),
+            leading: const Icon(Icons.photo_library_outlined),
+            title: const Text('Elegir de la galería'),
+            onTap: () => Navigator.of(sheetContext).pop(false),
+          ),
+        ],
+      ),
+    ),
+  );
 
   Future<void> _removePhoto(JournalPhoto photo) async {
     final bool? confirmed = await showDialog<bool>(
@@ -685,8 +717,13 @@ class _Unavailable extends StatelessWidget {
 }
 
 Color _moodColor(AppThemeTokens tokens, JournalMood? mood) => switch (mood) {
+  JournalMood.happy => tokens.valueYellow,
+  JournalMood.motivated => tokens.progressGreen,
   JournalMood.focused => tokens.progressGreen,
+  JournalMood.calm => tokens.infoCyan,
   JournalMood.normal => tokens.infoCyan,
+  JournalMood.anxious => tokens.attentionOrange,
+  JournalMood.sad => tokens.structuralRed,
   JournalMood.tired => tokens.attentionOrange,
   null => tokens.textDisabled,
 };

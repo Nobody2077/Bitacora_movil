@@ -14,6 +14,9 @@ import '../../features/missions/presentation/mission_presentation_support.dart';
 import '../../features/profile/application/user_profile_providers.dart';
 import '../../features/profile/domain/models/user_profile.dart';
 import '../../features/profile/presentation/user_profile_edit_dialog.dart';
+import '../../features/progress/application/progress_providers.dart';
+import '../../features/progress/domain/models/progress_models.dart';
+import '../device/device_battery.dart';
 import 'app_breakpoints.dart';
 import 'terminal_application_header.dart';
 import 'terminal_sidebar.dart';
@@ -121,6 +124,22 @@ class _RailShell extends ConsumerWidget {
     final UserProfile profile =
         ref.watch(userProfileProvider).value ??
         const UserProfile.localDefault();
+    final OverallProgressViewData? overallProgress = extended
+        ? ref.watch(overallProgressProvider).value
+        : null;
+    final List<Mission>? todayMissions = extended
+        ? ref.watch(todayMissionsProvider).value
+        : null;
+    final List<MissionArea>? missionAreas = extended
+        ? ref.watch(missionAreasProvider).value
+        : null;
+    final SidebarMissionVitals? missionVitals = _sidebarMissionVitals(
+      todayMissions,
+      missionAreas,
+    );
+    final int? batteryLevel = extended
+        ? ref.watch(deviceBatteryLevelProvider).value
+        : null;
 
     return Scaffold(
       body: Row(
@@ -130,6 +149,9 @@ class _RailShell extends ConsumerWidget {
             extended: extended,
             displayName: profile.displayName,
             avatarPath: profile.avatarPath,
+            globalLevel: overallProgress?.rpgLevel,
+            missionVitals: missionVitals,
+            batteryLevel: batteryLevel,
             onProfilePressed: () => showDialog<void>(
               context: context,
               builder: (BuildContext context) =>
@@ -160,6 +182,42 @@ class _RailShell extends ConsumerWidget {
       ),
     );
   }
+}
+
+SidebarMissionVitals? _sidebarMissionVitals(
+  List<Mission>? todayMissions,
+  List<MissionArea>? missionAreas,
+) {
+  if (todayMissions == null || missionAreas == null) return null;
+
+  String? healthAreaId;
+  for (final MissionArea area in missionAreas) {
+    if (area.iconKey == 'favorite' ||
+        area.name.trim().toLowerCase() == 'salud') {
+      healthAreaId = area.id;
+      break;
+    }
+  }
+
+  final List<Mission> visibleMissions = todayMissions
+      .where(
+        (Mission mission) =>
+            mission.status != MissionStatus.cancelled &&
+            mission.status != MissionStatus.abandoned,
+      )
+      .toList(growable: false);
+  final List<Mission> healthMissions = healthAreaId == null
+      ? const <Mission>[]
+      : visibleMissions
+            .where((Mission mission) => mission.areaId == healthAreaId)
+            .toList(growable: false);
+
+  return SidebarMissionVitals(
+    healthCompleted: healthMissions
+        .where((Mission mission) => mission.status == MissionStatus.completed)
+        .length,
+    healthTotal: healthMissions.length,
+  );
 }
 
 class _GlobalActiveTimerBar extends ConsumerStatefulWidget {

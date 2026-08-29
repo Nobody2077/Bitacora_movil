@@ -13,9 +13,7 @@ final class DriftSettingsRepository implements SettingsRepository {
   @override
   Future<Result<AppPreferences>> load() async {
     try {
-      final AppPreferences preferences = SettingsMapper.fromDrift(
-        await _dao.getSettings(),
-      );
+      final AppPreferences preferences = await _loadPreferences();
       if (!AppPreferences.supportedAutoLockMinutes.contains(
         preferences.autoLockMinutes,
       )) {
@@ -35,7 +33,9 @@ final class DriftSettingsRepository implements SettingsRepository {
   Stream<Result<AppPreferences>> watch() async* {
     try {
       await for (final value in _dao.watchSettings()) {
-        final AppPreferences preferences = SettingsMapper.fromDrift(value);
+        final AppPreferences preferences = await _applyMetadata(
+          SettingsMapper.fromDrift(value),
+        );
         if (!AppPreferences.supportedAutoLockMinutes.contains(
           preferences.autoLockMinutes,
         )) {
@@ -69,7 +69,21 @@ final class DriftSettingsRepository implements SettingsRepository {
     }
 
     try {
-      await _dao.updateSettings(SettingsMapper.toDrift(preferences));
+      await _dao.updateSettingsWithMetadata(
+        SettingsMapper.toDrift(preferences),
+        <String, String>{
+          AppPreferences.allowScreenshotsMetadataKey: _encodeBool(
+            preferences.allowScreenshots,
+          ),
+          AppPreferences.showNotificationDetailsMetadataKey: _encodeBool(
+            preferences.showNotificationDetails,
+          ),
+          AppPreferences.allowCameraAttachmentsMetadataKey: _encodeBool(
+            preferences.allowCameraAttachments,
+          ),
+        },
+        updatedAtUtcMs: preferences.updatedAtUtc.millisecondsSinceEpoch,
+      );
       return const Success<void>(null);
     } on Object catch (error) {
       return Failure<void>(
@@ -77,4 +91,29 @@ final class DriftSettingsRepository implements SettingsRepository {
       );
     }
   }
+
+  Future<AppPreferences> _loadPreferences() async =>
+      _applyMetadata(SettingsMapper.fromDrift(await _dao.getSettings()));
+
+  Future<AppPreferences> _applyMetadata(AppPreferences preferences) async {
+    final entries = await _dao.getMetadataEntries(AppPreferences.metadataKeys);
+    final Map<String, String> values = <String, String>{
+      for (final entry in entries) entry.key: entry.value,
+    };
+    return preferences.copyWith(
+      allowScreenshots: _decodeBool(
+        values[AppPreferences.allowScreenshotsMetadataKey],
+      ),
+      showNotificationDetails: _decodeBool(
+        values[AppPreferences.showNotificationDetailsMetadataKey],
+      ),
+      allowCameraAttachments: _decodeBool(
+        values[AppPreferences.allowCameraAttachmentsMetadataKey],
+      ),
+    );
+  }
+
+  static bool _decodeBool(String? value) => value == '1';
+
+  static String _encodeBool(bool value) => value ? '1' : '0';
 }

@@ -47,6 +47,24 @@ final class SettingsDao {
     return getSettings();
   }
 
+  Future<AppSetting> updateSettingsWithMetadata(
+    AppSettingsCompanion changes,
+    Map<String, String> metadata, {
+    required int updatedAtUtcMs,
+  }) {
+    return _database.transaction(() async {
+      final AppSetting updated = await updateSettings(changes);
+      for (final MapEntry<String, String> entry in metadata.entries) {
+        await putMetadata(
+          key: entry.key,
+          value: entry.value,
+          updatedAtUtcMs: updatedAtUtcMs,
+        );
+      }
+      return updated;
+    });
+  }
+
   Future<String?> getMetadata(String key) async {
     final row = await (_database.select(
       _database.schemaMetadata,

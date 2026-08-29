@@ -1,5 +1,6 @@
 import 'package:bitacora_rpg_personal/features/access/application/access_session_controller.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
+import 'package:bitacora_rpg_personal/features/access/domain/privacy_window_platform.dart';
 import 'package:bitacora_rpg_personal/features/access/presentation/privacy_boundary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,6 +88,33 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(privacyShieldKey), findsNothing);
   });
+
+  testWidgets('desactiva FLAG_SECURE cuando el usuario permite capturas', (
+    WidgetTester tester,
+  ) async {
+    _transitionToResumed(tester.binding);
+    final _FakePrivacyWindowPlatform platform = _FakePrivacyWindowPlatform();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          accessSessionSeedProvider.overrideWithValue(
+            const AccessSessionState.unlockedForTesting(),
+          ),
+          privacyWindowPlatformProvider.overrideWithValue(platform),
+        ],
+        child: const MaterialApp(
+          home: AppPrivacyBoundary(
+            allowScreenshots: true,
+            child: Scaffold(body: Text('Contenido privado')),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(platform.protectionValues, <bool>[false]);
+  });
 }
 
 void _transitionToPaused(TestWidgetsFlutterBinding binding) {
@@ -136,6 +164,15 @@ final class _PauseBeforeChildPostFrame extends StatefulWidget {
   @override
   State<_PauseBeforeChildPostFrame> createState() =>
       _PauseBeforeChildPostFrameState();
+}
+
+final class _FakePrivacyWindowPlatform implements PrivacyWindowPlatform {
+  final List<bool> protectionValues = <bool>[];
+
+  @override
+  Future<void> setScreenshotProtectionEnabled(bool enabled) async {
+    protectionValues.add(enabled);
+  }
 }
 
 final class _PauseBeforeChildPostFrameState

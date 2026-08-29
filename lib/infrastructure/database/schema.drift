@@ -425,6 +425,16 @@ CREATE TABLE journal_entries (
   title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160),
   body TEXT,
   mood TEXT CHECK (mood IS NULL OR mood IN ('FOCUSED', 'NORMAL', 'TIRED')),
+  mood_detail TEXT CHECK (mood_detail IS NULL OR mood_detail IN (
+    'HAPPY',
+    'MOTIVATED',
+    'FOCUSED',
+    'CALM',
+    'NORMAL',
+    'ANXIOUS',
+    'SAD',
+    'TIRED'
+  )),
   is_private INTEGER NOT NULL CHECK (is_private IN (0, 1)),
   occurred_at INTEGER NOT NULL,
   created_at INTEGER NOT NULL,

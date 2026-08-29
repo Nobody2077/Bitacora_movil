@@ -46,15 +46,35 @@ void main() {
     expect(repository.archived, <String>['photo-1']);
     expect(store.deleted, <String>['prepared.brpa']);
   });
+
+  test('forwards the enabled camera source to the picker', () async {
+    final _PhotoRepository repository = _PhotoRepository();
+    final _PhotoStore store = _PhotoStore();
+    final _TrackingPicker picker = _TrackingPicker();
+    final JournalPhotoApplicationService service = _service(
+      repository,
+      store,
+      picker: picker,
+    );
+
+    final Result<JournalPhoto?> result = await service.pickAndAdd(
+      'entry-1',
+      useCamera: true,
+    );
+
+    expect(result, isA<Success<JournalPhoto?>>());
+    expect(picker.usedCamera, isTrue);
+  });
 }
 
 JournalPhotoApplicationService _service(
   _PhotoRepository repository,
-  _PhotoStore store,
-) => JournalPhotoApplicationService(
+  _PhotoStore store, {
+  JournalPhotoPicker picker = const _Picker(),
+}) => JournalPhotoApplicationService(
   repository: repository,
   photoStore: store,
-  picker: const _Picker(),
+  picker: picker,
   clock: const _Clock(),
   idGenerator: const _Ids(),
 );
@@ -76,7 +96,17 @@ final class _Picker implements JournalPhotoPicker {
   const _Picker();
 
   @override
-  Future<String?> pickPhotoPath() async => 'source.png';
+  Future<String?> pickPhotoPath({bool useCamera = false}) async => 'source.png';
+}
+
+final class _TrackingPicker implements JournalPhotoPicker {
+  bool? usedCamera;
+
+  @override
+  Future<String?> pickPhotoPath({bool useCamera = false}) async {
+    usedCamera = useCamera;
+    return 'source.png';
+  }
 }
 
 final class _Clock implements JournalClock {

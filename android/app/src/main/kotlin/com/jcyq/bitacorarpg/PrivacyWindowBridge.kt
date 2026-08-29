@@ -6,7 +6,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-/** Read-only runtime evidence for the A2 Android privacy contract. */
+/** Runtime control and evidence for the Android screenshot privacy contract. */
 internal class PrivacyWindowBridge(private val activity: Activity) :
     MethodChannel.MethodCallHandler {
     private companion object {
@@ -22,6 +22,22 @@ internal class PrivacyWindowBridge(private val activity: Activity) :
             "isFlagSecureEnabled" -> {
                 val flags = activity.window.attributes.flags
                 result.success(flags and WindowManager.LayoutParams.FLAG_SECURE != 0)
+            }
+
+            "setFlagSecureEnabled" -> {
+                val enabled = call.argument<Boolean>("enabled")
+                if (enabled == null) {
+                    result.error("INVALID_ARGUMENT", "enabled is required.", null)
+                    return
+                }
+                activity.runOnUiThread {
+                    if (enabled) {
+                        activity.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    } else {
+                        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    }
+                    result.success(null)
+                }
             }
 
             "usesFragmentActivity" -> result.success(

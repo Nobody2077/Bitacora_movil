@@ -1,6 +1,15 @@
 enum JournalOrigin { manual, mission, transaction, system }
 
-enum JournalMood { focused, normal, tired }
+enum JournalMood {
+  happy,
+  motivated,
+  focused,
+  calm,
+  normal,
+  anxious,
+  sad,
+  tired,
+}
 
 /// Entrada de Bitácora sin dependencias de almacenamiento o presentación.
 final class JournalEntry {

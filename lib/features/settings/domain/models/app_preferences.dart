@@ -16,6 +16,18 @@ enum AppAccentColor {
 
 /// Preferencias persistidas del usuario. No representa permisos del sistema.
 final class AppPreferences {
+  static const String allowScreenshotsMetadataKey =
+      'preference.allow_screenshots';
+  static const String showNotificationDetailsMetadataKey =
+      'preference.show_notification_details';
+  static const String allowCameraAttachmentsMetadataKey =
+      'preference.allow_camera_attachments';
+  static const Set<String> metadataKeys = <String>{
+    allowScreenshotsMetadataKey,
+    showNotificationDetailsMetadataKey,
+    allowCameraAttachmentsMetadataKey,
+  };
+
   static const Set<int> supportedAutoLockMinutes = <int>{0, 1, 5, 15};
   static final Set<String> supportedPrimaryColorHex = AppAccentColor.values
       .map((AppAccentColor color) => color.hex)
@@ -32,6 +44,9 @@ final class AppPreferences {
     dailySummary: true,
     soundEnabled: true,
     autoLockMinutes: 5,
+    allowScreenshots: false,
+    showNotificationDetails: false,
+    allowCameraAttachments: false,
     updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
   );
 
@@ -46,6 +61,9 @@ final class AppPreferences {
     required this.dailySummary,
     required this.soundEnabled,
     required this.autoLockMinutes,
+    this.allowScreenshots = false,
+    this.showNotificationDetails = false,
+    this.allowCameraAttachments = false,
     required this.updatedAtUtc,
   });
 
@@ -59,6 +77,9 @@ final class AppPreferences {
   final bool dailySummary;
   final bool soundEnabled;
   final int autoLockMinutes;
+  final bool allowScreenshots;
+  final bool showNotificationDetails;
+  final bool allowCameraAttachments;
   final DateTime updatedAtUtc;
 
   AppPreferences copyWith({
@@ -72,6 +93,9 @@ final class AppPreferences {
     bool? dailySummary,
     bool? soundEnabled,
     int? autoLockMinutes,
+    bool? allowScreenshots,
+    bool? showNotificationDetails,
+    bool? allowCameraAttachments,
     DateTime? updatedAtUtc,
   }) => AppPreferences(
     themeKey: themeKey ?? this.themeKey,
@@ -84,6 +108,11 @@ final class AppPreferences {
     dailySummary: dailySummary ?? this.dailySummary,
     soundEnabled: soundEnabled ?? this.soundEnabled,
     autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,
+    allowScreenshots: allowScreenshots ?? this.allowScreenshots,
+    showNotificationDetails:
+        showNotificationDetails ?? this.showNotificationDetails,
+    allowCameraAttachments:
+        allowCameraAttachments ?? this.allowCameraAttachments,
     updatedAtUtc: updatedAtUtc ?? this.updatedAtUtc,
   );
 }

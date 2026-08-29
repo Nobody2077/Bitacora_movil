@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
@@ -149,10 +150,18 @@ class _UserProfileEditDialogState extends ConsumerState<UserProfileEditDialog> {
   }
 
   Future<void> _pickAvatar() async {
+    bool useCamera = false;
+    final bool allowCamera =
+        ref.read(appPreferencesProvider).value?.allowCameraAttachments ?? false;
+    if (allowCamera) {
+      final bool? selectedSource = await _pickPhotoSource();
+      if (selectedSource == null || !mounted) return;
+      useCamera = selectedSource;
+    }
     setState(() => _updatingAvatar = true);
     final Result<UserProfile?> result = await ref
         .read(userProfileServiceProvider)
-        .pickAvatar(_profile);
+        .pickAvatar(_profile, useCamera: useCamera);
     if (!mounted) {
       return;
     }
@@ -169,6 +178,27 @@ class _UserProfileEditDialogState extends ConsumerState<UserProfileEditDialog> {
       setState(() => _updatingAvatar = false);
     }
   }
+
+  Future<bool?> _pickPhotoSource() => showModalBottomSheet<bool>(
+    context: context,
+    builder: (BuildContext sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.photo_camera_outlined),
+            title: const Text('Sacar foto'),
+            onTap: () => Navigator.of(sheetContext).pop(true),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library_outlined),
+            title: const Text('Elegir de la galería'),
+            onTap: () => Navigator.of(sheetContext).pop(false),
+          ),
+        ],
+      ),
+    ),
+  );
 
   Future<void> _removeAvatar() async {
     setState(() => _updatingAvatar = true);

@@ -40,10 +40,13 @@ final class UserProfileService {
     return _saveAndReturn(updated);
   }
 
-  Future<Result<UserProfile?>> pickAvatar(UserProfile current) async {
+  Future<Result<UserProfile?>> pickAvatar(
+    UserProfile current, {
+    bool useCamera = false,
+  }) async {
     try {
       final XFile? picked = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
+        source: useCamera ? ImageSource.camera : ImageSource.gallery,
         maxWidth: 768,
         maxHeight: 768,
         imageQuality: 88,

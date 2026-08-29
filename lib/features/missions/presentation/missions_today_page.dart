@@ -488,7 +488,7 @@ class _MissionCard extends StatelessWidget {
                     Text(
                       '${area?.name ?? 'Área'} · '
                       '${missionImportanceLabel(mission.importance)} · '
-                      '${missionDateLabel(mission.scheduledAtUtc)}',
+                      '${missionScheduleLabel(mission)}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(

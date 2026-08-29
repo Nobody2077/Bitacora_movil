@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 const int _now = 1787521320000;
 
 void main() {
-  group('schema v1 constraints', () {
+  group('schema v2 constraints', () {
     late AppDatabase database;
 
     setUp(() {
@@ -36,6 +36,17 @@ void main() {
       await _expectConstraint(
         database.customStatement(
           'UPDATE app_settings SET large_text = 2 WHERE id = 1',
+        ),
+      );
+      await _expectConstraint(
+        database.customStatement(
+          '''
+            INSERT INTO journal_entries (
+              id, origin_type, title, mood_detail, is_private,
+              occurred_at, created_at, updated_at
+            ) VALUES (?, 'MANUAL', 'Inválido', 'CONFUSED', 1, ?, ?, ?)
+          ''',
+          const <Object?>['invalid-mood', _now, _now, _now],
         ),
       );
       await _expectConstraint(

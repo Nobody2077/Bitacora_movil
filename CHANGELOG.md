@@ -1,5 +1,49 @@
 # Historial de cambios
 
+## En desarrollo — actualización local del 29 de agosto de 2026
+
+### Misiones y planificación
+
+- Las misiones de categoría diaria creadas desde el formulario normal pasan a
+  ser plantillas recurrentes y generan ocurrencias en el tablón diario.
+- La planificación admite tres modalidades: sin fecha, solo fecha y fecha con
+  hora. Las misiones de solo fecha no programan avisos a medianoche.
+- Las colecciones distinguen las misiones sin programación y conservan la
+  generación recurrente idempotente en fechas civiles.
+
+### Barra lateral y dispositivo
+
+- Se retiró el pie `BITÁCORA · V2` de la barra lateral.
+- `SALUD` se sustituyó por un corazón rojo.
+- Los segmentos horizontales de misiones se reemplazaron por una batería
+  vertical continua que refleja el nivel real del dispositivo mediante Android.
+
+### Privacidad, notificaciones e imágenes
+
+- Ajustes > Privacidad permite habilitar capturas de pantalla. Al bloquear la
+  aplicación se restablece la protección segura de la ventana.
+- Ajustes > Notificaciones permite mostrar u ocultar el título de la misión;
+  las notas y demás datos continúan fuera del aviso.
+- Ajustes > Privacidad permite habilitar la cámara al adjuntar imágenes. Cuando
+  está activa se puede elegir cámara o galería en Bitácora y perfil.
+- Las tres preferencias quedan desactivadas por defecto y se guardan en la base
+  local cifrada.
+
+### Bitácora y persistencia v2
+
+- El estado del momento se amplió de tres a ocho valores: Feliz, Motivado,
+  Enfocado, Tranquilo, Neutral, Ansioso, Triste y Cansado.
+- El esquema Drift sube a v2 con una columna opcional `mood_detail` y una
+  migración v1→v2 que conserva las entradas anteriores.
+- Se añadió el snapshot oficial `drift_schema_v2.json`, validación de contrato,
+  restricciones, reapertura idempotente y prueba de migración con datos v1.
+
+### Calidad
+
+- `flutter analyze` sin problemas y 212/212 pruebas aprobadas.
+- La integración Kotlin Android de batería, capturas y notificaciones compila.
+- No se generó una APK para este incremento.
+
 ## 1.1.1 — candidata `1.1.1+4`, validación física pendiente
 
 ### Interfaz terminal

@@ -394,7 +394,7 @@ class _ExecutionPanel extends StatelessWidget {
           _PlanRow(
             icon: Icons.calendar_today_outlined,
             label: 'Fecha',
-            value: missionDateLabel(mission.scheduledAtUtc),
+            value: missionScheduleLabel(mission),
           ),
           const TerminalDivider(),
           _PlanRow(

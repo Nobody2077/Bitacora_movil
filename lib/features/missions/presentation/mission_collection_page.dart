@@ -72,16 +72,19 @@ class MissionCollectionPage extends ConsumerWidget {
                   _CollectionSummary(missions: missions),
                   const SizedBox(height: 16),
                   missions.when(
-                    data: (items) => _CollectionList(
-                      missions: items,
-                      areas: areas.value ?? const <MissionArea>[],
-                      emptyTitle: _isUpcoming
-                          ? 'NO HAY MISIONES PROGRAMADAS DESDE MAÑANA'
-                          : 'AÚN NO HAY MISIONES REGISTRADAS',
-                      emptyDescription: _isUpcoming
-                          ? 'Las misiones que programes para otra fecha aparecerán aquí.'
-                          : 'Crea una misión para iniciar tu historial.',
-                    ),
+                    data: (items) => _isUpcoming
+                        ? _CollectionList(
+                            missions: items,
+                            areas: areas.value ?? const <MissionArea>[],
+                            emptyTitle:
+                                'NO HAY MISIONES PROGRAMADAS DESDE MAÑANA',
+                            emptyDescription:
+                                'Las misiones que programes para otra fecha aparecerán aquí.',
+                          )
+                        : _AllMissionSections(
+                            missions: items,
+                            areas: areas.value ?? const <MissionArea>[],
+                          ),
                     loading: () => const TerminalLoadingState(
                       message: 'Cargando colección de misiones…',
                     ),
@@ -102,6 +105,97 @@ class MissionCollectionPage extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _AllMissionSections extends StatelessWidget {
+  const _AllMissionSections({required this.missions, required this.areas});
+
+  final List<Mission> missions;
+  final List<MissionArea> areas;
+
+  @override
+  Widget build(BuildContext context) {
+    if (missions.isEmpty) {
+      return _CollectionList(
+        missions: missions,
+        areas: areas,
+        emptyTitle: 'AÚN NO HAY MISIONES REGISTRADAS',
+        emptyDescription: 'Crea una misión para iniciar tu historial.',
+      );
+    }
+    final List<Mission> unscheduled = missions
+        .where((mission) => mission.isUnscheduled)
+        .toList(growable: false);
+    final List<Mission> planned = missions
+        .where((mission) => !mission.isUnscheduled)
+        .toList(growable: false);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        if (unscheduled.isNotEmpty) ...<Widget>[
+          _SectionTitle(
+            label: 'Sin planificar',
+            count: unscheduled.length,
+            icon: Icons.inbox_outlined,
+          ),
+          const SizedBox(height: 12),
+          _CollectionList(
+            missions: unscheduled,
+            areas: areas,
+            emptyTitle: '',
+            emptyDescription: '',
+          ),
+          const SizedBox(height: 10),
+        ],
+        if (planned.isNotEmpty) ...<Widget>[
+          _SectionTitle(
+            label: 'Con planificación',
+            count: planned.length,
+            icon: Icons.event_available_outlined,
+          ),
+          const SizedBox(height: 12),
+          _CollectionList(
+            missions: planned,
+            areas: areas,
+            emptyTitle: '',
+            emptyDescription: '',
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.label,
+    required this.count,
+    required this.icon,
+  });
+
+  final String label;
+  final int count;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Row(
+      children: <Widget>[
+        Icon(icon, color: tokens.infoCyan),
+        const SizedBox(width: 8),
+        Text(
+          '${label.toUpperCase()} · $count',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: tokens.infoCyan,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -283,7 +377,7 @@ class _CollectionMissionCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              missionDateLabel(mission.scheduledAtUtc),
+              missionScheduleLabel(mission),
               style: const TextStyle(
                 color: Colors.white60,
                 fontFamily: 'JetBrains Mono',

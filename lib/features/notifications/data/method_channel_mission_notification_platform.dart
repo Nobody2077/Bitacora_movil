@@ -55,6 +55,8 @@ final class MethodChannelMissionNotificationPlatform
         'scheduleId': request.scheduleId,
         'notifyAtUtcMs': request.notifyAtUtcMs,
         'soundEnabled': request.soundEnabled,
+        'showDetails': request.showDetails,
+        if (request.missionTitle != null) 'missionTitle': request.missionTitle!,
         if (request.systemNotificationId != null)
           'systemNotificationId': request.systemNotificationId!,
       };

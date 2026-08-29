@@ -704,7 +704,7 @@ class _AgendaMission extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '${_timeLabel(mission.scheduledAtUtc)} · '
+                '${_timeLabel(mission)} · '
                 '${area?.name ?? 'Área'} · ${missionStatusLabel(mission.status)}',
                 style: TextStyle(color: tokens.textSecondary),
               ),
@@ -719,8 +719,9 @@ class _AgendaMission extends StatelessWidget {
 bool _sameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;
 
-String _timeLabel(DateTime? utc) {
-  if (utc == null) return 'Sin hora';
+String _timeLabel(Mission mission) {
+  final DateTime? utc = mission.scheduledAtUtc;
+  if (utc == null || mission.isDateOnly) return 'Sin hora';
   final DateTime local = utc.toLocal();
   return '${local.hour.toString().padLeft(2, '0')}:'
       '${local.minute.toString().padLeft(2, '0')}';

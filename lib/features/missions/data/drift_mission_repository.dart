@@ -297,6 +297,13 @@ final class DriftMissionRepository implements MissionRepository {
           priority: Value<String>(_priority(mission.priority)),
           difficulty: Value<String?>(_difficulty(mission.difficulty)),
           isRequired: Value<int>(mission.isRequired ? 1 : 0),
+          status:
+              const <MissionStatus>{
+                MissionStatus.scheduled,
+                MissionStatus.available,
+              }.contains(mission.status)
+              ? Value<String>(_status(mission.status))
+              : const Value<String>.absent(),
           scheduledAt: Value<int?>(_milliseconds(mission.scheduledAtUtc)),
           availableFrom: Value<int?>(_milliseconds(mission.availableFromUtc)),
           expiresAt: Value<int?>(_milliseconds(mission.expiresAtUtc)),
@@ -348,7 +355,7 @@ final class DriftMissionRepository implements MissionRepository {
     required DateTime updatedAtUtc,
   }) {
     final DateTime? scheduledAt = mission.scheduledAtUtc;
-    if (scheduledAt == null) {
+    if (scheduledAt == null || !mission.hasScheduledTime) {
       return null;
     }
     final int nowMs = updatedAtUtc.millisecondsSinceEpoch;
@@ -660,6 +667,17 @@ final class DriftMissionRepository implements MissionRepository {
         mission.title.trim().length > 160 ||
         !occurredAtUtc.isUtc ||
         mission.scheduledAtUtc?.isUtc == false ||
+        mission.availableFromUtc?.isUtc == false ||
+        mission.expiresAtUtc?.isUtc == false ||
+        (mission.availableFromUtc != null &&
+            mission.scheduledAtUtc != null &&
+            mission.availableFromUtc!.isAfter(mission.scheduledAtUtc!)) ||
+        (mission.scheduledAtUtc != null &&
+            mission.expiresAtUtc != null &&
+            mission.scheduledAtUtc!.isAfter(mission.expiresAtUtc!)) ||
+        (mission.availableFromUtc != null &&
+            mission.expiresAtUtc != null &&
+            mission.availableFromUtc!.isAfter(mission.expiresAtUtc!)) ||
         mission.xpPlanned < 0 ||
         (mission.estimatedMinutes != null && mission.estimatedMinutes! <= 0) ||
         (mission.budgetMinor != null && mission.budgetMinor! < 0) ||

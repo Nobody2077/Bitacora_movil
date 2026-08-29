@@ -2,6 +2,7 @@ import 'package:bitacora_rpg_personal/features/notifications/application/notific
 import 'package:bitacora_rpg_personal/features/notifications/data/drift_reminder_preferences_repository.dart';
 import 'package:bitacora_rpg_personal/features/notifications/domain/mission_notification_platform.dart';
 import 'package:bitacora_rpg_personal/features/notifications/domain/reminder_preferences.dart';
+import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/app_database.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/daos/notification_dao.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/daos/settings_dao.dart';
@@ -173,6 +174,29 @@ void main() {
         platform.scheduledRequests.single;
     expect(request.notifyAtUtcMs, deliveryAt);
     expect(request.soundEnabled, isFalse);
+    expect(request.showDetails, isFalse);
+  });
+
+  test('incluye el título solo cuando el usuario habilita detalles', () async {
+    await settingsDao.putMetadata(
+      key: AppPreferences.showNotificationDetailsMetadataKey,
+      value: '1',
+      updatedAtUtcMs: _nowMs,
+    );
+    await _insertSchedule(
+      database,
+      missionId: 'visible-title',
+      scheduleId: 'visible-title-schedule',
+      notifyAt: _nowMs + 60000,
+    );
+
+    final report = await service.reconcile();
+
+    expect(report.scheduled, 1);
+    final MissionNotificationRequest request =
+        platform.scheduledRequests.single;
+    expect(request.showDetails, isTrue);
+    expect(request.missionTitle, 'Misión privada');
   });
 }
 

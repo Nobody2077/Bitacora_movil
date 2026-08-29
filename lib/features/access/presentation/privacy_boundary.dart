@@ -10,13 +10,25 @@ import '../../settings/domain/models/app_preferences.dart';
 import '../application/access_session_controller.dart';
 import '../application/access_session_state.dart';
 import '../application/privacy_controller.dart';
+import '../data/method_channel_privacy_window_platform.dart';
+import '../domain/privacy_window_platform.dart';
 
 const Key privacyShieldKey = Key('privacy-shield');
 
+final Provider<PrivacyWindowPlatform> privacyWindowPlatformProvider =
+    Provider<PrivacyWindowPlatform>(
+      (Ref ref) => const MethodChannelPrivacyWindowPlatform(),
+    );
+
 class AppPrivacyBoundary extends ConsumerStatefulWidget {
-  const AppPrivacyBoundary({required this.child, super.key});
+  const AppPrivacyBoundary({
+    required this.child,
+    this.allowScreenshots = false,
+    super.key,
+  });
 
   final Widget child;
+  final bool allowScreenshots;
 
   @override
   ConsumerState<AppPrivacyBoundary> createState() => _AppPrivacyBoundaryState();
@@ -25,6 +37,7 @@ class AppPrivacyBoundary extends ConsumerStatefulWidget {
 class _AppPrivacyBoundaryState extends ConsumerState<AppPrivacyBoundary> {
   late final AppLifecycleListener _lifecycleListener;
   bool _revealScheduled = false;
+  bool? _lastScreenshotProtection;
 
   @override
   void initState() {
@@ -108,6 +121,20 @@ class _AppPrivacyBoundaryState extends ConsumerState<AppPrivacyBoundary> {
   Widget build(BuildContext context) {
     ref.watch(persistenceAccessGuardProvider);
     ref.watch(recurrenceGenerationGuardProvider);
+    final bool protectScreenshots = !widget.allowScreenshots;
+    if (_lastScreenshotProtection != protectScreenshots) {
+      _lastScreenshotProtection = protectScreenshots;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          unawaited(
+            ref
+                .read(privacyWindowPlatformProvider)
+                .setScreenshotProtectionEnabled(protectScreenshots)
+                .catchError((Object _) {}),
+          );
+        }
+      });
+    }
     ref.listen<AccessSessionState>(accessSessionProvider, (previous, next) {
       if (next.canRevealPrivacyShield) {
         _scheduleReveal();

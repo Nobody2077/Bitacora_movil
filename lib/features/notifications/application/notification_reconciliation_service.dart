@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../infrastructure/database/app_database.dart';
 import '../../../infrastructure/database/daos/notification_dao.dart';
 import '../../../infrastructure/database/daos/settings_dao.dart';
+import '../../settings/domain/models/app_preferences.dart';
 import '../domain/mission_notification_platform.dart';
 import '../domain/reminder_preferences.dart';
 import '../domain/reminder_preferences_repository.dart';
@@ -45,6 +46,11 @@ final class NotificationReconciliationService {
   Future<NotificationReconciliationReport> reconcile() async {
     final int nowUtcMs = _nowUtc().toUtc().millisecondsSinceEpoch;
     final AppSetting settings = await _settingsDao.getSettings();
+    final bool showNotificationDetails =
+        await _settingsDao.getMetadata(
+          AppPreferences.showNotificationDetailsMetadataKey,
+        ) ==
+        '1';
     ReminderPreferences reminderPreferences = ReminderPreferences.defaults;
     final preferencesResult = await _reminderPreferencesRepository.load();
     preferencesResult.fold<void>(
@@ -126,12 +132,18 @@ final class NotificationReconciliationService {
       final int deliveryAtUtcMs = reminderPreferences.deliveryAtUtcMs(
         schedule.notifyAt,
       );
+      final String? missionTitle = showNotificationDetails
+          ? await _notificationDao.findMissionTitle(schedule.missionId)
+          : null;
       final request = MissionNotificationRequest(
         scheduleId: schedule.id,
         notifyAtUtcMs: deliveryAtUtcMs,
         soundEnabled:
             settings.soundEnabled != 0 &&
             !reminderPreferences.isQuietAtUtcMs(deliveryAtUtcMs),
+        showDetails:
+            showNotificationDetails && missionTitle?.trim().isNotEmpty == true,
+        missionTitle: missionTitle?.trim(),
         systemNotificationId: schedule.systemNotificationId,
       );
       try {

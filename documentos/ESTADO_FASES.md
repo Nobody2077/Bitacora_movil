@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 28 de agosto de 2026
+Última actualización: 29 de agosto de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -15,7 +15,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
 | A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
-| A9 — Calendario y recordatorios | **EN VALIDACIÓN** | Código y 202 pruebas verdes; G9 físico pendiente |
+| A9 — Calendario y recordatorios | **EN VALIDACIÓN** | Código y 212 pruebas verdes; G9 físico pendiente |
 
 ## Evidencia G3 — A3 completada
 
@@ -263,16 +263,23 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 
 ## Evidencia parcial A9 — calendario y recordatorios
 
-- Candidata actual `1.1.1+4`; esquema y metadata de versión permanecen en v1.
+- Candidata instalada `1.1.1+4`; el código actual usa esquema v2 con migración
+  compatible desde v1. No se ensambló una APK con este incremento.
 - Calendario reactivo con vistas Día, Semana y Mes y rangos civiles locales.
 - Crear desde el calendario precarga la fecha elegida y vuelve al mismo día.
 - Ajustes > Notificaciones ya es funcional: activación, sonido, anticipación de
   0/5/15/30/60 minutos y horario silencioso que puede cruzar medianoche.
-- El aviso Android conserva texto genérico y visibilidad privada.
-- Preferencias nuevas persistidas en `schema_metadata` dentro de la base cifrada,
-  sin migración ni pérdida de compatibilidad.
-- `flutter analyze`: cero problemas; `flutter test`: **202/202 aprobadas** tras
-  añadir el acceso táctil, su transición, selector de color y fondo negro puro.
+- El aviso Android conserva por defecto texto genérico y visibilidad privada;
+  una preferencia opcional permite mostrar únicamente el título.
+- Las misiones admiten planificación sin fecha, con solo fecha o con fecha y
+  hora. La categoría diaria crea una plantilla y sus ocurrencias cotidianas.
+- Ajustes permite habilitar capturas, cámara al adjuntar imágenes y detalle en
+  notificaciones; las tres opciones comienzan desactivadas.
+- Bitácora ofrece ocho estados de ánimo y conserva los valores anteriores
+  mediante la migración v1→v2.
+- Preferencias nuevas persistidas en `schema_metadata` dentro de la base cifrada.
+- `flutter analyze`: cero problemas; `flutter test`: **212/212 aprobadas** tras
+  la extensión funcional del 29 de agosto.
 - APK `1.1.0+3`: 71.986.819 bytes, firma v2 válida con el certificado de
   producción, sin `INTERNET`, SHA-256
   `47a068089aa7f2dcd48801e92f4e7f471c46b47ad84eade121687df03b891ef3`.

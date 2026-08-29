@@ -36,7 +36,10 @@ class BitacoraApp extends ConsumerWidget {
       routerConfig: router,
       builder: (context, child) => AppUiPreferencesBoundary(
         preferences: uiPreferences,
-        child: AppPrivacyBoundary(child: child ?? const SizedBox.shrink()),
+        child: AppPrivacyBoundary(
+          allowScreenshots: preferences.allowScreenshots,
+          child: child ?? const SizedBox.shrink(),
+        ),
       ),
     );
   }

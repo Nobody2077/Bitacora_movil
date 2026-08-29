@@ -9,7 +9,7 @@ import '../domain/repositories/journal_repository.dart';
 import 'journal_application_service.dart';
 
 abstract interface class JournalPhotoPicker {
-  Future<String?> pickPhotoPath();
+  Future<String?> pickPhotoPath({bool useCamera = false});
 }
 
 final class ImagePickerJournalPhotoPicker implements JournalPhotoPicker {
@@ -18,9 +18,9 @@ final class ImagePickerJournalPhotoPicker implements JournalPhotoPicker {
   final ImagePicker _picker;
 
   @override
-  Future<String?> pickPhotoPath() async {
+  Future<String?> pickPhotoPath({bool useCamera = false}) async {
     final XFile? photo = await _picker.pickImage(
-      source: ImageSource.gallery,
+      source: useCamera ? ImageSource.camera : ImageSource.gallery,
       maxWidth: 4096,
       maxHeight: 4096,
       imageQuality: 95,
@@ -48,14 +48,19 @@ final class JournalPhotoApplicationService {
   final JournalClock _clock;
   final JournalIdGenerator _idGenerator;
 
-  Future<Result<JournalPhoto?>> pickAndAdd(String entryId) async {
+  Future<Result<JournalPhoto?>> pickAndAdd(
+    String entryId, {
+    bool useCamera = false,
+  }) async {
     if (entryId.trim().isEmpty) {
       return const Failure<JournalPhoto?>(
         ValidationFailure('La entrada de Bitácora no es válida.'),
       );
     }
     try {
-      final String? sourcePath = await _picker.pickPhotoPath();
+      final String? sourcePath = await _picker.pickPhotoPath(
+        useCamera: useCamera,
+      );
       if (sourcePath == null) {
         return const Success<JournalPhoto?>(null);
       }

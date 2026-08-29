@@ -85,6 +85,9 @@ void main() {
         reduceMotion: true,
         highContrast: true,
         hideAmounts: true,
+        allowScreenshots: true,
+        showNotificationDetails: true,
+        allowCameraAttachments: true,
         updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(
           1787600000001,
           isUtc: true,
@@ -100,6 +103,14 @@ void main() {
     expect(updated.reduceMotion, isTrue);
     expect(updated.highContrast, isTrue);
     expect(updated.hideAmounts, isTrue);
+    expect(updated.allowScreenshots, isTrue);
+    expect(updated.showNotificationDetails, isTrue);
+    expect(updated.allowCameraAttachments, isTrue);
+    final AppPreferences reloaded =
+        (await repository.load() as Success<AppPreferences>).value;
+    expect(reloaded.allowScreenshots, isTrue);
+    expect(reloaded.showNotificationDetails, isTrue);
+    expect(reloaded.allowCameraAttachments, isTrue);
     await changes.cancel();
   });
 }

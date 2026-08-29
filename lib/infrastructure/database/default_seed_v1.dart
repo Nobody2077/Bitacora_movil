@@ -186,10 +186,7 @@ Future<void> insertDefaultSeedV1(
     '''
       INSERT INTO schema_metadata ("key", value, updated_at)
       VALUES (?, ?, ?)
-      ON CONFLICT("key") DO UPDATE SET
-        value = excluded.value,
-        updated_at = excluded.updated_at
-      WHERE schema_metadata.value <> excluded.value
+      ON CONFLICT("key") DO NOTHING
     ''',
     <Object?>['schema_version', '1', nowUtcMs],
   );

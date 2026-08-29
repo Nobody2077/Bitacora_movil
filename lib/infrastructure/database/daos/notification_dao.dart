@@ -55,6 +55,14 @@ final class NotificationDao {
         .get();
   }
 
+  Future<String?> findMissionTitle(String missionId) async {
+    final query = _database.selectOnly(_database.missions)
+      ..addColumns(<Expression<Object>>[_database.missions.title])
+      ..where(_database.missions.id.equals(missionId));
+    final row = await query.getSingleOrNull();
+    return row?.read(_database.missions.title);
+  }
+
   Future<DaoWriteResult<NotificationSchedule>> scheduleIfAbsent(
     NotificationSchedulesCompanion schedule,
   ) {

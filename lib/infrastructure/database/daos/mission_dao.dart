@@ -212,17 +212,22 @@ final class MissionDao {
     required String missionId,
     required int expectedRowVersion,
     required MissionsCompanion changes,
+    bool allowPlanningStatus = false,
   }) async {
     if (expectedRowVersion < 1) {
       throw ArgumentError.value(expectedRowVersion, 'expectedRowVersion');
     }
+    final bool validPlanningStatus =
+        allowPlanningStatus &&
+        changes.status.present &&
+        const <String>{'SCHEDULED', 'AVAILABLE'}.contains(changes.status.value);
     if (changes.id.present ||
         changes.rowVersion.present ||
-        changes.status.present ||
+        (changes.status.present && !validPlanningStatus) ||
         changes.completedAt.present) {
       throw ArgumentError(
-        'id, row_version, status and completed_at are controlled by MissionDao. '
-        'Use transitionStatusWithEvent for state changes.',
+        'id, row_version and completed_at are controlled by MissionDao. '
+        'status only accepts planning transitions inside aggregate updates.',
       );
     }
 
@@ -274,6 +279,7 @@ final class MissionDao {
         missionId: missionId,
         expectedRowVersion: expectedRowVersion,
         changes: changes,
+        allowPlanningStatus: true,
       );
 
       await (_database.delete(

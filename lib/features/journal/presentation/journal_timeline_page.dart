@@ -382,8 +382,13 @@ Color _originColor(AppThemeTokens tokens, JournalOrigin origin) =>
     };
 
 Color _moodColor(AppThemeTokens tokens, JournalMood? mood) => switch (mood) {
+  JournalMood.happy => tokens.valueYellow,
+  JournalMood.motivated => tokens.progressGreen,
   JournalMood.focused => tokens.progressGreen,
+  JournalMood.calm => tokens.infoCyan,
   JournalMood.normal => tokens.infoCyan,
+  JournalMood.anxious => tokens.attentionOrange,
+  JournalMood.sad => tokens.structuralRed,
   JournalMood.tired => tokens.attentionOrange,
   null => tokens.textDisabled,
 };

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/providers/persistence_providers.dart';
 import '../../../app/router/app_routes.dart';
 import '../../../app/theme/app_theme_tokens.dart';
@@ -113,9 +114,29 @@ class _PrivacySettingsPageState extends ConsumerState<PrivacySettingsPage> {
     setState(() => _saving = false);
   }
 
+  Future<void> _savePrivacyPreferences(AppPreferences preferences) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final Result<void> result = await ref
+        .read(settingsRepositoryProvider)
+        .save(preferences.copyWith(updatedAtUtc: DateTime.now().toUtc()));
+    if (!mounted) return;
+    bool saved = false;
+    result.fold<void>(onSuccess: (_) => saved = true, onFailure: (_) {});
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo guardar la preferencia.')),
+      );
+    }
+    setState(() => _saving = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final int autoLockMinutes = ref.watch(autoLockMinutesProvider);
+    final AsyncValue<AppPreferences> preferences = ref.watch(
+      appPreferencesProvider,
+    );
     return _SettingsSurface(
       title: 'Privacidad y acceso',
       subtitle: 'Estas reglas se aplican antes de construir contenido privado.',
@@ -141,6 +162,52 @@ class _PrivacySettingsPageState extends ConsumerState<PrivacySettingsPage> {
             message: 'Guardando tiempo de autobloqueo…',
           ),
         ],
+        const SizedBox(height: 24),
+        Text(
+          'CONTROLES LOCALES',
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        const SizedBox(height: 10),
+        preferences.when(
+          loading: () => const TerminalInlineLoadingState(
+            message: 'Cargando controles de privacidad…',
+          ),
+          error: (_, _) => TerminalInlineErrorState(
+            message: 'No se pudieron leer los controles de privacidad.',
+            onRetry: () => ref.invalidate(appPreferencesProvider),
+          ),
+          data: (AppPreferences value) => Column(
+            children: <Widget>[
+              _PrivacySwitchCard(
+                switchKey: const Key('allow-screenshots-switch'),
+                icon: Icons.screenshot_monitor_outlined,
+                title: 'Permitir capturas de pantalla',
+                description: value.allowScreenshots
+                    ? 'Android permite capturar el contenido visible.'
+                    : 'Android bloquea capturas y grabaciones de esta ventana.',
+                value: value.allowScreenshots,
+                enabled: !_saving,
+                onChanged: (bool enabled) => _savePrivacyPreferences(
+                  value.copyWith(allowScreenshots: enabled),
+                ),
+              ),
+              const SizedBox(height: TerminalSpace.sm),
+              _PrivacySwitchCard(
+                switchKey: const Key('allow-camera-attachments-switch'),
+                icon: Icons.photo_camera_outlined,
+                title: 'Permitir cámara al adjuntar',
+                description: value.allowCameraAttachments
+                    ? 'Al elegir una imagen podrás usar cámara o galería.'
+                    : 'Los adjuntos solo se seleccionan desde la galería.',
+                value: value.allowCameraAttachments,
+                enabled: !_saving,
+                onChanged: (bool enabled) => _savePrivacyPreferences(
+                  value.copyWith(allowCameraAttachments: enabled),
+                ),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 24),
         Card(
           child: ListTile(
@@ -177,6 +244,38 @@ class _PrivacySettingsPageState extends ConsumerState<PrivacySettingsPage> {
       ],
     );
   }
+}
+
+class _PrivacySwitchCard extends StatelessWidget {
+  const _PrivacySwitchCard({
+    required this.switchKey,
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final Key switchKey;
+  final IconData icon;
+  final String title;
+  final String description;
+  final bool value;
+  final bool enabled;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Card(
+    child: SwitchListTile.adaptive(
+      key: switchKey,
+      secondary: Icon(icon),
+      title: Text(title),
+      subtitle: Text(description),
+      value: value,
+      onChanged: enabled ? onChanged : null,
+    ),
+  );
 }
 
 class ChangePinPage extends ConsumerStatefulWidget {

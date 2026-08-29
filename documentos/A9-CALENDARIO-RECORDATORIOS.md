@@ -12,16 +12,23 @@ Estado: implementación automatizada completa; validación física pendiente.
 - Ajustes de notificaciones para activar avisos y sonido.
 - Anticipación disponible: al comenzar, 5, 15, 30 o 60 minutos antes.
 - Horario silencioso configurable, incluso cuando cruza medianoche.
-- Notificación genérica y privada, sin título, descripción ni identificadores.
+- Por defecto, notificación genérica y privada, sin título, descripción ni
+  identificadores.
+- Extensión del 29 de agosto: el título puede mostrarse únicamente cuando el
+  usuario activa la preferencia; notas e identificadores siguen excluidos.
+- Planificación de misiones sin fecha, con solo fecha o con fecha y hora.
+- Las misiones de categoría diaria creadas desde el formulario se convierten en
+  plantillas recurrentes y generan ocurrencias diarias.
 
 Las preferencias nuevas se guardan en `schema_metadata`, dentro de la misma base
-cifrada. `schemaVersion=1` no cambia y la actualización conserva los datos de
-`1.0.0+2`.
+cifrada. El esquema pasó posteriormente a v2 para ampliar los estados de ánimo
+de Bitácora; la migración v1→v2 conserva los datos de instalaciones anteriores.
 
 ## Evidencia automatizada
 
 - `flutter analyze`: cero problemas.
-- `flutter test`: 202/202 pruebas aprobadas, incluida la matriz táctil, su
+- `flutter test`: 212/212 pruebas aprobadas tras la extensión del 29 de agosto,
+  incluida la matriz táctil, su
   transición terminal y la verificación del fondo negro puro.
 - `lintProdRelease`: aprobado sin errores.
 - Cobertura añadida para rangos mes/semana/día, fecha contextual, valores por

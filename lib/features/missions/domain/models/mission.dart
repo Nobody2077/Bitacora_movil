@@ -169,6 +169,22 @@ final class Mission {
   final List<MissionObjective> objectives;
   final List<MissionTimeEntry> timeEntries;
 
+  /// Una planificación de día completo usa [scheduledAtUtc] como ancla para
+  /// conservar orden, calendario e idempotencia, y la ventana completa como
+  /// marcador persistente de que el usuario no eligió una hora.
+  bool get isDateOnly =>
+      scheduledAtUtc != null &&
+      availableFromUtc != null &&
+      expiresAtUtc != null &&
+      scheduledAtUtc == availableFromUtc;
+
+  bool get hasScheduledTime => scheduledAtUtc != null && !isDateOnly;
+
+  bool get isUnscheduled =>
+      scheduledAtUtc == null &&
+      availableFromUtc == null &&
+      expiresAtUtc == null;
+
   MissionTimeEntry? get openWorkTimer {
     for (final entry in timeEntries.reversed) {
       if (entry.isOpen) {

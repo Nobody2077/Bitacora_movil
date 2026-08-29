@@ -28,8 +28,8 @@ const Set<String> _applicationTables = <String>{
 };
 
 void main() {
-  test('drift_schema_v1.json matches the current schema exactly', () async {
-    final snapshotFile = File('drift_schemas/drift_schema_v1.json');
+  test('drift_schema_v2.json matches the current schema exactly', () async {
+    final snapshotFile = File('drift_schemas/drift_schema_v2.json');
     expect(await snapshotFile.exists(), isTrue);
 
     final snapshot =
@@ -68,7 +68,7 @@ void main() {
     final version = await database
         .customSelect('PRAGMA user_version')
         .getSingle();
-    expect(version.read<int>('user_version'), 1);
+    expect(version.read<int>('user_version'), 2);
 
     final rows = await database.customSelect('''
       SELECT name, sql

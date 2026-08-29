@@ -7612,6 +7612,18 @@ class JournalEntries extends Table
     $customConstraints:
         'CHECK (mood IS NULL OR mood IN (\'FOCUSED\', \'NORMAL\', \'TIRED\'))',
   );
+  static const VerificationMeta _moodDetailMeta = const VerificationMeta(
+    'moodDetail',
+  );
+  late final GeneratedColumn<String> moodDetail = GeneratedColumn<String>(
+    'mood_detail',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'CHECK (mood_detail IS NULL OR mood_detail IN (\'HAPPY\', \'MOTIVATED\', \'FOCUSED\', \'CALM\', \'NORMAL\', \'ANXIOUS\', \'SAD\', \'TIRED\'))',
+  );
   static const VerificationMeta _isPrivateMeta = const VerificationMeta(
     'isPrivate',
   );
@@ -7676,6 +7688,7 @@ class JournalEntries extends Table
     title,
     body,
     mood,
+    moodDetail,
     isPrivate,
     occurredAt,
     createdAt,
@@ -7740,6 +7753,12 @@ class JournalEntries extends Table
       context.handle(
         _moodMeta,
         mood.isAcceptableOrUnknown(data['mood']!, _moodMeta),
+      );
+    }
+    if (data.containsKey('mood_detail')) {
+      context.handle(
+        _moodDetailMeta,
+        moodDetail.isAcceptableOrUnknown(data['mood_detail']!, _moodDetailMeta),
       );
     }
     if (data.containsKey('is_private')) {
@@ -7817,6 +7836,10 @@ class JournalEntries extends Table
         DriftSqlType.string,
         data['${effectivePrefix}mood'],
       ),
+      moodDetail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mood_detail'],
+      ),
       isPrivate: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}is_private'],
@@ -7857,6 +7880,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
   final String title;
   final String? body;
   final String? mood;
+  final String? moodDetail;
   final int isPrivate;
   final int occurredAt;
   final int createdAt;
@@ -7870,6 +7894,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
     required this.title,
     this.body,
     this.mood,
+    this.moodDetail,
     required this.isPrivate,
     required this.occurredAt,
     required this.createdAt,
@@ -7894,6 +7919,9 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
     if (!nullToAbsent || mood != null) {
       map['mood'] = Variable<String>(mood);
     }
+    if (!nullToAbsent || moodDetail != null) {
+      map['mood_detail'] = Variable<String>(moodDetail);
+    }
     map['is_private'] = Variable<int>(isPrivate);
     map['occurred_at'] = Variable<int>(occurredAt);
     map['created_at'] = Variable<int>(createdAt);
@@ -7917,6 +7945,9 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
       title: Value(title),
       body: body == null && nullToAbsent ? const Value.absent() : Value(body),
       mood: mood == null && nullToAbsent ? const Value.absent() : Value(mood),
+      moodDetail: moodDetail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(moodDetail),
       isPrivate: Value(isPrivate),
       occurredAt: Value(occurredAt),
       createdAt: Value(createdAt),
@@ -7940,6 +7971,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
       title: serializer.fromJson<String>(json['title']),
       body: serializer.fromJson<String?>(json['body']),
       mood: serializer.fromJson<String?>(json['mood']),
+      moodDetail: serializer.fromJson<String?>(json['mood_detail']),
       isPrivate: serializer.fromJson<int>(json['is_private']),
       occurredAt: serializer.fromJson<int>(json['occurred_at']),
       createdAt: serializer.fromJson<int>(json['created_at']),
@@ -7958,6 +7990,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
       'title': serializer.toJson<String>(title),
       'body': serializer.toJson<String?>(body),
       'mood': serializer.toJson<String?>(mood),
+      'mood_detail': serializer.toJson<String?>(moodDetail),
       'is_private': serializer.toJson<int>(isPrivate),
       'occurred_at': serializer.toJson<int>(occurredAt),
       'created_at': serializer.toJson<int>(createdAt),
@@ -7974,6 +8007,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
     String? title,
     Value<String?> body = const Value.absent(),
     Value<String?> mood = const Value.absent(),
+    Value<String?> moodDetail = const Value.absent(),
     int? isPrivate,
     int? occurredAt,
     int? createdAt,
@@ -7989,6 +8023,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
     title: title ?? this.title,
     body: body.present ? body.value : this.body,
     mood: mood.present ? mood.value : this.mood,
+    moodDetail: moodDetail.present ? moodDetail.value : this.moodDetail,
     isPrivate: isPrivate ?? this.isPrivate,
     occurredAt: occurredAt ?? this.occurredAt,
     createdAt: createdAt ?? this.createdAt,
@@ -8008,6 +8043,9 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
       title: data.title.present ? data.title.value : this.title,
       body: data.body.present ? data.body.value : this.body,
       mood: data.mood.present ? data.mood.value : this.mood,
+      moodDetail: data.moodDetail.present
+          ? data.moodDetail.value
+          : this.moodDetail,
       isPrivate: data.isPrivate.present ? data.isPrivate.value : this.isPrivate,
       occurredAt: data.occurredAt.present
           ? data.occurredAt.value
@@ -8030,6 +8068,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
           ..write('title: $title, ')
           ..write('body: $body, ')
           ..write('mood: $mood, ')
+          ..write('moodDetail: $moodDetail, ')
           ..write('isPrivate: $isPrivate, ')
           ..write('occurredAt: $occurredAt, ')
           ..write('createdAt: $createdAt, ')
@@ -8048,6 +8087,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
     title,
     body,
     mood,
+    moodDetail,
     isPrivate,
     occurredAt,
     createdAt,
@@ -8065,6 +8105,7 @@ class JournalEntry extends DataClass implements Insertable<JournalEntry> {
           other.title == this.title &&
           other.body == this.body &&
           other.mood == this.mood &&
+          other.moodDetail == this.moodDetail &&
           other.isPrivate == this.isPrivate &&
           other.occurredAt == this.occurredAt &&
           other.createdAt == this.createdAt &&
@@ -8080,6 +8121,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
   final Value<String> title;
   final Value<String?> body;
   final Value<String?> mood;
+  final Value<String?> moodDetail;
   final Value<int> isPrivate;
   final Value<int> occurredAt;
   final Value<int> createdAt;
@@ -8094,6 +8136,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
     this.title = const Value.absent(),
     this.body = const Value.absent(),
     this.mood = const Value.absent(),
+    this.moodDetail = const Value.absent(),
     this.isPrivate = const Value.absent(),
     this.occurredAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -8109,6 +8152,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
     required String title,
     this.body = const Value.absent(),
     this.mood = const Value.absent(),
+    this.moodDetail = const Value.absent(),
     required int isPrivate,
     required int occurredAt,
     required int createdAt,
@@ -8130,6 +8174,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
     Expression<String>? title,
     Expression<String>? body,
     Expression<String>? mood,
+    Expression<String>? moodDetail,
     Expression<int>? isPrivate,
     Expression<int>? occurredAt,
     Expression<int>? createdAt,
@@ -8145,6 +8190,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
       if (title != null) 'title': title,
       if (body != null) 'body': body,
       if (mood != null) 'mood': mood,
+      if (moodDetail != null) 'mood_detail': moodDetail,
       if (isPrivate != null) 'is_private': isPrivate,
       if (occurredAt != null) 'occurred_at': occurredAt,
       if (createdAt != null) 'created_at': createdAt,
@@ -8162,6 +8208,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
     Value<String>? title,
     Value<String?>? body,
     Value<String?>? mood,
+    Value<String?>? moodDetail,
     Value<int>? isPrivate,
     Value<int>? occurredAt,
     Value<int>? createdAt,
@@ -8177,6 +8224,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
       title: title ?? this.title,
       body: body ?? this.body,
       mood: mood ?? this.mood,
+      moodDetail: moodDetail ?? this.moodDetail,
       isPrivate: isPrivate ?? this.isPrivate,
       occurredAt: occurredAt ?? this.occurredAt,
       createdAt: createdAt ?? this.createdAt,
@@ -8210,6 +8258,9 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
     if (mood.present) {
       map['mood'] = Variable<String>(mood.value);
     }
+    if (moodDetail.present) {
+      map['mood_detail'] = Variable<String>(moodDetail.value);
+    }
     if (isPrivate.present) {
       map['is_private'] = Variable<int>(isPrivate.value);
     }
@@ -8241,6 +8292,7 @@ class JournalEntriesCompanion extends UpdateCompanion<JournalEntry> {
           ..write('title: $title, ')
           ..write('body: $body, ')
           ..write('mood: $mood, ')
+          ..write('moodDetail: $moodDetail, ')
           ..write('isPrivate: $isPrivate, ')
           ..write('occurredAt: $occurredAt, ')
           ..write('createdAt: $createdAt, ')
@@ -18027,6 +18079,7 @@ typedef $JournalEntriesCreateCompanionBuilder =
       required String title,
       Value<String?> body,
       Value<String?> mood,
+      Value<String?> moodDetail,
       required int isPrivate,
       required int occurredAt,
       required int createdAt,
@@ -18043,6 +18096,7 @@ typedef $JournalEntriesUpdateCompanionBuilder =
       Value<String> title,
       Value<String?> body,
       Value<String?> mood,
+      Value<String?> moodDetail,
       Value<int> isPrivate,
       Value<int> occurredAt,
       Value<int> createdAt,
@@ -18160,6 +18214,11 @@ class $JournalEntriesFilterComposer
 
   ColumnFilters<String> get mood => $composableBuilder(
     column: $table.mood,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get moodDetail => $composableBuilder(
+    column: $table.moodDetail,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -18319,6 +18378,11 @@ class $JournalEntriesOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get moodDetail => $composableBuilder(
+    column: $table.moodDetail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get isPrivate => $composableBuilder(
     column: $table.isPrivate,
     builder: (column) => ColumnOrderings(column),
@@ -18416,6 +18480,11 @@ class $JournalEntriesAnnotationComposer
 
   GeneratedColumn<String> get mood =>
       $composableBuilder(column: $table.mood, builder: (column) => column);
+
+  GeneratedColumn<String> get moodDetail => $composableBuilder(
+    column: $table.moodDetail,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get isPrivate =>
       $composableBuilder(column: $table.isPrivate, builder: (column) => column);
@@ -18573,6 +18642,7 @@ class $JournalEntriesTableManager
                 Value<String> title = const Value.absent(),
                 Value<String?> body = const Value.absent(),
                 Value<String?> mood = const Value.absent(),
+                Value<String?> moodDetail = const Value.absent(),
                 Value<int> isPrivate = const Value.absent(),
                 Value<int> occurredAt = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
@@ -18587,6 +18657,7 @@ class $JournalEntriesTableManager
                 title: title,
                 body: body,
                 mood: mood,
+                moodDetail: moodDetail,
                 isPrivate: isPrivate,
                 occurredAt: occurredAt,
                 createdAt: createdAt,
@@ -18603,6 +18674,7 @@ class $JournalEntriesTableManager
                 required String title,
                 Value<String?> body = const Value.absent(),
                 Value<String?> mood = const Value.absent(),
+                Value<String?> moodDetail = const Value.absent(),
                 required int isPrivate,
                 required int occurredAt,
                 required int createdAt,
@@ -18617,6 +18689,7 @@ class $JournalEntriesTableManager
                 title: title,
                 body: body,
                 mood: mood,
+                moodDetail: moodDetail,
                 isPrivate: isPrivate,
                 occurredAt: occurredAt,
                 createdAt: createdAt,

@@ -281,6 +281,16 @@ final class RecurrenceApplicationService {
     int created = 0;
     for (final localDate in dates) {
       final int scheduledAtMs = await _localDateToUtcMs(localDate, rule);
+      final bool hasFixedTime = rule.localTimeMinutes != null;
+      final int? availableFromMs = hasFixedTime ? null : scheduledAtMs;
+      final int? expiresAtMs = hasFixedTime
+          ? null
+          : (await _civilTime.localDateTimeToUtcEpochMillis(
+                  localDate: _addCivilDays(localDate, 1),
+                  localTimeMinutes: 0,
+                  timeZoneId: rule.timezoneId,
+                )) -
+                1;
       final String occurrenceId = _idGenerator.nextId();
       final String eventId = _idGenerator.nextId();
       final String notificationId = _idGenerator.nextId();
@@ -302,6 +312,8 @@ final class RecurrenceApplicationService {
           isRequired: Value<int>(bundle.template.isRequired),
           status: Value<String>(statusStr),
           scheduledAt: Value<int?>(scheduledAtMs),
+          availableFrom: Value<int?>(availableFromMs),
+          expiresAt: Value<int?>(expiresAtMs),
           xpPlanned: Value<int>(bundle.template.xpReward),
           estimatedMinutes: Value<int?>(bundle.template.estimatedMinutes),
           budgetMinor: Value<int?>(bundle.template.budgetMinor),
@@ -316,17 +328,19 @@ final class RecurrenceApplicationService {
           toStatus: Value<String>(statusStr),
           occurredAt: Value<int>(nowUtcMs),
         ),
-        notifications: <drift.NotificationSchedulesCompanion>[
-          drift.NotificationSchedulesCompanion.insert(
-            id: notificationId,
-            missionId: occurrenceId,
-            notificationType: 'START',
-            notifyAt: scheduledAtMs,
-            status: 'PENDING',
-            createdAt: nowUtcMs,
-            updatedAt: nowUtcMs,
-          ),
-        ],
+        notifications: hasFixedTime
+            ? <drift.NotificationSchedulesCompanion>[
+                drift.NotificationSchedulesCompanion.insert(
+                  id: notificationId,
+                  missionId: occurrenceId,
+                  notificationType: 'START',
+                  notifyAt: scheduledAtMs,
+                  status: 'PENDING',
+                  createdAt: nowUtcMs,
+                  updatedAt: nowUtcMs,
+                ),
+              ]
+            : const <drift.NotificationSchedulesCompanion>[],
       );
       if (result.created) {
         created++;

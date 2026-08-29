@@ -63,12 +63,14 @@ final class SaveMissionRequest {
     required this.importance,
     required this.priority,
     required this.isRequired,
-    required this.scheduledAtUtc,
     required this.xpPlanned,
     required this.objectives,
     this.existing,
     this.description,
     this.difficulty,
+    this.scheduledAtUtc,
+    this.availableFromUtc,
+    this.expiresAtUtc,
     this.estimatedMinutes,
     this.budgetMinor,
   });
@@ -82,7 +84,9 @@ final class SaveMissionRequest {
   final MissionPriority priority;
   final MissionDifficulty? difficulty;
   final bool isRequired;
-  final DateTime scheduledAtUtc;
+  final DateTime? scheduledAtUtc;
+  final DateTime? availableFromUtc;
+  final DateTime? expiresAtUtc;
   final int? estimatedMinutes;
   final int? budgetMinor;
   final int xpPlanned;
@@ -117,6 +121,11 @@ final class MissionApplicationService {
         ),
     ];
 
+    final MissionStatus plannedStatus = _statusForSchedule(
+      existing: existing,
+      scheduledAtUtc: request.scheduledAtUtc,
+      nowUtc: nowUtc,
+    );
     final Mission mission = existing == null
         ? Mission(
             id: missionId,
@@ -128,17 +137,19 @@ final class MissionApplicationService {
             priority: request.priority,
             difficulty: request.difficulty,
             isRequired: request.isRequired,
-            status: request.scheduledAtUtc.isAfter(nowUtc)
-                ? MissionStatus.scheduled
-                : MissionStatus.available,
+            status: plannedStatus,
             scheduledAtUtc: request.scheduledAtUtc,
+            availableFromUtc: request.availableFromUtc,
+            expiresAtUtc: request.expiresAtUtc,
             estimatedMinutes: request.estimatedMinutes,
             budgetMinor: request.budgetMinor,
             xpPlanned: request.xpPlanned,
             rowVersion: 1,
             objectives: objectives,
           )
-        : existing.copyWith(
+        : Mission(
+            id: existing.id,
+            templateId: existing.templateId,
             areaId: request.areaId,
             title: request.title,
             description: request.description,
@@ -147,11 +158,20 @@ final class MissionApplicationService {
             priority: request.priority,
             difficulty: request.difficulty,
             isRequired: request.isRequired,
+            status: plannedStatus,
             scheduledAtUtc: request.scheduledAtUtc,
+            availableFromUtc: request.availableFromUtc,
+            expiresAtUtc: request.expiresAtUtc,
             estimatedMinutes: request.estimatedMinutes,
             budgetMinor: request.budgetMinor,
             xpPlanned: request.xpPlanned,
+            actualResult: existing.actualResult,
+            convenienceRating: existing.convenienceRating,
+            completedAtUtc: existing.completedAtUtc,
+            archivedAtUtc: existing.archivedAtUtc,
+            rowVersion: existing.rowVersion,
             objectives: objectives,
+            timeEntries: existing.timeEntries,
           );
 
     final String eventId = _idGenerator.nextId();
@@ -169,6 +189,25 @@ final class MissionApplicationService {
             notificationId: notificationId,
             occurredAtUtc: nowUtc,
           );
+  }
+
+  MissionStatus _statusForSchedule({
+    required Mission? existing,
+    required DateTime? scheduledAtUtc,
+    required DateTime nowUtc,
+  }) {
+    if (existing != null &&
+        !const <MissionStatus>{
+          MissionStatus.draft,
+          MissionStatus.scheduled,
+          MissionStatus.available,
+          MissionStatus.rescheduled,
+        }.contains(existing.status)) {
+      return existing.status;
+    }
+    return scheduledAtUtc?.isAfter(nowUtc) == true
+        ? MissionStatus.scheduled
+        : MissionStatus.available;
   }
 
   Future<Result<Mission>> startTimer(Mission mission) {

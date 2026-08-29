@@ -107,6 +107,8 @@ class MissionNotificationBridge(
                 scheduleId = request.scheduleId,
                 systemNotificationId = request.systemNotificationId,
                 soundEnabled = request.soundEnabled,
+                showDetails = request.showDetails,
+                missionTitle = request.missionTitle,
             )
             result.success(request.systemNotificationId)
         } catch (error: IllegalArgumentException) {
@@ -144,6 +146,11 @@ class MissionNotificationBridge(
             notifyAtUtcMs = notifyAtUtcMs,
             systemNotificationId = systemId,
             soundEnabled = call.argument<Boolean>("soundEnabled") ?: true,
+            showDetails = call.argument<Boolean>("showDetails") ?: false,
+            missionTitle = call.argument<String>("missionTitle")
+                ?.trim()
+                ?.take(120)
+                ?.takeIf { it.isNotEmpty() },
         )
     }
 
@@ -152,6 +159,10 @@ class MissionNotificationBridge(
             putExtra(MissionAlarmReceiver.EXTRA_SCHEDULE_ID, request.scheduleId)
             putExtra(MissionAlarmReceiver.EXTRA_SYSTEM_ID, request.systemNotificationId)
             putExtra(MissionAlarmReceiver.EXTRA_SOUND_ENABLED, request.soundEnabled)
+            putExtra(MissionAlarmReceiver.EXTRA_SHOW_DETAILS, request.showDetails)
+            request.missionTitle?.let {
+                putExtra(MissionAlarmReceiver.EXTRA_MISSION_TITLE, it)
+            }
         }
         return PendingIntent.getBroadcast(
             activity,
@@ -171,5 +182,7 @@ class MissionNotificationBridge(
         val notifyAtUtcMs: Long,
         val systemNotificationId: Int,
         val soundEnabled: Boolean,
+        val showDetails: Boolean,
+        val missionTitle: String?,
     )
 }

@@ -135,7 +135,7 @@ class _PriorityMissionPanel extends StatelessWidget {
           const SizedBox(height: TerminalSpace.xs),
           Text(
             '${missionStatusLabel(mission!.status)} · '
-            '${missionDateLabel(mission!.scheduledAtUtc)}',
+            '${missionScheduleLabel(mission!)}',
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: tokens.textSecondary),
@@ -213,7 +213,7 @@ class _NextMissionPanel extends StatelessWidget {
           Text(
             mission == null
                 ? 'Las próximas misiones aparecerán aquí.'
-                : missionDateLabel(mission!.scheduledAtUtc),
+                : missionScheduleLabel(mission!),
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: tokens.textSecondary),

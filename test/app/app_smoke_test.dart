@@ -14,8 +14,12 @@ import 'package:bitacora_rpg_personal/features/missions/application/mission_prov
 import 'package:bitacora_rpg_personal/features/missions/domain/models/mission.dart';
 import 'package:bitacora_rpg_personal/features/profile/application/user_profile_providers.dart';
 import 'package:bitacora_rpg_personal/features/profile/domain/models/user_profile.dart';
+import 'package:bitacora_rpg_personal/features/progress/application/progress_providers.dart';
+import 'package:bitacora_rpg_personal/features/progress/domain/models/progress_models.dart';
+import 'package:bitacora_rpg_personal/features/progress/domain/models/rpg_level.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
+import 'package:bitacora_rpg_personal/shared/device/device_battery.dart';
 import 'package:bitacora_rpg_personal/shared/widgets/terminal/terminal_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,6 +39,10 @@ void main() {
 
       expect(find.byType(NavigationBar), findsOneWidget);
       expect(find.byType(TerminalSidebar), findsNothing);
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-global-level-panel')),
+        findsNothing,
+      );
 
       await tester.tap(find.text('Misiones'));
       await tester.pump(const Duration(milliseconds: 500));
@@ -50,14 +58,32 @@ void main() {
     ) async {
       _ensureResumed(tester);
       _setSurface(tester, const Size(1280, 800));
-      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.journal));
+      await tester.pumpWidget(
+        _testApp(
+          initialLocation: AppRoutes.journal,
+          todayMissions: _sidebarMissions(),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(TerminalSidebar), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
-      expect(find.text('Bitácora'), findsWidgets);
-      expect(find.text('Progreso'), findsOneWidget);
-      expect(find.text('Ajustes'), findsOneWidget);
+      for (final MapEntry<String, String> item in const <String, String>{
+        'Inicio': 'INICIO',
+        'Misiones': 'MISIONES',
+        'Bitácora': 'BITÁCORA',
+        'Economía': 'ECONOMÍA',
+        'Progreso': 'PROGRESO',
+        'Ajustes': 'AJUSTES',
+      }.entries) {
+        expect(
+          find.descendant(
+            of: find.byKey(ValueKey<String>('sidebar-destination-${item.key}')),
+            matching: find.text(item.value),
+          ),
+          findsOneWidget,
+        );
+      }
       expect(find.text('Usuario local'), findsOneWidget);
       expect(find.text('SISTEMA PERSONAL'), findsNothing);
 
@@ -67,16 +93,75 @@ void main() {
       final AppThemeTokens tokens = Theme.of(
         sidebarContext,
       ).extension<AppThemeTokens>()!;
-      final Text missionsLabel = tester.widget<Text>(find.text('Misiones'));
+      final Text missionsLabel = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(
+            const ValueKey<String>('sidebar-destination-Misiones'),
+          ),
+          matching: find.text('MISIONES'),
+        ),
+      );
       final Text journalLabel = tester.widget<Text>(
         find.descendant(
           of: find.byType(TerminalSidebar),
-          matching: find.text('Bitácora'),
+          matching: find.text('BITÁCORA'),
         ),
+      );
+      final Text profileName = tester.widget<Text>(
+        find.byKey(const ValueKey<String>('sidebar-profile-name')),
       );
       expect(missionsLabel.style?.color, tokens.terminalRed);
       expect(missionsLabel.style?.fontSize, 16);
       expect(journalLabel.style?.color, tokens.valueYellow);
+      expect(profileName.style?.color, tokens.valueYellow);
+      expect(find.text('PERFIL LOCAL'), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(TerminalSidebar),
+          matching: find.byIcon(Icons.edit_outlined),
+        ),
+        findsNothing,
+      );
+      expect(find.text('SALUD'), findsNothing);
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-health-icon')),
+        findsOneWidget,
+      );
+      expect(find.text('1/2'), findsOneWidget);
+      final LinearProgressIndicator healthProgress = tester
+          .widget<LinearProgressIndicator>(
+            find.byKey(const ValueKey<String>('sidebar-health-progress')),
+          );
+      expect(healthProgress.value, 0.5);
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-profile-missions-label')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-device-battery')),
+        findsOneWidget,
+      );
+      final FractionallySizedBox batteryFill = tester
+          .widget<FractionallySizedBox>(
+            find.byKey(const ValueKey<String>('sidebar-device-battery-fill')),
+          );
+      expect(batteryFill.heightFactor, 0.62);
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-mission-segments-overflow')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-global-level-panel')),
+        findsOneWidget,
+      );
+      expect(find.text('NIVEL GLOBAL'), findsOneWidget);
+      expect(find.text('07'), findsOneWidget);
+      expect(find.text('400 / 1300'), findsOneWidget);
+      final LinearProgressIndicator globalProgress = tester
+          .widget<LinearProgressIndicator>(
+            find.byKey(const ValueKey<String>('sidebar-global-level-progress')),
+          );
+      expect(globalProgress.value, closeTo(400 / 1300, 0.0001));
       final AnimatedContainer selectedDestination = tester
           .widget<AnimatedContainer>(
             find.byKey(const ValueKey<String>('sidebar-destination-Bitácora')),
@@ -171,7 +256,11 @@ void main() {
   });
 }
 
-Widget _testApp({required String initialLocation}) => ProviderScope(
+Widget _testApp({
+  required String initialLocation,
+  List<Mission> todayMissions = const <Mission>[],
+  int batteryLevel = 62,
+}) => ProviderScope(
   overrides: [
     accessSessionSeedProvider.overrideWithValue(
       const AccessSessionState.unlockedForTesting(),
@@ -188,21 +277,62 @@ Widget _testApp({required String initialLocation}) => ProviderScope(
       (ref) => Stream<AppPreferences>.value(AppPreferences.defaults),
     ),
     todayMissionsProvider.overrideWith(
-      (ref) => Stream<List<Mission>>.value(const <Mission>[]),
+      (ref) => Stream<List<Mission>>.value(todayMissions),
+    ),
+    deviceBatteryLevelProvider.overrideWith(
+      (ref) => Stream<int?>.value(batteryLevel),
     ),
     upcomingMissionsProvider.overrideWith(
       (ref) => Stream<List<Mission>>.value(const <Mission>[]),
     ),
-    missionAreasProvider.overrideWith((ref) async => const <MissionArea>[]),
+    missionAreasProvider.overrideWith(
+      (ref) async => const <MissionArea>[
+        MissionArea(
+          id: 'health',
+          name: 'Salud',
+          iconKey: 'favorite',
+          colorHex: '#22C55E',
+          isDefault: false,
+        ),
+      ],
+    ),
     activeTimerMissionProvider.overrideWith((ref) async => null),
     userProfileProvider.overrideWith(
       (ref) async => const UserProfile.localDefault(),
+    ),
+    overallProgressProvider.overrideWith(
+      (ref) async => OverallProgressViewData(
+        rpgLevel: RpgLevel.fromTotalXp(4000),
+        totalXp: 4000,
+        todayXp: 0,
+        weekXp: 0,
+        areaBreakdown: const <AreaProgressItem>[],
+      ),
     ),
     journalRepositoryProvider.overrideWithValue(
       const _SmokeJournalRepository(),
     ),
   ],
   child: const BitacoraApp(),
+);
+
+List<Mission> _sidebarMissions() => List<Mission>.generate(
+  7,
+  (int index) => Mission(
+    id: 'mission-$index',
+    areaId: index < 2 ? 'health' : 'other',
+    title: 'Misión $index',
+    type: MissionType.daily,
+    importance: MissionImportance.normal,
+    priority: MissionPriority.normal,
+    isRequired: false,
+    status: index == 0 || index == 2
+        ? MissionStatus.completed
+        : MissionStatus.scheduled,
+    xpPlanned: 25,
+    rowVersion: 1,
+  ),
+  growable: false,
 );
 
 void _setSurface(WidgetTester tester, Size size) {

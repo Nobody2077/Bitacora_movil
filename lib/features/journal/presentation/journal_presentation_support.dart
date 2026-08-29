@@ -4,15 +4,25 @@ import '../../../app/theme/terminal_foundations.dart';
 import '../domain/models/journal_entry.dart';
 
 String journalMoodLabel(JournalMood? value) => switch (value) {
+  JournalMood.happy => 'Feliz',
+  JournalMood.motivated => 'Motivado',
   JournalMood.focused => 'Enfocado',
-  JournalMood.normal => 'Normal',
+  JournalMood.calm => 'Tranquilo',
+  JournalMood.normal => 'Neutral',
+  JournalMood.anxious => 'Ansioso',
+  JournalMood.sad => 'Triste',
   JournalMood.tired => 'Cansado',
   null => 'Sin estado',
 };
 
 IconData journalMoodIcon(JournalMood? value) => switch (value) {
+  JournalMood.happy => Icons.sentiment_very_satisfied_outlined,
+  JournalMood.motivated => Icons.local_fire_department_outlined,
   JournalMood.focused => Icons.center_focus_strong,
+  JournalMood.calm => Icons.spa_outlined,
   JournalMood.normal => Icons.sentiment_satisfied_alt_outlined,
+  JournalMood.anxious => Icons.sentiment_dissatisfied_outlined,
+  JournalMood.sad => Icons.sentiment_very_dissatisfied_outlined,
   JournalMood.tired => Icons.battery_2_bar_outlined,
   null => Icons.remove_circle_outline,
 };

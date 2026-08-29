@@ -71,6 +71,23 @@ String missionDateLabel(DateTime? utc) {
   return '$day/$month/${local.year} · $hour:$minute';
 }
 
+String missionScheduleLabel(Mission mission) {
+  final DateTime? utc = mission.scheduledAtUtc;
+  if (utc == null) {
+    return 'Sin fecha';
+  }
+  final DateTime local = utc.toLocal();
+  final String day = local.day.toString().padLeft(2, '0');
+  final String month = local.month.toString().padLeft(2, '0');
+  final String date = '$day/$month/${local.year}';
+  if (mission.isDateOnly) {
+    return '$date · Sin hora';
+  }
+  final String hour = local.hour.toString().padLeft(2, '0');
+  final String minute = local.minute.toString().padLeft(2, '0');
+  return '$date · $hour:$minute';
+}
+
 String missionMoneyLabel(int minor) {
   final double value = minor / 100;
   return value == value.roundToDouble()

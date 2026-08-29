@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **28 de agosto de 2026** (G7 verde; A8 en progreso)
+- Última revisión: **29 de agosto de 2026** (incremento funcional sin APK; A8 en progreso)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -15,7 +15,8 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   27 de agosto de 2026. A5 está completada y G5 está verde.
 - ADR-005 retira A6 del MVP y deja G6 sin aplicación. No habrá exportación,
   restauración ni historial local de copias.
-- La infraestructura contiene el esquema completo v1 y DAOs adelantados para varias fases.
+- La infraestructura contiene el esquema v2, compatible mediante migración con
+  datos v1, y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
   compilación de la APK `prod-debug` el 27 de agosto de 2026.
@@ -47,6 +48,13 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   matriz a **202/202 pruebas** con análisis limpio. El APK `1.1.1+4` está
   firmado y verificado; el AAB `1.1.0+3` es anterior a estos ajustes visuales.
   Falta validación física G9.
+- Incremento local del **29 de agosto de 2026**: las misiones diarias creadas
+  desde el formulario generan recurrencia; la planificación admite sin fecha,
+  solo fecha o fecha y hora. La barra lateral usa batería real vertical y un
+  corazón rojo, sin el pie `BITÁCORA · V2`. Ajustes incorpora permisos locales
+  para capturas, título en notificaciones y cámara al adjuntar. Bitácora ofrece
+  ocho estados de ánimo y el esquema migra de v1 a v2 sin perder entradas. La
+  matriz está verde con 212 pruebas y análisis limpio. No se generó APK.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -161,7 +169,7 @@ Se detectaron y corrigieron dos incumplimientos de la jerarquía de color defini
 
 ### Persistencia
 
-- Esquema Drift v1 de 19 tablas.
+- Esquema Drift v2 de 19 tablas, con snapshot v1 preservado y migración probada.
 - 21 índices explícitos y 19 claves foráneas.
 - Seeds iniciales idempotentes.
 - DAOs para misiones, recurrencia, notificaciones, economía, Bitácora, progreso y ajustes.

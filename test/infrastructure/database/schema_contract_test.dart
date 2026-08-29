@@ -151,7 +151,7 @@ const Set<String> _expectedForeignKeys = <String>{
 };
 
 void main() {
-  group('schema v1 catalog', () {
+  group('schema v2 catalog', () {
     late AppDatabase database;
 
     setUp(() {
@@ -242,7 +242,7 @@ void main() {
         final userVersion = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(userVersion.read<int>('user_version'), 1);
+        expect(userVersion.read<int>('user_version'), 2);
 
         final metadataRows = await database.customSelect('''
         SELECT "key", value, updated_at
@@ -258,7 +258,7 @@ void main() {
         };
         expect(metadata, <String, ({String value, int updatedAt})>{
           'created_with': (value: '0.1.0+1', updatedAt: _seedTime),
-          'schema_version': (value: '1', updatedAt: _seedTime),
+          'schema_version': (value: '2', updatedAt: _seedTime),
           'seed_version': (value: '1', updatedAt: _seedTime),
         });
 
@@ -405,11 +405,11 @@ void main() {
     });
   });
 
-  test('reopening the same v1 database is idempotent', () async {
+  test('reopening the same v2 database is idempotent', () async {
     final Directory directory = await Directory.systemTemp.createTemp(
       'bitacora_g1_reopen_',
     );
-    final File file = File(p.join(directory.path, 'schema_v1.sqlite'));
+    final File file = File(p.join(directory.path, 'schema_v2.sqlite'));
     AppDatabase? first;
     AppDatabase? reopened;
 

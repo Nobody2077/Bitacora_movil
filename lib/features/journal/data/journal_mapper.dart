@@ -14,7 +14,7 @@ abstract final class JournalMapper {
     transactionId: value.transactionId,
     title: value.title,
     body: value.body,
-    mood: _mood(value.mood),
+    mood: _mood(value.moodDetail ?? value.mood),
     isPrivate: value.isPrivate == 1,
     occurredAtUtc: _utc(value.occurredAt),
     createdAtUtc: _utc(value.createdAt),
@@ -34,7 +34,8 @@ abstract final class JournalMapper {
         transactionId: Value<String?>(value.transactionId),
         title: value.title,
         body: Value<String?>(value.body),
-        mood: Value<String?>(_moodToDrift(value.mood)),
+        mood: Value<String?>(_legacyMoodToDrift(value.mood)),
+        moodDetail: Value<String?>(_moodToDrift(value.mood)),
         isPrivate: value.isPrivate ? 1 : 0,
         occurredAt: value.occurredAtUtc.millisecondsSinceEpoch,
         createdAt: value.createdAtUtc.millisecondsSinceEpoch,
@@ -45,7 +46,8 @@ abstract final class JournalMapper {
       drift.JournalEntriesCompanion(
         title: Value<String>(value.title),
         body: Value<String?>(value.body),
-        mood: Value<String?>(_moodToDrift(value.mood)),
+        mood: Value<String?>(_legacyMoodToDrift(value.mood)),
+        moodDetail: Value<String?>(_moodToDrift(value.mood)),
         isPrivate: Value<int>(value.isPrivate ? 1 : 0),
         occurredAt: Value<int>(value.occurredAtUtc.millisecondsSinceEpoch),
         updatedAt: Value<int>(value.updatedAtUtc.millisecondsSinceEpoch),
@@ -61,8 +63,13 @@ abstract final class JournalMapper {
 
   static JournalMood? _mood(String? value) => switch (value) {
     null => null,
+    'HAPPY' => JournalMood.happy,
+    'MOTIVATED' => JournalMood.motivated,
     'FOCUSED' => JournalMood.focused,
+    'CALM' => JournalMood.calm,
     'NORMAL' => JournalMood.normal,
+    'ANXIOUS' => JournalMood.anxious,
+    'SAD' => JournalMood.sad,
     'TIRED' => JournalMood.tired,
     _ => throw FormatException('Unknown persisted journal mood: $value'),
   };
@@ -76,8 +83,20 @@ abstract final class JournalMapper {
 
   static String? _moodToDrift(JournalMood? value) => switch (value) {
     null => null,
+    JournalMood.happy => 'HAPPY',
+    JournalMood.motivated => 'MOTIVATED',
+    JournalMood.focused => 'FOCUSED',
+    JournalMood.calm => 'CALM',
+    JournalMood.normal => 'NORMAL',
+    JournalMood.anxious => 'ANXIOUS',
+    JournalMood.sad => 'SAD',
+    JournalMood.tired => 'TIRED',
+  };
+
+  static String? _legacyMoodToDrift(JournalMood? value) => switch (value) {
     JournalMood.focused => 'FOCUSED',
     JournalMood.normal => 'NORMAL',
     JournalMood.tired => 'TIRED',
+    _ => null,
   };
 }
