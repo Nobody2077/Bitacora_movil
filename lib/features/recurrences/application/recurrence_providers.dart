@@ -48,6 +48,20 @@ final StreamProvider<List<RecurrenceTemplate>> activeTemplatesProvider =
           );
     });
 
+/// Misiones diarias que pueden tomarse manualmente desde el tablón.
+final StreamProvider<List<MissionBoardEntry>> missionBoardProvider =
+    StreamProvider<List<MissionBoardEntry>>((Ref ref) {
+      return ref
+          .watch(recurrenceApplicationServiceProvider)
+          .watchMissionBoard()
+          .map(
+            (result) => result.fold(
+              onSuccess: (entries) => entries,
+              onFailure: (failure) => throw failure,
+            ),
+          );
+    });
+
 /// Detalle de una plantilla por id.
 FutureProvider<RecurrenceTemplate?> templateDetailProvider(String templateId) =>
     FutureProvider<RecurrenceTemplate?>((Ref ref) async {

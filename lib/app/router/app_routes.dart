@@ -6,6 +6,7 @@ abstract final class AppRoutes {
   static const String home = '/home';
   static const String more = '/more';
   static const String missionsToday = '/missions/today';
+  static const String missionsBoard = '/missions/board';
   static const String journal = '/journal';
   static const String finance = '/finance';
   static const String dashboardDaily = '/dashboard/daily';
@@ -17,7 +18,7 @@ abstract final class AppRoutes {
       '/settings/privacy/biometrics';
   static const String settingsNotifications = '/settings/notifications';
 
-  /// El mapa definitivo contiene 58 identificadores NAV y 60 patrones URI.
+  /// El mapa definitivo contiene 59 identificadores NAV y 61 patrones URI.
   /// `/more` es el único contenedor de navegación, no una superficie funcional.
   static const List<AppRouteContract> all = <AppRouteContract>[
     AppRouteContract(
@@ -52,6 +53,12 @@ abstract final class AppRoutes {
       area: AppArea.missions,
     ),
     AppRouteContract(
+      name: 'missionsBoard',
+      path: missionsBoard,
+      title: 'Tablón de misiones',
+      area: AppArea.missions,
+    ),
+    AppRouteContract(
       name: 'missionsUpcoming',
       path: '/missions/upcoming',
       title: 'Próximas misiones',
@@ -81,7 +88,7 @@ abstract final class AppRoutes {
       path: '/missions/new',
       title: 'Crear misión',
       area: AppArea.missions,
-      queryParameters: <String>{'origin', 'date'},
+      queryParameters: <String>{'origin', 'date', 'board'},
     ),
     AppRouteContract(
       name: 'missionTemplateNew',

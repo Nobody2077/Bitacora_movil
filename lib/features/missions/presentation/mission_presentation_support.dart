@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/application/commands/complete_mission.dart';
+import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/app_ui_preferences.dart';
 import '../domain/models/mission.dart';
 
@@ -130,3 +132,90 @@ String completionMovementTypeLabel(CompletionMovementType value) =>
       CompletionMovementType.expense => 'Gasto',
       CompletionMovementType.income => 'Ingreso',
     };
+
+enum MissionSection { today, board, upcoming, all, calendar }
+
+class MissionSectionNavigation extends StatelessWidget {
+  const MissionSectionNavigation({required this.selected, super.key});
+
+  final MissionSection selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Semantics(
+      label: 'Secciones de misiones',
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: <Widget>[
+            for (final section in MissionSection.values) ...<Widget>[
+              _MissionSectionButton(
+                section: section,
+                selected: section == selected,
+                selectedColor: section == MissionSection.board
+                    ? tokens.infoCyan
+                    : tokens.valueYellow,
+              ),
+              if (section != MissionSection.values.last)
+                const SizedBox(width: 8),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MissionSectionButton extends StatelessWidget {
+  const _MissionSectionButton({
+    required this.section,
+    required this.selected,
+    required this.selectedColor,
+  });
+
+  final MissionSection section;
+  final bool selected;
+  final Color selectedColor;
+
+  @override
+  Widget build(BuildContext context) => OutlinedButton.icon(
+    onPressed: selected ? null : () => context.goNamed(_routeName(section)),
+    icon: Icon(_sectionIcon(section), size: 18),
+    label: Text(_sectionLabel(section)),
+    style: OutlinedButton.styleFrom(
+      minimumSize: const Size(0, 48),
+      foregroundColor: selected ? Colors.black : Colors.white70,
+      backgroundColor: selected ? selectedColor : Colors.transparent,
+      disabledForegroundColor: Colors.black,
+      disabledBackgroundColor: selectedColor,
+      side: BorderSide(color: selected ? selectedColor : Colors.white24),
+    ),
+  );
+
+  static String _routeName(MissionSection value) => switch (value) {
+    MissionSection.today => 'missionsToday',
+    MissionSection.board => 'missionsBoard',
+    MissionSection.upcoming => 'missionsUpcoming',
+    MissionSection.all => 'missionsAll',
+    MissionSection.calendar => 'missionsCalendar',
+  };
+
+  static String _sectionLabel(MissionSection value) => switch (value) {
+    MissionSection.today => 'Hoy',
+    MissionSection.board => 'Tablón',
+    MissionSection.upcoming => 'Próximas',
+    MissionSection.all => 'Todas',
+    MissionSection.calendar => 'Calendario',
+  };
+
+  static IconData _sectionIcon(MissionSection value) => switch (value) {
+    MissionSection.today => Icons.today_outlined,
+    MissionSection.board => Icons.dashboard_customize_outlined,
+    MissionSection.upcoming => Icons.event_outlined,
+    MissionSection.all => Icons.list_alt_outlined,
+    MissionSection.calendar => Icons.calendar_month_outlined,
+  };
+}

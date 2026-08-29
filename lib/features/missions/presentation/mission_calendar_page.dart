@@ -87,6 +87,10 @@ class _MissionCalendarPageState extends ConsumerState<MissionCalendarPage> {
                     onCreate: _createMission,
                   ),
                   const SizedBox(height: TerminalSpace.sm),
+                  const MissionSectionNavigation(
+                    selected: MissionSection.calendar,
+                  ),
+                  const SizedBox(height: TerminalSpace.sm),
                   _CalendarViewSelector(
                     value: _view,
                     onChanged: (MissionCalendarViewMode value) =>

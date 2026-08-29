@@ -15,6 +15,20 @@ final class MissionTemplateBundle {
   final RecurrenceRule? rule;
 }
 
+final class MissionBoardLink {
+  const MissionBoardLink({
+    required this.templateId,
+    this.missionId,
+    this.scheduledAt,
+    this.status,
+  });
+
+  final String templateId;
+  final String? missionId;
+  final int? scheduledAt;
+  final String? status;
+}
+
 final class RecurrenceDao {
   RecurrenceDao(this._database);
 
@@ -38,6 +52,16 @@ final class RecurrenceDao {
 
   Future<MissionTemplateBundle?> findTemplateBundle(String templateId) {
     return _database.transaction(() => _findTemplateBundle(templateId));
+  }
+
+  Future<bool> templateHasMissions(String templateId) async {
+    final count = _database.missions.id.count();
+    final row =
+        await (_database.selectOnly(_database.missions)
+              ..addColumns(<Expression<Object>>[count])
+              ..where(_database.missions.templateId.equals(templateId)))
+            .getSingle();
+    return (row.read(count) ?? 0) > 0;
   }
 
   Future<MissionTemplateBundle?> _findTemplateBundle(String templateId) async {
@@ -65,6 +89,39 @@ final class RecurrenceDao {
       rule: rule,
     );
   }
+
+  Stream<List<MissionBoardLink>> watchBoardLinks() => _database
+      .customSelect(
+        '''
+          SELECT
+            mt.id AS template_id,
+            m.id AS mission_id,
+            m.scheduled_at AS scheduled_at,
+            m.status AS mission_status
+          FROM mission_templates AS mt
+          LEFT JOIN missions AS m ON m.template_id = mt.id
+          WHERE mt.is_active = 1
+            AND mt.availability_mode = 'BOARD'
+          ORDER BY mt.title COLLATE NOCASE, mt.id, m.scheduled_at DESC
+        ''',
+        readsFrom: <ResultSetImplementation<dynamic, dynamic>>{
+          _database.missionTemplates,
+          _database.missions,
+        },
+      )
+      .watch()
+      .map(
+        (rows) => rows
+            .map(
+              (row) => MissionBoardLink(
+                templateId: row.read<String>('template_id'),
+                missionId: row.readNullable<String>('mission_id'),
+                scheduledAt: row.readNullable<int>('scheduled_at'),
+                status: row.readNullable<String>('mission_status'),
+              ),
+            )
+            .toList(growable: false),
+      );
 
   Future<MissionTemplateBundle> insertTemplateAggregate({
     required MissionTemplatesCompanion template,
@@ -300,6 +357,76 @@ final class RecurrenceDao {
         }
       }
       return result;
+    });
+  }
+
+  Future<DaoWriteResult<Mission>> takeBoardMissionAtomically({
+    required MissionsCompanion occurrence,
+    required int createdAtUtcMs,
+    required String Function() objectiveIdFactory,
+    required MissionEventsCompanion createdEvent,
+  }) {
+    _validateOccurrence(occurrence);
+    final String missionId = occurrence.id.value;
+    final String templateId = occurrence.templateId.value!;
+    final int scheduledAt = occurrence.scheduledAt.value!;
+    if (occurrence.status.value != 'AVAILABLE' ||
+        !createdEvent.id.present ||
+        createdEvent.missionId.value != missionId ||
+        createdEvent.eventType.value != 'CREATED' ||
+        createdEvent.toStatus.value != 'AVAILABLE') {
+      throw ArgumentError('Invalid board occurrence aggregate.');
+    }
+
+    return _database.transaction(() async {
+      final MissionTemplate? template = await (_database.select(
+        _database.missionTemplates,
+      )..where((table) => table.id.equals(templateId))).getSingleOrNull();
+      if (template == null ||
+          template.isActive != 1 ||
+          template.availabilityMode != 'BOARD') {
+        throw RecordNotFoundException(
+          table: 'mission_templates',
+          key: templateId,
+        );
+      }
+
+      final Mission? existing =
+          await (_database.select(_database.missions)..where(
+                (table) =>
+                    table.templateId.equals(templateId) &
+                    table.scheduledAt.equals(scheduledAt),
+              ))
+              .getSingleOrNull();
+      if (existing != null) {
+        return DaoWriteResult<Mission>(value: existing, created: false);
+      }
+
+      final Mission inserted = await _database
+          .into(_database.missions)
+          .insertReturning(occurrence);
+      final objectives =
+          await (_database.select(_database.missionTemplateObjectives)
+                ..where((table) => table.templateId.equals(templateId))
+                ..orderBy(<OrderingTerm Function(MissionTemplateObjectives)>[
+                  (table) => OrderingTerm.asc(table.position),
+                ]))
+              .get();
+      for (final MissionTemplateObjective objective in objectives) {
+        await _database
+            .into(_database.missionObjectives)
+            .insert(
+              MissionObjectivesCompanion.insert(
+                id: objectiveIdFactory(),
+                missionId: missionId,
+                description: objective.description,
+                position: objective.position,
+                createdAt: createdAtUtcMs,
+              ),
+            );
+      }
+      await _database.into(_database.missionEvents).insert(createdEvent);
+      return DaoWriteResult<Mission>(value: inserted, created: true);
     });
   }
 

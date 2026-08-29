@@ -15,7 +15,8 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
 | A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
-| A9 — Calendario y recordatorios | **EN VALIDACIÓN** | Código y 212 pruebas verdes; G9 físico pendiente |
+| A9 — Calendario y recordatorios | **EN VALIDACIÓN** | Código y 215 pruebas verdes; G9 físico pendiente |
+| A10 — Tablón de misiones | **EN VALIDACIÓN** | Diarias seleccionables, esquema v3, 219 pruebas y APK `1.2.0+5`; recorrido físico pendiente |
 
 ## Evidencia G3 — A3 completada
 
@@ -263,8 +264,9 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 
 ## Evidencia parcial A9 — calendario y recordatorios
 
-- Candidata instalada `1.1.1+4`; el código actual usa esquema v2 con migración
-  compatible desde v1. No se ensambló una APK con este incremento.
+- Candidata instalada `1.1.1+4`; el checkpoint A9 usaba esquema v2 con
+  migración compatible desde v1. La candidata posterior `1.2.0+5` incorpora
+  esquema v3 y el tablón de misiones.
 - Calendario reactivo con vistas Día, Semana y Mes y rangos civiles locales.
 - Crear desde el calendario precarga la fecha elegida y vuelve al mismo día.
 - Ajustes > Notificaciones ya es funcional: activación, sonido, anticipación de
@@ -278,7 +280,7 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 - Bitácora ofrece ocho estados de ánimo y conserva los valores anteriores
   mediante la migración v1→v2.
 - Preferencias nuevas persistidas en `schema_metadata` dentro de la base cifrada.
-- `flutter analyze`: cero problemas; `flutter test`: **212/212 aprobadas** tras
+- `flutter analyze`: cero problemas; `flutter test`: **215/215 aprobadas** tras
   la extensión funcional del 29 de agosto.
 - APK `1.1.0+3`: 71.986.819 bytes, firma v2 válida con el certificado de
   producción, sin `INTERNET`, SHA-256

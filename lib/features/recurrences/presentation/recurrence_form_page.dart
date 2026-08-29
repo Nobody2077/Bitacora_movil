@@ -44,6 +44,8 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
   RecurrenceTemplate? _existing;
   String? _areaId;
   MissionType _type = MissionType.recurring;
+  TemplateAvailabilityMode _availabilityMode =
+      TemplateAvailabilityMode.automatic;
   MissionImportance _importance = MissionImportance.normal;
   MissionPriority _priority = MissionPriority.normal;
   MissionDifficulty? _difficulty;
@@ -129,7 +131,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                           : 'Nueva plantilla recurrente',
                       subtitle: widget.isEditing
                           ? 'Actualiza la configuración de recurrencia'
-                          : 'Define la misión que se repetirá automáticamente',
+                          : 'Define si se genera sola o se ofrece en el tablón',
                     ),
                     const SizedBox(height: 22),
                     if (compact) ...<Widget>[
@@ -139,12 +141,14 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                         areas: availableAreas,
                         areaId: _areaId,
                         type: _type,
+                        availabilityMode: _availabilityMode,
                         importance: _importance,
                         priority: _priority,
                         difficulty: _difficulty,
                         isRequired: _isRequired,
                         onAreaChanged: (v) => setState(() => _areaId = v),
-                        onTypeChanged: (v) => setState(() => _type = v),
+                        onTypeChanged: _changeType,
+                        onAvailabilityChanged: _changeAvailabilityMode,
                         onImportanceChanged: (v) {
                           setState(() {
                             _importance = v;
@@ -161,6 +165,8 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                       ),
                       const SizedBox(height: 18),
                       _RecurrencePanel(
+                        boardMode:
+                            _availabilityMode == TemplateAvailabilityMode.board,
                         frequency: _frequency,
                         intervalController: _intervalController,
                         weekdaysMask: _weekdaysMask,
@@ -192,12 +198,14 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                               areas: availableAreas,
                               areaId: _areaId,
                               type: _type,
+                              availabilityMode: _availabilityMode,
                               importance: _importance,
                               priority: _priority,
                               difficulty: _difficulty,
                               isRequired: _isRequired,
                               onAreaChanged: (v) => setState(() => _areaId = v),
-                              onTypeChanged: (v) => setState(() => _type = v),
+                              onTypeChanged: _changeType,
+                              onAvailabilityChanged: _changeAvailabilityMode,
                               onImportanceChanged: (v) {
                                 setState(() {
                                   _importance = v;
@@ -220,6 +228,9 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                           Expanded(
                             flex: 2,
                             child: _RecurrencePanel(
+                              boardMode:
+                                  _availabilityMode ==
+                                  TemplateAvailabilityMode.board,
                               frequency: _frequency,
                               intervalController: _intervalController,
                               weekdaysMask: _weekdaysMask,
@@ -286,6 +297,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
           ? ''
           : missionMoneyLabel(existing.budgetMinor!);
       _type = existing.missionType;
+      _availabilityMode = existing.availabilityMode;
       _importance = existing.importance;
       _priority = existing.priority;
       _difficulty = existing.difficulty;
@@ -325,6 +337,27 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
       if (a.isDefault) return a;
     }
     return null;
+  }
+
+  void _changeType(MissionType value) {
+    setState(() {
+      _type = value;
+      if (value != MissionType.daily) {
+        _availabilityMode = TemplateAvailabilityMode.automatic;
+      }
+    });
+  }
+
+  void _changeAvailabilityMode(TemplateAvailabilityMode value) {
+    setState(() {
+      _availabilityMode = value;
+      if (value == TemplateAvailabilityMode.board) {
+        _type = MissionType.daily;
+        _frequency = RecurrenceFrequency.daily;
+        _intervalController.text = '1';
+        _localTime = null;
+      }
+    });
   }
 
   void _addObjective() {
@@ -389,11 +422,14 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
       return;
     }
 
-    final int interval = int.parse(_intervalController.text.trim());
+    final bool boardMode = _availabilityMode == TemplateAvailabilityMode.board;
+    final int interval = boardMode
+        ? 1
+        : int.parse(_intervalController.text.trim());
     final int xp = int.parse(_xpController.text.trim());
     final int? duration = _optionalInt(_durationController.text);
     final int? budgetMinor = _optionalMoneyMinor(_budgetController.text);
-    final int? localTimeMinutes = _localTime == null
+    final int? localTimeMinutes = boardMode || _localTime == null
         ? null
         : _localTime!.hour * 60 + _localTime!.minute;
 
@@ -424,6 +460,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
             title: _titleController.text,
             description: _descriptionController.text,
             missionType: _type,
+            availabilityMode: _availabilityMode,
             importance: _importance,
             priority: _priority,
             difficulty: _difficulty,
@@ -431,9 +468,10 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
             xpReward: xp,
             estimatedMinutes: duration,
             budgetMinor: budgetMinor,
-            frequency: _frequency,
+            frequency: boardMode ? RecurrenceFrequency.daily : _frequency,
             intervalValue: interval,
-            weekdaysMask: _frequency == RecurrenceFrequency.specificDays
+            weekdaysMask:
+                !boardMode && _frequency == RecurrenceFrequency.specificDays
                 ? _weekdaysMask
                 : null,
             localTimeMinutes: localTimeMinutes,
@@ -467,7 +505,12 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
         );
         ref.invalidate(allTemplatesProvider);
         ref.invalidate(activeTemplatesProvider);
-        context.goNamed('missionsRecurring');
+        ref.invalidate(missionBoardProvider);
+        context.goNamed(
+          template.availabilityMode == TemplateAvailabilityMode.board
+              ? 'missionsBoard'
+              : 'missionsRecurring',
+        );
       },
       onFailure: (AppFailure failure) {
         ScaffoldMessenger.of(
@@ -521,11 +564,13 @@ class _InfoPanel extends StatelessWidget {
     required this.areas,
     required this.areaId,
     required this.type,
+    required this.availabilityMode,
     required this.importance,
     required this.priority,
     required this.isRequired,
     required this.onAreaChanged,
     required this.onTypeChanged,
+    required this.onAvailabilityChanged,
     required this.onImportanceChanged,
     required this.onPriorityChanged,
     required this.onRequiredChanged,
@@ -538,12 +583,14 @@ class _InfoPanel extends StatelessWidget {
   final List<MissionArea> areas;
   final String? areaId;
   final MissionType type;
+  final TemplateAvailabilityMode availabilityMode;
   final MissionImportance importance;
   final MissionPriority priority;
   final MissionDifficulty? difficulty;
   final bool isRequired;
   final ValueChanged<String?> onAreaChanged;
   final ValueChanged<MissionType> onTypeChanged;
+  final ValueChanged<TemplateAvailabilityMode> onAvailabilityChanged;
   final ValueChanged<MissionImportance> onImportanceChanged;
   final ValueChanged<MissionPriority> onPriorityChanged;
   final ValueChanged<MissionDifficulty?>? onDifficultyChanged;
@@ -635,6 +682,28 @@ class _InfoPanel extends StatelessWidget {
               if (v != null) onTypeChanged(v);
             },
           ),
+          if (type == MissionType.daily) ...<Widget>[
+            const SizedBox(height: 12),
+            DropdownButtonFormField<TemplateAvailabilityMode>(
+              initialValue: availabilityMode,
+              decoration: const InputDecoration(
+                labelText: 'Disponibilidad diaria',
+              ),
+              items: const <DropdownMenuItem<TemplateAvailabilityMode>>[
+                DropdownMenuItem<TemplateAvailabilityMode>(
+                  value: TemplateAvailabilityMode.automatic,
+                  child: Text('Crear automáticamente'),
+                ),
+                DropdownMenuItem<TemplateAvailabilityMode>(
+                  value: TemplateAvailabilityMode.board,
+                  child: Text('Ofrecer en el tablón'),
+                ),
+              ],
+              onChanged: (v) {
+                if (v != null) onAvailabilityChanged(v);
+              },
+            ),
+          ],
           const SizedBox(height: 8),
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
@@ -650,6 +719,7 @@ class _InfoPanel extends StatelessWidget {
 
 class _RecurrencePanel extends StatelessWidget {
   const _RecurrencePanel({
+    required this.boardMode,
     required this.frequency,
     required this.intervalController,
     required this.weekdaysMask,
@@ -668,6 +738,7 @@ class _RecurrencePanel extends StatelessWidget {
     this.endDate,
   });
 
+  final bool boardMode;
   final RecurrenceFrequency frequency;
   final TextEditingController intervalController;
   final int weekdaysMask;
@@ -706,58 +777,66 @@ class _RecurrencePanel extends StatelessWidget {
         children: <Widget>[
           _PanelTitle(label: 'Recurrencia', icon: Icons.repeat),
           const SizedBox(height: 16),
-          DropdownButtonFormField<RecurrenceFrequency>(
-            initialValue: frequency,
-            decoration: const InputDecoration(labelText: 'Frecuencia'),
-            items: <DropdownMenuItem<RecurrenceFrequency>>[
-              for (final v in RecurrenceFrequency.values)
-                DropdownMenuItem<RecurrenceFrequency>(
-                  value: v,
-                  child: Text(_frequencyLabel(v)),
-                ),
-            ],
-            onChanged: (v) {
-              if (v != null) onFrequencyChanged(v);
-            },
-          ),
-          const SizedBox(height: 12),
-          if (frequency != RecurrenceFrequency.specificDays) ...<Widget>[
-            TextFormField(
-              controller: intervalController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Cada cuántos ${_intervalUnit(frequency)}',
-              ),
-              validator: (v) {
-                final int? n = int.tryParse(v?.trim() ?? '');
-                return n == null || n < 1 ? 'Debe ser al menos 1.' : null;
+          if (boardMode) ...<Widget>[
+            Text(
+              'Disponible todos los días para tomarla, sin hora fija. Solo se crea una misión cuando la eliges.',
+              style: TextStyle(color: tokens.infoCyan),
+            ),
+            const SizedBox(height: 16),
+          ] else ...<Widget>[
+            DropdownButtonFormField<RecurrenceFrequency>(
+              initialValue: frequency,
+              decoration: const InputDecoration(labelText: 'Frecuencia'),
+              items: <DropdownMenuItem<RecurrenceFrequency>>[
+                for (final v in RecurrenceFrequency.values)
+                  DropdownMenuItem<RecurrenceFrequency>(
+                    value: v,
+                    child: Text(_frequencyLabel(v)),
+                  ),
+              ],
+              onChanged: (v) {
+                if (v != null) onFrequencyChanged(v);
               },
             ),
             const SizedBox(height: 12),
-          ],
-          if (frequency == RecurrenceFrequency.specificDays) ...<Widget>[
-            Text(
-              'DÍAS DE LA SEMANA',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: tokens.infoCyan,
-                letterSpacing: 1,
+            if (frequency != RecurrenceFrequency.specificDays) ...<Widget>[
+              TextFormField(
+                controller: intervalController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Cada cuántos ${_intervalUnit(frequency)}',
+                ),
+                validator: (v) {
+                  final int? n = int.tryParse(v?.trim() ?? '');
+                  return n == null || n < 1 ? 'Debe ser al menos 1.' : null;
+                },
               ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              children: <Widget>[
-                for (final day in _weekdays)
-                  _DayToggle(
-                    label: day.label,
-                    selected: (weekdaysMask & (1 << day.bit)) != 0,
-                    onToggle: () {
-                      onWeekdayMaskChanged(weekdaysMask ^ (1 << day.bit));
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
+            ],
+            if (frequency == RecurrenceFrequency.specificDays) ...<Widget>[
+              Text(
+                'DÍAS DE LA SEMANA',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: tokens.infoCyan,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                children: <Widget>[
+                  for (final day in _weekdays)
+                    _DayToggle(
+                      label: day.label,
+                      selected: (weekdaysMask & (1 << day.bit)) != 0,
+                      onToggle: () {
+                        onWeekdayMaskChanged(weekdaysMask ^ (1 << day.bit));
+                      },
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
           ],
           // Fecha de inicio
           OutlinedButton.icon(
@@ -793,7 +872,7 @@ class _RecurrencePanel extends StatelessWidget {
             ),
           const SizedBox(height: 10),
           // Hora local (opcional)
-          if (localTime != null) ...<Widget>[
+          if (!boardMode && localTime != null) ...<Widget>[
             Row(
               children: <Widget>[
                 Expanded(
@@ -811,7 +890,7 @@ class _RecurrencePanel extends StatelessWidget {
                 ),
               ],
             ),
-          ] else
+          ] else if (!boardMode)
             TextButton.icon(
               onPressed: onPickTime,
               icon: const Icon(Icons.schedule),

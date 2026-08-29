@@ -3,6 +3,10 @@ import '../../../missions/domain/models/mission.dart';
 /// Frecuencia de repetición de una plantilla recurrente.
 enum RecurrenceFrequency { daily, weekly, specificDays, everyNDays }
 
+/// Determina si una plantilla crea ocurrencias automáticamente o espera a que
+/// el usuario la tome desde el tablón diario.
+enum TemplateAvailabilityMode { automatic, board }
+
 /// Objetivo por defecto de la plantilla, copiado a cada ocurrencia generada.
 final class RecurrenceObjective {
   const RecurrenceObjective({
@@ -92,6 +96,7 @@ final class RecurrenceTemplate {
     required this.priority,
     required this.isRequired,
     required this.xpReward,
+    required this.availabilityMode,
     required this.isActive,
     required this.objectives,
     this.description,
@@ -113,6 +118,7 @@ final class RecurrenceTemplate {
   final int xpReward;
   final int? estimatedMinutes;
   final int? budgetMinor;
+  final TemplateAvailabilityMode availabilityMode;
 
   /// `true` mientras la plantilla genera nuevas ocurrencias.
   final bool isActive;
@@ -134,6 +140,7 @@ final class RecurrenceTemplate {
     int? xpReward,
     int? estimatedMinutes,
     int? budgetMinor,
+    TemplateAvailabilityMode? availabilityMode,
     bool? isActive,
     List<RecurrenceObjective>? objectives,
     RecurrenceRule? rule,
@@ -150,8 +157,32 @@ final class RecurrenceTemplate {
     xpReward: xpReward ?? this.xpReward,
     estimatedMinutes: estimatedMinutes,
     budgetMinor: budgetMinor,
+    availabilityMode: availabilityMode ?? this.availabilityMode,
     isActive: isActive ?? this.isActive,
     objectives: objectives ?? this.objectives,
     rule: rule ?? this.rule,
   );
+}
+
+/// Elemento visible en el tablón para el día civil actual.
+final class MissionBoardEntry {
+  const MissionBoardEntry({
+    required this.template,
+    this.missionId,
+    this.missionStatus,
+  });
+
+  final RecurrenceTemplate template;
+  final String? missionId;
+  final MissionStatus? missionStatus;
+
+  bool get isTakenToday => missionId != null;
+}
+
+/// Resultado idempotente de tomar una misión del tablón.
+final class MissionBoardTake {
+  const MissionBoardTake({required this.missionId, required this.created});
+
+  final String missionId;
+  final bool created;
 }

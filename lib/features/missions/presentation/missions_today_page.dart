@@ -66,7 +66,10 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
                 children: <Widget>[
                   _MissionHeader(
                     onCreate: () => context.pushNamed('missionNew'),
-                    onCalendar: () => context.pushNamed('missionsCalendar'),
+                  ),
+                  const SizedBox(height: TerminalSpace.md),
+                  const MissionSectionNavigation(
+                    selected: MissionSection.today,
                   ),
                   const SizedBox(height: TerminalSpace.md),
                   _MissionControls(
@@ -146,10 +149,9 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
 enum _MissionFilter { all, today, active, completed }
 
 class _MissionHeader extends StatelessWidget {
-  const _MissionHeader({required this.onCreate, required this.onCalendar});
+  const _MissionHeader({required this.onCreate});
 
   final VoidCallback onCreate;
-  final VoidCallback onCalendar;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -162,11 +164,6 @@ class _MissionHeader extends StatelessWidget {
         spacing: TerminalSpace.xs,
         runSpacing: TerminalSpace.xs,
         children: <Widget>[
-          TerminalOutlineButton(
-            label: 'Calendario',
-            icon: Icons.calendar_month_outlined,
-            onPressed: onCalendar,
-          ),
           TerminalPrimaryButton(
             label: 'Nueva misión',
             icon: Icons.add_box_outlined,

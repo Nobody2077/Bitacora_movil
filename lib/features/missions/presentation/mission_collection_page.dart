@@ -43,30 +43,19 @@ class MissionCollectionPage extends ConsumerWidget {
                 children: <Widget>[
                   TerminalPageHeader(title: title, subtitle: subtitle),
                   const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: <Widget>[
-                      TerminalOutlineButton(
-                        label: 'Misiones de hoy',
-                        icon: Icons.today_outlined,
-                        onPressed: () => context.goNamed('missionsToday'),
-                      ),
-                      TerminalOutlineButton(
-                        label: _isUpcoming ? 'Todas' : 'Próximas',
-                        icon: _isUpcoming
-                            ? Icons.list_alt_outlined
-                            : Icons.event_outlined,
-                        onPressed: () => context.goNamed(
-                          _isUpcoming ? 'missionsAll' : 'missionsUpcoming',
-                        ),
-                      ),
-                      TerminalPrimaryButton(
-                        label: 'Nueva misión',
-                        icon: Icons.add,
-                        onPressed: () => context.pushNamed('missionNew'),
-                      ),
-                    ],
+                  MissionSectionNavigation(
+                    selected: _isUpcoming
+                        ? MissionSection.upcoming
+                        : MissionSection.all,
+                  ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TerminalPrimaryButton(
+                      label: 'Nueva misión',
+                      icon: Icons.add,
+                      onPressed: () => context.pushNamed('missionNew'),
+                    ),
                   ),
                   const SizedBox(height: 22),
                   _CollectionSummary(missions: missions),

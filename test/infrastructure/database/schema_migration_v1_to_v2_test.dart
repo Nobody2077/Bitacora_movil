@@ -14,12 +14,10 @@ import 'package:sqlite3/sqlite3.dart';
 const int _nowMs = 1788000000000;
 
 void main() {
-  test(
-    'migra v1 a v2, conserva el ánimo anterior y acepta los nuevos',
-    () async {
-      final Database rawDatabase = sqlite3.openInMemory();
-      _createSchemaV1(rawDatabase);
-      rawDatabase.execute('''
+  test('migra v1 a v3, conserva el ánimo y añade el modo del tablón', () async {
+    final Database rawDatabase = sqlite3.openInMemory();
+    _createSchemaV1(rawDatabase);
+    rawDatabase.execute('''
       INSERT INTO journal_entries (
         id, origin_type, title, mood, is_private,
         occurred_at, created_at, updated_at
@@ -29,55 +27,61 @@ void main() {
       )
     ''');
 
-      final AppDatabase database = AppDatabase(
-        NativeDatabase.opened(rawDatabase),
-        utcNowMilliseconds: () => _nowMs,
-      );
-      addTearDown(database.close);
-      final DriftJournalRepository repository = DriftJournalRepository(
-        JournalDao(database),
-      );
+    final AppDatabase database = AppDatabase(
+      NativeDatabase.opened(rawDatabase),
+      utcNowMilliseconds: () => _nowMs,
+    );
+    addTearDown(database.close);
+    final DriftJournalRepository repository = DriftJournalRepository(
+      JournalDao(database),
+    );
 
-      final domain.JournalEntry? legacy = _success(
-        await repository.findById('legacy-entry'),
-      );
-      expect(database.schemaVersion, 2);
-      expect(legacy?.mood, domain.JournalMood.focused);
+    final domain.JournalEntry? legacy = _success(
+      await repository.findById('legacy-entry'),
+    );
+    expect(database.schemaVersion, 3);
+    expect(legacy?.mood, domain.JournalMood.focused);
 
-      final domain.JournalEntry happy = domain.JournalEntry(
-        id: 'happy-entry',
-        origin: domain.JournalOrigin.manual,
-        title: 'Un gran día',
-        mood: domain.JournalMood.happy,
-        isPrivate: true,
-        occurredAtUtc: DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
-        createdAtUtc: DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
-        updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
-        attachmentCount: 0,
-      );
-      _success(await repository.create(happy));
-      expect(
-        _success(await repository.findById(happy.id))?.mood,
-        domain.JournalMood.happy,
-      );
+    final domain.JournalEntry happy = domain.JournalEntry(
+      id: 'happy-entry',
+      origin: domain.JournalOrigin.manual,
+      title: 'Un gran día',
+      mood: domain.JournalMood.happy,
+      isPrivate: true,
+      occurredAtUtc: DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
+      createdAtUtc: DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
+      updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
+      attachmentCount: 0,
+    );
+    _success(await repository.create(happy));
+    expect(
+      _success(await repository.findById(happy.id))?.mood,
+      domain.JournalMood.happy,
+    );
 
-      final row = await database.customSelect('''
+    final row = await database.customSelect('''
       SELECT mood, mood_detail
       FROM journal_entries
       WHERE id = 'happy-entry'
     ''').getSingle();
-      expect(row.readNullable<String>('mood'), isNull);
-      expect(row.read<String>('mood_detail'), 'HAPPY');
-      expect(
-        await database.customSelect('PRAGMA foreign_key_check').get(),
-        isEmpty,
-      );
-      final schemaMirror = await database.customSelect('''
+    expect(row.readNullable<String>('mood'), isNull);
+    expect(row.read<String>('mood_detail'), 'HAPPY');
+    final templateColumns = await database
+        .customSelect('PRAGMA table_info(mission_templates)')
+        .get();
+    expect(
+      templateColumns.map((column) => column.read<String>('name')),
+      contains('availability_mode'),
+    );
+    expect(
+      await database.customSelect('PRAGMA foreign_key_check').get(),
+      isEmpty,
+    );
+    final schemaMirror = await database.customSelect('''
       SELECT value FROM schema_metadata WHERE "key" = 'schema_version'
     ''').getSingle();
-      expect(schemaMirror.read<String>('value'), '2');
-    },
-  );
+    expect(schemaMirror.read<String>('value'), '3');
+  });
 }
 
 void _createSchemaV1(Database database) {

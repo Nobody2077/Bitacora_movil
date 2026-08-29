@@ -27,7 +27,7 @@ de Bitácora; la migración v1→v2 conserva los datos de instalaciones anterior
 ## Evidencia automatizada
 
 - `flutter analyze`: cero problemas.
-- `flutter test`: 212/212 pruebas aprobadas tras la extensión del 29 de agosto,
+- `flutter test`: 215/215 pruebas aprobadas tras la extensión del 29 de agosto,
   incluida la matriz táctil, su
   transición terminal y la verificación del fondo negro puro.
 - `lintProdRelease`: aprobado sin errores.

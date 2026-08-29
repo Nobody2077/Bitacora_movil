@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 const int _now = 1787521320000;
 
 void main() {
-  group('schema v2 constraints', () {
+  group('schema v3 constraints', () {
     late AppDatabase database;
 
     setUp(() {

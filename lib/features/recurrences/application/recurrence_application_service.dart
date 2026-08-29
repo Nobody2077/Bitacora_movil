@@ -43,6 +43,7 @@ final class SaveTemplateRequest {
     this.weekdaysMask,
     this.localTimeMinutes,
     this.endDate,
+    this.availabilityMode = TemplateAvailabilityMode.automatic,
   });
 
   final RecurrenceTemplate? existing;
@@ -65,6 +66,7 @@ final class SaveTemplateRequest {
   final String? endDate;
   final String timezoneId;
   final List<RecurrenceObjectiveDraft> objectives;
+  final TemplateAvailabilityMode availabilityMode;
 }
 
 // ── Servicio de aplicación ──────────────────────────────────────────────────
@@ -150,8 +152,27 @@ final class RecurrenceApplicationService {
         );
       }
     }
+    if (request.availabilityMode == TemplateAvailabilityMode.board &&
+        (request.missionType != MissionType.daily ||
+            request.frequency != RecurrenceFrequency.daily ||
+            request.intervalValue != 1 ||
+            request.localTimeMinutes != null)) {
+      return const Failure<RecurrenceTemplate>(
+        ValidationFailure('El tablón admite misiones diarias sin hora fija.'),
+      );
+    }
 
     final RecurrenceTemplate? existing = request.existing;
+    if (existing != null &&
+        existing.availabilityMode != request.availabilityMode &&
+        await _dao.templateHasMissions(existing.id)) {
+      return const Failure<RecurrenceTemplate>(
+        ConflictFailure(
+          'No se puede cambiar el modo porque la plantilla ya tiene misiones. '
+          'Páusala y crea una nueva plantilla con el modo deseado.',
+        ),
+      );
+    }
     final String templateId = existing?.id ?? _idGenerator.nextId();
     final String ruleId = existing?.rule?.id ?? _idGenerator.nextId();
 
@@ -193,6 +214,7 @@ final class RecurrenceApplicationService {
       xpReward: request.xpReward,
       estimatedMinutes: request.estimatedMinutes,
       budgetMinor: request.budgetMinor,
+      availabilityMode: request.availabilityMode,
       isActive: existing?.isActive ?? true,
       objectives: objectives,
       rule: rule,
@@ -231,6 +253,9 @@ final class RecurrenceApplicationService {
 
       int created = 0;
       for (final rawTemplate in activeTemplates) {
+        if (rawTemplate.availabilityMode == 'BOARD') {
+          continue;
+        }
         final bundle = await _dao.findTemplateBundle(rawTemplate.id);
         if (bundle == null || bundle.rule == null) {
           continue;
@@ -258,6 +283,193 @@ final class RecurrenceApplicationService {
       );
     }
   }
+
+  /// Emite el tablón del día y reacciona tanto a plantillas como a misiones
+  /// tomadas. Las plantillas fuera de su período civil no se muestran.
+  Stream<Result<List<MissionBoardEntry>>> watchMissionBoard() =>
+      _dao.watchBoardLinks().asyncMap((List<MissionBoardLink> links) async {
+        try {
+          final List<MissionBoardEntry> entries = <MissionBoardEntry>[];
+          final Set<String> templateIds = <String>{
+            for (final MissionBoardLink link in links) link.templateId,
+          };
+          final int nowUtcMs = _clock.nowUtc().millisecondsSinceEpoch;
+          for (final String templateId in templateIds) {
+            final Result<RecurrenceTemplate?> loaded = await _repository
+                .findById(templateId);
+            final RecurrenceTemplate? template = loaded.fold(
+              onSuccess: (RecurrenceTemplate? value) => value,
+              onFailure: (AppFailure failure) => throw failure,
+            );
+            final RecurrenceRule? rule = template?.rule;
+            if (template == null ||
+                !template.isActive ||
+                template.availabilityMode != TemplateAvailabilityMode.board ||
+                rule == null) {
+              continue;
+            }
+            final String localToday = await _civilTime.localDateForUtc(
+              utcEpochMillis: nowUtcMs,
+              timeZoneId: rule.timezoneId,
+            );
+            if (!_boardRuleIncludes(rule, localToday)) {
+              continue;
+            }
+            final int dayStart = await _civilTime.localDateTimeToUtcEpochMillis(
+              localDate: localToday,
+              localTimeMinutes: 0,
+              timeZoneId: rule.timezoneId,
+            );
+            final int nextDayStart = await _civilTime
+                .localDateTimeToUtcEpochMillis(
+                  localDate: _addCivilDays(localToday, 1),
+                  localTimeMinutes: 0,
+                  timeZoneId: rule.timezoneId,
+                );
+            MissionBoardLink? taken;
+            for (final MissionBoardLink link in links) {
+              final int? scheduledAt = link.scheduledAt;
+              if (link.templateId == templateId &&
+                  link.missionId != null &&
+                  scheduledAt != null &&
+                  scheduledAt >= dayStart &&
+                  scheduledAt < nextDayStart) {
+                taken = link;
+                break;
+              }
+            }
+            entries.add(
+              MissionBoardEntry(
+                template: template,
+                missionId: taken?.missionId,
+                missionStatus: taken?.status == null
+                    ? null
+                    : _missionStatusFromDb(taken!.status!),
+              ),
+            );
+          }
+          entries.sort(
+            (MissionBoardEntry a, MissionBoardEntry b) => a.template.title
+                .toLowerCase()
+                .compareTo(b.template.title.toLowerCase()),
+          );
+          return Success<List<MissionBoardEntry>>(entries);
+        } on AppFailure catch (failure) {
+          return Failure<List<MissionBoardEntry>>(failure);
+        } on Object catch (error) {
+          return Failure<List<MissionBoardEntry>>(
+            StorageFailure('No se pudo cargar el tablón diario.', cause: error),
+          );
+        }
+      });
+
+  /// Toma una misión una sola vez por plantilla y día civil.
+  Future<Result<MissionBoardTake>> takeMissionFromBoard(
+    String templateId,
+  ) async {
+    try {
+      final MissionTemplateBundle? bundle = await _dao.findTemplateBundle(
+        templateId,
+      );
+      final drift.RecurrenceRule? rule = bundle?.rule;
+      if (bundle == null ||
+          rule == null ||
+          bundle.template.isActive != 1 ||
+          bundle.template.availabilityMode != 'BOARD') {
+        return const Failure<MissionBoardTake>(
+          ValidationFailure('La misión ya no está disponible en el tablón.'),
+        );
+      }
+      final int nowUtcMs = _clock.nowUtc().millisecondsSinceEpoch;
+      final String localToday = await _civilTime.localDateForUtc(
+        utcEpochMillis: nowUtcMs,
+        timeZoneId: rule.timezoneId,
+      );
+      if (!_boardRuleIncludesRaw(rule, localToday)) {
+        return const Failure<MissionBoardTake>(
+          ValidationFailure('La misión no está disponible durante este día.'),
+        );
+      }
+      final int dayStart = await _civilTime.localDateTimeToUtcEpochMillis(
+        localDate: localToday,
+        localTimeMinutes: 0,
+        timeZoneId: rule.timezoneId,
+      );
+      final int nextDayStart = await _civilTime.localDateTimeToUtcEpochMillis(
+        localDate: _addCivilDays(localToday, 1),
+        localTimeMinutes: 0,
+        timeZoneId: rule.timezoneId,
+      );
+      final String missionId = _idGenerator.nextId();
+      final stored = await _dao.takeBoardMissionAtomically(
+        occurrence: drift.MissionsCompanion(
+          id: Value<String>(missionId),
+          templateId: Value<String?>(bundle.template.id),
+          areaId: Value<String>(bundle.template.areaId),
+          title: Value<String>(bundle.template.title),
+          description: Value<String?>(bundle.template.description),
+          missionType: Value<String>(bundle.template.missionType),
+          importance: Value<String>(bundle.template.importance),
+          priority: Value<String>(bundle.template.priority),
+          difficulty: Value<String?>(bundle.template.difficulty),
+          isRequired: Value<int>(bundle.template.isRequired),
+          status: const Value<String>('AVAILABLE'),
+          scheduledAt: Value<int?>(dayStart),
+          availableFrom: Value<int?>(dayStart),
+          expiresAt: Value<int?>(nextDayStart - 1),
+          xpPlanned: Value<int>(bundle.template.xpReward),
+          estimatedMinutes: Value<int?>(bundle.template.estimatedMinutes),
+          budgetMinor: Value<int?>(bundle.template.budgetMinor),
+        ),
+        createdAtUtcMs: nowUtcMs,
+        objectiveIdFactory: _idGenerator.nextId,
+        createdEvent: drift.MissionEventsCompanion(
+          id: Value<String>(_idGenerator.nextId()),
+          missionId: Value<String>(missionId),
+          eventType: const Value<String>('CREATED'),
+          toStatus: const Value<String>('AVAILABLE'),
+          occurredAt: Value<int>(nowUtcMs),
+          reason: const Value<String?>('Tomada desde el tablón diario'),
+        ),
+      );
+      return Success<MissionBoardTake>(
+        MissionBoardTake(missionId: stored.value.id, created: stored.created),
+      );
+    } on Object catch (error) {
+      return Failure<MissionBoardTake>(
+        StorageFailure('No se pudo tomar la misión del tablón.', cause: error),
+      );
+    }
+  }
+
+  bool _boardRuleIncludes(RecurrenceRule rule, String localDate) =>
+      rule.frequency == RecurrenceFrequency.daily &&
+      rule.intervalValue == 1 &&
+      rule.localTimeMinutes == null &&
+      rule.startDate.compareTo(localDate) <= 0 &&
+      (rule.endDate == null || rule.endDate!.compareTo(localDate) >= 0);
+
+  bool _boardRuleIncludesRaw(drift.RecurrenceRule rule, String localDate) =>
+      rule.frequency == 'DAILY' &&
+      rule.intervalValue == 1 &&
+      rule.localTimeMinutes == null &&
+      rule.startDate.compareTo(localDate) <= 0 &&
+      (rule.endDate == null || rule.endDate!.compareTo(localDate) >= 0);
+
+  MissionStatus _missionStatusFromDb(String value) => switch (value) {
+    'DRAFT' => MissionStatus.draft,
+    'SCHEDULED' => MissionStatus.scheduled,
+    'AVAILABLE' => MissionStatus.available,
+    'ACTIVE' => MissionStatus.active,
+    'PAUSED' => MissionStatus.paused,
+    'RESCHEDULED' => MissionStatus.rescheduled,
+    'EXPIRED' => MissionStatus.expired,
+    'ABANDONED' => MissionStatus.abandoned,
+    'CANCELLED' => MissionStatus.cancelled,
+    'PARTIAL' => MissionStatus.partial,
+    'COMPLETED' => MissionStatus.completed,
+    _ => throw FormatException('Unknown mission status: $value'),
+  };
 
   Future<int> _generateForTemplate({
     required MissionTemplateBundle bundle,

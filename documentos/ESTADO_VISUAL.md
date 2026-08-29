@@ -6,6 +6,12 @@ Este documento complementa `ESTADO_ACTUAL.md`. Describe exclusivamente el
 estado de la interfaz; no sustituye los ADR, el contrato de persistencia ni las
 decisiones de producto.
 
+La pantalla de PIN adaptable basada en los bocetos del 29 de agosto está
+implementada y descrita en `PROPUESTA-ACCESO-ADAPTATIVO.md`.
+
+El bloque de perfil y su franja modular cian de batería están implementados y
+descritos en `PROPUESTA-PERFIL-BATERIA.md`.
+
 ## Implementado en código Flutter
 
 - Tema oscuro centralizado en `lib/app/theme/`: colores semánticos, tipografía,
@@ -23,10 +29,10 @@ decisiones de producto.
   inactivos usan rojo y el seleccionado usa amarillo con marco completo y una
   esquina inferior derecha recortada; etiquetas de 16 px, iconos de 24 px y
   filas de 52 px mejoran la legibilidad en tablet.
-- El resumen del perfil usa un corazón rojo para salud y una batería vertical
-  continua con el nivel real del dispositivo. Se retiraron la etiqueta
-  `MISIONES`, los segmentos alternados y el pie `BITÁCORA · V2`, evitando huecos
-  visuales y liberando altura para la navegación.
+- El resumen del perfil usa un corazón rojo para salud y veinte módulos cian
+  con el nivel real de batería. Los módulos se llenan consecutivamente y los
+  restantes conservan un contorno tenue. Se retiraron la etiqueta `MISIONES`,
+  los segmentos alternados y el pie `BITÁCORA · V2`.
 - Cabecera técnica persistente en tablet: identidad, contexto del módulo,
   estado de terminal local, fecha y hora. Es parte del shell, no de una
   pantalla aislada. Sus divisores estructurales, el separador del perfil y la

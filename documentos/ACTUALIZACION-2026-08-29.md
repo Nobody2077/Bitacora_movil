@@ -1,6 +1,7 @@
 # Actualización funcional — 29 de agosto de 2026
 
-Estado: implementación y verificación automatizada completas. No se generó APK.
+Estado: implementación y verificación automatizada completas. APK
+`prodRelease` `1.2.0+5` firmada; validación física pendiente.
 
 ## Misiones
 
@@ -8,17 +9,20 @@ Estado: implementación y verificación automatizada completas. No se generó AP
   fecha y hora.
 - Una misión de solo fecha queda disponible durante el día y no crea una alarma
   artificial a medianoche.
-- Elegir la categoría diaria en el formulario crea una plantilla recurrente;
-  sus ocurrencias aparecen en el tablón de misiones diarias.
+- Elegir la categoría diaria permite crearla automáticamente o publicarla en el
+  tablón. En modo tablón solo pasa a Hoy cuando el usuario la toma.
+- El tablón se ubica dentro de Misiones junto a Hoy, Próximas, Todas y
+  Calendario; una misión solo puede tomarse una vez por día civil.
 - Las colecciones muestran por separado las misiones sin programación.
 
 ## Barra lateral
 
 - Se eliminó el texto `BITÁCORA · V2`.
 - La etiqueta `SALUD` se reemplazó por un corazón rojo.
-- El indicador segmentado de misiones se sustituyó por una batería vertical
-  continua conectada al nivel real que publica Android. No realiza sondeo
-  periódico: reacciona a los cambios del sistema.
+- El indicador de misiones se sustituyó por veinte módulos cian de batería real.
+  Se llenan consecutivamente y reaccionan a Android sin sondeo periódico.
+- El acceso PIN usa una columna en vertical y dos columnas en horizontal; el
+  teclado, búfer, protocolo y recuperación quedan visibles en tablet.
 
 ## Ajustes configurables
 
@@ -41,7 +45,7 @@ Estado: implementación y verificación automatizada completas. No se generó AP
 Las tres preferencias están desactivadas inicialmente y se persisten como
 metadata dentro de la base cifrada.
 
-## Bitácora y esquema v2
+## Bitácora y esquema v3
 
 El selector “Estado del momento” ofrece:
 
@@ -65,16 +69,21 @@ El esquema Drift pasa de v1 a v2 mediante una ampliación compatible:
 - La migración añade la columna sin reconstruir tablas ni modificar claves
   foráneas.
 - Se conservan `drift_schema_v1.json` y el nuevo `drift_schema_v2.json`.
+- La segunda ampliación añade `mission_templates.availability_mode`; las bases
+  v1 y v2 migran a v3 y las plantillas existentes conservan modo automático.
+- Se añade `drift_schema_v3.json` sin eliminar los snapshots anteriores.
 
 ## Evidencia
 
 - `flutter analyze`: sin problemas.
-- `flutter test`: 212/212 pruebas aprobadas.
-- Prueba v1→v2 con una entrada previa real y posterior escritura/lectura de un
+- `flutter test`: 219/219 pruebas aprobadas.
+- Pruebas v1→v3 y v2→v3 con datos previos, además de escritura/lectura de un
   nuevo estado.
 - Prueba de identidad y persistencia para los ocho estados.
-- Contrato v2, restricciones, integridad, claves foráneas y reapertura
+- Contrato v3, restricciones, integridad, claves foráneas y reapertura
   idempotente verificados.
 - Integración Kotlin Android compilada para los puentes de batería, privacidad
   y notificaciones.
-- No se ejecutó una tarea de ensamblado de APK.
+- APK `prodRelease`: 72.741.699 bytes, firma v2 válida, versión `1.2.0+5`, sin
+  permiso `INTERNET`; SHA-256
+  `35191226ac66eb6076303faf478f0ffeda166a8536db31f70a5060b64c856a0f`.

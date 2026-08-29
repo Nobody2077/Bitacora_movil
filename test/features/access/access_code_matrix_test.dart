@@ -84,7 +84,7 @@ void main() {
 
   testWidgets('golden del acceso táctil amarillo', (WidgetTester tester) async {
     tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(412, 1100);
+    tester.view.physicalSize = const Size(800, 1280);
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetPhysicalSize);
 
@@ -107,10 +107,138 @@ void main() {
     expect(find.byType(TextField), findsNothing);
     expect(find.text('BÚFER'), findsOneWidget);
     expect(find.text('MATRIZ DE CÓDIGO'), findsOneWidget);
+    expect(
+      tester.getBottomRight(find.byKey(const Key('open-recovery-button'))).dy,
+      lessThanOrEqualTo(1280),
+    );
     await expectLater(
       find.byType(AccessGatePage),
       matchesGoldenFile('goldens/access_matrix_yellow.png'),
     );
+  });
+
+  testWidgets('acceso horizontal usa dos columnas completas', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 800);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          accessSessionSeedProvider.overrideWithValue(_lockedSession),
+          accessAccentProvider.overrideWith(
+            (ref) async => AppAccentColor.yellow,
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const AccessGatePage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('access-layout-wide')), findsOneWidget);
+    expect(find.byKey(const Key('access-layout-portrait')), findsNothing);
+    expect(find.byKey(const Key('access-code-key-0')), findsOneWidget);
+    expect(find.byKey(const Key('access-code-backspace')), findsOneWidget);
+    expect(find.byKey(const Key('open-recovery-button')), findsOneWidget);
+    expect(
+      tester.getCenter(find.byKey(const Key('unlock-code-matrix'))).dx,
+      lessThan(
+        tester.getCenter(find.byKey(const Key('access-protocol-panel'))).dx,
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    await expectLater(
+      find.byType(AccessGatePage),
+      matchesGoldenFile('goldens/access_matrix_wide_yellow.png'),
+    );
+  });
+
+  testWidgets('texto 2.0 conserva teclado y recuperación accesibles', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          accessSessionSeedProvider.overrideWithValue(_lockedSession),
+          accessAccentProvider.overrideWith(
+            (ref) async => AppAccentColor.yellow,
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(2)),
+            child: AccessGatePage(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('access-layout-portrait')), findsOneWidget);
+    expect(find.byKey(const Key('access-code-key-0')), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('open-recovery-button')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.byKey(const Key('open-recovery-button')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('muestra solo una espera de seguridad real', (
+    WidgetTester tester,
+  ) async {
+    final AccessSessionState waitingSession = AccessSessionState(
+      phase: AccessSessionPhase.locked,
+      revision: 3,
+      setupStep: AccessSetupStep.enterPin,
+      recoveryStep: AccessRecoveryStep.enterRecoveryAndPin,
+      biometricsEnabled: false,
+      biometricAvailability: BiometricAvailability.unavailable,
+      isBusy: false,
+      failedAttempts: 5,
+      blockedUntilEpochMillis: DateTime.now()
+          .add(const Duration(seconds: 30))
+          .millisecondsSinceEpoch,
+      notice: AccessNotice.progressiveWait,
+      oneTimeRecoveryCode: null,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          accessSessionSeedProvider.overrideWithValue(waitingSession),
+          accessAccentProvider.overrideWith(
+            (ref) async => AppAccentColor.yellow,
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const AccessGatePage(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('ESPERA DE SEGURIDAD'), findsOneWidget);
+    final Text countdown = tester.widget<Text>(
+      find.byKey(const Key('access-security-status-value')),
+    );
+    expect(countdown.data, anyOf('29s', '30s'));
+
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('transición terminal respeta movimiento reducido', (

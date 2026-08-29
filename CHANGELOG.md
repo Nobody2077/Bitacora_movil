@@ -1,11 +1,15 @@
 # Historial de cambios
 
-## En desarrollo — actualización local del 29 de agosto de 2026
+## 1.2.0 — candidata `1.2.0+5`
 
 ### Misiones y planificación
 
-- Las misiones de categoría diaria creadas desde el formulario normal pasan a
-  ser plantillas recurrentes y generan ocurrencias en el tablón diario.
+- Misiones incorpora navegación interna `Hoy · Tablón · Próximas · Todas ·
+  Calendario` sin añadir otro destino a la barra lateral.
+- Las misiones diarias pueden generarse automáticamente o quedar disponibles
+  en el tablón para tomarlas. Tomarlas es idempotente por plantilla y día.
+- Las misiones del tablón no ocupan la lista de Hoy hasta que el usuario las
+  selecciona; se crean sin hora fija y copian sus objetivos.
 - La planificación admite tres modalidades: sin fecha, solo fecha y fecha con
   hora. Las misiones de solo fecha no programan avisos a medianoche.
 - Las colecciones distinguen las misiones sin programación y conservan la
@@ -15,8 +19,19 @@
 
 - Se retiró el pie `BITÁCORA · V2` de la barra lateral.
 - `SALUD` se sustituyó por un corazón rojo.
-- Los segmentos horizontales de misiones se reemplazaron por una batería
-  vertical continua que refleja el nivel real del dispositivo mediante Android.
+- Los segmentos de misiones se reemplazaron por veinte módulos cian que reflejan
+  la batería real del dispositivo. Se llenan consecutivamente, sin huecos
+  intermedios ni sondeo periódico.
+
+### Acceso adaptable
+
+- El PIN conserva su composición secuencial en vertical y usa matriz/protocolo
+  en dos columnas a partir de 840 px cuando existe altura suficiente.
+- El acceso horizontal muestra búfer, teclado completo, protocolo y recuperación
+  sin recortes en 1280×800.
+- La espera de seguridad muestra un contador únicamente durante un bloqueo
+  progresivo real; no se añadieron límites ficticios ni demoras artificiales.
+- Texto 2.0× vuelve a la composición desplazable antes de recortar controles.
 
 ### Privacidad, notificaciones e imágenes
 
@@ -29,7 +44,7 @@
 - Las tres preferencias quedan desactivadas por defecto y se guardan en la base
   local cifrada.
 
-### Bitácora y persistencia v2
+### Bitácora y persistencia v3
 
 - El estado del momento se amplió de tres a ocho valores: Feliz, Motivado,
   Enfocado, Tranquilo, Neutral, Ansioso, Triste y Cansado.
@@ -37,12 +52,16 @@
   migración v1→v2 que conserva las entradas anteriores.
 - Se añadió el snapshot oficial `drift_schema_v2.json`, validación de contrato,
   restricciones, reapertura idempotente y prueba de migración con datos v1.
+- Drift sube a v3 con `mission_templates.availability_mode`; las plantillas
+  anteriores migran como automáticas y se conserva el snapshot v2.
 
 ### Calidad
 
-- `flutter analyze` sin problemas y 212/212 pruebas aprobadas.
+- `flutter analyze` sin problemas y 219/219 pruebas aprobadas.
 - La integración Kotlin Android de batería, capturas y notificaciones compila.
-- No se generó una APK para este incremento.
+- APK `prodRelease` firmada `1.2.0+5`: 72.741.699 bytes, firma v2 válida,
+  sin permiso `INTERNET`; SHA-256
+  `35191226ac66eb6076303faf478f0ffeda166a8536db31f70a5060b64c856a0f`.
 
 ## 1.1.1 — candidata `1.1.1+4`, validación física pendiente
 

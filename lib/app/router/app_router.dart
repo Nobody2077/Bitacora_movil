@@ -21,6 +21,7 @@ import '../../features/journal/presentation/journal_entry_form_page.dart';
 import '../../features/journal/presentation/journal_search_archive_pages.dart';
 import '../../features/journal/presentation/journal_timeline_page.dart';
 import '../../features/missions/presentation/mission_active_page.dart';
+import '../../features/missions/presentation/mission_board_page.dart';
 import '../../features/missions/presentation/mission_calendar_page.dart';
 import '../../features/missions/presentation/mission_collection_page.dart';
 import '../../features/missions/presentation/mission_completion_pages.dart';
@@ -129,6 +130,9 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         if (contract.name == 'missionsToday') {
           return const MissionsTodayPage();
         }
+        if (contract.name == 'missionsBoard') {
+          return const MissionBoardPage();
+        }
         if (contract.name == 'missionsUpcoming') {
           return const MissionCollectionPage(
             collection: MissionCollection.upcoming,
@@ -151,6 +155,7 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
               state.uri.queryParameters['date'],
             ),
             origin: state.uri.queryParameters['origin'],
+            initialBoard: state.uri.queryParameters['board'] == '1',
           );
         }
         if (contract.name == 'missionTemplateNew') {

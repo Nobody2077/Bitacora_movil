@@ -20,6 +20,7 @@ abstract final class RecurrenceMapper {
       xpReward: t.xpReward,
       estimatedMinutes: t.estimatedMinutes,
       budgetMinor: t.budgetMinor,
+      availabilityMode: _availabilityMode(t.availabilityMode),
       isActive: t.isActive == 1,
       objectives: bundle.objectives
           .map(
@@ -61,6 +62,21 @@ abstract final class RecurrenceMapper {
     RecurrenceFrequency.specificDays => 'SPECIFIC_DAYS',
     RecurrenceFrequency.everyNDays => 'EVERY_N_DAYS',
   };
+
+  static TemplateAvailabilityMode _availabilityMode(String value) =>
+      switch (value) {
+        'AUTOMATIC' => TemplateAvailabilityMode.automatic,
+        'BOARD' => TemplateAvailabilityMode.board,
+        _ => throw FormatException(
+          'Unknown persisted availability mode: $value',
+        ),
+      };
+
+  static String availabilityModeToDb(TemplateAvailabilityMode value) =>
+      switch (value) {
+        TemplateAvailabilityMode.automatic => 'AUTOMATIC',
+        TemplateAvailabilityMode.board => 'BOARD',
+      };
 
   static MissionType _missionType(String value) => switch (value) {
     'PRIMARY' => MissionType.primary,

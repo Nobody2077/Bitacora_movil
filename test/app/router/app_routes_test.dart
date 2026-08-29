@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppRoutes', () {
-    test('registra los 60 patrones URI canónicos', () {
-      expect(AppRoutes.all, hasLength(60));
+    test('registra los 61 patrones URI canónicos', () {
+      expect(AppRoutes.all, hasLength(61));
       expect(
         AppRoutes.all.where(
           (AppRouteContract route) => route.isFunctionalSurface,
         ),
-        hasLength(59),
+        hasLength(60),
       );
     });
 
@@ -35,8 +35,9 @@ void main() {
 
       expect(
         _byName('missionNew').queryParameters,
-        containsAll(<String>['origin', 'date']),
+        containsAll(<String>['origin', 'date', 'board']),
       );
+      expect(_byName('missionsBoard').path, AppRoutes.missionsBoard);
       expect(_byName('missionsCalendar').queryParameters, contains('date'));
       expect(
         _byName('financeNewIncome').queryParameters,

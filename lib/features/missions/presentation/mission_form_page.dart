@@ -27,11 +27,13 @@ class MissionFormPage extends ConsumerStatefulWidget {
     this.missionId,
     this.initialScheduledLocal,
     this.origin,
+    this.initialBoard = false,
   });
 
   final String? missionId;
   final DateTime? initialScheduledLocal;
   final String? origin;
+  final bool initialBoard;
 
   bool get isEditing => missionId != null;
 
@@ -55,6 +57,8 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
   MissionPriority _priority = MissionPriority.normal;
   bool _isRequired = false;
   _PlanningMode _planningMode = _PlanningMode.dateOnly;
+  TemplateAvailabilityMode _dailyAvailabilityMode =
+      TemplateAvailabilityMode.automatic;
   DateTime _date = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
   bool _initialized = false;
@@ -170,6 +174,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                         mode: _planningMode,
                         isDaily:
                             !widget.isEditing && _type == MissionType.daily,
+                        dailyAvailabilityMode: _dailyAvailabilityMode,
                         date: _date,
                         time: _time,
                         durationController: _durationController,
@@ -177,6 +182,8 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                         xpController: _xpController,
                         onModeChanged: (value) =>
                             setState(() => _planningMode = value),
+                        onDailyAvailabilityChanged:
+                            _changeDailyAvailabilityMode,
                         onPickDate: _pickDate,
                         onPickTime: _pickTime,
                       ),
@@ -224,6 +231,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                               isDaily:
                                   !widget.isEditing &&
                                   _type == MissionType.daily,
+                              dailyAvailabilityMode: _dailyAvailabilityMode,
                               date: _date,
                               time: _time,
                               durationController: _durationController,
@@ -231,6 +239,8 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                               xpController: _xpController,
                               onModeChanged: (value) =>
                                   setState(() => _planningMode = value),
+                              onDailyAvailabilityChanged:
+                                  _changeDailyAvailabilityMode,
                               onPickDate: _pickDate,
                               onPickTime: _pickTime,
                             ),
@@ -294,8 +304,15 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
           ),
         ),
       );
-    } else if (widget.initialScheduledLocal case final DateTime initial) {
-      _date = DateTime(initial.year, initial.month, initial.day);
+    } else {
+      if (widget.initialScheduledLocal case final DateTime initial) {
+        _date = DateTime(initial.year, initial.month, initial.day);
+      }
+      if (widget.initialBoard) {
+        _type = MissionType.daily;
+        _dailyAvailabilityMode = TemplateAvailabilityMode.board;
+        _planningMode = _PlanningMode.dateOnly;
+      }
     }
     _initialized = true;
   }
@@ -306,6 +323,18 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
       if (!widget.isEditing &&
           value == MissionType.daily &&
           _planningMode == _PlanningMode.anytime) {
+        _planningMode = _PlanningMode.dateOnly;
+      }
+      if (value != MissionType.daily) {
+        _dailyAvailabilityMode = TemplateAvailabilityMode.automatic;
+      }
+    });
+  }
+
+  void _changeDailyAvailabilityMode(TemplateAvailabilityMode value) {
+    setState(() {
+      _dailyAvailabilityMode = value;
+      if (value == TemplateAvailabilityMode.board) {
         _planningMode = _PlanningMode.dateOnly;
       }
     });
@@ -471,6 +500,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
             title: _titleController.text,
             description: _descriptionController.text,
             missionType: MissionType.daily,
+            availabilityMode: _dailyAvailabilityMode,
             importance: _importance,
             priority: _priority,
             isRequired: _isRequired,
@@ -479,7 +509,9 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
             budgetMinor: budgetMinor,
             frequency: RecurrenceFrequency.daily,
             intervalValue: 1,
-            localTimeMinutes: _planningMode == _PlanningMode.dateTime
+            localTimeMinutes:
+                _dailyAvailabilityMode == TemplateAvailabilityMode.automatic &&
+                    _planningMode == _PlanningMode.dateTime
                 ? _time.hour * 60 + _time.minute
                 : null,
             startDate: _dateParameter(_date),
@@ -499,6 +531,15 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(failure.message)));
+      return;
+    }
+
+    if (_dailyAvailabilityMode == TemplateAvailabilityMode.board) {
+      setState(() => _saving = false);
+      ref.invalidate(allTemplatesProvider);
+      ref.invalidate(activeTemplatesProvider);
+      ref.invalidate(missionBoardProvider);
+      context.goNamed('missionsBoard');
       return;
     }
 
@@ -729,7 +770,7 @@ class _InformationPanel extends StatelessWidget {
           if (!editing && type == MissionType.daily) ...<Widget>[
             const SizedBox(height: 10),
             Text(
-              'Se creará una plantilla activa que generará una misión cada día.',
+              'La misión diaria puede generarse sola o quedar disponible en el tablón.',
               style: TextStyle(color: tokens.infoCyan),
             ),
           ],
@@ -757,24 +798,28 @@ class _PlanningPanel extends StatelessWidget {
   const _PlanningPanel({
     required this.mode,
     required this.isDaily,
+    required this.dailyAvailabilityMode,
     required this.date,
     required this.time,
     required this.durationController,
     required this.budgetController,
     required this.xpController,
     required this.onModeChanged,
+    required this.onDailyAvailabilityChanged,
     required this.onPickDate,
     required this.onPickTime,
   });
 
   final _PlanningMode mode;
   final bool isDaily;
+  final TemplateAvailabilityMode dailyAvailabilityMode;
   final DateTime date;
   final TimeOfDay time;
   final TextEditingController durationController;
   final TextEditingController budgetController;
   final TextEditingController xpController;
   final ValueChanged<_PlanningMode> onModeChanged;
+  final ValueChanged<TemplateAvailabilityMode> onDailyAvailabilityChanged;
   final VoidCallback onPickDate;
   final VoidCallback onPickTime;
 
@@ -788,6 +833,28 @@ class _PlanningPanel extends StatelessWidget {
         children: <Widget>[
           _PanelTitle(label: 'Planificación', icon: Icons.calendar_month),
           const SizedBox(height: 16),
+          if (isDaily) ...<Widget>[
+            DropdownButtonFormField<TemplateAvailabilityMode>(
+              initialValue: dailyAvailabilityMode,
+              decoration: const InputDecoration(
+                labelText: 'Disponibilidad diaria',
+              ),
+              items: const <DropdownMenuItem<TemplateAvailabilityMode>>[
+                DropdownMenuItem<TemplateAvailabilityMode>(
+                  value: TemplateAvailabilityMode.automatic,
+                  child: Text('Crear automáticamente'),
+                ),
+                DropdownMenuItem<TemplateAvailabilityMode>(
+                  value: TemplateAvailabilityMode.board,
+                  child: Text('Ofrecer en el tablón'),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) onDailyAvailabilityChanged(value);
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
           DropdownButtonFormField<_PlanningMode>(
             initialValue: mode,
             decoration: const InputDecoration(labelText: 'Cuándo'),
@@ -801,10 +868,11 @@ class _PlanningPanel extends StatelessWidget {
                 value: _PlanningMode.dateOnly,
                 child: Text('Solo fecha'),
               ),
-              const DropdownMenuItem<_PlanningMode>(
-                value: _PlanningMode.dateTime,
-                child: Text('Fecha y hora'),
-              ),
+              if (dailyAvailabilityMode != TemplateAvailabilityMode.board)
+                const DropdownMenuItem<_PlanningMode>(
+                  value: _PlanningMode.dateTime,
+                  child: Text('Fecha y hora'),
+                ),
             ],
             onChanged: (value) {
               if (value != null) onModeChanged(value);
@@ -828,9 +896,11 @@ class _PlanningPanel extends StatelessWidget {
           ],
           if (mode == _PlanningMode.dateOnly) ...<Widget>[
             const SizedBox(height: 10),
-            const Text(
-              'Disponible durante el día, sin hora fija ni recordatorio automático.',
-              style: TextStyle(color: Colors.white54, fontSize: 12),
+            Text(
+              dailyAvailabilityMode == TemplateAvailabilityMode.board
+                  ? 'Aparecerá cada día en el tablón hasta que decidas tomarla.'
+                  : 'Disponible durante el día, sin hora fija ni recordatorio automático.',
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
             ),
           ],
           if (mode == _PlanningMode.anytime) ...<Widget>[

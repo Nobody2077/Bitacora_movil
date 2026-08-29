@@ -27,7 +27,7 @@ void main() {
     final UserProfile profile = (result as Success<UserProfile>).value;
     expect(profile.displayName, 'Usuario local');
     expect(profile.avatarPath, isNull);
-    expect(database.schemaVersion, 2);
+    expect(database.schemaVersion, 3);
   });
 
   test('persiste nombre y ruta privada como un único valor JSON', () async {

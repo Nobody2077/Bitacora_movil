@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **29 de agosto de 2026** (incremento funcional sin APK; A8 en progreso)
+- Última revisión: **29 de agosto de 2026** (APK firmada `1.2.0+5`; A8 en progreso)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -15,8 +15,8 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   27 de agosto de 2026. A5 está completada y G5 está verde.
 - ADR-005 retira A6 del MVP y deja G6 sin aplicación. No habrá exportación,
   restauración ni historial local de copias.
-- La infraestructura contiene el esquema v2, compatible mediante migración con
-  datos v1, y DAOs adelantados para varias fases.
+- La infraestructura contiene el esquema v3, compatible mediante migración con
+  datos v1 y v2, y DAOs adelantados para varias fases.
 - Acceso, recuperación, biometría, privacidad y persistencia cifrada sí están conectados al arranque real.
 - La consolidación de A5.3 aprobó formato, `flutter analyze`, 158 pruebas y la
   compilación de la APK `prod-debug` el 27 de agosto de 2026.
@@ -50,11 +50,16 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   Falta validación física G9.
 - Incremento local del **29 de agosto de 2026**: las misiones diarias creadas
   desde el formulario generan recurrencia; la planificación admite sin fecha,
-  solo fecha o fecha y hora. La barra lateral usa batería real vertical y un
-  corazón rojo, sin el pie `BITÁCORA · V2`. Ajustes incorpora permisos locales
+  solo fecha o fecha y hora. La barra lateral usa una batería real modular cian
+  y un corazón rojo, sin el pie `BITÁCORA · V2`. El acceso PIN se adapta a una
+  columna vertical o dos columnas horizontales sin cambiar su seguridad.
+  Ajustes incorpora permisos locales
   para capturas, título en notificaciones y cámara al adjuntar. Bitácora ofrece
-  ocho estados de ánimo y el esquema migra de v1 a v2 sin perder entradas. La
-  matriz está verde con 212 pruebas y análisis limpio. No se generó APK.
+  ocho estados de ánimo. Misiones añade un tablón interno para tomar rutinas
+  diarias sin crearlas por anticipado; el esquema migra de v1/v2 a v3 sin
+  perder entradas. La matriz está verde con 219 pruebas y análisis limpio. La
+  APK `prodRelease` `1.2.0+5` está firmada y verificada; aún requiere recorrido
+  físico en dispositivo.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -169,7 +174,8 @@ Se detectaron y corrigieron dos incumplimientos de la jerarquía de color defini
 
 ### Persistencia
 
-- Esquema Drift v2 de 19 tablas, con snapshot v1 preservado y migración probada.
+- Esquema Drift v3 de 19 tablas, con snapshots v1/v2 preservados y migraciones
+  probadas.
 - 21 índices explícitos y 19 claves foráneas.
 - Seeds iniciales idempotentes.
 - DAOs para misiones, recurrencia, notificaciones, economía, Bitácora, progreso y ajustes.
@@ -405,7 +411,7 @@ main_dev/main_prod
 
 ### Nivel 2 — Extender respetando contratos existentes
 
-- `app/router/app_routes.dart`: conserva los 60 patrones URI y sus parámetros permitidos.
+- `app/router/app_routes.dart`: conserva 61 patrones URI y sus parámetros permitidos.
 - `app/router/app_router.dart`: reemplaza placeholders por páginas reales sin debilitar el guard.
 - `shared/adaptive/adaptive_shell.dart`: conserva breakpoints y ramas independientes.
 - `app/theme/`: reutiliza tokens antes de crear estilos locales.

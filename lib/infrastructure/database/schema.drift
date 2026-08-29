@@ -62,6 +62,9 @@ CREATE TABLE mission_templates (
     estimated_minutes IS NULL OR estimated_minutes > 0
   ),
   budget_minor INTEGER CHECK (budget_minor IS NULL OR budget_minor >= 0),
+  availability_mode TEXT NOT NULL DEFAULT 'AUTOMATIC' CHECK (
+    availability_mode IN ('AUTOMATIC', 'BOARD')
+  ),
   is_active INTEGER NOT NULL CHECK (is_active IN (0, 1))
 );
 

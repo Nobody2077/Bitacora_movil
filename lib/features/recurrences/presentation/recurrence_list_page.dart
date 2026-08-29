@@ -34,7 +34,7 @@ class RecurrenceListPage extends ConsumerWidget {
                 children: <Widget>[
                   TerminalPageHeader(
                     title: 'Misiones recurrentes',
-                    subtitle: 'Plantillas que generan ocurrencias automáticas',
+                    subtitle: 'Plantillas automáticas y del tablón diario',
                     action: TerminalPrimaryButton(
                       label: 'Nueva plantilla',
                       icon: Icons.add,
@@ -237,7 +237,7 @@ class _TemplateList extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Crea una plantilla para generar misiones automáticamente.',
+              'Crea una plantilla automática o disponible en el tablón.',
               textAlign: TextAlign.center,
             ),
           ],
@@ -334,6 +334,12 @@ class _TemplateCard extends StatelessWidget {
                   color: tokens.attentionOrange,
                   icon: Icons.repeat,
                 ),
+                if (template.availabilityMode == TemplateAvailabilityMode.board)
+                  TerminalBadge(
+                    label: 'Tablón',
+                    color: tokens.infoCyan,
+                    icon: Icons.dashboard_customize_outlined,
+                  ),
               ],
             ),
             const SizedBox(height: 14),

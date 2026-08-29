@@ -657,6 +657,19 @@ class MissionTemplates extends Table
     requiredDuringInsert: false,
     $customConstraints: 'CHECK (budget_minor IS NULL OR budget_minor >= 0)',
   );
+  static const VerificationMeta _availabilityModeMeta = const VerificationMeta(
+    'availabilityMode',
+  );
+  late final GeneratedColumn<String> availabilityMode = GeneratedColumn<String>(
+    'availability_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT \'AUTOMATIC\' CHECK (availability_mode IN (\'AUTOMATIC\', \'BOARD\'))',
+    defaultValue: const CustomExpression('\'AUTOMATIC\''),
+  );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -682,6 +695,7 @@ class MissionTemplates extends Table
     xpReward,
     estimatedMinutes,
     budgetMinor,
+    availabilityMode,
     isActive,
   ];
   @override
@@ -789,6 +803,15 @@ class MissionTemplates extends Table
         ),
       );
     }
+    if (data.containsKey('availability_mode')) {
+      context.handle(
+        _availabilityModeMeta,
+        availabilityMode.isAcceptableOrUnknown(
+          data['availability_mode']!,
+          _availabilityModeMeta,
+        ),
+      );
+    }
     if (data.containsKey('is_active')) {
       context.handle(
         _isActiveMeta,
@@ -854,6 +877,10 @@ class MissionTemplates extends Table
         DriftSqlType.int,
         data['${effectivePrefix}budget_minor'],
       ),
+      availabilityMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}availability_mode'],
+      )!,
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}is_active'],
@@ -883,6 +910,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
   final int xpReward;
   final int? estimatedMinutes;
   final int? budgetMinor;
+  final String availabilityMode;
   final int isActive;
   const MissionTemplate({
     required this.id,
@@ -897,6 +925,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
     required this.xpReward,
     this.estimatedMinutes,
     this.budgetMinor,
+    required this.availabilityMode,
     required this.isActive,
   });
   @override
@@ -922,6 +951,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
     if (!nullToAbsent || budgetMinor != null) {
       map['budget_minor'] = Variable<int>(budgetMinor);
     }
+    map['availability_mode'] = Variable<String>(availabilityMode);
     map['is_active'] = Variable<int>(isActive);
     return map;
   }
@@ -948,6 +978,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
       budgetMinor: budgetMinor == null && nullToAbsent
           ? const Value.absent()
           : Value(budgetMinor),
+      availabilityMode: Value(availabilityMode),
       isActive: Value(isActive),
     );
   }
@@ -970,6 +1001,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
       xpReward: serializer.fromJson<int>(json['xp_reward']),
       estimatedMinutes: serializer.fromJson<int?>(json['estimated_minutes']),
       budgetMinor: serializer.fromJson<int?>(json['budget_minor']),
+      availabilityMode: serializer.fromJson<String>(json['availability_mode']),
       isActive: serializer.fromJson<int>(json['is_active']),
     );
   }
@@ -989,6 +1021,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
       'xp_reward': serializer.toJson<int>(xpReward),
       'estimated_minutes': serializer.toJson<int?>(estimatedMinutes),
       'budget_minor': serializer.toJson<int?>(budgetMinor),
+      'availability_mode': serializer.toJson<String>(availabilityMode),
       'is_active': serializer.toJson<int>(isActive),
     };
   }
@@ -1006,6 +1039,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
     int? xpReward,
     Value<int?> estimatedMinutes = const Value.absent(),
     Value<int?> budgetMinor = const Value.absent(),
+    String? availabilityMode,
     int? isActive,
   }) => MissionTemplate(
     id: id ?? this.id,
@@ -1022,6 +1056,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
         ? estimatedMinutes.value
         : this.estimatedMinutes,
     budgetMinor: budgetMinor.present ? budgetMinor.value : this.budgetMinor,
+    availabilityMode: availabilityMode ?? this.availabilityMode,
     isActive: isActive ?? this.isActive,
   );
   MissionTemplate copyWithCompanion(MissionTemplatesCompanion data) {
@@ -1052,6 +1087,9 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
       budgetMinor: data.budgetMinor.present
           ? data.budgetMinor.value
           : this.budgetMinor,
+      availabilityMode: data.availabilityMode.present
+          ? data.availabilityMode.value
+          : this.availabilityMode,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
     );
   }
@@ -1071,6 +1109,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
           ..write('xpReward: $xpReward, ')
           ..write('estimatedMinutes: $estimatedMinutes, ')
           ..write('budgetMinor: $budgetMinor, ')
+          ..write('availabilityMode: $availabilityMode, ')
           ..write('isActive: $isActive')
           ..write(')'))
         .toString();
@@ -1090,6 +1129,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
     xpReward,
     estimatedMinutes,
     budgetMinor,
+    availabilityMode,
     isActive,
   );
   @override
@@ -1108,6 +1148,7 @@ class MissionTemplate extends DataClass implements Insertable<MissionTemplate> {
           other.xpReward == this.xpReward &&
           other.estimatedMinutes == this.estimatedMinutes &&
           other.budgetMinor == this.budgetMinor &&
+          other.availabilityMode == this.availabilityMode &&
           other.isActive == this.isActive);
 }
 
@@ -1124,6 +1165,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
   final Value<int> xpReward;
   final Value<int?> estimatedMinutes;
   final Value<int?> budgetMinor;
+  final Value<String> availabilityMode;
   final Value<int> isActive;
   final Value<int> rowid;
   const MissionTemplatesCompanion({
@@ -1139,6 +1181,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
     this.xpReward = const Value.absent(),
     this.estimatedMinutes = const Value.absent(),
     this.budgetMinor = const Value.absent(),
+    this.availabilityMode = const Value.absent(),
     this.isActive = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1155,6 +1198,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
     required int xpReward,
     this.estimatedMinutes = const Value.absent(),
     this.budgetMinor = const Value.absent(),
+    this.availabilityMode = const Value.absent(),
     required int isActive,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -1177,6 +1221,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
     Expression<int>? xpReward,
     Expression<int>? estimatedMinutes,
     Expression<int>? budgetMinor,
+    Expression<String>? availabilityMode,
     Expression<int>? isActive,
     Expression<int>? rowid,
   }) {
@@ -1193,6 +1238,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
       if (xpReward != null) 'xp_reward': xpReward,
       if (estimatedMinutes != null) 'estimated_minutes': estimatedMinutes,
       if (budgetMinor != null) 'budget_minor': budgetMinor,
+      if (availabilityMode != null) 'availability_mode': availabilityMode,
       if (isActive != null) 'is_active': isActive,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1211,6 +1257,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
     Value<int>? xpReward,
     Value<int?>? estimatedMinutes,
     Value<int?>? budgetMinor,
+    Value<String>? availabilityMode,
     Value<int>? isActive,
     Value<int>? rowid,
   }) {
@@ -1227,6 +1274,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
       xpReward: xpReward ?? this.xpReward,
       estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
       budgetMinor: budgetMinor ?? this.budgetMinor,
+      availabilityMode: availabilityMode ?? this.availabilityMode,
       isActive: isActive ?? this.isActive,
       rowid: rowid ?? this.rowid,
     );
@@ -1271,6 +1319,9 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
     if (budgetMinor.present) {
       map['budget_minor'] = Variable<int>(budgetMinor.value);
     }
+    if (availabilityMode.present) {
+      map['availability_mode'] = Variable<String>(availabilityMode.value);
+    }
     if (isActive.present) {
       map['is_active'] = Variable<int>(isActive.value);
     }
@@ -1295,6 +1346,7 @@ class MissionTemplatesCompanion extends UpdateCompanion<MissionTemplate> {
           ..write('xpReward: $xpReward, ')
           ..write('estimatedMinutes: $estimatedMinutes, ')
           ..write('budgetMinor: $budgetMinor, ')
+          ..write('availabilityMode: $availabilityMode, ')
           ..write('isActive: $isActive, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -12304,6 +12356,7 @@ typedef $MissionTemplatesCreateCompanionBuilder =
       required int xpReward,
       Value<int?> estimatedMinutes,
       Value<int?> budgetMinor,
+      Value<String> availabilityMode,
       required int isActive,
       Value<int> rowid,
     });
@@ -12321,6 +12374,7 @@ typedef $MissionTemplatesUpdateCompanionBuilder =
       Value<int> xpReward,
       Value<int?> estimatedMinutes,
       Value<int?> budgetMinor,
+      Value<String> availabilityMode,
       Value<int> isActive,
       Value<int> rowid,
     });
@@ -12473,6 +12527,11 @@ class $MissionTemplatesFilterComposer
 
   ColumnFilters<int> get budgetMinor => $composableBuilder(
     column: $table.budgetMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get availabilityMode => $composableBuilder(
+    column: $table.availabilityMode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12644,6 +12703,11 @@ class $MissionTemplatesOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get availabilityMode => $composableBuilder(
+    column: $table.availabilityMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get isActive => $composableBuilder(
     column: $table.isActive,
     builder: (column) => ColumnOrderings(column),
@@ -12726,6 +12790,11 @@ class $MissionTemplatesAnnotationComposer
 
   GeneratedColumn<int> get budgetMinor => $composableBuilder(
     column: $table.budgetMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get availabilityMode => $composableBuilder(
+    column: $table.availabilityMode,
     builder: (column) => column,
   );
 
@@ -12877,6 +12946,7 @@ class $MissionTemplatesTableManager
                 Value<int> xpReward = const Value.absent(),
                 Value<int?> estimatedMinutes = const Value.absent(),
                 Value<int?> budgetMinor = const Value.absent(),
+                Value<String> availabilityMode = const Value.absent(),
                 Value<int> isActive = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => MissionTemplatesCompanion(
@@ -12892,6 +12962,7 @@ class $MissionTemplatesTableManager
                 xpReward: xpReward,
                 estimatedMinutes: estimatedMinutes,
                 budgetMinor: budgetMinor,
+                availabilityMode: availabilityMode,
                 isActive: isActive,
                 rowid: rowid,
               ),
@@ -12909,6 +12980,7 @@ class $MissionTemplatesTableManager
                 required int xpReward,
                 Value<int?> estimatedMinutes = const Value.absent(),
                 Value<int?> budgetMinor = const Value.absent(),
+                Value<String> availabilityMode = const Value.absent(),
                 required int isActive,
                 Value<int> rowid = const Value.absent(),
               }) => MissionTemplatesCompanion.insert(
@@ -12924,6 +12996,7 @@ class $MissionTemplatesTableManager
                 xpReward: xpReward,
                 estimatedMinutes: estimatedMinutes,
                 budgetMinor: budgetMinor,
+                availabilityMode: availabilityMode,
                 isActive: isActive,
                 rowid: rowid,
               ),

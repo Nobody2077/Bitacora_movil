@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -97,6 +99,674 @@ class AccessScaffold extends StatelessWidget {
       ),
     );
   }
+}
+
+class AdaptiveAccessUnlock extends StatelessWidget {
+  const AdaptiveAccessUnlock({
+    required this.controller,
+    required this.accentColor,
+    required this.enabled,
+    required this.onCompleted,
+    required this.onRecovery,
+    required this.showBiometrics,
+    required this.onBiometrics,
+    required this.notice,
+    required this.failedAttempts,
+    this.blockedUntilEpochMillis,
+    super.key,
+  });
+
+  final TextEditingController controller;
+  final Color accentColor;
+  final bool enabled;
+  final ValueChanged<String> onCompleted;
+  final VoidCallback onRecovery;
+  final bool showBiometrics;
+  final VoidCallback onBiometrics;
+  final AccessNotice? notice;
+  final int failedAttempts;
+  final int? blockedUntilEpochMillis;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: <Widget>[
+          Positioned.fill(
+            child: ExcludeSemantics(
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: _TerminalDataRainPainter(
+                    accentColor: accentColor,
+                    progress: 0.58,
+                    staticFrame: true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                final double textScale = MediaQuery.textScalerOf(
+                  context,
+                ).scale(1);
+                final bool useWide =
+                    constraints.maxWidth >= 840 &&
+                    constraints.maxHeight >= 560 &&
+                    textScale <= 1.35;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(
+                    useWide ? TerminalSpace.lg : TerminalSpace.md,
+                  ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: useWide ? 1320 : 680,
+                        minHeight:
+                            (constraints.maxHeight -
+                                    (useWide
+                                        ? TerminalSpace.lg * 2
+                                        : TerminalSpace.md * 2))
+                                .clamp(0, double.infinity),
+                      ),
+                      child: useWide
+                          ? _WideAccessUnlock(
+                              controller: controller,
+                              accentColor: accentColor,
+                              enabled: enabled,
+                              onCompleted: onCompleted,
+                              onRecovery: onRecovery,
+                              showBiometrics: showBiometrics,
+                              onBiometrics: onBiometrics,
+                              notice: notice,
+                              failedAttempts: failedAttempts,
+                              blockedUntilEpochMillis: blockedUntilEpochMillis,
+                            )
+                          : _PortraitAccessUnlock(
+                              controller: controller,
+                              accentColor: accentColor,
+                              enabled: enabled,
+                              onCompleted: onCompleted,
+                              onRecovery: onRecovery,
+                              showBiometrics: showBiometrics,
+                              onBiometrics: onBiometrics,
+                              notice: notice,
+                              failedAttempts: failedAttempts,
+                              blockedUntilEpochMillis: blockedUntilEpochMillis,
+                            ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PortraitAccessUnlock extends StatelessWidget {
+  const _PortraitAccessUnlock({
+    required this.controller,
+    required this.accentColor,
+    required this.enabled,
+    required this.onCompleted,
+    required this.onRecovery,
+    required this.showBiometrics,
+    required this.onBiometrics,
+    required this.notice,
+    required this.failedAttempts,
+    required this.blockedUntilEpochMillis,
+  });
+
+  final TextEditingController controller;
+  final Color accentColor;
+  final bool enabled;
+  final ValueChanged<String> onCompleted;
+  final VoidCallback onRecovery;
+  final bool showBiometrics;
+  final VoidCallback onBiometrics;
+  final AccessNotice? notice;
+  final int failedAttempts;
+  final int? blockedUntilEpochMillis;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    key: const Key('access-layout-portrait'),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      _AccessIdentityHeader(accentColor: accentColor),
+      const SizedBox(height: TerminalSpace.lg),
+      _AccessSecurityStatus(
+        accentColor: accentColor,
+        notice: notice,
+        failedAttempts: failedAttempts,
+        blockedUntilEpochMillis: blockedUntilEpochMillis,
+      ),
+      const SizedBox(height: TerminalSpace.lg),
+      Text(
+        'ENLACE DE ACCESO',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          color: accentColor,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 1.1,
+        ),
+      ),
+      const SizedBox(height: TerminalSpace.xs),
+      Text(
+        'Introduce tu secuencia de seis dígitos para abrir la Bitácora.',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyLarge,
+      ),
+      const SizedBox(height: TerminalSpace.lg),
+      AccessCodeMatrix(
+        key: const Key('unlock-code-matrix'),
+        controller: controller,
+        accentColor: accentColor,
+        enabled: enabled,
+        onCompleted: onCompleted,
+      ),
+      const SizedBox(height: TerminalSpace.md),
+      _AccessProtocolPanel(
+        accentColor: accentColor,
+        compact: true,
+        enabled: enabled,
+        showBiometrics: showBiometrics,
+        onBiometrics: onBiometrics,
+        onRecovery: onRecovery,
+      ),
+    ],
+  );
+}
+
+class _WideAccessUnlock extends StatelessWidget {
+  const _WideAccessUnlock({
+    required this.controller,
+    required this.accentColor,
+    required this.enabled,
+    required this.onCompleted,
+    required this.onRecovery,
+    required this.showBiometrics,
+    required this.onBiometrics,
+    required this.notice,
+    required this.failedAttempts,
+    required this.blockedUntilEpochMillis,
+  });
+
+  final TextEditingController controller;
+  final Color accentColor;
+  final bool enabled;
+  final ValueChanged<String> onCompleted;
+  final VoidCallback onRecovery;
+  final bool showBiometrics;
+  final VoidCallback onBiometrics;
+  final AccessNotice? notice;
+  final int failedAttempts;
+  final int? blockedUntilEpochMillis;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    key: const Key('access-layout-wide'),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      _AccessIdentityHeader(accentColor: accentColor, technical: true),
+      const SizedBox(height: TerminalSpace.md),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: _AccessSecurityStatus(
+              accentColor: accentColor,
+              notice: notice,
+              failedAttempts: failedAttempts,
+              blockedUntilEpochMillis: blockedUntilEpochMillis,
+            ),
+          ),
+          const SizedBox(width: TerminalSpace.md),
+          Expanded(
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder:
+                  (
+                    BuildContext context,
+                    TextEditingValue value,
+                    Widget? child,
+                  ) => _AccessBuffer(
+                    enteredDigits: value.text.length.clamp(
+                      0,
+                      AccessCodeMatrix.codeLength,
+                    ),
+                    accentColor: accentColor,
+                    compact: true,
+                  ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: TerminalSpace.md),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: AccessCodeMatrix(
+              key: const Key('unlock-code-matrix'),
+              controller: controller,
+              accentColor: accentColor,
+              enabled: enabled,
+              showBuffer: false,
+              onCompleted: onCompleted,
+            ),
+          ),
+          const SizedBox(width: TerminalSpace.lg),
+          Expanded(
+            child: _AccessProtocolPanel(
+              accentColor: accentColor,
+              compact: false,
+              enabled: enabled,
+              showBiometrics: showBiometrics,
+              onBiometrics: onBiometrics,
+              onRecovery: onRecovery,
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+class _AccessIdentityHeader extends StatelessWidget {
+  const _AccessIdentityHeader({
+    required this.accentColor,
+    this.technical = false,
+  });
+
+  final Color accentColor;
+  final bool technical;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: TerminalSpace.md,
+      vertical: TerminalSpace.sm,
+    ),
+    decoration: BoxDecoration(
+      color: Colors.black.withValues(alpha: 0.72),
+      border: Border(
+        top: BorderSide(color: accentColor),
+        bottom: BorderSide(color: accentColor.withValues(alpha: 0.45)),
+      ),
+    ),
+    child: Row(
+      children: <Widget>[
+        Container(
+          width: 42,
+          height: 42,
+          decoration: ShapeDecoration(
+            color: accentColor.withValues(alpha: 0.12),
+            shape: TerminalCutCornerBorder(
+              cut: 8,
+              side: BorderSide(color: accentColor),
+            ),
+          ),
+          child: Icon(Icons.shield_outlined, color: accentColor),
+        ),
+        const SizedBox(width: TerminalSpace.sm),
+        Expanded(
+          child: Text(
+            'BITÁCORA // ACCESO',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: accentColor,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.3,
+            ),
+          ),
+        ),
+        if (technical)
+          Text(
+            'TERMINAL LOCAL · AES-256',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: accentColor.withValues(alpha: 0.76),
+              fontFamily: 'monospace',
+              letterSpacing: 0.8,
+            ),
+          ),
+      ],
+    ),
+  );
+}
+
+class _AccessSecurityStatus extends StatefulWidget {
+  const _AccessSecurityStatus({
+    required this.accentColor,
+    required this.notice,
+    required this.failedAttempts,
+    required this.blockedUntilEpochMillis,
+  });
+
+  final Color accentColor;
+  final AccessNotice? notice;
+  final int failedAttempts;
+  final int? blockedUntilEpochMillis;
+
+  @override
+  State<_AccessSecurityStatus> createState() => _AccessSecurityStatusState();
+}
+
+class _AccessSecurityStatusState extends State<_AccessSecurityStatus> {
+  Timer? _ticker;
+
+  bool get _isWaiting =>
+      widget.notice == AccessNotice.progressiveWait &&
+      widget.blockedUntilEpochMillis != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncTicker();
+  }
+
+  @override
+  void didUpdateWidget(covariant _AccessSecurityStatus oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.blockedUntilEpochMillis != widget.blockedUntilEpochMillis ||
+        oldWidget.notice != widget.notice) {
+      _syncTicker();
+    }
+  }
+
+  void _syncTicker() {
+    _ticker?.cancel();
+    _ticker = _isWaiting
+        ? Timer.periodic(const Duration(seconds: 1), (_) {
+            if (!mounted) {
+              return;
+            }
+            if (_remainingSeconds() <= 0) {
+              _ticker?.cancel();
+            }
+            setState(() {});
+          })
+        : null;
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.notice != null && !_isWaiting) {
+      return AccessNoticeBanner(
+        notice: widget.notice,
+        blockedUntilEpochMillis: widget.blockedUntilEpochMillis,
+      );
+    }
+
+    final int remaining = _remainingSeconds();
+    final int duration = _waitDurationSeconds(widget.failedAttempts);
+    final bool waiting = _isWaiting && remaining > 0;
+    final String title = waiting
+        ? 'ESPERA DE SEGURIDAD'
+        : 'TERMINAL LOCAL PROTEGIDA';
+    final String value = waiting ? '${remaining}s' : 'ACTIVA';
+    final double progress = waiting
+        ? (remaining / duration).clamp(0.0, 1.0)
+        : 1;
+    return Semantics(
+      container: true,
+      liveRegion: waiting,
+      label: waiting
+          ? 'Espera de seguridad, $remaining segundos restantes'
+          : 'Terminal local protegida y lista',
+      child: ExcludeSemantics(
+        child: Container(
+          key: const Key('access-security-status'),
+          padding: const EdgeInsets.all(TerminalSpace.md),
+          decoration: ShapeDecoration(
+            color: Colors.black.withValues(alpha: 0.82),
+            shape: TerminalCutCornerBorder(
+              cut: 10,
+              side: BorderSide(color: widget.accentColor),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: widget.accentColor,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    value,
+                    key: const Key('access-security-status-value'),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: widget.accentColor,
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: TerminalSpace.sm),
+              LinearProgressIndicator(
+                value: progress,
+                minHeight: 7,
+                backgroundColor: widget.accentColor.withValues(alpha: 0.12),
+                valueColor: AlwaysStoppedAnimation<Color>(widget.accentColor),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  int _remainingSeconds() {
+    final int? until = widget.blockedUntilEpochMillis;
+    if (until == null) {
+      return 0;
+    }
+    return DateTime.fromMillisecondsSinceEpoch(
+      until,
+    ).difference(DateTime.now()).inSeconds.clamp(0, 900);
+  }
+
+  int _waitDurationSeconds(int failedAttempts) {
+    int duration = 30;
+    for (int index = 5; index < failedAttempts; index++) {
+      duration = (duration * 2).clamp(30, 900);
+    }
+    return duration;
+  }
+}
+
+class _AccessProtocolPanel extends StatelessWidget {
+  const _AccessProtocolPanel({
+    required this.accentColor,
+    required this.compact,
+    required this.enabled,
+    required this.showBiometrics,
+    required this.onBiometrics,
+    required this.onRecovery,
+  });
+
+  final Color accentColor;
+  final bool compact;
+  final bool enabled;
+  final bool showBiometrics;
+  final VoidCallback onBiometrics;
+  final VoidCallback onRecovery;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    key: const Key('access-protocol-panel'),
+    padding: const EdgeInsets.all(TerminalSpace.lg),
+    decoration: ShapeDecoration(
+      color: Colors.black.withValues(alpha: 0.84),
+      shape: TerminalCutCornerBorder(
+        cut: 12,
+        side: BorderSide(color: accentColor),
+      ),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Icon(Icons.security_outlined, color: accentColor),
+            const SizedBox(width: TerminalSpace.sm),
+            Expanded(
+              child: Text(
+                'PROTOCOLO DE ACCESO',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: accentColor,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: TerminalSpace.md),
+        if (compact) ...<Widget>[
+          Text(
+            'SECUENCIA SEGURA · 6 DÍGITOS · VALIDACIÓN LOCAL CIFRADA',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: accentColor.withValues(alpha: 0.82),
+              fontFamily: 'monospace',
+              letterSpacing: 0.7,
+            ),
+          ),
+        ] else ...<Widget>[
+          Text(
+            'ENLACE DE ACCESO',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              color: accentColor,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: TerminalSpace.xs),
+          Text(
+            'Introduce tu secuencia de seis dígitos para abrir la Bitácora.',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          _ProtocolStep(
+            accentColor: accentColor,
+            icon: Icons.shield_outlined,
+            index: '01',
+            title: 'SECUENCIA SEGURA',
+            detail: 'Solo tú posees la clave.',
+          ),
+          _ProtocolStep(
+            accentColor: accentColor,
+            icon: Icons.lock_outline,
+            index: '02',
+            title: '6 DÍGITOS REQUERIDOS',
+            detail: 'Introduce el código de acceso completo.',
+          ),
+          _ProtocolStep(
+            accentColor: accentColor,
+            icon: Icons.memory_outlined,
+            index: '03',
+            title: 'VALIDACIÓN LOCAL CIFRADA',
+            detail: 'Verificación realizada en el dispositivo.',
+          ),
+        ],
+        const SizedBox(height: TerminalSpace.md),
+        if (showBiometrics) ...<Widget>[
+          OutlinedButton.icon(
+            key: const Key('biometric-unlock-button'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: accentColor,
+              side: BorderSide(color: accentColor),
+            ),
+            onPressed: enabled ? onBiometrics : null,
+            icon: const Icon(Icons.fingerprint),
+            label: const Text('Usar biometría'),
+          ),
+          const SizedBox(height: TerminalSpace.xs),
+        ],
+        TextButton(
+          key: const Key('open-recovery-button'),
+          style: TextButton.styleFrom(foregroundColor: accentColor),
+          onPressed: enabled ? onRecovery : null,
+          child: const Text('RECUPERAR ACCESO'),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ProtocolStep extends StatelessWidget {
+  const _ProtocolStep({
+    required this.accentColor,
+    required this.icon,
+    required this.index,
+    required this.title,
+    required this.detail,
+  });
+
+  final Color accentColor;
+  final IconData icon;
+  final String index;
+  final String title;
+  final String detail;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: TerminalSpace.sm),
+    child: Row(
+      children: <Widget>[
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: accentColor.withValues(alpha: 0.08),
+            border: Border.all(color: accentColor.withValues(alpha: 0.65)),
+          ),
+          child: Icon(icon, color: accentColor),
+        ),
+        const SizedBox(width: TerminalSpace.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                title,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: accentColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(detail, style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+        ),
+        Text(
+          index,
+          style: TextStyle(
+            color: accentColor,
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 enum AccessTerminalStage { validating, opening }
@@ -450,6 +1120,7 @@ class AccessCodeMatrix extends StatelessWidget {
     required this.accentColor,
     required this.onCompleted,
     this.enabled = true,
+    this.showBuffer = true,
     super.key,
   });
 
@@ -470,6 +1141,7 @@ class AccessCodeMatrix extends StatelessWidget {
   final Color accentColor;
   final ValueChanged<String> onCompleted;
   final bool enabled;
+  final bool showBuffer;
 
   @override
   Widget build(BuildContext context) =>
@@ -480,8 +1152,10 @@ class AccessCodeMatrix extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _AccessBuffer(enteredDigits: entered, accentColor: accentColor),
-              const SizedBox(height: 18),
+              if (showBuffer) ...<Widget>[
+                _AccessBuffer(enteredDigits: entered, accentColor: accentColor),
+                const SizedBox(height: 18),
+              ],
               _AccessNumberGrid(
                 accentColor: accentColor,
                 enabled: enabled,
@@ -530,10 +1204,15 @@ class AccessCodeMatrix extends StatelessWidget {
 }
 
 class _AccessBuffer extends StatelessWidget {
-  const _AccessBuffer({required this.enteredDigits, required this.accentColor});
+  const _AccessBuffer({
+    required this.enteredDigits,
+    required this.accentColor,
+    this.compact = false,
+  });
 
   final int enteredDigits;
   final Color accentColor;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -560,9 +1239,12 @@ class _AccessBuffer extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: compact ? 6 : 10),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 10 : 14,
+              vertical: compact ? 8 : 12,
+            ),
             decoration: ShapeDecoration(
               color: accentColor.withValues(alpha: 0.05),
               shape: TerminalCutCornerBorder(
@@ -575,11 +1257,11 @@ class _AccessBuffer extends StatelessWidget {
               children: List<Widget>.generate(
                 AccessCodeMatrix.codeLength,
                 (int index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 5),
                   child: Container(
                     key: ValueKey<String>('access-buffer-slot-$index'),
-                    width: 28,
-                    height: 34,
+                    width: compact ? 24 : 28,
+                    height: compact ? 28 : 34,
                     decoration: BoxDecoration(
                       color: index < enteredDigits
                           ? accentColor.withValues(alpha: 0.20)
@@ -636,12 +1318,14 @@ class _AccessNumberGrid extends StatelessWidget {
             children: <Widget>[
               const Icon(Icons.grid_view_outlined, color: Colors.black),
               const SizedBox(width: 10),
-              Text(
-                'MATRIZ DE CÓDIGO',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.1,
+              Expanded(
+                child: Text(
+                  'MATRIZ DE CÓDIGO',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
             ],

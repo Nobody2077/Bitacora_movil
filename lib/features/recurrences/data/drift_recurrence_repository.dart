@@ -198,6 +198,9 @@ final class DriftRecurrenceRepository implements RecurrenceRepository {
     xpReward: Value<int>(t.xpReward),
     estimatedMinutes: Value<int?>(t.estimatedMinutes),
     budgetMinor: Value<int?>(t.budgetMinor),
+    availabilityMode: Value<String>(
+      RecurrenceMapper.availabilityModeToDb(t.availabilityMode),
+    ),
     isActive: Value<int>(t.isActive ? 1 : 0),
   );
 

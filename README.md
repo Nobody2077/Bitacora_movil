@@ -12,8 +12,9 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 > externo de la firma. A9 añade calendario día/semana/mes y recordatorios
 > configurables. El incremento local más reciente añade planificación flexible,
 > batería real, controles configurables de privacidad/cámara/notificaciones y
-> ocho estados de ánimo con migración Drift v1→v2. La matriz está verde con
-> 212 pruebas; todavía no se generó una APK de este incremento.
+> ocho estados de ánimo y un tablón diario para tomar misiones sin llenar Hoy
+> por anticipado. Drift migra bases v1/v2 a v3. La matriz está verde con 219
+> pruebas y la APK `prodRelease` firmada `1.2.0+5` fue verificada.
 
 ## Qué busca ofrecer
 
@@ -31,7 +32,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | Fase | Estado | Resultado |
 | --- | --- | --- |
 | A0 — Base del proyecto | Completada | Flavors, tema, navegación, shell adaptable y arquitectura base |
-| A1 — Persistencia | Completada | Drift v2 compatible con v1, 19 tablas, DAOs, repositorios y SQLite cifrado |
+| A1 — Persistencia | Completada | Drift v3 compatible con v1/v2, 19 tablas, DAOs, repositorios y SQLite cifrado |
 | A2 — Acceso y privacidad | Completada | PIN, recuperación, biometría, guard global, autobloqueo y `FLAG_SECURE` |
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
@@ -39,7 +40,8 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A6 — Copia y restauración | Retirada del MVP | ADR-005; G6 retirada / no aplica |
 | A7 — UI v2 y accesibilidad | Completada | G7 verde: auditoría, 3 goldens, 182 pruebas y validación física |
 | A8 — Release | En progreso | Instalación y actualización release aprobadas; faltan métricas físicas y respaldo de firma |
-| A9 — Calendario y recordatorios | En validación | Día/semana/mes, planificación flexible, anticipación, privacidad configurable y 212 pruebas verdes |
+| A9 — Calendario y recordatorios | En validación | Día/semana/mes, planificación flexible, anticipación, privacidad configurable y 215 pruebas verdes |
+| A10 — Tablón de misiones | Implementada localmente | Diarias automáticas o disponibles para tomar, sin duplicados; 219 pruebas verdes |
 
 La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Todo el lienzo visual —fondo, barra lateral, paneles, tarjetas y superficies elevadas— usa negro puro. El acceso bloqueado usa BÚFER y una matriz numérica táctil sin teclado del sistema; su color dominante se elige en Apariencia entre amarillo, rojo y gris. Durante la validación muestra una transición terminal con códigos, barrido y estados reales, sin demoras artificiales ni datos sensibles. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección amarilla con marco completo y esquina inferior derecha recortada.
 
@@ -66,12 +68,14 @@ avisos, elegir 0/5/15/30/60 minutos de anticipación y definir un horario
 silencioso. El título permanece oculto por defecto y solo se incluye cuando el
 usuario habilita expresamente “Mostrar detalles de la misión”.
 
-La actualización del 29 de agosto añade fechas opcionales o sin hora, convierte
-las misiones diarias manuales en recurrencias, muestra la batería real en la
+La actualización del 29 de agosto añade fechas opcionales o sin hora, permite
+elegir entre diarias automáticas o disponibles en un tablón, muestra la batería real en la
 barra lateral y permite configurar capturas y cámara. Bitácora ofrece ocho
-estados de ánimo y migra el esquema local de v1 a v2 sin descartar entradas.
+estados de ánimo y migra el esquema local de v1/v2 a v3 sin descartar entradas.
 El detalle técnico está en
 [`documentos/ACTUALIZACION-2026-08-29.md`](documentos/ACTUALIZACION-2026-08-29.md).
+El contrato específico del tablón está en
+[`documentos/A10-TABLON-MISIONES.md`](documentos/A10-TABLON-MISIONES.md).
 
 ## Arquitectura resumida
 
@@ -99,7 +103,7 @@ Orden recomendado de lectura:
 
 1. [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md): relevo operativo y mapa de conexiones.
 2. [`documentos/DECISIONES_PRE_A0.md`](documentos/DECISIONES_PRE_A0.md): decisiones vinculantes y secuencia A0–A8.
-3. [`documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md`](documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md): contrato base de persistencia y cifrado; su ampliación compatible v2 se registra en la actualización del 29 de agosto.
+3. [`documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md`](documentos/ADR-001-CONTRATO_PERSISTENCIA_V1.md): contrato base de persistencia y cifrado; sus ampliaciones compatibles v2/v3 se registran en la actualización del 29 de agosto.
 4. [`documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`](documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md): acceso y privacidad.
 5. [`documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md`](documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md): reglas de títulos, rachas y niveles.
 6. [`documentos/ADR-005-RETIRO-A6-MVP.md`](documentos/ADR-005-RETIRO-A6-MVP.md): retiro de A6 y secuencia vigente hacia A8.
@@ -108,7 +112,7 @@ Orden recomendado de lectura:
 9. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico aprobado que cerró A7.
 10. [`documentos/A8-VALIDACION-RELEASE.md`](documentos/A8-VALIDACION-RELEASE.md): gate, métricas y recorrido pendiente para cerrar G8.
 11. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
-12. [`documentos/ACTUALIZACION-2026-08-29.md`](documentos/ACTUALIZACION-2026-08-29.md): planificación flexible, batería, controles y esquema v2.
+12. [`documentos/ACTUALIZACION-2026-08-29.md`](documentos/ACTUALIZACION-2026-08-29.md): planificación flexible, tablón, batería, controles y esquema v3.
 13. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.
 

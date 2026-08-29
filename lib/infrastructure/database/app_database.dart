@@ -14,7 +14,7 @@ final class AppDatabase extends _$AppDatabase {
   final UtcNowMilliseconds _utcNowMilliseconds;
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -25,12 +25,19 @@ final class AppDatabase extends _$AppDatabase {
       await _syncSchemaVersionMirror();
     },
     onUpgrade: (Migrator migrator, int from, int to) async {
-      if (from == 1 && to == 2) {
-        await migrator.addColumn(journalEntries, journalEntries.moodDetail);
-        await _syncSchemaVersionMirror();
-        return;
+      if (from < 1 || to != 3 || from >= to) {
+        throw UnsupportedError('No schema upgrade exists for $from -> $to.');
       }
-      throw UnsupportedError('No schema upgrade exists for $from -> $to.');
+      if (from == 1) {
+        await migrator.addColumn(journalEntries, journalEntries.moodDetail);
+      }
+      if (from <= 2) {
+        await migrator.addColumn(
+          missionTemplates,
+          missionTemplates.availabilityMode,
+        );
+      }
+      await _syncSchemaVersionMirror();
     },
     beforeOpen: (OpeningDetails _) async {
       await customStatement('PRAGMA foreign_keys = ON');

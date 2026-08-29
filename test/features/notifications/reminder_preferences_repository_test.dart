@@ -47,7 +47,7 @@ void main() {
     expect(actual.quietHoursEnabled, isTrue);
     expect(actual.quietStartMinutes, expected.quietStartMinutes);
     expect(actual.quietEndMinutes, expected.quietEndMinutes);
-    expect(await SettingsDao(database).getSchemaVersionMirror(), 2);
+    expect(await SettingsDao(database).getSchemaVersionMirror(), 3);
   });
 
   test('rechaza anticipación y horas no soportadas', () async {

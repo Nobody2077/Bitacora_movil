@@ -141,11 +141,22 @@ void main() {
         find.byKey(const ValueKey<String>('sidebar-device-battery')),
         findsOneWidget,
       );
-      final FractionallySizedBox batteryFill = tester
-          .widget<FractionallySizedBox>(
-            find.byKey(const ValueKey<String>('sidebar-device-battery-fill')),
-          );
-      expect(batteryFill.heightFactor, 0.62);
+      for (int index = 0; index < 13; index++) {
+        expect(
+          find.byKey(
+            ValueKey<String>('sidebar-device-battery-segment-$index-filled'),
+          ),
+          findsOneWidget,
+        );
+      }
+      for (int index = 13; index < 20; index++) {
+        expect(
+          find.byKey(
+            ValueKey<String>('sidebar-device-battery-segment-$index-empty'),
+          ),
+          findsOneWidget,
+        );
+      }
       expect(
         find.byKey(const ValueKey<String>('sidebar-mission-segments-overflow')),
         findsNothing,
@@ -175,6 +186,10 @@ void main() {
       expect(
         selectedShape.borderRadius,
         const BorderRadius.only(bottomRight: Radius.circular(10)),
+      );
+      await expectLater(
+        find.byType(TerminalSidebar),
+        matchesGoldenFile('goldens/sidebar_modular_battery.png'),
       );
       final TerminalDivider profileDivider = tester.widget<TerminalDivider>(
         find.byKey(const ValueKey<String>('sidebar-profile-divider')),

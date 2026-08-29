@@ -315,34 +315,25 @@ class _TerminalProfileHeader extends StatelessWidget {
                 if (extended) ...<Widget>[
                   const SizedBox(width: TerminalSpace.sm),
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                displayName,
-                                key: const ValueKey<String>(
-                                  'sidebar-profile-name',
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      color: tokens.valueYellow,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 16,
-                                    ),
+                        Text(
+                          displayName,
+                          key: const ValueKey<String>('sidebar-profile-name'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: tokens.valueYellow,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16,
                               ),
-                              const SizedBox(height: TerminalSpace.xxs),
-                              _ProfileHealthBar(vitals: missionVitals),
-                            ],
-                          ),
                         ),
-                        const SizedBox(width: TerminalSpace.xs),
-                        _VerticalDeviceBattery(level: batteryLevel),
+                        const SizedBox(height: TerminalSpace.xxs),
+                        _ProfileHealthBar(vitals: missionVitals),
+                        const SizedBox(height: TerminalSpace.xs),
+                        _ModularDeviceBattery(level: batteryLevel),
                       ],
                     ),
                   ),
@@ -418,8 +409,10 @@ class _ProfileHealthBar extends StatelessWidget {
   }
 }
 
-class _VerticalDeviceBattery extends StatelessWidget {
-  const _VerticalDeviceBattery({required this.level});
+class _ModularDeviceBattery extends StatelessWidget {
+  const _ModularDeviceBattery({required this.level});
+
+  static const int segmentCount = 20;
 
   final int? level;
 
@@ -431,67 +424,66 @@ class _VerticalDeviceBattery extends StatelessWidget {
     final int? safeLevel = level?.clamp(0, 100).toInt();
     final Color color = safeLevel == null
         ? tokens.textDisabled
-        : safeLevel <= 20
-        ? tokens.terminalRed
-        : safeLevel <= 50
-        ? tokens.valueYellow
         : tokens.infoCyan;
+    final int filledSegments = safeLevel == null
+        ? 0
+        : ((safeLevel / 100) * segmentCount).ceil().clamp(0, segmentCount);
     final String label = safeLevel == null
         ? 'Batería no disponible'
-        : 'Batería del dispositivo: $safeLevel%';
+        : 'Batería, $safeLevel por ciento';
 
     return Semantics(
       label: label,
-      child: Tooltip(
-        message: label,
-        child: SizedBox(
-          key: const ValueKey<String>('sidebar-device-battery'),
-          width: 18,
-          height: 42,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Container(
-                width: 8,
-                height: 3,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: color, width: 1),
-                ),
-              ),
-              Container(
-                width: 18,
-                height: 37,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: color, width: 1.2),
-                ),
-                child: safeLevel == null
-                    ? Center(
-                        child: Text(
-                          '?',
-                          style: TextStyle(
-                            color: color,
-                            fontFamily: 'JetBrains Mono',
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
+      value: safeLevel == null ? null : '$safeLevel%',
+      child: ExcludeSemantics(
+        child: Tooltip(
+          message: label,
+          child: SizedBox(
+            key: const ValueKey<String>('sidebar-device-battery'),
+            height: 18,
+            child: Row(
+              children: List<Widget>.generate(segmentCount, (int index) {
+                final bool filled = index < filledSegments;
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      right: index == segmentCount - 1 ? 0 : 2,
+                    ),
+                    child: Container(
+                      key: ValueKey<String>(
+                        'sidebar-device-battery-segment-$index-'
+                        '${filled ? 'filled' : 'empty'}',
+                      ),
+                      decoration: ShapeDecoration(
+                        color: filled
+                            ? color.withValues(alpha: 0.94)
+                            : color.withValues(alpha: 0.035),
+                        shape: TerminalCutCornerBorder(
+                          cut: 2,
+                          side: BorderSide(
+                            color: color.withValues(
+                              alpha: filled ? 0.95 : 0.28,
+                            ),
+                            width: filled ? 1 : 0.7,
                           ),
-                        ),
-                      )
-                    : Align(
-                        alignment: Alignment.bottomCenter,
-                        child: FractionallySizedBox(
-                          key: const ValueKey<String>(
-                            'sidebar-device-battery-fill',
-                          ),
-                          widthFactor: 1,
-                          heightFactor: safeLevel / 100,
-                          child: ColoredBox(color: color),
                         ),
                       ),
-              ),
-            ],
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          width: 2,
+                          height: 2,
+                          margin: const EdgeInsets.only(top: 2),
+                          color: filled
+                              ? Colors.black.withValues(alpha: 0.65)
+                              : color.withValues(alpha: 0.22),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
           ),
         ),
       ),

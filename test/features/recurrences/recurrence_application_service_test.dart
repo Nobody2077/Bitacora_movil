@@ -197,12 +197,88 @@ void main() {
       expect(stored.objectives, hasLength(original.objectives.length));
     },
   );
+
+  test('el tablón no autogenera y tomar una misión es idempotente', () async {
+    final saved =
+        (await service.saveTemplate(
+                  _request(
+                    frequency: RecurrenceFrequency.daily,
+                    startDate: '2026-08-26',
+                    missionType: MissionType.daily,
+                    availabilityMode: TemplateAvailabilityMode.board,
+                    objectives: const <RecurrenceObjectiveDraft>[
+                      RecurrenceObjectiveDraft(description: 'Paso del tablón'),
+                    ],
+                  ),
+                )
+                as Success<RecurrenceTemplate>)
+            .value;
+
+    final generated = await service.generatePendingOccurrences(
+      localTodayOverride: '2026-08-26',
+    );
+    expect((generated as Success<int>).value, 0);
+    expect(await database.select(database.missions).get(), isEmpty);
+
+    final before = await service.watchMissionBoard().first;
+    final beforeEntries = (before as Success<List<MissionBoardEntry>>).value;
+    expect(beforeEntries, hasLength(1));
+    expect(beforeEntries.single.isTakenToday, isFalse);
+
+    final first = await service.takeMissionFromBoard(saved.id);
+    final firstTake = (first as Success<MissionBoardTake>).value;
+    expect(firstTake.created, isTrue);
+
+    final retried = await service.takeMissionFromBoard(saved.id);
+    final retryTake = (retried as Success<MissionBoardTake>).value;
+    expect(retryTake.created, isFalse);
+    expect(retryTake.missionId, firstTake.missionId);
+    expect(await database.select(database.missions).get(), hasLength(1));
+    expect(
+      await database.select(database.missionObjectives).get(),
+      hasLength(1),
+    );
+
+    final after = await service.watchMissionBoard().first;
+    final afterEntry = (after as Success<List<MissionBoardEntry>>).value.single;
+    expect(afterEntry.missionId, firstTake.missionId);
+    expect(afterEntry.missionStatus, MissionStatus.available);
+  });
+
+  test('no mezcla modos cuando la plantilla ya generó misiones', () async {
+    final automatic =
+        (await service.saveTemplate(
+                  _request(
+                    frequency: RecurrenceFrequency.daily,
+                    startDate: '2026-08-26',
+                    missionType: MissionType.daily,
+                  ),
+                )
+                as Success<RecurrenceTemplate>)
+            .value;
+    await service.generatePendingOccurrences(localTodayOverride: '2026-08-26');
+
+    final changed = await service.saveTemplate(
+      _request(
+        existing: automatic,
+        frequency: RecurrenceFrequency.daily,
+        startDate: '2026-08-26',
+        missionType: MissionType.daily,
+        availabilityMode: TemplateAvailabilityMode.board,
+      ),
+    );
+
+    expect(changed, isA<Failure<RecurrenceTemplate>>());
+  });
 }
 
 SaveTemplateRequest _request({
   required RecurrenceFrequency frequency,
   required String startDate,
   RecurrenceTemplate? existing,
+  MissionType missionType = MissionType.recurring,
+  TemplateAvailabilityMode availabilityMode =
+      TemplateAvailabilityMode.automatic,
   String title = 'Rutina recurrente',
   int intervalValue = 1,
   int? localTimeMinutes,
@@ -213,7 +289,8 @@ SaveTemplateRequest _request({
   existing: existing,
   areaId: DefaultSeedV1.studiesAreaId,
   title: title,
-  missionType: MissionType.recurring,
+  missionType: missionType,
+  availabilityMode: availabilityMode,
   importance: MissionImportance.normal,
   priority: MissionPriority.normal,
   isRequired: false,
