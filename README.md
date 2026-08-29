@@ -6,7 +6,11 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 
 > **Estado actual:** A0–A5 y A7 están completadas; G7 quedó verde con la
 > aprobación física del usuario el 28 de agosto de 2026. A6 fue retirada del
-> MVP y G6 no aplica. A8 está autorizada como siguiente fase.
+> MVP y G6 no aplica. A8 está en progreso: preflight, firma permanente y
+> APK/AAB release están verificados; la instalación limpia y la actualización
+> conservando datos fueron aprobadas. Solo faltan métricas físicas y el respaldo
+> externo de la firma. A9 añade calendario día/semana/mes y recordatorios
+> configurables; su candidata visual `1.1.1+4` está pendiente de validación física.
 
 ## Qué busca ofrecer
 
@@ -15,7 +19,8 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 - Bitácora vinculable con misiones y movimientos.
 - XP, niveles y paneles diarios y semanales.
 - Funcionamiento completamente local y adaptable a teléfono y tablet.
-- PIN obligatorio, recuperación, biometría opcional, autobloqueo y protección de capturas.
+- PIN obligatorio mediante BÚFER y matriz numérica táctil, recuperación,
+  biometría opcional, autobloqueo y protección de capturas.
 - Base SQLite cifrada con claves protegidas por Android Keystore.
 
 ## Estado del desarrollo
@@ -30,9 +35,10 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
 | A6 — Copia y restauración | Retirada del MVP | ADR-005; G6 retirada / no aplica |
 | A7 — UI v2 y accesibilidad | Completada | G7 verde: auditoría, 3 goldens, 182 pruebas y validación física |
-| A8 — Release | Autorizada | Siguiente fase: rendimiento, regresión y artefactos release |
+| A8 — Release | En progreso | Instalación y actualización release aprobadas; faltan métricas físicas y respaldo de firma |
+| A9 — Calendario y recordatorios | En validación | Día/semana/mes, fecha contextual, anticipación y horario silencioso; 202 pruebas verdes |
 
-La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección cian.
+La capa visual disponible cubre acceso, recuperación, ajustes de privacidad, el ciclo completo de Misiones, las rutas canónicas de Economía y la base funcional de Bitácora. Todo el lienzo visual —fondo, barra lateral, paneles, tarjetas y superficies elevadas— usa negro puro. El acceso bloqueado usa BÚFER y una matriz numérica táctil sin teclado del sistema; su color dominante se elige en Apariencia entre amarillo, rojo y gris. Durante la validación muestra una transición terminal con códigos, barrido y estados reales, sin demoras artificiales ni datos sensibles. Inicio muestra el saldo disponible real y ofrece accesos directos para registrar gasto e ingreso. En tablet, la barra lateral incluye un perfil local editable con nombre y foto privada, navegación inactiva roja y selección amarilla con marco completo y esquina inferior derecha recortada.
 
 Para conocer el punto exacto de continuación, las piezas protegidas y lo que aún no tiene consumidor en producción, leer [`ESTADO_ACTUAL.md`](ESTADO_ACTUAL.md).
 
@@ -40,18 +46,21 @@ El estado del sistema visual real y las reglas para extenderlo sin romper la
 coherencia de tablet y móvil están en
 [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md).
 
-El último gate validado físicamente es G5: `/journal/search` busca por texto literal,
-rango, procedencia y presencia de fotografías; `/journal/archive` conserva
-entradas, vínculos y fotos fuera de la cronología y permite restaurarlas. El
-cierre diario y los dashboards diario, semanal y de nivel RPG también están
-conectados. Progreso añade niveles por área, rachas y títulos con historial. El
-trabajo actual es A7: su primer incremento conecta `/settings/appearance` con
-preferencias persistentes y reactivas. A7.2 añade composición exacta en los
-breakpoints, equivalencia teléfono/tablet, texto 2.0× y goldens compactos y
-expandidos. A7.3 unifica carga, vacío, error y reintento con semántica y foco en
-las rutas principales. A7.4 extiende el patrón a detalles, formularios,
-contenido en línea y el diálogo de perfil. ADR-005 retira A6 del MVP.
-La aprobación física cerró G7; el trabajo siguiente es A8.
+G7 es el último gate cerrado físicamente. A8 prepara la versión `1.0.0+2`, protege
+la firma release sin fallback debug, desactiva tráfico claro y toda extracción
+Android, ejecuta Lint de `prodRelease` y comprueba los índices de consultas
+críticas. El gate final mide la base cifrada con 1.000 misiones y 5.000
+movimientos en un dispositivo Android y verifica APK/AAB firmados.
+El usuario aprobó físicamente la candidata `prod-debug` y la instalación limpia
+de la release `1.0.0+1` el 28 de agosto de 2026. Después instaló `1.0.0+2`,
+firmada con el mismo certificado, encima de esa instalación y confirmó que todo
+funciona correctamente. Aún no se declara G8 verde hasta medirla en dispositivo
+y respaldar externamente la firma.
+
+A9 amplía el calendario a vistas diaria, semanal y mensual. Crear desde una
+fecha la precarga en el formulario. Ajustes > Notificaciones permite activar
+avisos, elegir 0/5/15/30/60 minutos de anticipación y definir un horario
+silencioso. Todo permanece local, cifrado y sin contenido sensible en el aviso.
 
 ## Arquitectura resumida
 
@@ -86,8 +95,9 @@ Orden recomendado de lectura:
 7. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): antecedente histórico superado por ADR-005.
 8. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
 9. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico aprobado que cerró A7.
-10. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
-11. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
+10. [`documentos/A8-VALIDACION-RELEASE.md`](documentos/A8-VALIDACION-RELEASE.md): gate, métricas y recorrido pendiente para cerrar G8.
+11. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
+12. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.
 
 Cuando un documento fuente contradiga una decisión posterior, prevalecen `DECISIONES_PRE_A0.md` y los ADR aplicables.
@@ -115,7 +125,7 @@ Producción local:
 flutter run --flavor prod -t lib/main_prod.dart
 ```
 
-## Generar APK
+## Generar APK debug
 
 ```powershell
 flutter build apk --debug --flavor dev -t lib/main_dev.dart
@@ -123,6 +133,22 @@ flutter build apk --debug --flavor prod -t lib/main_prod.dart
 ```
 
 No se conservan APK dentro del proyecto. `build/` está ignorado por Git y sus artefactos son reproducibles; los APK debug anteriores se eliminaron porque estaban duplicados y ocupaban aproximadamente 804 MiB. Si se necesita distribuir una versión, debe generarse desde el commit elegido y publicarse como asset de una GitHub Release o con separación por ABI; no debe añadirse al repositorio mediante `force-add`.
+
+## Generar release firmado
+
+Copiar `android/signing.properties.example` como `android/signing.properties` y
+completarlo con una llave de producción privada, o definir las cuatro variables
+`BITACORA_RELEASE_*`. El archivo y las llaves están ignorados por Git. Sin esa
+configuración, las tareas APK/AAB release fallan de forma deliberada.
+
+```powershell
+flutter build apk --release --flavor prod -t lib/main_prod.dart
+flutter build appbundle --release --flavor prod -t lib/main_prod.dart
+```
+
+No desinstalar una APK `prod` firmada con debug si contiene datos valiosos: una
+APK con la nueva firma de producción no puede actualizarla y A6 fue retirada.
+Usar un dispositivo limpio dedicado para el primer smoke release.
 
 ## Verificación disponible
 
@@ -142,6 +168,18 @@ Gate Android de acceso y privacidad:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tool/gate_g2.ps1 -DeviceId emulator-5554
+```
+
+Preflight A8 sin secretos ni dispositivo:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tool/a8_preflight.ps1
+```
+
+Gate G8 completo con firma y dispositivo dedicado:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tool/gate_g8.ps1 -DeviceId <serial-adb>
 ```
 
 La prioridad actual es avanzar la aplicación funcional. Las pruebas existentes se conservan como red de seguridad y las verificaciones deben ser proporcionales al cambio.

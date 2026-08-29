@@ -28,6 +28,7 @@ import '../../features/missions/presentation/mission_detail_page.dart';
 import '../../features/missions/presentation/mission_form_page.dart';
 import '../../features/missions/presentation/mission_switch_timer_page.dart';
 import '../../features/missions/presentation/missions_today_page.dart';
+import '../../features/notifications/presentation/notification_settings_page.dart';
 import '../../features/progress/presentation/dashboard_daily_page.dart';
 import '../../features/progress/presentation/dashboard_progress_page.dart';
 import '../../features/progress/presentation/dashboard_weekly_page.dart';
@@ -140,10 +141,17 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
           return const RecurrenceListPage();
         }
         if (contract.name == 'missionsCalendar') {
-          return const MissionCalendarPage();
+          return MissionCalendarPage(
+            initialDay: _parseLocalDate(state.uri.queryParameters['date']),
+          );
         }
         if (contract.name == 'missionNew') {
-          return const MissionFormPage();
+          return MissionFormPage(
+            initialScheduledLocal: _parseLocalDate(
+              state.uri.queryParameters['date'],
+            ),
+            origin: state.uri.queryParameters['origin'],
+          );
         }
         if (contract.name == 'missionTemplateNew') {
           return const RecurrenceFormPage();
@@ -317,6 +325,9 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
         if (contract.path == AppRoutes.settingsPrivacyBiometrics) {
           return const BiometricsSettingsPage();
         }
+        if (contract.path == AppRoutes.settingsNotifications) {
+          return const NotificationSettingsPage();
+        }
         return FeaturePlaceholderPage(
           contract: contract,
           location: state.uri.toString(),
@@ -354,4 +365,19 @@ String? _accessRedirect(Ref ref, GoRouterState state) {
 
 final class _RouterRefreshNotifier extends ChangeNotifier {
   void refresh() => notifyListeners();
+}
+
+DateTime? _parseLocalDate(String? value) {
+  if (value == null || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+    return null;
+  }
+  final DateTime? parsed = DateTime.tryParse(value);
+  if (parsed == null ||
+      '${parsed.year.toString().padLeft(4, '0')}-'
+              '${parsed.month.toString().padLeft(2, '0')}-'
+              '${parsed.day.toString().padLeft(2, '0')}' !=
+          value) {
+    return null;
+  }
+  return DateTime(parsed.year, parsed.month, parsed.day);
 }

@@ -1,0 +1,6 @@
+# Copiar como android/signing.properties y completar fuera del control de versiones.
+# storeFile puede ser una ruta absoluta o relativa a android/.
+storeFile=C:/ruta/privada/bitacora-release.jks
+storePassword=REEMPLAZAR
+keyAlias=bitacora-release
+keyPassword=REEMPLAZAR

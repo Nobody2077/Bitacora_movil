@@ -444,17 +444,27 @@ class TerminalCard extends StatelessWidget {
 }
 
 class TerminalDivider extends StatelessWidget {
-  const TerminalDivider({super.key, this.indent = 0, this.endIndent = 0});
+  const TerminalDivider({
+    super.key,
+    this.indent = 0,
+    this.endIndent = 0,
+    this.color,
+  });
 
   final double indent;
   final double endIndent;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
-    return Divider(color: tokens.border, indent: indent, endIndent: endIndent);
+    return Divider(
+      color: color ?? tokens.border,
+      indent: indent,
+      endIndent: endIndent,
+    );
   }
 }
 

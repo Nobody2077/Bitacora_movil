@@ -30,14 +30,21 @@ class _AppearanceSettingsPageState
     setState(() => _savingPreference = preference);
 
     AppFailure? failure;
+    bool saved = false;
     try {
       final Result<void> result = await ref
           .read(settingsRepositoryProvider)
           .save(nextPreferences.copyWith(updatedAtUtc: DateTime.now().toUtc()));
       result.fold<void>(
-        onSuccess: (_) {},
+        onSuccess: (_) => saved = true,
         onFailure: (AppFailure value) => failure = value,
       );
+      if (saved && preference == 'primaryColorHex') {
+        await ref
+            .read(accessAccentPreferenceStoreProvider)
+            .write(AppAccentColor.fromHex(nextPreferences.primaryColorHex));
+        ref.invalidate(accessAccentProvider);
+      }
     } on Object catch (error) {
       failure = UnexpectedFailure(
         'No se pudo actualizar la apariencia.',
@@ -196,10 +203,141 @@ class _AppearanceSettingsPageState
           ),
           const SizedBox(height: TerminalSpace.sm),
         ],
+        _AccessAccentSelector(
+          selected: AppAccentColor.fromHex(preferences.primaryColorHex),
+          enabled: !saving,
+          onSelected: (AppAccentColor color) => _save(
+            'primaryColorHex',
+            preferences.copyWith(primaryColorHex: color.hex),
+          ),
+        ),
+        const SizedBox(height: TerminalSpace.lg),
         content,
       ],
     );
   }
+}
+
+class _AccessAccentSelector extends StatelessWidget {
+  const _AccessAccentSelector({
+    required this.selected,
+    required this.enabled,
+    required this.onSelected,
+  });
+
+  final AppAccentColor selected;
+  final bool enabled;
+  final ValueChanged<AppAccentColor> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return TerminalPanel(
+      padding: const EdgeInsets.all(TerminalSpace.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const TerminalSectionTitle(
+            title: 'Color de acceso',
+            description:
+                'Define el color dominante del BÚFER y la matriz al iniciar.',
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double itemWidth =
+                  (constraints.maxWidth - TerminalSpace.sm * 2) / 3;
+              return Wrap(
+                spacing: TerminalSpace.sm,
+                runSpacing: TerminalSpace.sm,
+                children: <Widget>[
+                  for (final AppAccentColor color in AppAccentColor.values)
+                    SizedBox(
+                      width: itemWidth,
+                      child: _AccessAccentChoice(
+                        color: color,
+                        displayColor: _displayColor(color, tokens),
+                        selected: color == selected,
+                        enabled: enabled,
+                        onTap: () => onSelected(color),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _displayColor(AppAccentColor color, AppThemeTokens tokens) =>
+      switch (color) {
+        AppAccentColor.yellow => tokens.valueYellow,
+        AppAccentColor.red => tokens.terminalRed,
+        AppAccentColor.gray => tokens.textSecondary,
+      };
+}
+
+class _AccessAccentChoice extends StatelessWidget {
+  const _AccessAccentChoice({
+    required this.color,
+    required this.displayColor,
+    required this.selected,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final AppAccentColor color;
+  final Color displayColor;
+  final bool selected;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: 'Color ${color.label}',
+    selected: selected,
+    enabled: enabled,
+    button: true,
+    excludeSemantics: true,
+    child: TerminalCard(
+      key: ValueKey<String>('access-accent-${color.name}'),
+      onTap: enabled ? onTap : null,
+      borderColor: selected ? displayColor : null,
+      padding: const EdgeInsets.symmetric(
+        horizontal: TerminalSpace.xs,
+        vertical: TerminalSpace.sm,
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: displayColor.withValues(alpha: 0.18),
+              border: Border.all(color: displayColor, width: 1.5),
+            ),
+            child: selected
+                ? Icon(Icons.check, color: displayColor, size: 18)
+                : null,
+          ),
+          const SizedBox(height: TerminalSpace.xs),
+          Text(
+            color.label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: displayColor,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _PreferenceSwitchCard extends StatelessWidget {

@@ -4,6 +4,8 @@ import '../../../infrastructure/database/app_database.dart';
 import '../../../infrastructure/database/daos/notification_dao.dart';
 import '../../../infrastructure/database/daos/settings_dao.dart';
 import '../domain/mission_notification_platform.dart';
+import '../domain/reminder_preferences.dart';
+import '../domain/reminder_preferences_repository.dart';
 
 final class NotificationReconciliationReport {
   const NotificationReconciliationReport({
@@ -25,21 +27,30 @@ final class NotificationReconciliationService {
   const NotificationReconciliationService({
     required NotificationDao notificationDao,
     required SettingsDao settingsDao,
+    required ReminderPreferencesRepository reminderPreferencesRepository,
     required MissionNotificationPlatform platform,
     required DateTime Function() nowUtc,
   }) : _notificationDao = notificationDao,
        _settingsDao = settingsDao,
+       _reminderPreferencesRepository = reminderPreferencesRepository,
        _platform = platform,
        _nowUtc = nowUtc;
 
   final NotificationDao _notificationDao;
   final SettingsDao _settingsDao;
+  final ReminderPreferencesRepository _reminderPreferencesRepository;
   final MissionNotificationPlatform _platform;
   final DateTime Function() _nowUtc;
 
   Future<NotificationReconciliationReport> reconcile() async {
     final int nowUtcMs = _nowUtc().toUtc().millisecondsSinceEpoch;
     final AppSetting settings = await _settingsDao.getSettings();
+    ReminderPreferences reminderPreferences = ReminderPreferences.defaults;
+    final preferencesResult = await _reminderPreferencesRepository.load();
+    preferencesResult.fold<void>(
+      onSuccess: (ReminderPreferences value) => reminderPreferences = value,
+      onFailure: (_) {},
+    );
     final List<NotificationSchedule> candidates = await _notificationDao
         .findReconciliationCandidates();
     final terminal = candidates.where(
@@ -112,14 +123,19 @@ final class NotificationReconciliationService {
     int scheduledCount = 0;
     int fired = 0;
     for (final schedule in open) {
+      final int deliveryAtUtcMs = reminderPreferences.deliveryAtUtcMs(
+        schedule.notifyAt,
+      );
       final request = MissionNotificationRequest(
         scheduleId: schedule.id,
-        notifyAtUtcMs: schedule.notifyAt,
-        soundEnabled: settings.soundEnabled != 0,
+        notifyAtUtcMs: deliveryAtUtcMs,
+        soundEnabled:
+            settings.soundEnabled != 0 &&
+            !reminderPreferences.isQuietAtUtcMs(deliveryAtUtcMs),
         systemNotificationId: schedule.systemNotificationId,
       );
       try {
-        if (schedule.notifyAt <= nowUtcMs) {
+        if (deliveryAtUtcMs <= nowUtcMs) {
           await _platform.deliverIfNeeded(request);
           await _notificationDao.transitionStatus(
             scheduleId: schedule.id,

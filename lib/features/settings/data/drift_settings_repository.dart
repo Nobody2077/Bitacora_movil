@@ -57,6 +57,9 @@ final class DriftSettingsRepository implements SettingsRepository {
   Future<Result<void>> save(AppPreferences preferences) async {
     if (!preferences.updatedAtUtc.isUtc ||
         preferences.themeKey.trim().isEmpty ||
+        !AppPreferences.supportedPrimaryColorHex.contains(
+          preferences.primaryColorHex.toUpperCase(),
+        ) ||
         !AppPreferences.supportedAutoLockMinutes.contains(
           preferences.autoLockMinutes,
         )) {

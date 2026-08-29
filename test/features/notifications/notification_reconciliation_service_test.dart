@@ -1,5 +1,7 @@
 import 'package:bitacora_rpg_personal/features/notifications/application/notification_reconciliation_service.dart';
+import 'package:bitacora_rpg_personal/features/notifications/data/drift_reminder_preferences_repository.dart';
 import 'package:bitacora_rpg_personal/features/notifications/domain/mission_notification_platform.dart';
+import 'package:bitacora_rpg_personal/features/notifications/domain/reminder_preferences.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/app_database.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/daos/notification_dao.dart';
 import 'package:bitacora_rpg_personal/infrastructure/database/daos/settings_dao.dart';
@@ -14,20 +16,28 @@ void main() {
   late AppDatabase database;
   late NotificationDao notificationDao;
   late SettingsDao settingsDao;
+  late DriftReminderPreferencesRepository reminderPreferencesRepository;
   late _FakeNotificationPlatform platform;
   late NotificationReconciliationService service;
 
-  setUp(() {
+  setUp(() async {
     database = AppDatabase(
       NativeDatabase.memory(),
       utcNowMilliseconds: () => _nowMs,
     );
     notificationDao = NotificationDao(database);
     settingsDao = SettingsDao(database);
+    reminderPreferencesRepository = DriftReminderPreferencesRepository(
+      settingsDao,
+    );
+    await reminderPreferencesRepository.save(
+      ReminderPreferences.defaults.copyWith(leadMinutes: 0),
+    );
     platform = _FakeNotificationPlatform();
     service = NotificationReconciliationService(
       notificationDao: notificationDao,
       settingsDao: settingsDao,
+      reminderPreferencesRepository: reminderPreferencesRepository,
       platform: platform,
       nowUtc: () => DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
     );
@@ -130,6 +140,40 @@ void main() {
     expect(row.status, 'PENDING');
     expect(row.systemNotificationId, isNull);
   });
+
+  test('aplica anticipación y silencia avisos dentro del horario', () async {
+    final int missionStart =
+        _nowMs + const Duration(minutes: 20).inMilliseconds;
+    final int deliveryAt =
+        missionStart - const Duration(minutes: 15).inMilliseconds;
+    final DateTime deliveryLocal = DateTime.fromMillisecondsSinceEpoch(
+      deliveryAt,
+      isUtc: true,
+    ).toLocal();
+    final int deliveryMinute = deliveryLocal.hour * 60 + deliveryLocal.minute;
+    await reminderPreferencesRepository.save(
+      ReminderPreferences(
+        leadMinutes: 15,
+        quietHoursEnabled: true,
+        quietStartMinutes: deliveryMinute,
+        quietEndMinutes: (deliveryMinute + 1) % 1440,
+      ),
+    );
+    await _insertSchedule(
+      database,
+      missionId: 'anticipated',
+      scheduleId: 'anticipated-schedule',
+      notifyAt: missionStart,
+    );
+
+    final report = await service.reconcile();
+
+    expect(report.scheduled, 1);
+    final MissionNotificationRequest request =
+        platform.scheduledRequests.single;
+    expect(request.notifyAtUtcMs, deliveryAt);
+    expect(request.soundEnabled, isFalse);
+  });
 }
 
 Future<void> _insertSchedule(
@@ -174,6 +218,8 @@ final class _FakeNotificationPlatform implements MissionNotificationPlatform {
   bool permissionGranted = true;
   int permissionRequests = 0;
   final List<String> scheduled = <String>[];
+  final List<MissionNotificationRequest> scheduledRequests =
+      <MissionNotificationRequest>[];
   final List<String> delivered = <String>[];
   final List<int> cancelled = <int>[];
 
@@ -186,6 +232,7 @@ final class _FakeNotificationPlatform implements MissionNotificationPlatform {
   @override
   Future<int> schedule(MissionNotificationRequest request) async {
     scheduled.add(request.scheduleId);
+    scheduledRequests.add(request);
     return request.systemNotificationId ?? 1001;
   }
 

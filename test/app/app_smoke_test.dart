@@ -16,6 +16,7 @@ import 'package:bitacora_rpg_personal/features/profile/application/user_profile_
 import 'package:bitacora_rpg_personal/features/profile/domain/models/user_profile.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
+import 'package:bitacora_rpg_personal/shared/widgets/terminal/terminal_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -75,7 +76,33 @@ void main() {
       );
       expect(missionsLabel.style?.color, tokens.terminalRed);
       expect(missionsLabel.style?.fontSize, 16);
-      expect(journalLabel.style?.color, tokens.infoCyan);
+      expect(journalLabel.style?.color, tokens.valueYellow);
+      final AnimatedContainer selectedDestination = tester
+          .widget<AnimatedContainer>(
+            find.byKey(const ValueKey<String>('sidebar-destination-Bitácora')),
+          );
+      final ShapeDecoration selectedDecoration =
+          selectedDestination.decoration! as ShapeDecoration;
+      final BeveledRectangleBorder selectedShape =
+          selectedDecoration.shape as BeveledRectangleBorder;
+      expect(selectedShape.side.color, tokens.valueYellow);
+      expect(selectedShape.side.width, 1.5);
+      expect(
+        selectedShape.borderRadius,
+        const BorderRadius.only(bottomRight: Radius.circular(10)),
+      );
+      final TerminalDivider profileDivider = tester.widget<TerminalDivider>(
+        find.byKey(const ValueKey<String>('sidebar-profile-divider')),
+      );
+      final TerminalDivider headerDivider = tester.widget<TerminalDivider>(
+        find.byKey(const ValueKey<String>('application-header-divider')),
+      );
+      final VerticalDivider shellDivider = tester.widget<VerticalDivider>(
+        find.byKey(const ValueKey<String>('sidebar-content-divider')),
+      );
+      expect(profileDivider.color, tokens.structuralRed);
+      expect(headerDivider.color, tokens.structuralRed);
+      expect(shellDivider.color, tokens.structuralRed);
 
       await tester.tap(find.text('Usuario local'));
       await tester.pumpAndSettle();

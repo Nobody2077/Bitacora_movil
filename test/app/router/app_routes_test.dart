@@ -33,7 +33,11 @@ void main() {
         expect(route.path, isNot(endsWith('/')));
       }
 
-      expect(_byName('missionNew').queryParameters, contains('origin'));
+      expect(
+        _byName('missionNew').queryParameters,
+        containsAll(<String>['origin', 'date']),
+      );
+      expect(_byName('missionsCalendar').queryParameters, contains('date'));
       expect(
         _byName('financeNewIncome').queryParameters,
         containsAll(<String>['missionId', 'refundOf']),

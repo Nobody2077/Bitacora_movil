@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bitacora_rpg_personal/app/providers/app_preferences_provider.dart';
 import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
+import 'package:bitacora_rpg_personal/app/theme/access_accent_preference_store.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_ui_preferences.dart';
 import 'package:bitacora_rpg_personal/core/result/result.dart';
@@ -14,7 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('muestra y persiste las cuatro preferencias de A7', (
+  testWidgets('muestra y persiste apariencia y accesibilidad', (
     WidgetTester tester,
   ) async {
     final _FakeSettingsRepository repository = _FakeSettingsRepository();
@@ -25,6 +26,9 @@ void main() {
     expect(find.byKey(const Key('reduce-motion-switch')), findsOneWidget);
     expect(find.byKey(const Key('high-contrast-switch')), findsOneWidget);
     expect(find.byKey(const Key('hide-amounts-switch')), findsOneWidget);
+    expect(find.byKey(const Key('access-accent-yellow')), findsOneWidget);
+    expect(find.byKey(const Key('access-accent-red')), findsOneWidget);
+    expect(find.byKey(const Key('access-accent-gray')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('high-contrast-switch')));
     await tester.pumpAndSettle();
@@ -37,6 +41,26 @@ void main() {
           .value,
       isTrue,
     );
+  });
+
+  testWidgets('persiste amarillo para el acceso previo a la base cifrada', (
+    WidgetTester tester,
+  ) async {
+    final _FakeSettingsRepository repository = _FakeSettingsRepository();
+    final _MemoryAccessAccentPreferenceStore accentStore =
+        _MemoryAccessAccentPreferenceStore();
+    addTearDown(repository.dispose);
+    await _pumpAppearance(
+      tester,
+      repository: repository,
+      accentStore: accentStore,
+    );
+
+    await tester.tap(find.byKey(const Key('access-accent-yellow')));
+    await tester.pumpAndSettle();
+
+    expect(repository.current.primaryColorHex, AppAccentColor.yellow.hex);
+    expect(accentStore.current, AppAccentColor.yellow);
   });
 
   testWidgets('cumple objetivos táctiles, etiquetas y contraste en compacto', (
@@ -154,6 +178,7 @@ Future<void> _pumpAppearance(
   required _FakeSettingsRepository repository,
   Size size = const Size(412, 915),
   double textScale = 1,
+  AccessAccentPreferenceStore? accentStore,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -164,6 +189,9 @@ Future<void> _pumpAppearance(
     ProviderScope(
       overrides: [
         settingsRepositoryProvider.overrideWithValue(repository),
+        accessAccentPreferenceStoreProvider.overrideWithValue(
+          accentStore ?? _MemoryAccessAccentPreferenceStore(),
+        ),
         appPreferencesProvider.overrideWith(
           (ref) => repository.watch().map(
             (Result<AppPreferences> result) => result.fold(
@@ -194,6 +222,17 @@ Future<void> _pumpAppearance(
     ),
   );
   await tester.pumpAndSettle();
+}
+
+final class _MemoryAccessAccentPreferenceStore
+    implements AccessAccentPreferenceStore {
+  AppAccentColor current = AppAccentColor.red;
+
+  @override
+  Future<AppAccentColor> read() async => current;
+
+  @override
+  Future<void> write(AppAccentColor color) async => current = color;
 }
 
 final class _FakeSettingsRepository implements SettingsRepository {

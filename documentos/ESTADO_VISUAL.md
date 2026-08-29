@@ -20,11 +20,13 @@ decisiones de producto.
   `NavigationRail` genérico sin cambiar rutas ni lógica de navegación.
 - La parte superior de la barra muestra el perfil local en vez de la marca
   fija: nombre, avatar o inicial y acceso al editor de nombre/foto. Los destinos
-  inactivos usan rojo y el seleccionado conserva cian; etiquetas de 16 px,
-  iconos de 24 px y filas de 52 px mejoran la legibilidad en tablet.
+  inactivos usan rojo y el seleccionado usa amarillo con marco completo y una
+  esquina inferior derecha recortada; etiquetas de 16 px, iconos de 24 px y
+  filas de 52 px mejoran la legibilidad en tablet.
 - Cabecera técnica persistente en tablet: identidad, contexto del módulo,
   estado de terminal local, fecha y hora. Es parte del shell, no de una
-  pantalla aislada.
+  pantalla aislada. Sus divisores estructurales, el separador del perfil y la
+  división vertical entre navegación y contenido usan `structuralRed`.
 - Inicio dejó de ser un placeholder: `HomeOperationsPage` compone una misión
   prioritaria, siguiente misión y métricas reales. Desde A4 también muestra el
   saldo disponible derivado y activa los accesos de gasto e ingreso.
@@ -65,6 +67,14 @@ decisiones de producto.
   controles persistentes para texto grande, movimiento reducido, alto
   contraste e importes ocultos. Ajustes dejó de usar un destino genérico para
   Apariencia y sus controles declaran estado, etiqueta y objetivo táctil.
+- Apariencia añade un selector amarillo/rojo/gris para la superficie de acceso.
+  La pantalla bloqueada presenta seis posiciones bajo `BÚFER` y una matriz
+  numérica táctil encabezada por `MATRIZ DE CÓDIGO`; no invoca el teclado del
+  sistema y conserva recuperación, biometría y validación existentes.
+- `AccessTerminalTransition` sustituye la matriz solo durante los estados reales
+  de autenticación y apertura. Usa códigos decorativos no sensibles, barrido y
+  carga segmentada; no impone una duración mínima y se vuelve estática cuando
+  el usuario activa movimiento reducido.
 - La política visual es global: texto grande fija un mínimo de 1.3× sin reducir
   escalas del sistema de 2.0×, movimiento reducido elimina las transiciones
   Terminal instrumentadas, alto contraste cambia a una paleta reforzada e
@@ -83,9 +93,9 @@ decisiones de producto.
    → repositorio → infraestructura.
 2. El shell conserva la responsabilidad de elegir la ruta; `TerminalSidebar`
    solo muestra el estado y devuelve un índice.
-3. El color rojo es identidad, estructura y navegación inactiva; el cian
-   comunica foco, selección e información, y el amarillo se reserva para
-   etiquetas o valores técnicos.
+3. El color rojo es identidad, estructura y navegación inactiva; el amarillo
+   identifica la opción activa de la barra lateral y también valores técnicos;
+   el cian comunica foco e información en el resto de la interfaz.
 4. No añadir fuentes o paquetes solo para simular el diseño. Las familias
    declaradas usan la plataforma hasta que se incorpore una licencia y assets
    de fuente reales.
@@ -99,15 +109,14 @@ prevalece sobre interpretaciones anteriores de la ficha de componentes:
 
 | Uso | Token | Valor |
 | --- | --- | --- |
-| Fondo principal | `background` | `#08090D` |
-| Superficie / elevada | `surfaceLow` / `surfaceHigh` | `#11151C` / `#171D25` |
+| Todos los fondos y superficies | `background` / `surfaceLow` / `surfaceHigh` / `surfaceOverlay` | `#000000` |
 | Borde neutral | `border` | `#2A3340` |
 | Rojo de identidad y estructura | `terminalRed` | `#FF3B3B` |
 | Acción crítica o destructiva | `criticalAction` | `#D00000` |
 | Marco rojo secundario | `structuralRed` | `#7A2631` |
-| Foco, selección y texto técnico | `infoCyan` | `#55E6E6` |
+| Foco y texto informativo | `infoCyan` | `#55E6E6` |
 | CTA normal sólido | `primaryAction` | `#1EC2C6` |
-| Prioridad / tiempo / economía | `valueYellow` | `#F5D547` |
+| Navegación lateral activa / prioridad / tiempo / economía | `valueYellow` | `#F5D547` |
 | Progreso / éxito / ingreso | `progressGreen` | `#45D483` |
 | Atención / reserva | `attentionOrange` | `#FF9F43` |
 

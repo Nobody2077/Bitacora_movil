@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **28 de agosto de 2026** (G7 verde; A8 autorizada)
+- Última revisión: **28 de agosto de 2026** (G7 verde; A8 en progreso)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -27,6 +27,26 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   de perfil admite desplazamiento con texto 2.0× y comunica sus operaciones.
   La matriz está verde con 182 pruebas y APK `prod-debug`. El usuario aprobó la
   validación física el 28 de agosto de 2026: A7 está completada y G7 verde.
+- Base release: **A8.1**. La versión `1.0.0+2`; firma release
+  falla cerrada sin credenciales y nunca usa la llave debug. `prod` rechaza
+  tráfico claro, Android excluye todos los dominios de backup/transferencia y
+  `java.time` queda desugared para API 24–25. El preflight de hardening, planes
+  de consulta, **183/183 pruebas** y Lint `prodRelease` está verde; la APK
+  `prod-debug` también compila y fue aprobada físicamente por el usuario.
+  Se creó la firma permanente y se verificaron APK/AAB release `1.0.0+1`, sin
+  permiso `INTERNET`. El usuario aprobó la instalación limpia y los flujos de
+  la release. La candidata `1.0.0+2`, compilada y verificada con la misma firma,
+  se instaló encima de `1.0.0+1`; el usuario confirmó que todo funciona y no
+  reportó pérdida de datos. Faltan las métricas cifradas y el respaldo externo
+  de la firma.
+- Incremento actual: **A9.1**. La candidata `1.1.1+4` amplía el calendario a
+  Día/Semana/Mes, crea misiones con la fecha seleccionada y activa la pantalla
+  real de Notificaciones con anticipación y horario silencioso. Las preferencias
+  usan metadata cifrada y no cambian el esquema v1. El BÚFER táctil y el color
+  de acceso configurable, la transición terminal y el fondo negro elevan la
+  matriz a **202/202 pruebas** con análisis limpio. El APK `1.1.1+4` está
+  firmado y verificado; el AAB `1.1.0+3` es anterior a estos ajustes visuales.
+  Falta validación física G9.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -39,8 +59,10 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
   guarda en la base cifrada y la imagen se copia al directorio privado de la
   aplicación sin modificar el esquema Drift v1.
 - Los destinos no seleccionados de la barra usan rojo de identidad; el destino
-  seleccionado conserva cian. Texto a 16 px, iconos a 24 px y objetivos táctiles
-  de 52 px mejoran la lectura en tablet.
+  seleccionado usa amarillo con marco completo y esquina inferior derecha
+  recortada. Texto a 16 px, iconos a 24 px y objetivos táctiles de 52 px
+  mejoran la lectura en tablet. Los tres divisores principales del shell usan
+  rojo estructural.
 - Inicio (`HomeOperationsPage`): Centro de Operaciones con datos reales de
   Misiones y saldo disponible real de Economía, con accesos a gasto e ingreso.
 - Centro de Misiones: filtros por estado y área, búsqueda local, tarjetas
@@ -58,7 +80,9 @@ Los siguientes cambios visuales están integrados en `main` desde el commit
 1. No limpiar datos de la app: es almacenamiento local cifrado.
 2. A5 y G5 están cerradas, incluida la validación física de títulos, rachas y
    niveles por área el 27 de agosto de 2026.
-3. A6 fue retirada del MVP según ADR-005. G7 está verde y A8 autorizada.
+3. A6 fue retirada del MVP según ADR-005. G7 está verde y A8 está en progreso.
+4. No desinstalar una APK `prod` debug que contenga datos: Android no permite
+   actualizarla con la nueva firma y A6 no ofrece migración/exportación.
 
 ### Cambios locales ajenos que se deben preservar
 
@@ -127,6 +151,8 @@ Se detectaron y corrigieron dos incumplimientos de la jerarquía de color defini
 - Entradas separadas `main_dev.dart` y `main_prod.dart`.
 - `ProviderScope` raíz con entorno inyectado.
 - Tema oscuro y shell adaptable para teléfono y tablet.
+- Fondo negro puro `#000000` en lienzo, barra lateral, paneles, tarjetas y
+  superficies elevadas; la jerarquía depende de bordes, forma y color de texto.
 - GoRouter con seis ramas de dominio y una rama técnica `/more`.
 - Localización española.
 - `Result<T>` y jerarquía tipada de fallos.
@@ -147,6 +173,16 @@ Se detectaron y corrigieron dos incumplimientos de la jerarquía de color defini
 ### Acceso y privacidad
 
 - Configuración y cambio de PIN obligatorio de seis dígitos.
+- La pantalla bloqueada captura el PIN mediante una matriz numérica táctil; no
+  monta un `TextField` ni abre el teclado del sistema. El BÚFER oculta cada
+  dígito y valida automáticamente al completar seis posiciones.
+- Mientras la autenticación real está activa, una transición terminal muestra
+  lluvia de códigos, barrido, segmentos y los estados de validación/apertura.
+  No añade demora, no usa datos sensibles y queda estática con movimiento
+  reducido.
+- Apariencia permite elegir amarillo, rojo o gris para esta superficie. Un
+  espejo local no sensible conserva únicamente esa elección para poder leerla
+  antes de abrir la base cifrada; nunca contiene PIN ni datos privados.
 - Código de recuperación Crockford Base32.
 - PBKDF2-HMAC-SHA256 con 600.000 iteraciones.
 - Espera progresiva persistente ante fallos.
@@ -396,8 +432,10 @@ main_dev/main_prod
 
 ### Secuencia recomendada para continuar (próxima sesión)
 
-Iniciar A8 para regresión, rendimiento, versionado, firma y artefactos release.
-A6/G6 no forman parte del MVP según ADR-005.
+Continuar A8 ejecutando `tool/gate_g8.ps1` con credenciales de firma y un
+dispositivo ADB. La firma ya está configurada localmente; registrar métricas y completar
+`documentos/A8-VALIDACION-RELEASE.md`. No cerrar G8 sin APK/AAB firmados,
+regresión Android, smoke y matriz física. A6/G6 no forman parte del MVP.
 
 ---
 
@@ -445,6 +483,18 @@ Verificación completa:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tool/quality.ps1
+```
+
+Preflight release A8:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tool/a8_preflight.ps1
+```
+
+Gate G8 completo (requiere firma y dispositivo dedicado):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tool/gate_g8.ps1 -DeviceId <serial-adb>
 ```
 
 ---

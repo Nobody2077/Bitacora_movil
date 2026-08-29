@@ -14,7 +14,8 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
-| A8 — Release | **AUTORIZADA** | Siguiente fase |
+| A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
+| A9 — Calendario y recordatorios | **EN VALIDACIÓN** | Código y 202 pruebas verdes; G9 físico pendiente |
 
 ## Evidencia G3 — A3 completada
 
@@ -99,7 +100,7 @@ permanece bloqueada hasta completar G4.
 - `assembleDevDebug` y `assembleProdDebug`: compilados correctamente el 27 de
   agosto de 2026.
 - Ajuste transversal aprobado en código: barra lateral de tablet con destinos
-  inactivos rojos, selección cian, tipografía ampliada y perfil local editable.
+  inactivos rojos, selección amarilla, tipografía ampliada y perfil local editable.
   El nombre vive en la base cifrada y la foto se copia al almacenamiento privado
   mediante el selector del sistema; no hubo migración del esquema v1.
 - `assembleProdDebug` volvió a aprobar después de integrar el perfil y
@@ -217,6 +218,73 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   volvió a especificar modelo ni versión Android; la referencia de los gates
   físicos anteriores es una Redmi Pad 2. No declaró bloqueos.
 - **A7 queda completada y G7 queda verde. A8 está autorizada.**
+
+## Evidencia parcial A8 — hardening y preflight release
+
+- Versión candidata fijada en `1.0.0+2`; esquema Drift y espejo de metadata
+  permanecen explícitamente en v1.
+- Firma release configurable por archivo privado ignorado o variables de
+  entorno. Una tarea APK/AAB release sin las cuatro credenciales falla y nunca
+  reutiliza la llave debug.
+- El flavor `prod` rechaza tráfico claro y no solicita `INTERNET`.
+- Backup, extracción cloud y transferencia dispositivo a dispositivo excluyen
+  todos los dominios de datos, además de `allowBackup=false`.
+- Core library desugaring protege el uso de `java.time` en Android API 24–25;
+  este defecto fue descubierto por Lint release durante A8.
+- Una regresión `EXPLAIN QUERY PLAN` exige índices para Misiones, Economía,
+  Bitácora y XP; aprobada el 28 de agosto de 2026.
+- Formato: 202 archivos sin cambios; `flutter analyze`: cero problemas;
+  `flutter test`: **183/183 pruebas aprobadas**; `lintProdRelease`: aprobado sin
+  errores; APK `prod-debug`: compilada correctamente.
+- `tool/a8_preflight.ps1` automatiza versionado, hardening, logs, calidad y
+  Lint. `tool/gate_g8.ps1` añade regresión Android, métricas cifradas sobre
+  1.000 misiones/5.000 movimientos, APK/AAB, firma, permisos, hashes y smoke.
+- El usuario aprobó físicamente la APK `prod-debug` actual el 28 de agosto de
+  2026 y autorizó eliminar sus datos para probar la firma real desde cero.
+- Llave release permanente RSA-4096 creada fuera del repositorio. Certificado
+  SHA-256: `a6092c6c05727240487247f71ecedee1ecc4d8ed0d61775d014e6512a4d116b8`.
+- APK release `1.0.0+1`: 71.937.139 bytes, firma v2 válida, sin `INTERNET`,
+  SHA-256 `63af346221f2ac62fcb7c51f6fd3f0b8610089abfb262043b0ec70fcbd078f82`.
+- AAB release `1.0.0+1`: 55.545.407 bytes, firma JAR verificada, SHA-256
+  `856b895b0306c12305568ee0143110d661c3a90fdf0957c6b0f2dce02d0d3bbe`.
+- El usuario desinstaló la variante debug, instaló desde cero la release
+  `1.0.0+1` y confirmó que todo funciona correctamente.
+- APK release `1.0.0+2`: 71.937.139 bytes, firma v2 válida con el mismo
+  certificado, sin `INTERNET`, SHA-256
+  `37c4163bf8350ae94bf8f3e8aa77faca0b12eb4fb7a4fa72db61e35deabfb50f`.
+- AAB release `1.0.0+2`: 55.545.412 bytes, firma JAR verificada, SHA-256
+  `317a503b57982fdfacb52cd47befb8831462920d0bad96153b19edb84ae60ae9`.
+- El usuario instaló `1.0.0+2` encima de `1.0.0+1` y confirmó que todo funciona,
+  sin reportar pérdida de datos. La actualización con la misma firma queda
+  aprobada. La conexión USB no está disponible.
+- Pendiente: respaldo externo de llave/credenciales, métricas físicas mediante
+  ADB inalámbrico u otro dispositivo accesible y cierre documental. **A8 y G8
+  no están cerradas.**
+
+## Evidencia parcial A9 — calendario y recordatorios
+
+- Candidata actual `1.1.1+4`; esquema y metadata de versión permanecen en v1.
+- Calendario reactivo con vistas Día, Semana y Mes y rangos civiles locales.
+- Crear desde el calendario precarga la fecha elegida y vuelve al mismo día.
+- Ajustes > Notificaciones ya es funcional: activación, sonido, anticipación de
+  0/5/15/30/60 minutos y horario silencioso que puede cruzar medianoche.
+- El aviso Android conserva texto genérico y visibilidad privada.
+- Preferencias nuevas persistidas en `schema_metadata` dentro de la base cifrada,
+  sin migración ni pérdida de compatibilidad.
+- `flutter analyze`: cero problemas; `flutter test`: **202/202 aprobadas** tras
+  añadir el acceso táctil, su transición, selector de color y fondo negro puro.
+- APK `1.1.0+3`: 71.986.819 bytes, firma v2 válida con el certificado de
+  producción, sin `INTERNET`, SHA-256
+  `47a068089aa7f2dcd48801e92f4e7f471c46b47ad84eade121687df03b891ef3`.
+- AAB `1.1.0+3`: 55.605.200 bytes, firma JAR verificada, SHA-256
+  `a9237ec6c7bbe6e4c1b921fe2de0c9eb03900e00f954b66745d4bf4acb1a5b5b`.
+- APK `1.1.1+4`: 72.232.747 bytes, firma v2 válida con el mismo certificado de
+  producción, sin `INTERNET`, SHA-256
+  `4735193a6e574be1cca51a8ac39fb7ea843cf467f78c61e4bf35fbfe8a903313`.
+- No se generó un AAB `1.1.1+4`; el bundle anterior precede los últimos ajustes
+  visuales.
+- Pendiente: recorrido físico de `A9-CALENDARIO-RECORDATORIOS.md`.
+  **A9/G9 no están cerradas.**
 
 ## Evidencia G0
 

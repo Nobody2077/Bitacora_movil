@@ -1,6 +1,25 @@
+enum AppAccentColor {
+  yellow('#F5D547', 'Amarillo'),
+  red('#FF3B3B', 'Rojo'),
+  gray('#B6C0CD', 'Gris');
+
+  const AppAccentColor(this.hex, this.label);
+
+  final String hex;
+  final String label;
+
+  static AppAccentColor fromHex(String value) => values.firstWhere(
+    (AppAccentColor color) => color.hex.toUpperCase() == value.toUpperCase(),
+    orElse: () => AppAccentColor.red,
+  );
+}
+
 /// Preferencias persistidas del usuario. No representa permisos del sistema.
 final class AppPreferences {
   static const Set<int> supportedAutoLockMinutes = <int>{0, 1, 5, 15};
+  static final Set<String> supportedPrimaryColorHex = AppAccentColor.values
+      .map((AppAccentColor color) => color.hex)
+      .toSet();
 
   static final AppPreferences defaults = AppPreferences(
     themeKey: 'terminal_reinforced',

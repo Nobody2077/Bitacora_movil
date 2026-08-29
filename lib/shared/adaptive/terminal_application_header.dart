@@ -83,8 +83,10 @@ class _TerminalApplicationHeaderState extends State<TerminalApplicationHeader> {
             ),
           ),
           TerminalDivider(
+            key: const ValueKey<String>('application-header-divider'),
             indent: TerminalSpace.lg,
             endIndent: TerminalSpace.lg,
+            color: tokens.structuralRed,
           ),
         ],
       ),

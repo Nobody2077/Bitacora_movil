@@ -28,7 +28,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Bitácora bloqueada'), findsOneWidget);
+    expect(find.text('ENLACE DE ACCESO'), findsOneWidget);
     expect(find.byType(FeaturePlaceholderPage), findsNothing);
     expect(protectedBuilds, 0);
   });
@@ -70,6 +70,7 @@ Widget _app({
     appPreferencesProvider.overrideWith(
       (ref) => Stream<AppPreferences>.value(AppPreferences.defaults),
     ),
+    accessAccentProvider.overrideWith((ref) async => AppAccentColor.red),
   ],
   child: const BitacoraApp(),
 );

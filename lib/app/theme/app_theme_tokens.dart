@@ -23,10 +23,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
   });
 
   static const AppThemeTokens terminal = AppThemeTokens(
-    background: Color(0xFF08090D),
-    surfaceLow: Color(0xFF11151C),
-    surfaceHigh: Color(0xFF171D25),
-    surfaceOverlay: Color(0xFF202833),
+    background: Color(0xFF000000),
+    surfaceLow: Color(0xFF000000),
+    surfaceHigh: Color(0xFF000000),
+    surfaceOverlay: Color(0xFF000000),
     border: Color(0xFF2A3340),
     borderFocused: Color(0xFF55E6E6),
     terminalRed: Color(0xFFFF3B3B),
@@ -44,9 +44,9 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
 
   static const AppThemeTokens terminalHighContrast = AppThemeTokens(
     background: Color(0xFF000000),
-    surfaceLow: Color(0xFF080A0D),
-    surfaceHigh: Color(0xFF10141A),
-    surfaceOverlay: Color(0xFF18202A),
+    surfaceLow: Color(0xFF000000),
+    surfaceHigh: Color(0xFF000000),
+    surfaceOverlay: Color(0xFF000000),
     border: Color(0xFFA7B5C5),
     borderFocused: Color(0xFF80FFFF),
     terminalRed: Color(0xFFFF6B6B),

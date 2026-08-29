@@ -65,8 +65,10 @@ class TerminalSidebar extends StatelessWidget {
                 ),
               ),
               TerminalDivider(
+                key: const ValueKey<String>('sidebar-profile-divider'),
                 indent: TerminalSpace.sm,
                 endIndent: TerminalSpace.sm,
+                color: tokens.structuralRed,
               ),
               const SizedBox(height: TerminalSpace.sm),
               Expanded(
@@ -214,7 +216,17 @@ class _SidebarDestination extends StatelessWidget {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
-    final Color foreground = selected ? tokens.infoCyan : tokens.terminalRed;
+    final Color foreground = selected ? tokens.valueYellow : tokens.terminalRed;
+    const BeveledRectangleBorder interactionShape = BeveledRectangleBorder(
+      borderRadius: BorderRadius.only(bottomRight: Radius.circular(10)),
+    );
+    final BeveledRectangleBorder selectionShape = BeveledRectangleBorder(
+      borderRadius: const BorderRadius.only(bottomRight: Radius.circular(10)),
+      side: BorderSide(
+        color: selected ? tokens.valueYellow : Colors.transparent,
+        width: 1.5,
+      ),
+    );
     return Semantics(
       selected: selected,
       button: true,
@@ -223,30 +235,24 @@ class _SidebarDestination extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: TerminalSpace.xs),
         child: Material(
           color: Colors.transparent,
+          shape: interactionShape,
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
+            customBorder: interactionShape,
             child: AnimatedContainer(
+              key: ValueKey<String>('sidebar-destination-${item.label}'),
               duration: TerminalMotion.resolve(
                 context,
                 TerminalMotion.standard,
               ),
               curve: Curves.easeOut,
               height: 52,
-              decoration: BoxDecoration(
+              decoration: ShapeDecoration(
                 color: selected
-                    ? tokens.infoCyan.withValues(alpha: 0.08)
+                    ? tokens.valueYellow.withValues(alpha: 0.08)
                     : Colors.transparent,
-                border: Border(
-                  left: BorderSide(
-                    color: selected ? tokens.infoCyan : Colors.transparent,
-                    width: 2,
-                  ),
-                  right: BorderSide(
-                    color: selected
-                        ? tokens.terminalRed.withValues(alpha: 0.65)
-                        : Colors.transparent,
-                  ),
-                ),
+                shape: selectionShape,
               ),
               child: Padding(
                 padding: EdgeInsets.symmetric(

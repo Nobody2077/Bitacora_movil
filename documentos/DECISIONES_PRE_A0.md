@@ -2,7 +2,7 @@
 
 Versión: 1.5
 Fecha: 28 de agosto de 2026
-Estado: vigente; A0–A5 y A7 completadas, A6 retirada y A8 autorizada
+Estado: vigente; A0–A5 y A7 completadas, A6 retirada y A8 en progreso
 
 ## 1. Propósito y precedencia
 
@@ -275,4 +275,5 @@ en un ADR. ADR-005 retira A6/G6 del MVP; A8 queda condicionada únicamente a G7.
   matriz automatizada y la validación física final de Progreso.
 - A6: retirada del MVP por decisión explícita; G6 retirada / no aplica.
 - A7: completada; G7 verde el 28 de agosto de 2026.
-- A8: autorizada como siguiente fase.
+- A8: en progreso; G8 permanece rojo hasta validar firma, artefactos,
+  rendimiento, regresión y smoke en dispositivo dedicado.

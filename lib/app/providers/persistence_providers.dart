@@ -16,8 +16,10 @@ import '../../features/missions/application/mission_application_service.dart'
 import '../../features/missions/data/drift_mission_repository.dart';
 import '../../features/missions/domain/repositories/mission_repository.dart';
 import '../../features/notifications/application/notification_reconciliation_service.dart';
+import '../../features/notifications/data/drift_reminder_preferences_repository.dart';
 import '../../features/notifications/data/method_channel_mission_notification_platform.dart';
 import '../../features/notifications/domain/mission_notification_platform.dart';
+import '../../features/notifications/domain/reminder_preferences_repository.dart';
 import '../../features/progress/data/drift_progress_repository.dart';
 import '../../features/progress/domain/repositories/progress_repository.dart';
 import '../../features/recurrences/application/recurrence_application_service.dart';
@@ -186,12 +188,21 @@ missionNotificationPlatformProvider = Provider<MissionNotificationPlatform>(
   (Ref ref) => const MethodChannelMissionNotificationPlatform(),
 );
 
+final Provider<ReminderPreferencesRepository>
+reminderPreferencesRepositoryProvider = Provider<ReminderPreferencesRepository>(
+  (Ref ref) =>
+      DriftReminderPreferencesRepository(ref.watch(settingsDaoProvider)),
+);
+
 final Provider<NotificationReconciliationService>
 notificationReconciliationServiceProvider =
     Provider<NotificationReconciliationService>(
       (Ref ref) => NotificationReconciliationService(
         notificationDao: ref.watch(notificationDaoProvider),
         settingsDao: ref.watch(settingsDaoProvider),
+        reminderPreferencesRepository: ref.watch(
+          reminderPreferencesRepositoryProvider,
+        ),
         platform: ref.watch(missionNotificationPlatformProvider),
         nowUtc: () => DateTime.now().toUtc(),
       ),

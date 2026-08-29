@@ -39,6 +39,14 @@ class SettingsLandingPage extends StatelessWidget {
         description: 'PIN, biometría, bloqueo y cubierta segura.',
         onTap: () => context.go(AppRoutes.settingsPrivacy),
       ),
+      const SizedBox(height: TerminalSpace.sm),
+      _SettingsDestination(
+        key: const Key('open-notification-settings'),
+        icon: Icons.notifications_outlined,
+        title: 'Notificaciones',
+        description: 'Anticipación, sonido y horario silencioso.',
+        onTap: () => context.go(AppRoutes.settingsNotifications),
+      ),
     ],
   );
 }

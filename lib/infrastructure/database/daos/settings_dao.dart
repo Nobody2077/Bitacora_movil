@@ -54,6 +54,17 @@ final class SettingsDao {
     return row?.value;
   }
 
+  Future<List<SchemaMetadataData>> getMetadataEntries(Set<String> keys) {
+    if (keys.isEmpty) {
+      return Future<List<SchemaMetadataData>>.value(
+        const <SchemaMetadataData>[],
+      );
+    }
+    return (_database.select(
+      _database.schemaMetadata,
+    )..where((table) => table.key.isIn(keys))).get();
+  }
+
   Stream<List<SchemaMetadataData>> watchMetadata() {
     return (_database.select(_database.schemaMetadata)
           ..orderBy(<OrderingTerm Function(SchemaMetadata)>[
@@ -94,6 +105,41 @@ final class SettingsDao {
         _database.schemaMetadata,
       },
     );
+  }
+
+  Future<void> putMetadataBatch(
+    Map<String, String> values, {
+    required int updatedAtUtcMs,
+  }) async {
+    if (values.isEmpty) {
+      return;
+    }
+    for (final String key in values.keys) {
+      if (key.trim().isEmpty || _reservedMetadataKeys.contains(key)) {
+        throw ArgumentError.value(key, 'values', 'Metadata key is invalid.');
+      }
+    }
+    await _database.transaction(() async {
+      for (final MapEntry<String, String> entry in values.entries) {
+        await _database.customInsert(
+          '''
+            INSERT INTO schema_metadata ("key", value, updated_at)
+            VALUES (?, ?, ?)
+            ON CONFLICT("key") DO UPDATE SET
+              value = excluded.value,
+              updated_at = excluded.updated_at
+          ''',
+          variables: <Variable<Object>>[
+            Variable<String>(entry.key),
+            Variable<String>(entry.value),
+            Variable<int>(updatedAtUtcMs),
+          ],
+          updates: <ResultSetImplementation<Table, Object?>>{
+            _database.schemaMetadata,
+          },
+        );
+      }
+    });
   }
 
   Future<int> getSchemaVersionMirror() async {

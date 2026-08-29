@@ -15,6 +15,7 @@ abstract final class AppRoutes {
   static const String settingsPrivacyPin = '/settings/privacy/pin';
   static const String settingsPrivacyBiometrics =
       '/settings/privacy/biometrics';
+  static const String settingsNotifications = '/settings/notifications';
 
   /// El mapa definitivo contiene 58 identificadores NAV y 60 patrones URI.
   /// `/more` es el único contenedor de navegación, no una superficie funcional.
@@ -73,13 +74,14 @@ abstract final class AppRoutes {
       path: '/missions/calendar',
       title: 'Calendario de misiones',
       area: AppArea.missions,
+      queryParameters: <String>{'date'},
     ),
     AppRouteContract(
       name: 'missionNew',
       path: '/missions/new',
       title: 'Crear misión',
       area: AppArea.missions,
-      queryParameters: <String>{'origin'},
+      queryParameters: <String>{'origin', 'date'},
     ),
     AppRouteContract(
       name: 'missionTemplateNew',
@@ -317,7 +319,7 @@ abstract final class AppRoutes {
     ),
     AppRouteContract(
       name: 'settingsNotifications',
-      path: '/settings/notifications',
+      path: settingsNotifications,
       title: 'Notificaciones',
       area: AppArea.settings,
     ),

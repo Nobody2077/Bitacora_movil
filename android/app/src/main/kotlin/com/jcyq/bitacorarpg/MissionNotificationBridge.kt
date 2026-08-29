@@ -20,7 +20,6 @@ class MissionNotificationBridge(
     companion object {
         private const val CHANNEL = "com.jcyq.bitacorarpg/mission_notifications"
         private const val PERMISSION_REQUEST = 46031
-        private const val ALARM_WINDOW_MS = 10 * 60 * 1000L
     }
 
     private var permissionResult: MethodChannel.Result? = null
@@ -82,12 +81,16 @@ class MissionNotificationBridge(
             val request = requestFrom(call)
             val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val triggerAt = maxOf(request.notifyAtUtcMs, System.currentTimeMillis() + 1_000L)
-            alarmManager.setWindow(
-                AlarmManager.RTC_WAKEUP,
-                triggerAt,
-                ALARM_WINDOW_MS,
-                alarmPendingIntent(request, PendingIntent.FLAG_UPDATE_CURRENT),
-            )
+            val pendingIntent = alarmPendingIntent(request, PendingIntent.FLAG_UPDATE_CURRENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent,
+                )
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+            }
             result.success(request.systemNotificationId)
         } catch (error: IllegalArgumentException) {
             result.error("INVALID_NOTIFICATION", error.message, null)

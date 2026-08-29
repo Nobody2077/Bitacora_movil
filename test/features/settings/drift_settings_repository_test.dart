@@ -51,6 +51,26 @@ void main() {
     expect(await repository.load(), isA<Failure<AppPreferences>>());
   });
 
+  test('rechaza un color de acceso fuera de la paleta admitida', () async {
+    final AppPreferences baseline =
+        (await repository.load() as Success<AppPreferences>).value;
+
+    final Result<void> saved = await repository.save(
+      baseline.copyWith(
+        primaryColorHex: '#00FF00',
+        updatedAtUtc: DateTime.fromMillisecondsSinceEpoch(
+          1787600000001,
+          isUtc: true,
+        ),
+      ),
+    );
+
+    expect(saved, isA<Failure<void>>());
+    final AppPreferences after =
+        (await repository.load() as Success<AppPreferences>).value;
+    expect(after.primaryColorHex, baseline.primaryColorHex);
+  });
+
   test('watch publica los cambios de accesibilidad persistidos', () async {
     final StreamIterator<Result<AppPreferences>> changes = StreamIterator(
       repository.watch(),

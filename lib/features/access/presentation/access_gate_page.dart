@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/router/app_routes.dart';
+import '../../../app/theme/app_theme_tokens.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../settings/domain/models/app_preferences.dart';
 import '../application/access_session_controller.dart';
 import '../application/access_session_state.dart';
 import '../domain/biometric_authenticator.dart';
@@ -74,6 +77,7 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
   @override
   Widget build(BuildContext context) {
     final AccessSessionState session = ref.watch(accessSessionProvider);
+    final Color accentColor = _accessAccentColor();
     return switch (session.phase) {
       AccessSessionPhase.bootstrapping => const AccessScaffold(
         title: 'Verificando acceso',
@@ -84,8 +88,11 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
         ),
       ),
       AccessSessionPhase.setupRequired => _buildSetup(session),
-      AccessSessionPhase.locked ||
-      AccessSessionPhase.authenticating => _buildLocked(session),
+      AccessSessionPhase.locked => _buildLocked(session, accentColor),
+      AccessSessionPhase.authenticating => AccessTerminalTransition(
+        accentColor: accentColor,
+        stage: AccessTerminalStage.validating,
+      ),
       AccessSessionPhase.corrupted => AccessScaffold(
         title: 'Acceso cerrado',
         subtitle:
@@ -109,13 +116,23 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
           message: 'Abriendo recuperación local…',
         ),
       ),
-      AccessSessionPhase.unlocked => const AccessScaffold(
-        title: 'Acceso confirmado',
-        subtitle: 'Restaurando el destino interno de forma segura.',
-        child: TerminalInlineLoadingState(
-          message: 'Restaurando destino protegido…',
-        ),
+      AccessSessionPhase.unlocked => AccessTerminalTransition(
+        accentColor: accentColor,
+        stage: AccessTerminalStage.opening,
       ),
+    };
+  }
+
+  Color _accessAccentColor() {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final AppAccentColor accentChoice =
+        ref.watch(accessAccentProvider).value ?? AppAccentColor.red;
+    return switch (accentChoice) {
+      AppAccentColor.yellow => tokens.valueYellow,
+      AppAccentColor.red => tokens.terminalRed,
+      AppAccentColor.gray => tokens.textSecondary,
     };
   }
 
@@ -201,57 +218,61 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
     );
   }
 
-  Widget _buildLocked(AccessSessionState session) => AccessScaffold(
-    title: 'Bitácora bloqueada',
-    subtitle:
-        'Ninguna pantalla privada ni repositorio se construye hasta abrir.',
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        AccessNoticeBanner(
-          notice: session.notice,
-          blockedUntilEpochMillis: session.blockedUntilEpochMillis,
-        ),
-        PinTextField(
-          fieldKey: const Key('unlock-pin'),
-          controller: _pinController,
-          label: 'PIN de Bitácora',
-          enabled: !session.isBusy,
-          autofocus: true,
-          onSubmitted: (_) => _unlockWithPin(),
-        ),
-        const SizedBox(height: 16),
-        FilledButton.icon(
-          key: const Key('unlock-button'),
-          onPressed: session.isBusy ? null : _unlockWithPin,
-          icon: session.isBusy
-              ? const SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.lock_open_outlined),
-          label: Text(session.isBusy ? 'Abriendo Bitácora…' : 'Abrir Bitácora'),
-        ),
-        if (session.biometricsEnabled &&
-            session.biometricAvailability ==
-                BiometricAvailability.available) ...<Widget>[
+  Widget _buildLocked(AccessSessionState session, Color accentColor) {
+    return AccessScaffold(
+      title: 'ENLACE DE ACCESO',
+      subtitle:
+          'Introduce tu secuencia de seis dígitos para abrir la Bitácora.',
+      accentColor: accentColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          AccessNoticeBanner(
+            notice: session.notice,
+            blockedUntilEpochMillis: session.blockedUntilEpochMillis,
+          ),
+          if (session.isBusy) ...<Widget>[
+            LinearProgressIndicator(
+              key: const Key('access-matrix-progress'),
+              color: accentColor,
+            ),
+            const SizedBox(height: 16),
+          ],
+          AccessCodeMatrix(
+            key: const Key('unlock-code-matrix'),
+            controller: _pinController,
+            accentColor: accentColor,
+            enabled: !session.isBusy,
+            onCompleted: (_) => _unlockWithPin(),
+          ),
+          if (session.biometricsEnabled &&
+              session.biometricAvailability ==
+                  BiometricAvailability.available) ...<Widget>[
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              key: const Key('biometric-unlock-button'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: accentColor,
+                side: BorderSide(color: accentColor),
+              ),
+              onPressed: session.isBusy
+                  ? null
+                  : ref
+                        .read(accessSessionProvider.notifier)
+                        .unlockWithBiometrics,
+              icon: const Icon(Icons.fingerprint),
+              label: const Text('Usar biometría'),
+            ),
+          ],
           const SizedBox(height: 10),
-          OutlinedButton.icon(
-            key: const Key('biometric-unlock-button'),
-            onPressed: session.isBusy
-                ? null
-                : ref.read(accessSessionProvider.notifier).unlockWithBiometrics,
-            icon: const Icon(Icons.fingerprint),
-            label: const Text('Usar biometría'),
+          TextButton(
+            key: const Key('open-recovery-button'),
+            style: TextButton.styleFrom(foregroundColor: accentColor),
+            onPressed: session.isBusy ? null : _openRecovery,
+            child: const Text('Recuperar acceso'),
           ),
         ],
-        const SizedBox(height: 10),
-        TextButton(
-          key: const Key('open-recovery-button'),
-          onPressed: session.isBusy ? null : _openRecovery,
-          child: const Text('Olvidé mi PIN'),
-        ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }

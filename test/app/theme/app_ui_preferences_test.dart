@@ -100,4 +100,16 @@ void main() {
     expect(tokens.border, AppThemeTokens.terminalHighContrast.border);
     expect(tokens.infoCyan, AppThemeTokens.terminalHighContrast.infoCyan);
   });
+
+  test('todas las superficies son negro puro en ambas paletas', () {
+    for (final AppThemeTokens tokens in <AppThemeTokens>[
+      AppThemeTokens.terminal,
+      AppThemeTokens.terminalHighContrast,
+    ]) {
+      expect(tokens.background, Colors.black);
+      expect(tokens.surfaceLow, Colors.black);
+      expect(tokens.surfaceHigh, Colors.black);
+      expect(tokens.surfaceOverlay, Colors.black);
+    }
+  });
 }

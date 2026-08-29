@@ -142,7 +142,11 @@ class _RailShell extends ConsumerWidget {
               );
             },
           ),
-          VerticalDivider(width: 1, color: tokens.border),
+          VerticalDivider(
+            key: const ValueKey<String>('sidebar-content-divider'),
+            width: 1,
+            color: tokens.structuralRed,
+          ),
           Expanded(
             child: Column(
               children: <Widget>[

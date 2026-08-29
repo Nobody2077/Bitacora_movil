@@ -17,9 +17,16 @@ import '../domain/models/mission.dart';
 import 'mission_presentation_support.dart';
 
 class MissionFormPage extends ConsumerStatefulWidget {
-  const MissionFormPage({super.key, this.missionId});
+  const MissionFormPage({
+    super.key,
+    this.missionId,
+    this.initialScheduledLocal,
+    this.origin,
+  });
 
   final String? missionId;
+  final DateTime? initialScheduledLocal;
+  final String? origin;
 
   bool get isEditing => missionId != null;
 
@@ -264,6 +271,8 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
           ),
         ),
       );
+    } else if (widget.initialScheduledLocal case final DateTime initial) {
+      _date = DateTime(initial.year, initial.month, initial.day);
     }
     _initialized = true;
   }
@@ -375,6 +384,13 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
           );
           return;
         }
+        if (widget.origin == 'calendar') {
+          context.goNamed(
+            'missionsCalendar',
+            queryParameters: <String, String>{'date': _dateParameter(_date)},
+          );
+          return;
+        }
         context.goNamed('missionsToday');
       },
       onFailure: (AppFailure failure) {
@@ -415,6 +431,11 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     MissionImportance.critical => 100,
   };
 }
+
+String _dateParameter(DateTime date) =>
+    '${date.year.toString().padLeft(4, '0')}-'
+    '${date.month.toString().padLeft(2, '0')}-'
+    '${date.day.toString().padLeft(2, '0')}';
 
 class _InformationPanel extends StatelessWidget {
   const _InformationPanel({
