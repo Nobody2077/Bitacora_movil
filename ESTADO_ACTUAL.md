@@ -411,7 +411,9 @@ main_dev/main_prod
 
 ### Nivel 2 — Extender respetando contratos existentes
 
-- `app/router/app_routes.dart`: conserva 61 patrones URI y sus parámetros permitidos.
+- `app/router/app_routes.dart`: conserva 56 patrones URI y sus parámetros
+  permitidos. Las cinco rutas de datos/continuidad (`settingsData*`) se retiraron
+  con A6 por ADR-005; no re-añadirlas sin reabrir ese ADR.
 - `app/router/app_router.dart`: reemplaza placeholders por páginas reales sin debilitar el guard.
 - `shared/adaptive/adaptive_shell.dart`: conserva breakpoints y ramas independientes.
 - `app/theme/`: reutiliza tokens antes de crear estilos locales.

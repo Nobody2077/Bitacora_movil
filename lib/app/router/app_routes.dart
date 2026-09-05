@@ -18,7 +18,7 @@ abstract final class AppRoutes {
       '/settings/privacy/biometrics';
   static const String settingsNotifications = '/settings/notifications';
 
-  /// El mapa definitivo contiene 59 identificadores NAV y 61 patrones URI.
+  /// El mapa contiene 56 patrones URI (55 superficies funcionales).
   /// `/more` es el único contenedor de navegación, no una superficie funcional.
   static const List<AppRouteContract> all = <AppRouteContract>[
     AppRouteContract(
@@ -354,36 +354,10 @@ abstract final class AppRoutes {
       title: 'Ajustes de Dashboard',
       area: AppArea.settings,
     ),
-    AppRouteContract(
-      name: 'settingsDataExport',
-      path: '/settings/data/export',
-      title: 'Exportar datos',
-      area: AppArea.settings,
-    ),
-    AppRouteContract(
-      name: 'settingsDataImportConfirm',
-      path: '/settings/data/import/confirm',
-      title: 'Confirmar importación',
-      area: AppArea.settings,
-    ),
-    AppRouteContract(
-      name: 'settingsDataImport',
-      path: '/settings/data/import',
-      title: 'Importar datos',
-      area: AppArea.settings,
-    ),
-    AppRouteContract(
-      name: 'settingsDataTrash',
-      path: '/settings/data/trash',
-      title: 'Papelera de datos',
-      area: AppArea.settings,
-    ),
-    AppRouteContract(
-      name: 'settingsData',
-      path: '/settings/data',
-      title: 'Datos y continuidad',
-      area: AppArea.settings,
-    ),
+    // Las rutas de datos y continuidad (settingsData, settingsDataExport,
+    // settingsDataImport, settingsDataImportConfirm, settingsDataTrash) fueron
+    // retiradas: A6 (copia/restauración/exportación) salió del MVP por ADR-005.
+    // No re-añadir sin reabrir ese ADR.
     AppRouteContract(
       name: 'settingsAdvanced',
       path: '/settings/advanced',

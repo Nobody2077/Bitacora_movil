@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppRoutes', () {
-    test('registra los 61 patrones URI canónicos', () {
-      expect(AppRoutes.all, hasLength(61));
+    test('registra los 56 patrones URI canónicos', () {
+      expect(AppRoutes.all, hasLength(56));
       expect(
         AppRoutes.all.where(
           (AppRouteContract route) => route.isFunctionalSurface,
         ),
-        hasLength(60),
+        hasLength(55),
       );
     });
 
