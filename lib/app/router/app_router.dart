@@ -1,42 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/access/application/access_session_controller.dart';
 import '../../features/access/application/access_session_state.dart';
-import '../../features/access/presentation/access_gate_page.dart';
-import '../../features/access/presentation/privacy_settings_pages.dart';
 import '../../features/access/presentation/protected_route_gate.dart';
-import '../../features/access/presentation/recovery_page.dart';
-import '../../features/economy/domain/models/economy_models.dart';
-import '../../features/economy/presentation/economy_analysis_page.dart';
-import '../../features/economy/presentation/economy_overview_page.dart';
-import '../../features/economy/presentation/economy_savings_pages.dart';
-import '../../features/economy/presentation/economy_transaction_pages.dart';
-import '../../features/home/presentation/home_operations_page.dart';
-import '../../features/journal/application/daily_close_application_service.dart';
-import '../../features/journal/presentation/daily_close_page.dart';
-import '../../features/journal/presentation/journal_entry_detail_page.dart';
-import '../../features/journal/presentation/journal_entry_form_page.dart';
-import '../../features/journal/presentation/journal_search_archive_pages.dart';
-import '../../features/journal/presentation/journal_timeline_page.dart';
-import '../../features/missions/presentation/mission_active_page.dart';
-import '../../features/missions/presentation/mission_board_page.dart';
-import '../../features/missions/presentation/mission_calendar_page.dart';
-import '../../features/missions/presentation/mission_collection_page.dart';
-import '../../features/missions/presentation/mission_completion_pages.dart';
-import '../../features/missions/presentation/mission_detail_page.dart';
-import '../../features/missions/presentation/mission_form_page.dart';
-import '../../features/missions/presentation/mission_switch_timer_page.dart';
-import '../../features/missions/presentation/missions_today_page.dart';
-import '../../features/notifications/presentation/notification_settings_page.dart';
-import '../../features/progress/presentation/dashboard_daily_page.dart';
-import '../../features/progress/presentation/dashboard_progress_page.dart';
-import '../../features/progress/presentation/dashboard_weekly_page.dart';
-import '../../features/recurrences/presentation/recurrence_form_page.dart';
-import '../../features/recurrences/presentation/recurrence_list_page.dart';
-import '../../features/settings/presentation/appearance_settings_page.dart';
-import '../../features/settings/presentation/more_page.dart';
 import '../../shared/adaptive/adaptive_shell.dart';
 import '../../shared/widgets/feature_placeholder_page.dart';
 import '../config/app_environment.dart';
@@ -112,235 +80,34 @@ GoRoute _buildRoute(Ref ref, AppRouteContract contract) => GoRoute(
   name: contract.name,
   path: contract.path,
   builder: (context, state) {
-    if (contract.path == AppRoutes.lock) {
-      return const AccessGatePage();
-    }
-    if (contract.path == AppRoutes.lockRecovery) {
-      return const RecoveryPage();
+    // Las rutas de acceso (lock y recuperación) son las superficies públicas
+    // que permiten desbloquear la sesión: se construyen fuera del guard.
+    if (contract.area == AppArea.access) {
+      return _leafFor(contract, context, state);
     }
     return ProtectedRouteGate(
       builder: (context) {
         ref.read(protectedRouteBuildObserverProvider)(contract);
-        if (contract.path == AppRoutes.home) {
-          return const HomeOperationsPage();
-        }
-        if (contract.path == AppRoutes.more) {
-          return const MorePage();
-        }
-        if (contract.name == 'missionsToday') {
-          return const MissionsTodayPage();
-        }
-        if (contract.name == 'missionsBoard') {
-          return const MissionBoardPage();
-        }
-        if (contract.name == 'missionsUpcoming') {
-          return const MissionCollectionPage(
-            collection: MissionCollection.upcoming,
-          );
-        }
-        if (contract.name == 'missionsAll') {
-          return const MissionCollectionPage(collection: MissionCollection.all);
-        }
-        if (contract.name == 'missionsRecurring') {
-          return const RecurrenceListPage();
-        }
-        if (contract.name == 'missionsCalendar') {
-          return MissionCalendarPage(
-            initialDay: _parseLocalDate(state.uri.queryParameters['date']),
-          );
-        }
-        if (contract.name == 'missionNew') {
-          return MissionFormPage(
-            initialScheduledLocal: _parseLocalDate(
-              state.uri.queryParameters['date'],
-            ),
-            origin: state.uri.queryParameters['origin'],
-            initialBoard: state.uri.queryParameters['board'] == '1',
-          );
-        }
-        if (contract.name == 'missionTemplateNew') {
-          return const RecurrenceFormPage();
-        }
-        if (contract.name == 'missionTemplateEdit') {
-          final String? templateId = state.pathParameters['templateId'];
-          if (templateId != null) {
-            return RecurrenceFormPage(templateId: templateId);
-          }
-        }
-        if (contract.name == 'missionTemplatePause') {
-          return const RecurrenceListPage();
-        }
-        if (contract.name == 'missionEdit') {
-          return MissionFormPage(missionId: state.pathParameters['missionId']);
-        }
-        if (contract.name == 'missionDetail') {
-          final String? missionId = state.pathParameters['missionId'];
-          if (missionId != null) {
-            return MissionDetailPage(missionId: missionId);
-          }
-        }
-        if (contract.name == 'missionActive') {
-          final String? missionId = state.pathParameters['missionId'];
-          if (missionId != null) {
-            return MissionActivePage(missionId: missionId);
-          }
-        }
-        if (contract.name == 'missionSwitchTimer') {
-          final String? missionId = state.pathParameters['missionId'];
-          if (missionId != null) {
-            return MissionSwitchTimerPage(missionId: missionId);
-          }
-        }
-        if (contract.name == 'missionReview') {
-          final String? missionId = state.pathParameters['missionId'];
-          if (missionId != null) {
-            return MissionReviewPage(missionId: missionId);
-          }
-        }
-        if (contract.name == 'missionResult') {
-          final String? missionId = state.pathParameters['missionId'];
-          if (missionId != null) {
-            return MissionResultPage(missionId: missionId);
-          }
-        }
-        if (contract.name == 'journal') {
-          return const JournalTimelinePage();
-        }
-        if (contract.name == 'journalNew') {
-          return JournalEntryFormPage(
-            originHint: state.uri.queryParameters['origin'],
-          );
-        }
-        if (contract.name == 'journalSearch') {
-          return const JournalSearchPage();
-        }
-        if (contract.name == 'journalArchive') {
-          return const JournalArchivePage();
-        }
-        if (contract.name == 'journalDailyClose') {
-          final String? date = state.pathParameters['date'];
-          final DateTime? parsedDate = date != null
-              ? parseDailyCloseDate(date)
-              : null;
-          if (parsedDate != null) {
-            return DailyClosePage(localDay: parsedDate);
-          }
-        }
-        if (contract.name == 'journalEdit') {
-          final String? entryId = state.pathParameters['entryId'];
-          if (entryId != null) {
-            return JournalEntryFormPage(entryId: entryId);
-          }
-        }
-        if (contract.name == 'journalDetail') {
-          final String? entryId = state.pathParameters['entryId'];
-          if (entryId != null) {
-            return JournalEntryDetailPage(entryId: entryId);
-          }
-        }
-        if (contract.name == 'finance') {
-          return const EconomyOverviewPage();
-        }
-        if (contract.name == 'financeTransactions') {
-          return const EconomyTransactionsPage();
-        }
-        if (contract.name == 'financeNewExpense') {
-          return EconomyTransactionFormPage(
-            initialType: EconomyTransactionType.expense,
-            missionId: state.uri.queryParameters['missionId'],
-          );
-        }
-        if (contract.name == 'financeNewIncome') {
-          return EconomyTransactionFormPage(
-            initialType: EconomyTransactionType.income,
-            missionId: state.uri.queryParameters['missionId'],
-          );
-        }
-        if (contract.name == 'financeNewAdjustment') {
-          return const EconomyTransactionFormPage(
-            initialType: EconomyTransactionType.adjustmentCredit,
-          );
-        }
-        if (contract.name == 'financeTransactionCorrect') {
-          final String? transactionId = state.pathParameters['transactionId'];
-          if (transactionId != null) {
-            return EconomyTransactionFormPage(
-              initialType: EconomyTransactionType.adjustmentCredit,
-              transactionId: transactionId,
-            );
-          }
-        }
-        if (contract.name == 'financeTransactionVoid') {
-          final String? transactionId = state.pathParameters['transactionId'];
-          if (transactionId != null) {
-            return EconomyTransactionDetailPage(
-              transactionId: transactionId,
-              requestVoid: true,
-            );
-          }
-        }
-        if (contract.name == 'financeTransactionDetail') {
-          final String? transactionId = state.pathParameters['transactionId'];
-          if (transactionId != null) {
-            return EconomyTransactionDetailPage(transactionId: transactionId);
-          }
-        }
-        if (contract.name == 'financeSavings') {
-          return const EconomySavingsPage();
-        }
-        if (contract.name == 'financeSavingsNew') {
-          return const EconomyGoalFormPage();
-        }
-        if (contract.name == 'financeSavingsEdit') {
-          final String? goalId = state.pathParameters['goalId'];
-          if (goalId != null) {
-            return EconomyGoalFormPage(goalId: goalId);
-          }
-        }
-        if (contract.name == 'financeSavingsDetail') {
-          final String? goalId = state.pathParameters['goalId'];
-          if (goalId != null) {
-            return EconomyGoalDetailPage(goalId: goalId);
-          }
-        }
-        if (contract.name == 'financeAnalysis') {
-          return const EconomyAnalysisPage();
-        }
-        if (contract.name == 'dashboardDaily') {
-          return const DashboardDailyPage();
-        }
-        if (contract.name == 'dashboardWeekly') {
-          return const DashboardWeeklyPage();
-        }
-        if (contract.name == 'dashboardProgress') {
-          return const DashboardProgressPage();
-        }
-        if (contract.path == AppRoutes.settings) {
-          return const SettingsLandingPage();
-        }
-        if (contract.path == AppRoutes.settingsAppearance) {
-          return const AppearanceSettingsPage();
-        }
-        if (contract.path == AppRoutes.settingsPrivacy) {
-          return const PrivacySettingsPage();
-        }
-        if (contract.path == AppRoutes.settingsPrivacyPin) {
-          return const ChangePinPage();
-        }
-        if (contract.path == AppRoutes.settingsPrivacyBiometrics) {
-          return const BiometricsSettingsPage();
-        }
-        if (contract.path == AppRoutes.settingsNotifications) {
-          return const NotificationSettingsPage();
-        }
-        return FeaturePlaceholderPage(
-          contract: contract,
-          location: state.uri.toString(),
-        );
+        return _leafFor(contract, context, state);
       },
     );
   },
 );
+
+/// Resuelve la hoja de una ruta a partir de su contrato. Si el contrato no
+/// declara `builder` (superficie diferida) o su builder devuelve `null` (por
+/// ejemplo, falta un parámetro obligatorio), muestra el placeholder.
+Widget _leafFor(
+  AppRouteContract contract,
+  BuildContext context,
+  GoRouterState state,
+) {
+  return contract.builder?.call(context, state) ??
+      FeaturePlaceholderPage(
+        contract: contract,
+        location: state.uri.toString(),
+      );
+}
 
 String? _accessRedirect(Ref ref, GoRouterState state) {
   final AccessSessionState session = ref.read(accessSessionProvider);
@@ -370,19 +137,4 @@ String? _accessRedirect(Ref ref, GoRouterState state) {
 
 final class _RouterRefreshNotifier extends ChangeNotifier {
   void refresh() => notifyListeners();
-}
-
-DateTime? _parseLocalDate(String? value) {
-  if (value == null || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
-    return null;
-  }
-  final DateTime? parsed = DateTime.tryParse(value);
-  if (parsed == null ||
-      '${parsed.year.toString().padLeft(4, '0')}-'
-              '${parsed.month.toString().padLeft(2, '0')}-'
-              '${parsed.day.toString().padLeft(2, '0')}' !=
-          value) {
-    return null;
-  }
-  return DateTime(parsed.year, parsed.month, parsed.day);
 }

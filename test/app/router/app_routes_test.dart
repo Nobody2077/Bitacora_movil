@@ -45,6 +45,38 @@ void main() {
       );
     });
 
+    test(
+      'toda superficie funcional resuelve una página salvo las diferidas',
+      () {
+        final Set<String> sinBuilder = AppRoutes.all
+            .where(
+              (AppRouteContract route) =>
+                  route.isFunctionalSurface && route.builder == null,
+            )
+            .map((AppRouteContract route) => route.name)
+            .toSet();
+
+        // Conjunto cerrado de superficies aún sin página real: caen al
+        // placeholder de forma deliberada. Añadir una ruta sin builder obliga a
+        // reconocerla aquí, evitando huérfanos silenciosos.
+        expect(sinBuilder, <String>{
+          'missionReschedule',
+          'missionConfirmResolution',
+          'settingsMissionsProgress',
+          'settingsFinance',
+          'settingsJournal',
+          'settingsDashboard',
+          'settingsAdvanced',
+        });
+      },
+    );
+
+    test('el contenedor de navegación /more tiene página', () {
+      final AppRouteContract more = _byName('more');
+      expect(more.isFunctionalSurface, isFalse);
+      expect(more.builder, isNotNull);
+    });
+
     test('conserva las seis raíces de dominio', () {
       expect(<String>{
         AppRoutes.home,
