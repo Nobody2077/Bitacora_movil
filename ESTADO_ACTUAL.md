@@ -1,6 +1,7 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **29 de agosto de 2026** (APK firmada `1.2.0+5`; A8 en progreso)
+- Última revisión: **5 de septiembre de 2026** (mantenimiento del router; APK
+  firmada `1.2.0+5` sin cambios; A8 en progreso)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`
 
@@ -60,6 +61,14 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   perder entradas. La matriz está verde con 219 pruebas y análisis limpio. La
   APK `prodRelease` `1.2.0+5` está firmada y verificada; aún requiere recorrido
   físico en dispositivo.
+- Mantenimiento del **5 de septiembre de 2026** (sin cambios funcionales ni de
+  versión): se retiraron las cinco rutas huérfanas `settingsData*` de A6
+  (ADR-005) y se refactorizó el router a builder-por-contrato. `_buildRoute`
+  dejó de despachar por nombre con ~40 `if`; ahora cada `AppRouteContract`
+  declara su página en `builder` y el router solo aplica el envoltorio
+  transversal (guard + observer). Se añadió una prueba que fija las superficies
+  diferidas sin página para evitar rutas huérfanas silenciosas. Detalle en
+  "Nivel 2" más abajo. La matriz quedó en 221 pruebas con análisis limpio.
 
 ## Relevo inmediato — diseño Terminal V2
 
@@ -413,8 +422,21 @@ main_dev/main_prod
 
 - `app/router/app_routes.dart`: conserva 56 patrones URI y sus parámetros
   permitidos. Las cinco rutas de datos/continuidad (`settingsData*`) se retiraron
-  con A6 por ADR-005; no re-añadirlas sin reabrir ese ADR.
-- `app/router/app_router.dart`: reemplaza placeholders por páginas reales sin debilitar el guard.
+  con A6 por ADR-005; no re-añadirlas sin reabrir ese ADR. Desde el refactor
+  builder-por-contrato, cada `AppRouteContract` lleva su propia página en el
+  campo `builder` (fuente única: ruta y página juntas) y `AppRoutes.all` pasó de
+  `const` a `static final`. Añadir una ruta con página real es declarar su
+  `builder` aquí; dejarlo en `null` la deja como superficie diferida al
+  placeholder.
+- `app/router/app_router.dart`: ya no despacha por nombre. Solo aplica lo
+  transversal —`ProtectedRouteGate` + observer para rutas protegidas y
+  construcción directa para las de acceso— y delega la hoja en
+  `contract.builder` vía `_leafFor`. El `FeaturePlaceholderPage` es el fallback
+  natural cuando falta `builder` o un parámetro obligatorio. No mover el guard
+  ni el observer fuera de este envoltorio central.
+- Guardarraíl anti-huérfanos: `test/app/router/app_routes_test.dart` fija el
+  conjunto exacto de superficies diferidas sin `builder`. Una ruta funcional
+  nueva sin página falla la prueba hasta reconocerla explícitamente.
 - `shared/adaptive/adaptive_shell.dart`: conserva breakpoints y ramas independientes.
 - `app/theme/`: reutiliza tokens antes de crear estilos locales.
 - `core/result/` y `core/errors/`: los repositorios devuelven resultados tipados.
