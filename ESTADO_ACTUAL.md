@@ -1,9 +1,9 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **5 de septiembre de 2026** (mantenimiento del router; APK
-  firmada `1.2.0+5` sin cambios; A8 en progreso)
+- Última revisión: **6 de septiembre de 2026** (validación física de `1.2.1+6`
+  en curso; hallazgo de descubrimiento de recurrencia abierto)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`
+- Rama de trabajo: `feat/misiones-recurrentes-tablon` (2 commits sobre `main`)
 
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
@@ -69,6 +69,72 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   transversal (guard + observer). Se añadió una prueba que fija las superficies
   diferidas sin página para evitar rutas huérfanas silenciosas. Detalle en
   "Nivel 2" más abajo. La matriz quedó en 221 pruebas con análisis limpio.
+- Sesión del **6 de septiembre de 2026**: la rama
+  `feat/misiones-recurrentes-tablon` lleva `1.2.1+6` a validación física. El
+  detalle de cada sesión, con lo decidido y lo que queda abierto, vive ahora
+  en "Bitácora de sesiones", justo debajo.
+
+## Bitácora de sesiones
+
+Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
+arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
+qué se tocó, qué se decidió, qué quedó abierto.
+
+### 2026-09-06 — Validación física de `1.2.1+6` y hallazgo de descubrimiento
+
+**Rama:** `feat/misiones-recurrentes-tablon` (2 commits por delante de `main`).
+
+**Commits de la rama:**
+
+| Commit | Contenido |
+|---|---|
+| `96a4a37` | `feat(misiones)`: sección propia "Recurrentes" en la navegación interna, tablón deja de listar misiones ya resueltas, `MissionCardGrid` reparte en 1–3 columnas, el fallo de generación de ocurrencias deja de ser silencioso. 222 pruebas verdes. |
+| `cc3635a` | `chore(release)`: `pubspec.yaml` a `1.2.1+6` para el recorrido físico. |
+
+**Validado físicamente por el usuario:**
+
+- Crear una plantilla recurrente y verla aparecer en los días correspondientes
+  funciona como se esperaba. Aprobado.
+
+**Hallazgo abierto — descubrimiento de la recurrencia (no corregido):**
+
+El usuario, que es quien construye la aplicación, no encontró cómo crear una
+misión que se repita cada lunes. Existen dos caminos y ninguna señal los une:
+
+1. `mission_form_page.dart` — crear misión. Solo el tipo **Diaria** genera
+   plantilla, y lo hace con `frequency: daily, intervalValue: 1` fijo
+   (`mission_form_page.dart:502-511`). `MissionType.recurring` está oculto al
+   crear: `if (editing || value != MissionType.recurring)`
+   (`mission_form_page.dart:758`).
+2. `recurrence_form_page.dart` — plantilla recurrente. Aquí sí existe el
+   selector completo: Diaria, Semanal, **Días específicos** con chips de lunes a
+   domingo (`recurrence_form_page.dart:791` y `:828`), intervalo, periodo y
+   hora local. Se alcanza por Misiones → **Recurrentes** → "Nueva plantilla"
+   (`recurrence_list_page.dart:95`).
+
+Un usuario que quiere "materia de universidad todos los lunes" entra por "Crear
+misión" y no llega nunca al segundo camino. **Propuesta pendiente de decidir:**
+enlace en el formulario de misión del tipo "¿Se repite en días concretos? →
+Crear plantilla recurrente" que navegue a `missionTemplateNew` arrastrando
+título y área ya escritos. No implementado; se decidirá al cerrar el recorrido
+físico.
+
+**Decisiones de esta sesión:**
+
+- No apilar cambios nuevos sobre el APK que está bajo prueba física: mientras
+  código y dispositivo coincidan en `1.2.1+6`, cada anomalía encontrada es
+  atribuible sin ambigüedad. Se sigue probando antes de commitear.
+- El refactor que se mencionó en la sesión anterior queda **después** de cerrar
+  los cambios funcionales en curso. No se abre ahora.
+- A partir de esta entrada, cada sesión documenta aquí sus cambios en detalle.
+
+**Abierto / por recordar:**
+
+- El contenido del "commit 2" planificado en la sesión anterior se perdió al
+  cerrarse esa sesión. El usuario intentará reconstruirlo.
+- El golden `sidebar_modular_battery` ya fallaba en `main` antes de `96a4a37`
+  (0,26 % por antialiasing de fuente). Se dejó intacto a propósito.
+- Recorrido físico de `1.2.1+6` en curso, no cerrado.
 
 ## Relevo inmediato — diseño Terminal V2
 
