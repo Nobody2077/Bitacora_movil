@@ -84,6 +84,62 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-09-07 — Decisiones desbloqueadas para notificaciones
+
+**Rama:** `main`. Sin cambios de código; sesión de lectura, verificación y decisión.
+
+**Verificación del estado real (no solo lo documentado):**
+
+- Árbol limpio, `1.2.1+6`, coincide con el relevo.
+- Tres commits de documentación seguían sin subir: `cf4101d`, `69eed05`,
+  `62ab819`.
+- `AndroidManifest.xml` declara `MissionAlarmReceiver` pero **no** tiene
+  `RECEIVE_BOOT_COMPLETED` ni receiver de arranque. El punto 1 del plan es
+  trabajo nuevo de Kotlin y manifiesto, confirmado.
+
+**Hallazgo que invalida una opción del relevo anterior.** La columna
+`mission_id` de `notification_schedules` es
+`NOT NULL REFERENCES missions(id) ON DELETE RESTRICT`
+(`app_database.g.dart:5324`). Por tanto el **identificador sintético NO es
+viable**: la clave foránea exige una misión que exista de verdad, así que
+habría que insertar una misión fantasma en `missions`, que aparecería en
+listados, conteos y estadísticas salvo filtrarla en todas partes. Peor que
+migrar. Las alternativas reales son dos: migrar v3 → v4 haciendo `mission_id`
+nullable, o **sacar el resumen diario de `notification_schedules`** y guardar
+hora y último conteo en las preferencias cifradas que ya usa A9.1 — sin
+migración y compartiendo mecanismo con el espejo del punto 1.
+
+**DECISIÓN TOMADA — espejo de alarmas: Opción A (espejo completo).**
+El usuario **acepta** que un espejo mínimo y cifrado viva fuera de la base para
+reponer las alarmas tras un reinicio. Queda cerrada la decisión que bloqueaba
+todo el incremento de notificaciones. Términos:
+
+- `EncryptedSharedPreferences` con clave de Keystore que **no** exige
+  autenticación de usuario, para poder leerse al arrancar.
+- El espejo guarda solo `scheduleId`, `notifyAtUtcMs`, `soundEnabled` y
+  `showDetails`. **Nunca el título de la misión** ni ningún otro contenido.
+- Se escribe en `reconcile()`, con la app desbloqueada.
+- Tras un reinicio y hasta abrir la app, las notificaciones salen con texto
+  genérico aunque "mostrar detalles" esté activo. **Esto debe explicarse en la
+  pantalla de Ajustes**, no dejarse como sorpresa. Es parte del entregable, no
+  un extra.
+
+**Decisión de esquema: aplazada a propósito.** El usuario opta por decidir
+dónde vive el resumen diario **al implementar el punto 2**, con el punto 1 ya
+cerrado. No se decide por accidente al escribir el primer `INSERT`; se decide
+entonces, y entre las dos opciones reales de arriba.
+
+**Siguiente paso acordado:** punto 1 del plan — reprogramar alarmas tras
+reinicio. Es el cimiento: sin él, los puntos 2 y 3 se evaporan en cada
+reinicio del teléfono.
+
+**Abierto / por recordar:**
+
+- Sigue pendiente del usuario: `git push origin main` y activar "Include
+  private contributions on my profile".
+- La prueba empírica de reinicio (programar aviso → reiniciar → ver si llega)
+  deja de ser curiosidad: será la forma de verificar el punto 1.
+
 ### 2026-09-06 — Validación física de `1.2.1+6` y hallazgo de descubrimiento
 
 **Rama:** `feat/misiones-recurrentes-tablon`, fusionada a `main` al cerrar el recorrido.
@@ -196,8 +252,10 @@ tiene fallos abiertos.
 ### Estado en una línea
 
 `1.2.1+6` aprobada físicamente, todo fusionado en `main`, árbol limpio. El
-siguiente incremento es **notificaciones**, y está bloqueado por **una decisión
-del usuario que sigue sin tomar** (ver "Decisión pendiente" más abajo).
+siguiente incremento es **notificaciones**. **Ya no está bloqueado:** el
+2026-09-07 el usuario eligió la **Opción A (espejo completo)** y aplazó a
+propósito la decisión de esquema hasta implementar el punto 2. Se empieza por
+el **punto 1: reprogramar alarmas tras reinicio**.
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
@@ -210,9 +268,15 @@ del usuario que sigue sin tomar** (ver "Decisión pendiente" más abajo).
 3. **Opcional pero útil:** dejar una notificación programada, reiniciar el
    teléfono y ver si llega. Confirmaría empíricamente lo que motiva el punto 1
    del plan. No bloquea: la conducta de Android está documentada.
-4. **Decidir lo del PIN.** Es lo único que impide arrancar a escribir código.
+4. ~~**Decidir lo del PIN.**~~ **RESUELTO el 2026-09-07: Opción A (espejo
+   completo).** Ya no impide arrancar a escribir código.
 
-### Decisión pendiente — el receiver de arranque y la base cerrada
+### Decisión RESUELTA (2026-09-07) — el receiver de arranque y la base cerrada
+
+> **Resuelta: el usuario eligió la Opción A, espejo completo.** Lo que sigue se
+> conserva como registro del razonamiento y de los términos aceptados. El
+> recordatorio en Ajustes sobre el texto genérico tras un reinicio forma parte
+> del entregable.
 
 **El problema.** Android borra todas las alarmas de `AlarmManager` al reiniciar
 el teléfono. Un receiver de `BOOT_COMPLETED` puede reponerlas, pero al arrancar
@@ -288,11 +352,17 @@ reinicio? Es un ablandamiento consciente de ADR-002 y por eso lo decide él.
 - El receiver **nunca** abre la base cifrada.
 - El texto que se ve en pantalla bloqueada respeta "mostrar detalles".
 
-**Decisión de esquema que sigue abierta:** `notification_schedules` exige
-`missionId` y su clave única es `{missionId, notificationType, notifyAt}`. El
-resumen diario no pertenece a ninguna misión. Elegir a propósito entre migrar el
-esquema (v3 → v4) o usar un identificador sintético. No decidir esto por
-accidente al escribir el primer `INSERT`.
+**Decisión de esquema, aplazada a propósito (2026-09-07):** el usuario decide
+dónde vive el resumen diario **al implementar el punto 2**, no antes. Aviso
+importante para quien lo implemente: el "identificador sintético" que se
+proponía aquí **no es viable**. `mission_id` es
+`NOT NULL REFERENCES missions(id) ON DELETE RESTRICT`
+(`app_database.g.dart:5324`), así que exigiría insertar una misión fantasma en
+`missions`, visible en listados, conteos y estadísticas. Las dos opciones
+reales son: migrar v3 → v4 haciendo `mission_id` nullable, o sacar el resumen
+de `notification_schedules` y guardar hora y último conteo en las preferencias
+cifradas de A9.1 (sin migración, mismo mecanismo que el espejo del punto 1).
+No decidir esto por accidente al escribir el primer `INSERT`.
 
 ### Deuda de UX registrada, que NO se toca
 
