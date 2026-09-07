@@ -1,9 +1,9 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **6 de septiembre de 2026** (validación física de `1.2.1+6`
-  en curso; hallazgo de descubrimiento de recurrencia abierto)
+- Última revisión: **6 de septiembre de 2026** (`1.2.1+6` aprobada físicamente;
+  siguiente incremento: notificaciones)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `feat/misiones-recurrentes-tablon` (2 commits sobre `main`)
+- Rama de trabajo: `feat/misiones-recurrentes-tablon` (3 commits sobre `main`)
 
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
@@ -91,50 +91,94 @@ qué se tocó, qué se decidió, qué quedó abierto.
 | `96a4a37` | `feat(misiones)`: sección propia "Recurrentes" en la navegación interna, tablón deja de listar misiones ya resueltas, `MissionCardGrid` reparte en 1–3 columnas, el fallo de generación de ocurrencias deja de ser silencioso. 222 pruebas verdes. |
 | `cc3635a` | `chore(release)`: `pubspec.yaml` a `1.2.1+6` para el recorrido físico. |
 
-**Validado físicamente por el usuario:**
+**Recorrido físico de `1.2.1+6`: CERRADO Y APROBADO por el usuario.**
 
-- Crear una plantilla recurrente y verla aparecer en los días correspondientes
-  funciona como se esperaba. Aprobado.
+Validado en dispositivo:
 
-**Hallazgo abierto — descubrimiento de la recurrencia (no corregido):**
+- Crear una plantilla recurrente y verla aparecer en los días correspondientes.
+- Sección **Recurrentes** alcanzable desde la navegación interna de Misiones.
+- Tablón, cuadrícula y el resto de la aplicación sin fallos reportados.
+- El usuario aprueba explícitamente la disposición actual: **"me gusta dónde
+  está todo, dejemos como está actualmente"**. No se reordena nada.
 
-El usuario, que es quien construye la aplicación, no encontró cómo crear una
-misión que se repita cada lunes. Existen dos caminos y ninguna señal los une:
+**Hallazgo confirmado — descubrimiento al crear misiones (registrado, NO se corrige por ahora):**
 
-1. `mission_form_page.dart` — crear misión. Solo el tipo **Diaria** genera
-   plantilla, y lo hace con `frequency: daily, intervalValue: 1` fijo
-   (`mission_form_page.dart:502-511`). `MissionType.recurring` está oculto al
-   crear: `if (editing || value != MissionType.recurring)`
-   (`mission_form_page.dart:758`).
-2. `recurrence_form_page.dart` — plantilla recurrente. Aquí sí existe el
-   selector completo: Diaria, Semanal, **Días específicos** con chips de lunes a
-   domingo (`recurrence_form_page.dart:791` y `:828`), intervalo, periodo y
-   hora local. Se alcanza por Misiones → **Recurrentes** → "Nueva plantilla"
+El único hallazgo del recorrido. El usuario, que es quien construye la
+aplicación, no encontró al crear una misión ni la recurrencia ni el tablón.
+Son **dos mecanismos distintos de ocultación**, no uno:
+
+1. **Recurrencia — ausente del formulario.** `MissionType.recurring` está oculto
+   al crear: `if (editing || value != MissionType.recurring)`
+   (`mission_form_page.dart:758`). Solo el tipo **Diaria** genera plantilla, con
+   `frequency: daily, intervalValue: 1` fijo (`mission_form_page.dart:502-511`).
+   El formulario real con Semanal y **Días específicos** (chips de lunes a
+   domingo) vive en otra pantalla: `recurrence_form_page.dart:791` y `:828`,
+   accesible por Misiones → Recurrentes → "Nueva plantilla"
    (`recurrence_list_page.dart:95`).
+2. **Tablón — presente pero en el panel equivocado.** El selector
+   Automática/Tablón sí está en el formulario (`mission_form_page.dart:837`),
+   pero solo aparece al elegir "Diaria" y lo hace en el panel de
+   **Planificación**, mientras que el tipo se elige en el panel de
+   **Información** (`:753`). El usuario cambia algo en una columna y la opción
+   brota en la otra.
 
-Un usuario que quiere "materia de universidad todos los lunes" entra por "Crear
-misión" y no llega nunca al segundo camino. **Propuesta pendiente de decidir:**
-enlace en el formulario de misión del tipo "¿Se repite en días concretos? →
-Crear plantilla recurrente" que navegue a `missionTemplateNew` arrastrando
-título y área ya escritos. No implementado; se decidirá al cerrar el recorrido
-físico.
+Efecto común: la opción existe, pero no está donde se la busca. Quien quiere
+"materia de universidad todos los lunes" entra por "Crear misión" y no llega.
+
+**Propuesta registrada, sin implementar:** enlace en el formulario del tipo
+"¿Se repite en días concretos? → Crear plantilla recurrente" que navegue a
+`missionTemplateNew` arrastrando título y área. **El usuario decidió mantener
+la disposición actual**, así que esto queda como deuda de UX consciente, no
+como tarea pendiente. Reabrir solo si aparecen usuarios distintos del autor.
 
 **Decisiones de esta sesión:**
 
-- No apilar cambios nuevos sobre el APK que está bajo prueba física: mientras
-  código y dispositivo coincidan en `1.2.1+6`, cada anomalía encontrada es
-  atribuible sin ambigüedad. Se sigue probando antes de commitear.
-- El refactor que se mencionó en la sesión anterior queda **después** de cerrar
-  los cambios funcionales en curso. No se abre ahora.
+- No apilar cambios nuevos sobre el APK bajo prueba física: mientras código y
+  dispositivo coincidan, cada anomalía es atribuible sin ambigüedad. Regla
+  respetada; el recorrido se cerró antes de tocar código.
+- El refactor mencionado en la sesión anterior queda **después** de cerrar los
+  cambios funcionales en curso. No se abre todavía.
 - A partir de esta entrada, cada sesión documenta aquí sus cambios en detalle.
+- **Alarmas exactas descartadas** por consumo de batería, a petición del
+  usuario. Se mantiene `setAndAllowWhileIdle`.
+
+**Siguiente incremento acordado — notificaciones.** Orden pactado:
+
+1. Reprogramar alarmas tras reinicio del teléfono (`RECEIVE_BOOT_COMPLETED` +
+   receiver). Android borra todas las alarmas de `AlarmManager` al arrancar y
+   hoy no hay nada que las reponga: `reconcile()` solo corre al desbloquear
+   (`persistence_providers.dart:225`). Coste de batería nulo; es el cimiento
+   del resto.
+2. Resumen diario configurable ("hoy tienes 8 misiones") a la hora que elija el
+   usuario. Una sola alarma al día.
+3. Aviso de vencimiento para misiones urgentes. Hoy el único tipo emitido es
+   `'START'` (`drift_mission_repository.dart:365`).
+4. Texto personalizable y pulido de "mostrar detalles".
+
+**Restricción de diseño que condiciona todo lo anterior:** la base está cifrada
+y cerrada mientras la sesión está bloqueada (ADR-002), así que el receiver
+nativo **no puede contar misiones al disparar**. El sistema actual ya resuelve
+esto precocinando el texto en Dart y pasándolo por el canal
+(`MissionAlarmReceiver.kt:76`). El resumen diario debe seguir el mismo patrón:
+conteo precalculado con la app desbloqueada. Consecuencia aceptada: el número
+es una foto del último uso, no del amanecer.
+
+**Decisión de esquema pendiente:** `notification_schedules` exige `missionId` y
+su clave única es `{missionId, notificationType, notifyAt}`. El resumen diario
+no pertenece a ninguna misión. Hay que elegir a propósito entre migrar el
+esquema (v3 → v4) o usar un identificador sintético.
 
 **Abierto / por recordar:**
 
 - El contenido del "commit 2" planificado en la sesión anterior se perdió al
-  cerrarse esa sesión. El usuario intentará reconstruirlo.
+  cerrarse esa sesión. Sigue sin reconstruirse.
 - El golden `sidebar_modular_battery` ya fallaba en `main` antes de `96a4a37`
   (0,26 % por antialiasing de fuente). Se dejó intacto a propósito.
-- Recorrido físico de `1.2.1+6` en curso, no cerrado.
+- El repositorio es **privado**: las contribuciones no aparecen en el perfil sin
+  activar "Include private contributions on my profile", y solo cuentan los
+  commits que llegan a la rama por defecto. El usuario fusiona a `main` a mano.
+- No se reportó el resultado de la prueba de reinicio del Bloque 4. La conducta
+  de Android está documentada, así que no bloquea el punto 1.
 
 ## Relevo inmediato — diseño Terminal V2
 
