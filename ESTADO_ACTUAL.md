@@ -84,6 +84,92 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-09-07 (tercera parte) — Candidata `1.3.0+7` y alcance post-MVP acotado
+
+**Rama:** `main`. Preparación de la candidata release y actualización documental.
+
+**Por qué release y no `prod-debug`.** El usuario preguntó si podía instalar el
+APK `prod-debug` teniendo la release en el teléfono. **No puede, y el intento es
+peligroso.** El flavor `prod` no tiene `applicationIdSuffix`
+(`build.gradle.kts`), así que `prod-debug` y `prod-release` son la misma
+aplicación para Android (`com.jcyq.bitacorarpg`) firmadas con llaves distintas.
+Android rechaza la instalación con `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, lo cual
+es una protección. El peligro es lo que uno hace después: desinstalar. Eso borra
+la base cifrada **y las claves del AndroidKeyStore que la descifran**, así que ni
+una copia del fichero serviría; y no hay red de seguridad, porque ADR-005 retiró
+la exportación y `allowBackup="false"`.
+
+Queda escrito para que nadie lo repita: **para probar en el dispositivo, o bien
+`--flavor dev` (se instala al lado, con sufijo `.dev` y datos propios), o bien
+una release firmada con la versión subida.** Nunca `prod-debug` encima de una
+`prod-release` con datos.
+
+**Candidata `1.3.0+7`.** Menor y no parche porque el receiver de arranque es
+funcionalidad nueva, no una corrección. Contiene el punto 1 de A11.
+
+**Documentos actualizados en esta sesión:**
+
+| Documento | Cambio |
+|---|---|
+| `ESTADO_FASES.md` | Llevaba sin tocarse desde el 29 de agosto. A10 pasa a COMPLETADA por el recorrido de `1.2.1+6`; A9 pasa a PARCIAL porque su calendario sí se validó pero sus recordatorios se separaron; se abre **A11 — Notificaciones** con la tabla de los cuatro puntos y su estado real. |
+| `CHANGELOG.md` | Se había quedado en `1.2.0`. Se añaden `1.2.1` (que nunca se documentó) y `1.3.0`. |
+| `DECISIONES_PRE_A0.md` | Se precisa el alcance post-MVP bajo la línea original, sin borrarla. |
+| `ESTADO_ACTUAL.md` | Esta entrada y las dos anteriores del día. |
+
+**Alcance post-MVP acotado por el usuario.** La lista original decía
+«Personajes, Tienda, Inventario, loadouts, servidor y sincronización quedan
+post-MVP». El usuario quiere **Personajes, Tienda e Inventario, y solo eso**.
+Loadouts, servidor y sincronización quedan **descartados**, no aplazados: la
+aplicación seguirá siendo local-first y de un solo usuario por decisión.
+
+**Orden acordado: notificaciones primero.** No se abre Personajes/Tienda hasta
+cerrar A11. Los puntos 2, 3 y 4 **no se han empezado a propósito**: el punto 1
+está en un APK que va camino del teléfono, y la regla de no apilar cambios sobre
+un APK bajo prueba física sigue vigente. Escribir el resumen diario ahora haría
+que, si algo falla en el recorrido, no se supiera a qué atribuirlo.
+
+**Commits de la sesión:**
+
+| Commit | Contenido |
+|---|---|
+| `73134ba` | `docs(estado)`: la decisión del espejo (Opción A) y el hallazgo de la clave foránea. |
+| `3026fd7` | `feat(notificaciones)`: el punto 1 completo. 737 líneas, 11 ficheros. |
+
+**Incidente al compilar la release, con solución conocida.** `assembleProdRelease`
+falló con `package dev.flutter.plugins.integration_test does not exist` en
+`GeneratedPluginRegistrant.java`. **No lo causaron los cambios de código.** Ese
+fichero está en `android/.gitignore` y se regenera; las compilaciones debug y las
+pasadas de `flutter test` de hoy lo dejaron con `integration_test` dentro, que es
+dependencia de desarrollo y no existe en el classpath de release.
+`.flutter-plugins-dependencies` lo marca bien (`dev_dependency: true`), así que
+el fichero estaba simplemente obsoleto. **Solución:** borrar
+`android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java` y
+volver a compilar; Flutter lo regenera en contexto release. Si vuelve a pasar,
+es esto, no una regresión.
+
+**Verificaciones de la candidata `1.3.0+7`, sobre el APK ya construido:**
+
+- `versionCode=7`, `versionName=1.3.0`.
+- Permisos: `USE_BIOMETRIC`, `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`,
+  `USE_FINGERPRINT` y el de receptor dinámico de Flutter. **Sigue sin
+  `INTERNET`.**
+- `BootAlarmRestoreReceiver` presente en el manifiesto del APK, `enabled=true`,
+  `exported=true`.
+- **Firma idéntica a la de `1.2.1+6`**: SHA-256 `a6092c6c…16b8` en ambos. Se
+  instalará como actualización y conservará los datos.
+
+**Recorrido físico pendiente para `1.3.0+7`:**
+
+1. Instalar encima de `1.2.1+6`. **No desinstalar nada.**
+2. Comprobar que los datos siguen ahí (misiones, bitácora, economía).
+3. Ajustes → Notificaciones: leer el panel nuevo «Después de reiniciar el
+   teléfono» y ver que su texto cambia al conmutar «mostrar detalles».
+4. **La prueba que importa:** programar una misión con hora cercana, reiniciar
+   el teléfono, y esperar sin abrir la aplicación. Debe llegar el aviso, con
+   texto genérico.
+5. Abrir la aplicación y comprobar que los avisos posteriores vuelven a mostrar
+   el título si «mostrar detalles» está activo.
+
 ### 2026-09-07 (segunda parte) — Punto 1: reponer alarmas tras reinicio
 
 **Rama:** `main`. Implementación del punto 1 del plan de notificaciones, ya
@@ -315,12 +401,13 @@ tiene fallos abiertos.
 
 ### Estado en una línea
 
-`1.2.1+6` aprobada físicamente, todo fusionado en `main`. El **punto 1 del plan
-de notificaciones (reponer alarmas tras reinicio) está implementado** y pendiente
-de una sola cosa: **la prueba física de reinicio**. La decisión que bloqueaba
-todo se cerró el 2026-09-07 (Opción A, espejo completo). El siguiente incremento
-es el **punto 2, el resumen diario**, y con él llega la decisión de esquema que
-se aplazó a propósito.
+**Candidata `1.3.0+7` compilada, firmada y verificada, esperando el recorrido
+físico.** Contiene el punto 1 de A11: los recordatorios ya se reponen tras
+reiniciar el teléfono. Su firma es idéntica a la de `1.2.1+6`, así que se
+instala encima conservando los datos. Los puntos 2–4 de notificaciones **no se
+han empezado a propósito**, porque hay un APK camino del teléfono y no se apilan
+cambios sobre algo en prueba física. Personajes, Tienda e Inventario quedan
+acordados como el siguiente bloque, después de cerrar A11.
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
@@ -334,11 +421,12 @@ se aplazó a propósito.
    su criterio, ya sin ese malentendido. Verificar también que
    `juancristianyujraquispe@gmail.com` esté verificado en
    <https://github.com/settings/emails>.
-3. **La prueba de reinicio, que ya NO es opcional.** Programar un aviso,
-   reiniciar el teléfono y comprobar que llega. El punto 1 está implementado,
-   y esta es la única forma de validarlo: las pruebas de Dart cubren el
-   contrato, no lo que hace Android al arrancar. Hasta que se haga, el punto 1
-   está **implementado pero no validado**.
+3. **El recorrido físico de `1.3.0+7`, que es lo único que bloquea seguir.**
+   Instalar `build/app/outputs/flutter-apk/app-prod-release.apk` **encima** de
+   la versión actual, sin desinstalar nada. Después: programar un aviso,
+   reiniciar el teléfono y esperar sin abrir la aplicación. Debe llegar con
+   texto genérico. Los cinco pasos completos están en la entrada
+   «2026-09-07 (tercera parte)» de la bitácora.
 4. ~~**Decidir lo del PIN.**~~ **RESUELTO el 2026-09-07: Opción A (espejo
    completo).** Ya está implementado.
 

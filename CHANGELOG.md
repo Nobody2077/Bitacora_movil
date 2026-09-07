@@ -1,5 +1,39 @@
 # Historial de cambios
 
+## 1.3.0 — candidata `1.3.0+7`
+
+### Notificaciones que sobreviven al reinicio
+
+- Los recordatorios se reponen solos tras reiniciar el teléfono o actualizar la
+  aplicación. Antes se perdían todos: Android borra las alarmas de
+  `AlarmManager` al arrancar y nada las repoblaba, porque la reconciliación solo
+  corre al desbloquear la aplicación.
+- Para lograrlo se guarda un espejo mínimo **fuera** de la base cifrada, con
+  solo el identificador del aviso, su hora, el sonido y la preferencia de
+  detalles. **Nunca el título de la misión.** Va cifrado con AES/GCM y una clave
+  de AndroidKeyStore, siguiendo el mismo patrón que ya usaba la clave de la
+  base.
+- Consecuencia visible y deliberada: tras un reinicio, y hasta que se abre la
+  aplicación, los avisos salen con el mensaje genérico aunque «mostrar
+  detalles» esté activo. Leer el título exigiría abrir la base cifrada, y eso
+  pide el PIN. Ajustes lo explica en un panel nuevo en vez de dejarlo como
+  sorpresa.
+- El permiso nuevo es `RECEIVE_BOOT_COMPLETED`. No da acceso a red ni a datos;
+  la aplicación sigue sin permiso de `INTERNET`.
+- Un fallo al sincronizar el espejo se reporta en el informe de reconciliación
+  en vez de pasar desapercibido.
+
+## 1.2.1 — candidata `1.2.1+6`
+
+Aprobada físicamente por el usuario el 6 de septiembre de 2026.
+
+- Misiones gana una sección propia **Recurrentes** en su navegación interna,
+  desde la que se crean y editan las plantillas.
+- El tablón deja de listar las misiones ya resueltas.
+- La cuadrícula de misiones reparte las tarjetas en una, dos o tres columnas
+  según el ancho disponible.
+- El fallo al generar ocurrencias de una plantilla deja de ser silencioso.
+
 ## 1.2.0 — candidata `1.2.0+5`
 
 ### Misiones y planificación

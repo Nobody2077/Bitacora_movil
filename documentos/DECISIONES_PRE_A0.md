@@ -19,6 +19,16 @@ Precedencia por materia:
 
 El MVP permanece Android, local-first, de un solo usuario, tablet-first y adaptable a teléfono. Personajes, Tienda, Inventario, loadouts, servidor y sincronización quedan post-MVP.
 
+> **Precisión del 7 de septiembre de 2026.** El usuario acotó qué parte de ese
+> post-MVP quiere de verdad: **Personajes, Tienda e Inventario, y solo eso**.
+> Loadouts, servidor y sincronización quedan **descartados**, no aplazados; el
+> proyecto sigue siendo local-first y de un solo usuario por decisión, no por
+> falta de tiempo. Este bloque no se abre hasta cerrar A11 (notificaciones) y
+> A8 (release), y cuando se abra exigirá su propio ADR: el esquema no tiene
+> tablas de tienda ni inventario, así que implica migración v3 → v4, y queda
+> abierta la decisión de con qué se paga —el XP de `xp_transactions` o el
+> dinero real de `transactions`—, que son dos productos distintos.
+
 ## 2. Identidad y entorno del proyecto
 
 | Decisión | Valor vinculante |

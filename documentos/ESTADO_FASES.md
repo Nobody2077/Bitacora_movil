@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 29 de agosto de 2026
+Última actualización: 7 de septiembre de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -15,8 +15,32 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
 | A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
-| A9 — Calendario y recordatorios | **EN VALIDACIÓN** | Código y 215 pruebas verdes; G9 físico pendiente |
-| A10 — Tablón de misiones | **EN VALIDACIÓN** | Diarias seleccionables, esquema v3, 219 pruebas y APK `1.2.0+5`; recorrido físico pendiente |
+| A9 — Calendario y recordatorios | **PARCIAL** | El calendario y las recurrencias quedaron aprobados físicamente con `1.2.1+6` el 6 de septiembre de 2026. Los recordatorios se separaron a A11 y siguen abiertos: G9 no se cierra hasta que A11 esté verde |
+| A10 — Tablón de misiones | **COMPLETADA** | Recorrido físico de `1.2.1+6` cerrado y aprobado por el usuario el 6 de septiembre de 2026 |
+| A11 — Notificaciones | **EN PROGRESO** | Punto 1 (reponer tras reinicio) implementado el 7 de septiembre de 2026 y pendiente de prueba física; puntos 2–4 sin empezar |
+
+## A11 — Notificaciones: los cuatro puntos pactados
+
+Orden acordado con el usuario. Cada punto se cierra antes de abrir el siguiente.
+
+| Punto | Estado | Detalle |
+| --- | --- | --- |
+| 1. Reponer alarmas tras reinicio | **IMPLEMENTADO, SIN VALIDAR** | `RECEIVE_BOOT_COMPLETED`, `BootAlarmRestoreReceiver` y espejo cifrado fuera de la base (Opción A, decidida por el usuario el 7 de septiembre de 2026). 225 pruebas verdes y APK compilada. Falta la prueba en dispositivo: programar un aviso, reiniciar y comprobar que llega |
+| 2. Resumen diario configurable | **PENDIENTE** | «Hoy tienes N misiones» a la hora que elija el usuario. Trae consigo la decisión de esquema aplazada a propósito: dónde vive el resumen, ya que `notification_schedules.mission_id` es `NOT NULL REFERENCES missions(id)` |
+| 3. Aviso de vencimiento | **PENDIENTE** | Hoy el único tipo emitido es `START`; requiere un tipo nuevo |
+| 4. Texto personalizable | **PENDIENTE** | El texto genérico está fijo en Kotlin; hay que pasarlo desde Dart |
+
+**Restricciones que no se negocian en A11:**
+
+- Alarmas exactas descartadas por consumo de batería, a petición del usuario. Se mantiene `setAndAllowWhileIdle`.
+- El receiver nunca abre la base cifrada (ADR-002).
+- El texto en pantalla bloqueada respeta «mostrar detalles».
+
+## Alcance post-MVP acordado el 7 de septiembre de 2026
+
+`DECISIONES_PRE_A0.md` dejaba fuera del MVP «Personajes, Tienda, Inventario, loadouts, servidor y sincronización». El usuario **redujo esa lista el 7 de septiembre de 2026**: quiere **Personajes, Tienda e Inventario**, y solo eso. Loadouts, servidor y sincronización quedan descartados, no aplazados.
+
+No se abre hasta cerrar A11 y A8. Cuando se abra necesitará su propio ADR: no hay tablas de tienda ni inventario en el esquema, así que implica migración v3 → v4, y hay una decisión de diseño pendiente sobre con qué se paga (XP ganado en misiones frente al dinero real de `transactions`).
 
 ## Evidencia G3 — A3 completada
 
