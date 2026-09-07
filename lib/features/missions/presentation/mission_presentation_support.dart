@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/application/commands/complete_mission.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/app_ui_preferences.dart';
+import '../../../app/theme/terminal_foundations.dart';
 import '../domain/models/mission.dart';
 
 Color missionAreaColor(String colorHex, Color fallback) {
@@ -133,7 +134,83 @@ String completionMovementTypeLabel(CompletionMovementType value) =>
       CompletionMovementType.income => 'Ingreso',
     };
 
-enum MissionSection { today, board, upcoming, all, calendar }
+/// Distribuye tarjetas de misión en una cuadrícula adaptable.
+///
+/// Aprovecha el ancho disponible en horizontal sin obligar a desplazarse:
+/// una columna en compacto, dos en medio y tres en tablet horizontal. Con
+/// texto ampliado vuelve a una sola columna para no recortar contenido, tal
+/// como exige la matriz de accesibilidad de A7.
+class MissionCardGrid extends StatelessWidget {
+  const MissionCardGrid({
+    required this.children,
+    this.spacing = TerminalSpace.sm,
+    super.key,
+  });
+
+  /// Ancho mínimo legible de una tarjeta de misión.
+  static const double minCardWidth = 340;
+
+  /// Escala de texto a partir de la cual se fuerza una sola columna.
+  static const double singleColumnTextScale = 1.3;
+
+  final List<Widget> children;
+  final double spacing;
+
+  @override
+  Widget build(BuildContext context) {
+    if (children.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final double textScale = MediaQuery.textScalerOf(
+      context,
+    ).scale(16) / 16;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final int columns = _columnsFor(
+          maxWidth: constraints.maxWidth,
+          textScale: textScale,
+          itemCount: children.length,
+        );
+        if (columns <= 1) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              for (int i = 0; i < children.length; i++) ...<Widget>[
+                if (i > 0) SizedBox(height: spacing),
+                children[i],
+              ],
+            ],
+          );
+        }
+        final double itemWidth =
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: <Widget>[
+            for (final Widget child in children)
+              SizedBox(width: itemWidth, child: child),
+          ],
+        );
+      },
+    );
+  }
+
+  static int _columnsFor({
+    required double maxWidth,
+    required double textScale,
+    required int itemCount,
+  }) {
+    if (textScale >= singleColumnTextScale || !maxWidth.isFinite) {
+      return 1;
+    }
+    final int fitting = maxWidth ~/ minCardWidth;
+    final int capped = fitting.clamp(1, 3);
+    return capped > itemCount ? itemCount : capped;
+  }
+}
+
+enum MissionSection { today, board, upcoming, all, calendar, recurring }
 
 class MissionSectionNavigation extends StatelessWidget {
   const MissionSectionNavigation({required this.selected, super.key});
@@ -201,6 +278,7 @@ class _MissionSectionButton extends StatelessWidget {
     MissionSection.upcoming => 'missionsUpcoming',
     MissionSection.all => 'missionsAll',
     MissionSection.calendar => 'missionsCalendar',
+    MissionSection.recurring => 'missionsRecurring',
   };
 
   static String _sectionLabel(MissionSection value) => switch (value) {
@@ -209,6 +287,7 @@ class _MissionSectionButton extends StatelessWidget {
     MissionSection.upcoming => 'Próximas',
     MissionSection.all => 'Todas',
     MissionSection.calendar => 'Calendario',
+    MissionSection.recurring => 'Recurrentes',
   };
 
   static IconData _sectionIcon(MissionSection value) => switch (value) {
@@ -217,5 +296,6 @@ class _MissionSectionButton extends StatelessWidget {
     MissionSection.upcoming => Icons.event_outlined,
     MissionSection.all => Icons.list_alt_outlined,
     MissionSection.calendar => Icons.calendar_month_outlined,
+    MissionSection.recurring => Icons.repeat_outlined,
   };
 }

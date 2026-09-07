@@ -280,15 +280,14 @@ class _CollectionList extends StatelessWidget {
         ),
       );
     }
-    return Column(
+    return MissionCardGrid(
+      spacing: 14,
       children: <Widget>[
-        for (final mission in missions) ...<Widget>[
+        for (final mission in missions)
           _CollectionMissionCard(
             mission: mission,
             area: _areaFor(mission.areaId),
           ),
-          const SizedBox(height: 14),
-        ],
       ],
     );
   }

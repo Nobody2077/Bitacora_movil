@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/providers/persistence_providers.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../features/missions/application/mission_providers.dart';
@@ -10,6 +11,61 @@ import '../../../features/missions/presentation/mission_presentation_support.dar
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/recurrence_providers.dart';
 import '../domain/models/recurrence_template.dart';
+
+/// Avisa cuando la generación automática de ocurrencias falló.
+///
+/// Sin esto, un fallo dejaba el calendario vacío sin explicación posible.
+class _GenerationDiagnostics extends ConsumerWidget {
+  const _GenerationDiagnostics();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final RecurrenceGenerationOutcome? outcome = ref.watch(
+      recurrenceGenerationOutcomeProvider,
+    );
+    if (outcome == null || outcome.succeeded) {
+      return const SizedBox.shrink();
+    }
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TerminalPanel(
+        borderColor: tokens.criticalAction,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Icon(Icons.warning_amber_outlined, color: tokens.criticalAction),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'No se generaron las misiones recurrentes',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    outcome.failureMessage!,
+                    style: TextStyle(color: tokens.textSecondary),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Las plantillas siguen guardadas. Bloquea y desbloquea la '
+                    'aplicación para reintentar.',
+                    style: TextStyle(color: tokens.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class RecurrenceListPage extends ConsumerWidget {
   const RecurrenceListPage({super.key});
@@ -42,6 +98,11 @@ class RecurrenceListPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  const MissionSectionNavigation(
+                    selected: MissionSection.recurring,
+                  ),
+                  const SizedBox(height: 20),
+                  const _GenerationDiagnostics(),
                   _TemplateSummary(templates: templates),
                   const SizedBox(height: 16),
                   templates.when(

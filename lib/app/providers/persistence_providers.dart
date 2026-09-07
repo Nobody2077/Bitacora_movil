@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/errors/app_failure.dart';
+import '../../core/result/result.dart';
 import '../../features/access/application/access_session_controller.dart';
 import '../../features/access/application/access_session_state.dart';
 import '../../features/economy/data/drift_economy_repository.dart';
@@ -135,9 +137,46 @@ final Provider<void> persistenceAccessGuardProvider = Provider<void>((Ref ref) {
   );
 });
 
+/// Resultado del último intento de generar ocurrencias recurrentes.
+///
+/// La generación sigue siendo best-effort y nunca bloquea el arranque, pero
+/// deja de perderse en silencio: si falla, la pantalla de misiones recurrentes
+/// puede explicar por qué no aparecieron las misiones esperadas.
+final class RecurrenceGenerationOutcome {
+  const RecurrenceGenerationOutcome({
+    required this.attemptedAtUtc,
+    this.createdCount,
+    this.failureMessage,
+  });
+
+  final DateTime attemptedAtUtc;
+  final int? createdCount;
+  final String? failureMessage;
+
+  bool get succeeded => failureMessage == null;
+}
+
+/// Último resultado de generación, o `null` si todavía no se intentó.
+final NotifierProvider<RecurrenceGenerationOutcomeController,
+        RecurrenceGenerationOutcome?>
+    recurrenceGenerationOutcomeProvider =
+    NotifierProvider<RecurrenceGenerationOutcomeController,
+        RecurrenceGenerationOutcome?>(
+      RecurrenceGenerationOutcomeController.new,
+    );
+
+class RecurrenceGenerationOutcomeController
+    extends Notifier<RecurrenceGenerationOutcome?> {
+  @override
+  RecurrenceGenerationOutcome? build() => null;
+
+  void record(RecurrenceGenerationOutcome outcome) => state = outcome;
+}
+
 /// Dispara la generación de ocurrencias recurrentes pendientes cada vez que
 /// la sesión pasa de bloqueada a desbloqueada. La generación es best-effort:
-/// un fallo no afecta la sesión ni bloquea la apertura de la app.
+/// un fallo no afecta la sesión ni bloquea la apertura de la app, pero queda
+/// registrado en [recurrenceGenerationOutcomeProvider].
 final Provider<void> recurrenceGenerationGuardProvider = Provider<void>((
   Ref ref,
 ) {
@@ -148,6 +187,16 @@ final Provider<void> recurrenceGenerationGuardProvider = Provider<void>((
     (bool? previous, bool next) {
       if (next && previous != true) {
         Future.microtask(() async {
+          void record(RecurrenceGenerationOutcome outcome) {
+            try {
+              ref
+                  .read(recurrenceGenerationOutcomeProvider.notifier)
+                  .record(outcome);
+            } on Object {
+              // El diagnóstico jamás debe tumbar el arranque.
+            }
+          }
+
           try {
             final RecurrenceDao dao = ref.read(recurrenceDaoProvider);
             final service = RecurrenceApplicationService(
@@ -157,12 +206,31 @@ final Provider<void> recurrenceGenerationGuardProvider = Provider<void>((
               idGenerator: SecureMissionIdGenerator(),
               civilTime: const MethodChannelRecurrenceCivilTime(),
             );
-            await service.generatePendingOccurrences();
+            final Result<int> generated = await service
+                .generatePendingOccurrences();
+            record(
+              generated.fold(
+                onSuccess: (int created) => RecurrenceGenerationOutcome(
+                  attemptedAtUtc: DateTime.now().toUtc(),
+                  createdCount: created,
+                ),
+                onFailure: (AppFailure failure) => RecurrenceGenerationOutcome(
+                  attemptedAtUtc: DateTime.now().toUtc(),
+                  failureMessage: failure.message,
+                ),
+              ),
+            );
             await ref
                 .read(notificationReconciliationServiceProvider)
                 .reconcile();
-          } on Object {
-            // best-effort
+          } on Object catch (error) {
+            record(
+              RecurrenceGenerationOutcome(
+                attemptedAtUtc: DateTime.now().toUtc(),
+                failureMessage: 'No se pudieron generar las misiones '
+                    'recurrentes: $error',
+              ),
+            );
           }
         });
       }

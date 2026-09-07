@@ -11,7 +11,11 @@ import 'mission_presentation_support.dart';
 
 /// Lista operativa: filtros, búsqueda y tarjetas trabajan sobre el stream real.
 class MissionsTodayPage extends ConsumerStatefulWidget {
-  const MissionsTodayPage({super.key});
+  const MissionsTodayPage({this.initialFilter, super.key});
+
+  /// Filtro preseleccionado al entrar desde otra superficie, por ejemplo el
+  /// contador de completadas del tablón.
+  final MissionsTodayFilter? initialFilter;
 
   @override
   ConsumerState<MissionsTodayPage> createState() => _MissionsTodayPageState();
@@ -19,7 +23,8 @@ class MissionsTodayPage extends ConsumerStatefulWidget {
 
 class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
   final TextEditingController _searchController = TextEditingController();
-  _MissionFilter _filter = _MissionFilter.all;
+  late MissionsTodayFilter _filter =
+      widget.initialFilter ?? MissionsTodayFilter.all;
   String? _areaId;
 
   @override
@@ -43,7 +48,7 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
             missions: _visibleMissions(source),
             areas: knownAreas,
             hasFilters:
-                _filter != _MissionFilter.all ||
+                _filter != MissionsTodayFilter.all ||
                 _areaId != null ||
                 _searchController.text.trim().isNotEmpty,
             onClearFilters: _clearFilters,
@@ -77,7 +82,7 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
                     selectedAreaId: _areaId,
                     areas: knownAreas,
                     controller: _searchController,
-                    onFilterChanged: (_MissionFilter value) =>
+                    onFilterChanged: (MissionsTodayFilter value) =>
                         setState(() => _filter = value),
                     onAreaChanged: (String? value) =>
                         setState(() => _areaId = value),
@@ -125,14 +130,14 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
   }
 
   bool _matchesFilter(Mission mission) => switch (_filter) {
-    _MissionFilter.all => true,
-    _MissionFilter.today =>
+    MissionsTodayFilter.all => true,
+    MissionsTodayFilter.today =>
       mission.status != MissionStatus.completed &&
           mission.status != MissionStatus.partial,
-    _MissionFilter.active =>
+    MissionsTodayFilter.active =>
       mission.status == MissionStatus.active ||
           mission.status == MissionStatus.paused,
-    _MissionFilter.completed =>
+    MissionsTodayFilter.completed =>
       mission.status == MissionStatus.completed ||
           mission.status == MissionStatus.partial,
   };
@@ -140,13 +145,13 @@ class _MissionsTodayPageState extends ConsumerState<MissionsTodayPage> {
   void _clearFilters() {
     _searchController.clear();
     setState(() {
-      _filter = _MissionFilter.all;
+      _filter = MissionsTodayFilter.all;
       _areaId = null;
     });
   }
 }
 
-enum _MissionFilter { all, today, active, completed }
+enum MissionsTodayFilter { all, today, active, completed }
 
 class _MissionHeader extends StatelessWidget {
   const _MissionHeader({required this.onCreate});
@@ -203,11 +208,11 @@ class _MissionControls extends StatelessWidget {
     required this.onSearchChanged,
   });
 
-  final _MissionFilter selectedFilter;
+  final MissionsTodayFilter selectedFilter;
   final String? selectedAreaId;
   final List<MissionArea> areas;
   final TextEditingController controller;
-  final ValueChanged<_MissionFilter> onFilterChanged;
+  final ValueChanged<MissionsTodayFilter> onFilterChanged;
   final ValueChanged<String?> onAreaChanged;
   final ValueChanged<String> onSearchChanged;
 
@@ -224,7 +229,7 @@ class _MissionControls extends StatelessWidget {
           runSpacing: TerminalSpace.xs,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            for (final _MissionFilter filter in _MissionFilter.values)
+            for (final MissionsTodayFilter filter in MissionsTodayFilter.values)
               _FilterTab(
                 label: _filterLabel(filter),
                 selected: selectedFilter == filter,
@@ -272,11 +277,11 @@ class _MissionControls extends StatelessWidget {
     );
   }
 
-  static String _filterLabel(_MissionFilter filter) => switch (filter) {
-    _MissionFilter.all => 'Todas',
-    _MissionFilter.today => 'Hoy',
-    _MissionFilter.active => 'En progreso',
-    _MissionFilter.completed => 'Completadas',
+  static String _filterLabel(MissionsTodayFilter filter) => switch (filter) {
+    MissionsTodayFilter.all => 'Todas',
+    MissionsTodayFilter.today => 'Hoy',
+    MissionsTodayFilter.active => 'En progreso',
+    MissionsTodayFilter.completed => 'Completadas',
   };
 }
 
@@ -414,12 +419,10 @@ class _MissionList extends StatelessWidget {
               ),
       );
     }
-    return Column(
+    return MissionCardGrid(
       children: <Widget>[
-        for (final Mission mission in missions) ...<Widget>[
+        for (final Mission mission in missions)
           _MissionCard(mission: mission, area: _areaFor(mission.areaId)),
-          const SizedBox(height: TerminalSpace.sm),
-        ],
       ],
     );
   }

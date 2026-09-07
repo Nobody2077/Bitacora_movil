@@ -55,7 +55,96 @@ void main() {
     expect(find.text('Beber agua'), findsOneWidget);
     expect(find.text('TOMAR MISIÓN'), findsOneWidget);
     expect(find.text('ABRIR MISIÓN'), findsOneWidget);
-    expect(find.text('1'), findsNWidgets(2));
+    expect(find.text('DISPONIBLES'), findsOneWidget);
+    expect(find.text('EN CURSO'), findsOneWidget);
+    expect(find.text('COMPLETADAS HOY'), findsOneWidget);
+  });
+
+  testWidgets('una misión resuelta deja el tablón y solo queda su contador', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1100, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          missionAreasProvider.overrideWith((ref) => const <MissionArea>[]),
+          missionBoardProvider.overrideWith(
+            (ref) => Stream.value(<MissionBoardEntry>[
+              MissionBoardEntry(template: _template('available', 'Caminar')),
+              MissionBoardEntry(
+                template: _template('done', 'Beber agua'),
+                missionId: 'mission-done',
+                missionStatus: MissionStatus.completed,
+              ),
+              MissionBoardEntry(
+                template: _template('partial', 'Leer'),
+                missionId: 'mission-partial',
+                missionStatus: MissionStatus.partial,
+              ),
+            ]),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const Scaffold(body: MissionBoardPage()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Completada y parcial salen de la lista: su registro vive en Hoy.
+    expect(find.text('Beber agua'), findsNothing);
+    expect(find.text('Leer'), findsNothing);
+    expect(find.text('Caminar'), findsOneWidget);
+    expect(find.text('ABRIR MISIÓN'), findsNothing);
+
+    // El contador conserva el registro visual sin ocupar la lista, y es el
+    // acceso accesible a Hoy › Completadas.
+    expect(find.text('COMPLETADAS HOY'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(RegExp(r'Completadas hoy: 2')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('el tablón despejado invita a revisar las completadas', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1100, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          missionAreasProvider.overrideWith((ref) => const <MissionArea>[]),
+          missionBoardProvider.overrideWith(
+            (ref) => Stream.value(<MissionBoardEntry>[
+              MissionBoardEntry(
+                template: _template('done', 'Beber agua'),
+                missionId: 'mission-done',
+                missionStatus: MissionStatus.completed,
+              ),
+            ]),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.dark(),
+          home: const Scaffold(body: MissionBoardPage()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // No es el vacío de "sin plantillas": distingue haberlas resuelto.
+    expect(find.text('TABLÓN DESPEJADO'), findsOneWidget);
+    expect(find.text('EL TABLÓN ESTÁ VACÍO'), findsNothing);
+    expect(find.text('VER COMPLETADAS DE HOY'), findsOneWidget);
   });
 }
 

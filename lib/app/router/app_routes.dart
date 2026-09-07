@@ -91,7 +91,10 @@ abstract final class AppRoutes {
       path: missionsToday,
       title: 'Misiones de hoy',
       area: AppArea.missions,
-      builder: (context, state) => const MissionsTodayPage(),
+      queryParameters: const <String>{'filter'},
+      builder: (context, state) => MissionsTodayPage(
+        initialFilter: _parseTodayFilter(state.uri.queryParameters['filter']),
+      ),
     ),
     AppRouteContract(
       name: 'missionsBoard',
@@ -558,6 +561,14 @@ abstract final class AppRoutes {
   static Iterable<AppRouteContract> forArea(AppArea area) =>
       all.where((AppRouteContract route) => route.area == area);
 }
+
+MissionsTodayFilter? _parseTodayFilter(String? value) => switch (value) {
+  'all' => MissionsTodayFilter.all,
+  'today' => MissionsTodayFilter.today,
+  'active' => MissionsTodayFilter.active,
+  'completed' => MissionsTodayFilter.completed,
+  _ => null,
+};
 
 DateTime? _parseLocalDate(String? value) {
   if (value == null || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {

@@ -177,6 +177,14 @@ final class MissionBoardEntry {
   final MissionStatus? missionStatus;
 
   bool get isTakenToday => missionId != null;
+
+  /// La misión del día ya quedó resuelta y no debe seguir ocupando el tablón.
+  bool get isFinishedToday =>
+      missionStatus == MissionStatus.completed ||
+      missionStatus == MissionStatus.partial;
+
+  /// Tomada y todavía en curso: sigue visible para poder abrirla.
+  bool get isInProgressToday => isTakenToday && !isFinishedToday;
 }
 
 /// Resultado idempotente de tomar una misión del tablón.

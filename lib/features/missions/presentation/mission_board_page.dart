@@ -76,6 +76,7 @@ class _MissionBoardPageState extends ConsumerState<MissionBoardPage> {
                       onTake: _take,
                       onOpen: _openMission,
                       onCreate: _createBoardMission,
+                      onShowCompleted: _openCompletedToday,
                     ),
                     loading: () => const TerminalLoadingState(
                       message: 'Consultando misiones disponibles…',
@@ -104,6 +105,11 @@ class _MissionBoardPageState extends ConsumerState<MissionBoardPage> {
   void _openMission(String missionId) => context.pushNamed(
     'missionDetail',
     pathParameters: <String, String>{'missionId': missionId},
+  );
+
+  void _openCompletedToday() => context.goNamed(
+    'missionsToday',
+    queryParameters: const <String, String>{'filter': 'completed'},
   );
 
   Future<void> _take(MissionBoardEntry entry) async {
@@ -148,6 +154,7 @@ class _BoardContent extends StatelessWidget {
     required this.onTake,
     required this.onOpen,
     required this.onCreate,
+    required this.onShowCompleted,
   });
 
   final List<MissionBoardEntry> entries;
@@ -156,6 +163,7 @@ class _BoardContent extends StatelessWidget {
   final ValueChanged<MissionBoardEntry> onTake;
   final ValueChanged<String> onOpen;
   final VoidCallback onCreate;
+  final VoidCallback onShowCompleted;
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +180,14 @@ class _BoardContent extends StatelessWidget {
         ),
       );
     }
-    final int taken = entries.where((entry) => entry.isTakenToday).length;
+    // Las resueltas dejan el tablón: su registro vive en Hoy › Completadas.
+    final List<MissionBoardEntry> pending = entries
+        .where((MissionBoardEntry entry) => !entry.isFinishedToday)
+        .toList(growable: false);
+    final int finished = entries.length - pending.length;
+    final int inProgress = pending
+        .where((MissionBoardEntry entry) => entry.isInProgressToday)
+        .length;
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
@@ -187,32 +202,53 @@ class _BoardContent extends StatelessWidget {
             children: <Widget>[
               TerminalMetric(
                 icon: Icons.inventory_2_outlined,
-                value: '${entries.length - taken}',
+                value: '${pending.length - inProgress}',
                 label: 'Disponibles',
                 color: tokens.infoCyan,
               ),
               TerminalMetric(
-                icon: Icons.task_alt,
-                value: '$taken',
-                label: 'Tomadas hoy',
-                color: tokens.progressGreen,
+                icon: Icons.play_arrow_outlined,
+                value: '$inProgress',
+                label: 'En curso',
+                color: tokens.valueYellow,
+              ),
+              _CompletedTodayMetric(
+                count: finished,
+                onPressed: onShowCompleted,
               ),
             ],
           ),
         ),
         const SizedBox(height: TerminalSpace.md),
-        for (final entry in entries) ...<Widget>[
-          _BoardMissionCard(
-            entry: entry,
-            area: _areaFor(entry.template.areaId),
-            taking: taking.contains(entry.template.id),
-            onTake: () => onTake(entry),
-            onOpen: entry.missionId == null
-                ? null
-                : () => onOpen(entry.missionId!),
+        if (pending.isEmpty)
+          TerminalEmptyState(
+            icon: Icons.task_alt,
+            title: 'TABLÓN DESPEJADO',
+            description: finished == 1
+                ? 'Resolviste la única misión ofrecida hoy. Vuelve mañana.'
+                : 'Resolviste las $finished misiones ofrecidas hoy. Vuelve mañana.',
+            action: TerminalOutlineButton(
+              label: 'Ver completadas de hoy',
+              icon: Icons.history,
+              color: tokens.progressGreen,
+              onPressed: onShowCompleted,
+            ),
+          )
+        else
+          MissionCardGrid(
+            children: <Widget>[
+              for (final entry in pending)
+                _BoardMissionCard(
+                  entry: entry,
+                  area: _areaFor(entry.template.areaId),
+                  taking: taking.contains(entry.template.id),
+                  onTake: () => onTake(entry),
+                  onOpen: entry.missionId == null
+                      ? null
+                      : () => onOpen(entry.missionId!),
+                ),
+            ],
           ),
-          const SizedBox(height: TerminalSpace.sm),
-        ],
       ],
     );
   }
@@ -222,6 +258,55 @@ class _BoardContent extends StatelessWidget {
       if (area.id == id) return area;
     }
     return null;
+  }
+}
+
+/// Métrica de completadas que además es el acceso a Hoy › Completadas.
+class _CompletedTodayMetric extends StatelessWidget {
+  const _CompletedTodayMetric({required this.count, required this.onPressed});
+
+  final int count;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final Widget metric = TerminalMetric(
+      icon: Icons.task_alt,
+      value: '$count',
+      label: 'Completadas hoy',
+      color: tokens.progressGreen,
+    );
+    if (count == 0) {
+      return Semantics(
+        label: 'Completadas hoy: ninguna todavía',
+        child: Opacity(opacity: 0.6, child: metric),
+      );
+    }
+    return Semantics(
+      button: true,
+      label: 'Completadas hoy: $count. Abre la lista de hoy ya filtrada.',
+      child: InkWell(
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              metric,
+              const SizedBox(width: 6),
+              Icon(
+                Icons.arrow_forward,
+                size: 18,
+                color: tokens.progressGreen,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
