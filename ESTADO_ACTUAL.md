@@ -84,6 +84,60 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-09-07 (cuarta parte) — Punto 1 VALIDADO en dispositivo
+
+**Recorrido físico de `1.3.0+7`: CERRADO Y APROBADO por el usuario.**
+
+Instalada encima de `1.2.1+6` sin desinstalar nada. El usuario confirmó que
+todos los datos siguen intactos y que la aplicación funciona con normalidad.
+
+**La prueba del reinicio, que es la que valida el punto 1:**
+
+| Momento | Hecho |
+|---|---|
+| 9:30 | Misión creada para las 10:00 y teléfono reiniciado acto seguido |
+| ~9:47 | Llega la notificación, sin abrir la aplicación en ningún momento |
+
+Contra un objetivo de 9:45 (10:00 menos los 15 minutos de anticipación por
+defecto), dos minutos de retraso: exactamente el margen esperado de
+`setAndAllowWhileIdle`. Las alarmas exactas siguen descartadas y no hacen falta.
+
+**Lo que esto demuestra:** las alarmas murieron con el reinicio, el receiver de
+arranque leyó el espejo cifrado **sin abrir la base**, y repuso la alarma. Todo
+sin intervención del usuario.
+
+**La degradación confirmada en la práctica.** El usuario tenía **«mostrar
+detalles» activado** y aun así el aviso decía *«Tienes una misión programada.»*,
+sin el título. Es la prueba de que el espejo lleva solo los cinco campos
+acordados y de que ningún contenido de la base cifrada salió de ella. La Opción
+A se comporta exactamente como se prometió al aceptarla.
+
+**A11 punto 1: COMPLETADO.**
+
+**Hallazgo de esquema que encarece la Opción «migrar» del punto 2.** Al preparar
+el punto 2 se leyó la definición real de `notification_schedules`
+(`schema.drift:320-345`) y aparecen tres obstáculos, no uno:
+
+1. `mission_id TEXT NOT NULL REFERENCES missions(id)`. Habría que hacerlo
+   nullable.
+2. `notification_type` tiene un `CHECK` cerrado a `EARLY`, `PREPARATION`,
+   `START`, `FOLLOW_UP`, `CRITICAL`. No admite un tipo de resumen diario, y
+   **SQLite no permite alterar un `CHECK`**: exige recrear la tabla entera
+   (crear, copiar, borrar, renombrar) con sus claves foráneas.
+3. `UNIQUE (mission_id, notification_type, notify_at)`. Con `mission_id` en
+   NULL, SQL considera los NULL distintos entre sí, así que **la unicidad
+   dejaría de proteger justo a las filas del resumen**: se podrían duplicar.
+   Haría falta un índice único parcial como compensación.
+
+O sea: la migración es una reconstrucción completa de tabla más una garantía
+debilitada, y todo por una fila al día.
+
+**Buena noticia para el punto 3.** El `CHECK` ya admite `CRITICAL` y
+`FOLLOW_UP`, y hoy solo se emite `START`. El aviso de vencimiento **no necesita
+migración**: puede usar un tipo que el esquema ya permite. Donde el relevo decía
+«requiere un tipo nuevo», se refería a emitir un tipo nuevo, no a añadirlo al
+esquema.
+
 ### 2026-09-07 (tercera parte) — Candidata `1.3.0+7` y alcance post-MVP acotado
 
 **Rama:** `main`. Preparación de la candidata release y actualización documental.
@@ -401,13 +455,11 @@ tiene fallos abiertos.
 
 ### Estado en una línea
 
-**Candidata `1.3.0+7` compilada, firmada y verificada, esperando el recorrido
-físico.** Contiene el punto 1 de A11: los recordatorios ya se reponen tras
-reiniciar el teléfono. Su firma es idéntica a la de `1.2.1+6`, así que se
-instala encima conservando los datos. Los puntos 2–4 de notificaciones **no se
-han empezado a propósito**, porque hay un APK camino del teléfono y no se apilan
-cambios sobre algo en prueba física. Personajes, Tienda e Inventario quedan
-acordados como el siguiente bloque, después de cerrar A11.
+**`1.3.0+7` aprobada físicamente el 7 de septiembre de 2026. El punto 1 de A11
+está COMPLETADO:** los recordatorios sobreviven al reinicio del teléfono,
+verificado en dispositivo. El siguiente paso es el **punto 2, el resumen
+diario**, que arranca con la decisión de esquema aplazada. Personajes, Tienda e
+Inventario esperan a cerrar A11 y A8.
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
@@ -421,12 +473,8 @@ acordados como el siguiente bloque, después de cerrar A11.
    su criterio, ya sin ese malentendido. Verificar también que
    `juancristianyujraquispe@gmail.com` esté verificado en
    <https://github.com/settings/emails>.
-3. **El recorrido físico de `1.3.0+7`, que es lo único que bloquea seguir.**
-   Instalar `build/app/outputs/flutter-apk/app-prod-release.apk` **encima** de
-   la versión actual, sin desinstalar nada. Después: programar un aviso,
-   reiniciar el teléfono y esperar sin abrir la aplicación. Debe llegar con
-   texto genérico. Los cinco pasos completos están en la entrada
-   «2026-09-07 (tercera parte)» de la bitácora.
+3. ~~El recorrido físico de `1.3.0+7`.~~ **HECHO y APROBADO el 2026-09-07.**
+   Datos intactos y prueba de reinicio superada.
 4. ~~**Decidir lo del PIN.**~~ **RESUELTO el 2026-09-07: Opción A (espejo
    completo).** Ya está implementado.
 
