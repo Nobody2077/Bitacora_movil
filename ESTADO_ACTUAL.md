@@ -5,6 +5,10 @@
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main` (`feat/misiones-recurrentes-tablon` ya fusionada)
 
+> **Si retomas el proyecto, salta a "RELEVO — empezar aquí la próxima
+> sesión"**. Dice dónde quedamos, qué está decidido, qué decisión sigue
+> abierta y qué se hace a continuación. Lo demás es historia de referencia.
+
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
 ## Resumen ejecutivo
@@ -179,6 +183,133 @@ esquema (v3 → v4) o usar un identificador sintético.
   commits que llegan a la rama por defecto. El usuario fusiona a `main` a mano.
 - No se reportó el resultado de la prueba de reinicio del Bloque 4. La conducta
   de Android está documentada, así que no bloquea el punto 1.
+
+
+---
+
+## RELEVO — empezar aquí la próxima sesión (escrito el 2026-09-06)
+
+Lee esta sección primero. Resume dónde quedamos, qué está decidido, qué no, y
+qué se hace a continuación. El recorrido físico está cerrado; la aplicación no
+tiene fallos abiertos.
+
+### Estado en una línea
+
+`1.2.1+6` aprobada físicamente, todo fusionado en `main`, árbol limpio. El
+siguiente incremento es **notificaciones**, y está bloqueado por **una decisión
+del usuario que sigue sin tomar** (ver "Decisión pendiente" más abajo).
+
+### Lo que el usuario debe hacer (pendiente de su lado)
+
+1. `git push origin main` — hay commits de documentación sin subir.
+2. Activar **"Include private contributions on my profile"** en
+   <https://github.com/settings/profile>. El repositorio es privado y sin ese
+   ajuste el gráfico de contribuciones queda vacío aunque los commits estén.
+   Verificar también que `juancristianyujraquispe@gmail.com` esté verificado en
+   <https://github.com/settings/emails>.
+3. **Opcional pero útil:** dejar una notificación programada, reiniciar el
+   teléfono y ver si llega. Confirmaría empíricamente lo que motiva el punto 1
+   del plan. No bloquea: la conducta de Android está documentada.
+4. **Decidir lo del PIN.** Es lo único que impide arrancar a escribir código.
+
+### Decisión pendiente — el receiver de arranque y la base cerrada
+
+**El problema.** Android borra todas las alarmas de `AlarmManager` al reiniciar
+el teléfono. Un receiver de `BOOT_COMPLETED` puede reponerlas, pero al arrancar
+el usuario **no ha introducido el PIN**, y por ADR-002 la base está cifrada y
+cerrada mientras la sesión está bloqueada. El receiver **no puede leer
+`notification_schedules`** para saber qué reprogramar.
+
+El sistema actual ya esquiva esto para las notificaciones normales: el texto se
+precocina en Dart con la app abierta y viaja por el canal hasta el receiver, que
+nunca toca la base (`MissionAlarmReceiver.kt:76`). Pero tras un reinicio no
+queda nada que precocinar: las alarmas murieron y su contenido vivía en ellas.
+
+Hace falta guardar algo **fuera de la base** para poder reponerlas. Qué
+exactamente es la decisión.
+
+**Opción A — Espejo mínimo cifrado (recomendada).**
+Al ejecutarse `reconcile()` con la app desbloqueada, escribir un espejo de las
+alarmas pendientes en `EncryptedSharedPreferences` (clave de Keystore que **no**
+exige autenticación de usuario, para poder leerse al arrancar). El espejo guarda
+solo `scheduleId`, `notifyAtUtcMs`, `soundEnabled` y `showDetails`. **Nunca el
+título de la misión.** Al arrancar, el receiver repone las alarmas desde el
+espejo y las notificaciones salen con el texto genérico
+("Tienes una misión programada."). Al desbloquear la app, `reconcile()` las
+vuelve a programar completas.
+- A favor: los recordatorios sobreviven al reinicio; ningún dato sensible sale
+  de la base; la degradación es visible y explicable.
+- En contra: tras un reinicio y hasta abrir la app, las notificaciones pierden
+  el título aunque "mostrar detalles" esté activo. Hay que contárselo al usuario
+  en la pantalla de Ajustes, no dejarlo como sorpresa.
+
+**Opción B — No reponer; avisar de que hay que abrir.**
+Al arrancar, una única notificación genérica: "Abre Bitácora para restaurar tus
+recordatorios".
+- A favor: cero datos fuera de la base. Máxima pureza de ADR-002.
+- En contra: experiencia pobre. Molesta sin informar, y si el usuario la ignora
+  pierde los recordatorios igual. Traslada al usuario un problema técnico.
+
+**Opción C — Reponer solo el resumen diario.**
+El espejo guarda únicamente la hora del resumen y el último conteo conocido. Los
+recordatorios por misión esperan al siguiente desbloqueo.
+- A favor: el resumen diario es precisamente el que debe sobrevivir, porque es
+  el que devuelve al usuario a la app. Su contenido ("tienes N misiones") es
+  mucho menos sensible que el título de una misión concreta.
+- En contra: los recordatorios individuales siguen perdiéndose tras reinicio.
+
+**Recomendación:** **A**, y si el usuario quiere ser más conservador con la
+privacidad, **A restringida a lo que describe C** (espejo solo del resumen).
+Ambas son coherentes con ADR-002; B no resuelve el problema, solo lo nombra.
+
+**Lo que hay que preguntarle al usuario:** ¿acepta que un espejo mínimo, cifrado
+y sin títulos viva fuera de la base para que los recordatorios sobrevivan al
+reinicio? Es un ablandamiento consciente de ADR-002 y por eso lo decide él.
+
+### Plan de notificaciones acordado (orden pactado)
+
+1. **Reprogramar tras reinicio.** `RECEIVE_BOOT_COMPLETED` + receiver + el
+   espejo que salga de la decisión anterior. Toca `AndroidManifest.xml` y Kotlin
+   nuevo; no toca esquema ni pantallas. Es el cimiento de los otros tres.
+2. **Resumen diario configurable.** "Hoy tienes 8 misiones" a la hora que elija
+   el usuario (pensaba en 5:00–6:00). Una sola alarma al día con
+   `setAndAllowWhileIdle`. Conteo precalculado con la app desbloqueada.
+3. **Aviso de vencimiento.** Para misiones urgentes antes de que expiren. Hoy el
+   único tipo emitido es `'START'` (`drift_mission_repository.dart:365`);
+   requiere un tipo nuevo.
+4. **Texto personalizable y pulido de "mostrar detalles".** El texto genérico
+   está fijo en Kotlin (`MissionAlarmReceiver.kt:76`); pasarlo desde Dart.
+
+**Restricciones que no se negocian:**
+
+- **Alarmas exactas descartadas** por consumo de batería, a petición expresa del
+  usuario. Se mantiene `setAndAllowWhileIdle`. Un resumen que suena a las 6:07 en
+  vez de a las 6:00 es aceptable; despertar el aparato al milisegundo, no.
+- El receiver **nunca** abre la base cifrada.
+- El texto que se ve en pantalla bloqueada respeta "mostrar detalles".
+
+**Decisión de esquema que sigue abierta:** `notification_schedules` exige
+`missionId` y su clave única es `{missionId, notificationType, notifyAt}`. El
+resumen diario no pertenece a ninguna misión. Elegir a propósito entre migrar el
+esquema (v3 → v4) o usar un identificador sintético. No decidir esto por
+accidente al escribir el primer `INSERT`.
+
+### Deuda de UX registrada, que NO se toca
+
+El único hallazgo del recorrido físico fue el descubrimiento al crear misiones
+(detallado arriba en la entrada del 2026-09-06). **El usuario decidió conservar
+la disposición actual** — "me gusta dónde está todo". Está documentado para que
+no se confunda con un olvido, pero **no es una tarea pendiente**. Reabrir solo
+si aparecen usuarios distintos del autor, o si el propio usuario lo pide.
+
+### Reglas de trabajo vigentes
+
+- Documentar cada sesión en "Bitácora de sesiones", entrada nueva arriba.
+- No apilar cambios sobre un APK que esté bajo prueba física.
+- El refactor mencionado hace dos sesiones sigue aplazado hasta cerrar los
+  cambios funcionales en curso.
+- No desinstalar una APK `prod` con datos: la firma cambia y no hay exportación
+  (ADR-005).
 
 ## Relevo inmediato — diseño Terminal V2
 
