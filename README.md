@@ -14,7 +14,9 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 > batería real, controles configurables de privacidad/cámara/notificaciones y
 > ocho estados de ánimo y un tablón diario para tomar misiones sin llenar Hoy
 > por anticipado. Drift migra bases v1/v2 a v3. La matriz está verde con 219
-> pruebas y la APK `prodRelease` firmada `1.2.0+5` fue verificada.
+> pruebas y la APK `prodRelease` firmada fue verificada. La versión en curso es
+> `1.4.0+8`, con notificaciones que sobreviven al reinicio, resumen diario,
+> aviso de vencimiento y texto configurable. Ver `ESTADO_ACTUAL.md`.
 
 ## Qué busca ofrecer
 

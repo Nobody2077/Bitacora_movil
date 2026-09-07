@@ -1,13 +1,21 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **6 de septiembre de 2026** (`1.2.1+6` aprobada físicamente;
-  siguiente incremento: notificaciones)
+- Última revisión: **7 de septiembre de 2026**
+- Versión en `pubspec.yaml`: **`1.4.0+8`**, compilada y firmada, **pendiente de
+  recorrido físico**
+- Última versión aprobada en dispositivo: `1.3.0+7`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main` (`feat/misiones-recurrentes-tablon` ya fusionada)
+- Rama de trabajo: `main`, árbol limpio, **siete commits sin subir**
+- En curso: **A11 — Notificaciones**, completa en código, a falta de validar los
+  puntos 2, 3 y 4
 
 > **Si retomas el proyecto, salta a "RELEVO — empezar aquí la próxima
-> sesión"**. Dice dónde quedamos, qué está decidido, qué decisión sigue
-> abierta y qué se hace a continuación. Lo demás es historia de referencia.
+> sesión"**. Dice dónde quedamos, qué está decidido, qué falta y cómo hacerlo,
+> incluido el punto de partida de Personajes/Tienda/Inventario. Lo demás es
+> historia de referencia.
+>
+> **Lo primero es preguntar al usuario si hizo el recorrido de `1.4.0+8` y qué
+> pasó.** La sesión se cerró con el APK construido y sin instalar.
 
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
@@ -77,6 +85,15 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   `feat/misiones-recurrentes-tablon` lleva `1.2.1+6` a validación física. El
   detalle de cada sesión, con lo decidido y lo que queda abierto, vive ahora
   en "Bitácora de sesiones", justo debajo.
+- Sesión del **7 de septiembre de 2026**: se implementó **A11 — Notificaciones**
+  entera. Punto 1 (reponer alarmas tras reinicio) validado en dispositivo con
+  `1.3.0+7`; puntos 2 (resumen diario), 3 (aviso de vencimiento) y 4 (texto
+  configurable) implementados y a la espera del recorrido de `1.4.0+8`. Se
+  decidió que el espejo de alarmas viva fuera de la base (Opción A) y que el
+  resumen diario **no** entre en `notification_schedules`, así que **el esquema
+  v3 sigue intacto**. El post-MVP quedó acotado a Personajes, Tienda e
+  Inventario. Matriz en **237 pruebas**. Detalle completo, con lo decidido y lo
+  que queda abierto, en "Bitácora de sesiones".
 
 ## Bitácora de sesiones
 
@@ -586,37 +603,179 @@ esquema (v3 → v4) o usar un identificador sintético.
 
 ---
 
-## RELEVO — empezar aquí la próxima sesión (escrito el 2026-09-06)
+## RELEVO — empezar aquí la próxima sesión (reescrito el 2026-09-07)
 
-Lee esta sección primero. Resume dónde quedamos, qué está decidido, qué no, y
-qué se hace a continuación. El recorrido físico está cerrado; la aplicación no
-tiene fallos abiertos.
+Lee esta sección entera antes de tocar nada. Dice dónde quedamos, qué está
+decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
 ### Estado en una línea
 
-**A11 completa en código: los cuatro puntos implementados.** El punto 1 ya está
-validado en dispositivo; los puntos 2, 3 y 4 esperan el recorrido físico de la
-candidata **`1.4.0+8`**, compilada, firmada y verificada. Cuando eso quede
-verde, A11 se cierra y tocan G8 y el respaldo de la firma antes de abrir
-Personajes, Tienda e Inventario.
+**A11 (Notificaciones) está completa en código: los cuatro puntos
+implementados.** El punto 1 ya se validó en dispositivo. Los puntos 2, 3 y 4
+esperan el recorrido físico de la candidata **`1.4.0+8`**, ya compilada, firmada
+y verificada, que está en `build/app/outputs/flutter-apk/app-prod-release.apk`.
+Árbol limpio. **Siete commits sin subir.**
+
+### Lo primero al retomar: preguntar por el recorrido
+
+La sesión se cerró con la candidata construida y **sin instalar**. Antes de
+escribir una sola línea, pregunta al usuario si llegó a hacer el recorrido de
+`1.4.0+8` y qué pasó. De su respuesta salen dos caminos:
+
+- **Si el recorrido fue bien:** cerrar A11 en `ESTADO_FASES.md`, marcar los
+  puntos 2, 3 y 4 como COMPLETADOS con la fecha, y pasar a «Qué viene después».
+- **Si algo falló:** corregir eso primero. No abrir nada nuevo encima.
+- **Si no lo hizo:** el APK sigue válido; se le recuerdan los cinco pasos de
+  abajo.
+
+### El recorrido pendiente de `1.4.0+8`
+
+Instalar **encima** de `1.3.0+7`. **Nunca desinstalar** (ver «Reglas»).
+
+1. Datos intactos: misiones, bitácora, economía.
+2. **Resumen diario:** Ajustes → Notificaciones → activar «Resumen diario» y
+   ponerlo unos minutos por delante. Debe llegar **un solo** aviso con el
+   recuento.
+3. **Texto configurable:** cambiar «Texto sin detalles», dejar «mostrar
+   detalles» apagado, programar una misión y comprobar que el aviso usa el
+   texto nuevo.
+4. **Aviso de vencimiento:** crear una misión **con hora y con vencimiento**
+   cercano. Deben llegar **dos** avisos: inicio y plazo.
+5. **Regresión del punto 1:** con el resumen activado, reiniciar el teléfono.
+   Debe seguir llegando, pero diciendo «Abre Bitácora para ver tu resumen de
+   hoy» en lugar del número: el recuento no vive en el espejo. **Eso es
+   correcto, no un fallo.**
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
-1. ~~`git push origin main`~~ **HECHO el 2026-09-07.** Quedan por subir los
-   commits de esta sesión.
-2. Activar **"Include private contributions on my profile"** en
+1. **Respaldar la llave de firma. Es lo único irreparable del proyecto.**
+   Copiar `android/signing.properties` y el `.jks` al que apunta a dos sitios
+   fuera del PC. Si se pierde, no se podrá volver a actualizar la aplicación
+   nunca: la única salida sería desinstalar, que borra todos los datos.
+   `ESTADO_ACTUAL.md` lo arrastra como pendiente desde A8.
+2. `git push origin main` — siete commits sin subir.
+3. El recorrido de `1.4.0+8` (arriba).
+4. Opcional: activar «Include private contributions on my profile» en
    <https://github.com/settings/profile>. **El usuario lo dejó apagado el
-   2026-09-07 creyendo que haría público el proyecto; no es así:** ese ajuste
-   solo hace que los commits cuenten en el gráfico, sin revelar el nombre del
-   repositorio ni su contenido. El repositorio sigue igual de privado. Queda a
-   su criterio, ya sin ese malentendido. Verificar también que
-   `juancristianyujraquispe@gmail.com` esté verificado en
-   <https://github.com/settings/emails>.
-3. **El recorrido físico de `1.4.0+8`**, con los puntos 2, 3 y 4 de una vez.
-   Los cinco pasos están en la entrada «2026-09-07 (sexta parte)». El punto 1
-   ya quedó validado y aprobado con `1.3.0+7`.
-4. ~~**Decidir lo del PIN.**~~ **RESUELTO el 2026-09-07: Opción A (espejo
-   completo).** Ya está implementado.
+   2026-09-07 creyendo que haría público el repositorio; no es así:** solo hace
+   que los commits cuenten en el gráfico, sin revelar nombre ni contenido. El
+   repositorio sigue privado. Queda a su criterio, ya sin el malentendido.
+
+### Qué viene después, en orden
+
+**1. Cerrar A11** con el recorrido de arriba.
+
+**2. Cerrar A8 / G8.** `documentos/A8-VALIDACION-RELEASE.md` dice «métricas
+pendientes, G8 permanece rojo». Necesita el recorrido en dos factores de forma
+y las métricas cifradas. Es trabajo acotado, sin diseño de por medio.
+
+**3. Personajes, Tienda e Inventario.** Solo después de 1 y 2. Alcance acotado
+por el usuario el 2026-09-07 en `DECISIONES_PRE_A0.md`: **esos tres y nada
+más**; loadouts, servidor y sincronización quedan **descartados**, no aplazados.
+
+### Personajes, Tienda e Inventario — qué incluye y cómo
+
+**Todavía no está diseñado ni aprobado.** Esto es el punto de partida para la
+conversación, no un plan cerrado. **Exige su propio ADR antes de escribir
+código**, porque toca esquema y economía.
+
+**Qué hay ya construido que sirve de base.** Media ficha de personaje existe,
+solo que repartida: `xp_transactions` (XP), niveles por área en Progreso,
+`title_definitions` y `title_history` (títulos), rachas, y el perfil con nombre
+y foto de la barra lateral. Personajes sería sobre todo **reunir** eso en una
+ficha, no inventarlo.
+
+**Qué falta de verdad.** No hay ninguna tabla de tienda ni de inventario. Eso
+significa **migración v3 → v4**, la primera del proyecto desde el tablón.
+
+**La decisión de diseño que hay que tomar antes de nada:** ¿con qué se paga?
+
+- **Con XP** (`xp_transactions`): sistema cerrado. Cumples misiones, ganas XP,
+  lo gastas en recompensas que tú defines («dos horas de videojuegos»). Es lo
+  que encaja con el marco RPG y con que la aplicación sea de un solo usuario.
+- **Con dinero real** (`transactions`): eso ya no es un juego, es contabilidad.
+  La Economía del proyecto registra gasto e ingreso reales.
+
+Son dos productos distintos. **Lo decide el usuario**, y conviene preguntárselo
+con esta disyuntiva delante, no dar por hecho ninguna.
+
+**Riesgo que hay que resolver antes de migrar, no después.** ADR-005 retiró la
+exportación y `allowBackup="false"`: **no hay copia de seguridad de nada**. Hoy
+eso es asumible porque el esquema está quieto. Una migración v3 → v4 que salga
+mal sobre datos reales **no tiene vuelta atrás**. Antes de tocar el esquema
+conviene poder volcar la base a un fichero cifrado, aunque no haya pantalla de
+restauración. No es reabrir A6; es la diferencia entre un error recuperable y
+perder meses de bitácora. **Planteárselo al usuario antes de empezar.**
+
+### Decisiones ya tomadas que NO se reabren
+
+- **Espejo de alarmas: Opción A**, aceptada el 2026-09-07. Espejo mínimo
+  cifrado fuera de la base, con `scheduleId`, `systemNotificationId`,
+  `notifyAtUtcMs`, `soundEnabled`, `showDetails` y `kind`. **Nunca el título ni
+  el recuento.** Detalle en la sección «Decisión RESUELTA» más abajo.
+- **El resumen diario vive fuera de `notification_schedules`**, en las
+  preferencias cifradas. El esquema v3 no se toca. Razones en la entrada
+  «2026-09-07 (quinta parte)». *Es reversible si el usuario prefiere migrar,
+  pero él no llegó a responder al cuadro de decisión: se siguió la
+  recomendación. Confirmarlo si surge.*
+- **Alarmas exactas descartadas** por consumo de batería. Se mantiene
+  `setAndAllowWhileIdle`. Un aviso a las 6:07 en vez de las 6:00 es aceptable.
+- **El receiver nunca abre la base cifrada** (ADR-002).
+- **Post-MVP acotado** a Personajes, Tienda e Inventario.
+
+### Deudas anotadas, con su estado
+
+| Deuda | Estado | Qué hacer |
+|---|---|---|
+| Golden `sidebar_modular_battery` falla (0,26 %, 2676 px) | **Preexistente**, comprobado con `git stash`: falla igual sin los cambios de esta sesión | Decidir con el usuario si se regenera el golden o se investiga el antialiasing. No se tocó a propósito. |
+| Columna muerta `app_settings.daily_summary` | Mapeada y expuesta en `AppPreferences`, **no decide nada** | O se cablea o se retira. **No** se reutilizó como interruptor del resumen porque su valor por defecto es verdadero y lo habría activado a todo el mundo sin pedirlo. Tener dos cosas llamadas «resumen diario» confunde. |
+| Descubrimiento al crear misiones | **No es tarea**: el usuario decidió conservar la disposición actual | Reabrir solo si él lo pide. Detalle en la entrada del 2026-09-06. |
+| Refactor aplazado hace varias sesiones | Sigue aplazado | Estaba condicionado a cerrar los cambios funcionales en curso. Con A11 cerrada, se puede replantear. |
+| «Commit 2» perdido de una sesión antigua | Sin reconstruir | Contenido desconocido. Si nadie lo echa en falta, se da por muerto. |
+| Métricas cifradas y respaldo de firma (A8) | Pendientes | Bloquean G8. |
+
+### Reglas de trabajo vigentes
+
+- **Nunca instalar un APK `prod-debug` sobre la `prod-release` instalada.** El
+  flavor `prod` no tiene sufijo de applicationId, así que son la misma
+  aplicación firmada con llaves distintas: Android rechaza la instalación. El
+  peligro es desinstalar para forzarlo, porque eso borra la base cifrada **y
+  las claves de AndroidKeyStore que la descifran**; ni una copia del fichero
+  serviría. Para probar sin riesgo: `--flavor dev`, que se instala al lado con
+  sufijo `.dev` y datos propios. Para probar de verdad: release firmada con la
+  versión subida, comprobando antes con
+  `apksigner verify --print-certs` que el SHA-256 coincide con el instalado.
+- **No apilar cambios sobre un APK que esté bajo prueba física.** Mientras
+  código y dispositivo coincidan, cada anomalía es atribuible sin ambigüedad.
+- **Documentar cada sesión** en «Bitácora de sesiones», entrada nueva arriba.
+- Antes de compilar release, si falla con
+  `package dev.flutter.plugins.integration_test does not exist`: borrar
+  `android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java`
+  y repetir. Es un fichero generado que las compilaciones debug dejan obsoleto,
+  no una regresión.
+- Los ficheros Kotlin del repositorio están en CRLF tras pasar por git. Las
+  sustituciones con `perl -0pi` que usen `\n` **no casan**: usar `\r?\n` o
+  reescribir el fichero entero.
+
+### Mapa rápido de lo que se tocó en A11
+
+| Fichero | Papel |
+|---|---|
+| `BootAlarmMirror.kt` | El espejo cifrado fuera de la base. AES/GCM con clave de AndroidKeyStore **sin** autenticación de usuario, para poder leerse al arrancar. |
+| `BootAlarmRestoreReceiver.kt` | Repone alarmas en `BOOT_COMPLETED` y `MY_PACKAGE_REPLACED`. Nunca abre la base. |
+| `MissionAlarmScheduler.kt` | Programar y cancelar, extraído del bridge porque el receiver no tiene Activity. |
+| `MissionAlarmReceiver.kt` | `EXTRA_CONTENT_TEXT`: si viene texto cocinado desde Dart, se usa tal cual. |
+| `reminder_preferences.dart` | Anticipación, horario silencioso, resumen diario y texto genérico. Todo en metadata cifrada, sin tocar el esquema. |
+| `notification_reconciliation_service.dart` | El centro: programa, dispara, cancela, cocina el texto, calcula el resumen y sincroniza el espejo. |
+| `mission_dao.dart` | `_replaceNotificationIntents`: reemplazo de intenciones por tipo, ya no fijado a `START`. |
+| `drift_mission_repository.dart` | `_startNotification` y `_expiryNotification`. |
+
+---
+
+## Historia: el relevo anterior y su razonamiento
+
+Lo que sigue se conserva porque explica **por qué** se decidió lo que se
+decidió. Ya no es la guía de trabajo: esa es la sección RELEVO de arriba.
 
 ### Decisión RESUELTA (2026-09-07) — el receiver de arranque y la base cerrada
 
@@ -677,10 +836,13 @@ Ambas son coherentes con ADR-002; B no resuelve el problema, solo lo nombra.
 y sin títulos viva fuera de la base para que los recordatorios sobrevivan al
 reinicio? Es un ablandamiento consciente de ADR-002 y por eso lo decide él.
 
-### Plan de notificaciones acordado (orden pactado)
+### Plan de notificaciones acordado (orden pactado) — TODO IMPLEMENTADO
 
-1. **Reprogramar tras reinicio. IMPLEMENTADO el 2026-09-07**, pendiente solo de
-   la prueba física de reinicio. `RECEIVE_BOOT_COMPLETED` + receiver + el
+> Estado real al 2026-09-07: los cuatro puntos están escritos. El 1 validado en
+> dispositivo; el 2, 3 y 4 esperan el recorrido de `1.4.0+8`. Lo que sigue es el
+> plan tal como se pactó, conservado por su razonamiento.
+
+1. **Reprogramar tras reinicio. COMPLETADO y validado el 2026-09-07.** `RECEIVE_BOOT_COMPLETED` + receiver + el
    espejo que salga de la decisión anterior. Toca `AndroidManifest.xml` y Kotlin
    nuevo; no toca esquema ni pantallas. Es el cimiento de los otros tres.
 2. **Resumen diario configurable.** "Hoy tienes 8 misiones" a la hora que elija
@@ -719,15 +881,6 @@ El único hallazgo del recorrido físico fue el descubrimiento al crear misiones
 la disposición actual** — "me gusta dónde está todo". Está documentado para que
 no se confunda con un olvido, pero **no es una tarea pendiente**. Reabrir solo
 si aparecen usuarios distintos del autor, o si el propio usuario lo pide.
-
-### Reglas de trabajo vigentes
-
-- Documentar cada sesión en "Bitácora de sesiones", entrada nueva arriba.
-- No apilar cambios sobre un APK que esté bajo prueba física.
-- El refactor mencionado hace dos sesiones sigue aplazado hasta cerrar los
-  cambios funcionales en curso.
-- No desinstalar una APK `prod` con datos: la firma cambia y no hay exportación
-  (ADR-005).
 
 ## Relevo inmediato — diseño Terminal V2
 

@@ -42,6 +42,18 @@ Orden acordado con el usuario. Cada punto se cierra antes de abrir el siguiente.
 
 No se abre hasta cerrar A11 y A8. Cuando se abra necesitará su propio ADR: no hay tablas de tienda ni inventario en el esquema, así que implica migración v3 → v4, y hay una decisión de diseño pendiente sobre con qué se paga (XP ganado en misiones frente al dinero real de `transactions`).
 
+## Qué falta para cerrar el MVP, en orden
+
+| Orden | Qué | Estado | Bloquea |
+| --- | --- | --- | --- |
+| 1 | **Recorrido físico de `1.4.0+8`** (puntos 2, 3 y 4 de A11) | APK compilada, firmada y verificada; sin instalar | Cerrar A11 |
+| 2 | **Respaldo externo de la llave de firma** | Pendiente desde A8 | Nada técnicamente, pero es lo único irreparable: sin la llave no hay más actualizaciones y la única salida sería desinstalar, que borra los datos |
+| 3 | **Métricas cifradas y G8** | Pendiente | Cerrar A8 |
+| 4 | **Personajes, Tienda e Inventario** | Sin diseñar; exige ADR propio | Es post-MVP: no se abre antes de 1 y 3 |
+
+Los cinco pasos del recorrido pendiente están en `ESTADO_ACTUAL.md`, sección
+«RELEVO», y el punto de partida de Personajes/Tienda/Inventario también.
+
 ## Evidencia G3 — A3 completada
 
 - Lista de hoy, creación, edición y detalle conectados a la persistencia cifrada.
