@@ -84,6 +84,7 @@ class MissionNotificationBridge(
                 soundEnabled = request.soundEnabled,
                 showDetails = request.showDetails,
                 missionTitle = request.missionTitle,
+                contentText = request.contentText,
             )
             result.success(request.systemNotificationId)
         } catch (error: IllegalArgumentException) {
@@ -103,6 +104,7 @@ class MissionNotificationBridge(
                 soundEnabled = request.soundEnabled,
                 showDetails = request.showDetails,
                 missionTitle = request.missionTitle,
+                contentText = request.contentText,
             )
             result.success(request.systemNotificationId)
         } catch (error: IllegalArgumentException) {
@@ -147,6 +149,8 @@ class MissionNotificationBridge(
                 notifyAtUtcMs = notifyAtUtcMs,
                 soundEnabled = item["soundEnabled"] as? Boolean ?: true,
                 showDetails = item["showDetails"] as? Boolean ?: false,
+                kind = (item["kind"] as? String)?.takeIf { it.isNotBlank() }
+                    ?: BootAlarmMirror.KIND_MISSION,
             )
         }
         BootAlarmMirror.replaceAll(activity.applicationContext, entries)
@@ -172,6 +176,10 @@ class MissionNotificationBridge(
                 ?.trim()
                 ?.take(120)
                 ?.takeIf { it.isNotEmpty() },
+            contentText = call.argument<String>("contentText")
+                ?.trim()
+                ?.take(160)
+                ?.takeIf { it.isNotEmpty() },
         )
     }
 
@@ -182,5 +190,6 @@ class MissionNotificationBridge(
         val soundEnabled: Boolean,
         val showDetails: Boolean,
         val missionTitle: String?,
+        val contentText: String?,
     )
 }

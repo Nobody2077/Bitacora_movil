@@ -110,6 +110,20 @@ class _NotificationSettingsPageState
     await _saveReminderPreferences(next);
   }
 
+  Future<void> _pickSummaryTime(ReminderPreferences preferences) async {
+    final int current = preferences.dailySummaryMinutes;
+    final TimeOfDay? selected = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: current ~/ 60, minute: current % 60),
+    );
+    if (selected == null || !mounted) return;
+    await _saveReminderPreferences(
+      preferences.copyWith(
+        dailySummaryMinutes: selected.hour * 60 + selected.minute,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<AppPreferences> appPreferences = ref.watch(
@@ -221,6 +235,10 @@ class _NotificationSettingsPageState
           ),
           onPickStart: () => _pickQuietTime(preferences: reminder, start: true),
           onPickEnd: () => _pickQuietTime(preferences: reminder, start: false),
+          onSummaryChanged: (bool value) => _saveReminderPreferences(
+            reminder.copyWith(dailySummaryEnabled: value),
+          ),
+          onPickSummary: () => _pickSummaryTime(reminder),
         ),
         const SizedBox(height: TerminalSpace.md),
         _NotificationSwitchCard(
@@ -286,6 +304,8 @@ class _ReminderTimingPanel extends StatelessWidget {
     required this.onQuietChanged,
     required this.onPickStart,
     required this.onPickEnd,
+    required this.onSummaryChanged,
+    required this.onPickSummary,
   });
 
   final ReminderPreferences preferences;
@@ -294,6 +314,8 @@ class _ReminderTimingPanel extends StatelessWidget {
   final ValueChanged<bool> onQuietChanged;
   final VoidCallback onPickStart;
   final VoidCallback onPickEnd;
+  final ValueChanged<bool> onSummaryChanged;
+  final VoidCallback onPickSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -379,6 +401,26 @@ class _ReminderTimingPanel extends StatelessWidget {
                   onPressed: enabled ? onPickEnd : null,
                 ),
               ],
+            ),
+          ],
+          const SizedBox(height: TerminalSpace.md),
+          SwitchListTile.adaptive(
+            key: const Key('daily-summary-switch'),
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Resumen diario'),
+            subtitle: const Text(
+              'Un solo aviso al día con cuántas misiones te esperan.',
+            ),
+            value: preferences.dailySummaryEnabled,
+            onChanged: enabled ? onSummaryChanged : null,
+          ),
+          if (preferences.dailySummaryEnabled) ...<Widget>[
+            const SizedBox(height: TerminalSpace.sm),
+            TerminalOutlineButton(
+              key: const Key('daily-summary-time-button'),
+              label: 'A las ${_timeLabel(preferences.dailySummaryMinutes)}',
+              icon: Icons.summarize_outlined,
+              onPressed: enabled ? onPickSummary : null,
             ),
           ],
         ],

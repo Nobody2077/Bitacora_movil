@@ -35,6 +35,8 @@ void main() {
       quietHoursEnabled: true,
       quietStartMinutes: 21 * 60 + 30,
       quietEndMinutes: 6 * 60 + 45,
+      dailySummaryEnabled: false,
+      dailySummaryMinutes: 6 * 60,
     );
 
     expect(await repository.save(expected), isA<Success<void>>());
@@ -56,6 +58,8 @@ void main() {
       quietHoursEnabled: true,
       quietStartMinutes: 300,
       quietEndMinutes: 300,
+      dailySummaryEnabled: false,
+      dailySummaryMinutes: 6 * 60,
     );
 
     expect(await repository.save(invalid), isA<Failure<void>>());
@@ -67,6 +71,8 @@ void main() {
       quietHoursEnabled: true,
       quietStartMinutes: 22 * 60,
       quietEndMinutes: 7 * 60,
+      dailySummaryEnabled: false,
+      dailySummaryMinutes: 6 * 60,
     );
     final DateTime now = DateTime.now();
     final DateTime late = DateTime(now.year, now.month, now.day, 23);

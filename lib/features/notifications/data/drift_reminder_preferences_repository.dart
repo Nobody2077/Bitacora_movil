@@ -13,6 +13,17 @@ final class DriftReminderPreferencesRepository
   static const String _quietEnabledKey = 'notification_quiet_enabled';
   static const String _quietStartKey = 'notification_quiet_start_minutes';
   static const String _quietEndKey = 'notification_quiet_end_minutes';
+  static const String _summaryEnabledKey = 'notification_daily_summary_enabled';
+  static const String _summaryMinutesKey = 'notification_daily_summary_minutes';
+
+  static const Set<String> _keys = <String>{
+    _leadKey,
+    _quietEnabledKey,
+    _quietStartKey,
+    _quietEndKey,
+    _summaryEnabledKey,
+    _summaryMinutesKey,
+  };
 
   final SettingsDao _dao;
 
@@ -20,12 +31,7 @@ final class DriftReminderPreferencesRepository
   Future<Result<ReminderPreferences>> load() async {
     try {
       final List<SchemaMetadataData> rows = await _dao.getMetadataEntries(
-        const <String>{
-          _leadKey,
-          _quietEnabledKey,
-          _quietStartKey,
-          _quietEndKey,
-        },
+        _keys,
       );
       return _decode(rows);
     } on Object catch (error) {
@@ -64,6 +70,8 @@ final class DriftReminderPreferencesRepository
         _quietEnabledKey: preferences.quietHoursEnabled ? '1' : '0',
         _quietStartKey: '${preferences.quietStartMinutes}',
         _quietEndKey: '${preferences.quietEndMinutes}',
+        _summaryEnabledKey: preferences.dailySummaryEnabled ? '1' : '0',
+        _summaryMinutesKey: '${preferences.dailySummaryMinutes}',
       }, updatedAtUtcMs: DateTime.now().toUtc().millisecondsSinceEpoch);
       return const Success<void>(null);
     } on Object catch (error) {
@@ -93,6 +101,14 @@ final class DriftReminderPreferencesRepository
           defaults.quietStartMinutes,
       quietEndMinutes:
           int.tryParse(values[_quietEndKey] ?? '') ?? defaults.quietEndMinutes,
+      dailySummaryEnabled: switch (values[_summaryEnabledKey]) {
+        '1' => true,
+        '0' => false,
+        _ => defaults.dailySummaryEnabled,
+      },
+      dailySummaryMinutes:
+          int.tryParse(values[_summaryMinutesKey] ?? '') ??
+          defaults.dailySummaryMinutes,
     );
     if (!preferences.isValid) {
       return const Failure<ReminderPreferences>(

@@ -16,6 +16,7 @@ final class NotificationReconciliationReport {
     required this.cancelled,
     required this.failed,
     this.bootMirrorSynced = true,
+    this.dailySummaryScheduled = false,
   });
 
   final bool permissionGranted;
@@ -24,11 +25,14 @@ final class NotificationReconciliationReport {
   final int cancelled;
   final int failed;
 
-  /// Si el espejo que permite reponer alarmas tras un reinicio quedo al dia.
+  /// Si el espejo que permite reponer alarmas tras un reinicio quedó al día.
   ///
   /// Se expone en vez de tragarse el fallo: un espejo desincronizado no rompe
-  /// nada hoy, pero significa que el proximo reinicio pierde recordatorios.
+  /// nada hoy, pero significa que el próximo reinicio pierde recordatorios.
   final bool bootMirrorSynced;
+
+  /// Si quedó programado el resumen diario de la próxima ocurrencia.
+  final bool dailySummaryScheduled;
 }
 
 final class NotificationReconciliationService {
@@ -44,11 +48,32 @@ final class NotificationReconciliationService {
        _platform = platform,
        _nowUtc = nowUtc;
 
+  /// Identificador de sistema fijo para el resumen diario.
+  ///
+  /// Constante a propósito: cada día reemplaza la notificación del anterior en
+  /// vez de apilarse, y permite cancelarlo sin recordar qué día se programó.
+  static const int dailySummarySystemNotificationId = 747474747;
+
   final NotificationDao _notificationDao;
   final SettingsDao _settingsDao;
   final ReminderPreferencesRepository _reminderPreferencesRepository;
   final MissionNotificationPlatform _platform;
   final DateTime Function() _nowUtc;
+
+  /// Identificador del resumen de un día civil concreto.
+  ///
+  /// Lleva la fecha porque Android descarta entregas repetidas del mismo
+  /// `scheduleId`. Con un identificador fijo, el resumen sonaría el primer día
+  /// y nunca más.
+  static String dailySummaryScheduleId(int occurrenceUtcMs) {
+    final DateTime local = DateTime.fromMillisecondsSinceEpoch(
+      occurrenceUtcMs,
+      isUtc: true,
+    ).toLocal();
+    final String month = local.month.toString().padLeft(2, '0');
+    final String day = local.day.toString().padLeft(2, '0');
+    return 'daily-summary-${local.year}-$month-$day';
+  }
 
   Future<NotificationReconciliationReport> reconcile() async {
     final int nowUtcMs = _nowUtc().toUtc().millisecondsSinceEpoch;
@@ -73,9 +98,9 @@ final class NotificationReconciliationService {
       (item) => const <String>{'PENDING', 'SCHEDULED'}.contains(item.status),
     );
 
-    // El espejo de arranque. La consulta no tiene ventana temporal, asi que
+    // El espejo de arranque. La consulta no tiene ventana temporal, así que
     // `open` es el conjunto completo de alarmas vivas y el espejo se puede
-    // reemplazar entero en cada pasada. Una lista vacia lo borra.
+    // reemplazar entero en cada pasada. Una lista vacía lo borra.
     final List<MissionNotificationMirrorEntry> mirror =
         <MissionNotificationMirrorEntry>[];
 
@@ -109,6 +134,7 @@ final class NotificationReconciliationService {
           failed++;
         }
       }
+      await _cancelDailySummary();
       return _withBootMirror(
         NotificationReconciliationReport(
           permissionGranted: false,
@@ -121,7 +147,10 @@ final class NotificationReconciliationService {
       );
     }
 
-    if (open.isEmpty) {
+    final bool needsPermission =
+        open.isNotEmpty || reminderPreferences.dailySummaryEnabled;
+    if (!needsPermission) {
+      await _cancelDailySummary();
       return _withBootMirror(
         NotificationReconciliationReport(
           permissionGranted: true,
@@ -190,7 +219,7 @@ final class NotificationReconciliationService {
             updatedAtUtcMs: nowUtcMs,
             systemNotificationId: Value<int?>(systemId),
           );
-          // Sin el titulo: el espejo vive fuera de la base cifrada.
+          // Sin el título: el espejo vive fuera de la base cifrada.
           mirror.add(
             MissionNotificationMirrorEntry(
               scheduleId: schedule.id,
@@ -207,6 +236,25 @@ final class NotificationReconciliationService {
       }
     }
 
+    bool summaryScheduled = false;
+    if (reminderPreferences.dailySummaryEnabled) {
+      try {
+        summaryScheduled = await _scheduleDailySummary(
+          preferences: reminderPreferences,
+          settings: settings,
+          nowUtcMs: nowUtcMs,
+          mirror: mirror,
+        );
+        if (summaryScheduled) {
+          scheduledCount++;
+        }
+      } on Object {
+        failed++;
+      }
+    } else {
+      await _cancelDailySummary();
+    }
+
     return _withBootMirror(
       NotificationReconciliationReport(
         permissionGranted: true,
@@ -214,9 +262,84 @@ final class NotificationReconciliationService {
         fired: fired,
         cancelled: cancelled,
         failed: failed,
+        dailySummaryScheduled: summaryScheduled,
       ),
       mirror,
     );
+  }
+
+  /// Programa la próxima ocurrencia del resumen diario.
+  ///
+  /// El recuento se calcula **aquí**, con la aplicación desbloqueada, y viaja
+  /// hasta la alarma ya convertido en texto. El receiver que la entrega no
+  /// puede abrir la base cifrada (ADR-002), así que no hay otra forma. La
+  /// consecuencia aceptada es que el número es una foto del último uso de la
+  /// aplicación, no del amanecer.
+  Future<bool> _scheduleDailySummary({
+    required ReminderPreferences preferences,
+    required AppSetting settings,
+    required int nowUtcMs,
+    required List<MissionNotificationMirrorEntry> mirror,
+  }) async {
+    final int occurrenceUtcMs = preferences.nextSummaryUtcMs(nowUtcMs);
+    final DateTime occurrenceLocal = DateTime.fromMillisecondsSinceEpoch(
+      occurrenceUtcMs,
+      isUtc: true,
+    ).toLocal();
+    final DateTime dayStartLocal = DateTime(
+      occurrenceLocal.year,
+      occurrenceLocal.month,
+      occurrenceLocal.day,
+    );
+    final DateTime dayEndLocal = DateTime(
+      occurrenceLocal.year,
+      occurrenceLocal.month,
+      occurrenceLocal.day + 1,
+    );
+    final int missions = await _notificationDao.countOpenMissionsBetween(
+      fromUtcMs: dayStartLocal.toUtc().millisecondsSinceEpoch,
+      toUtcMs: dayEndLocal.toUtc().millisecondsSinceEpoch,
+    );
+    final String scheduleId = dailySummaryScheduleId(occurrenceUtcMs);
+    final bool soundEnabled =
+        settings.soundEnabled != 0 &&
+        !preferences.isQuietAtUtcMs(occurrenceUtcMs);
+    await _platform.schedule(
+      MissionNotificationRequest(
+        scheduleId: scheduleId,
+        notifyAtUtcMs: occurrenceUtcMs,
+        soundEnabled: soundEnabled,
+        showDetails: false,
+        contentText: dailySummaryText(missions),
+        systemNotificationId: dailySummarySystemNotificationId,
+        kind: MissionNotificationKind.dailySummary,
+      ),
+    );
+    mirror.add(
+      MissionNotificationMirrorEntry(
+        scheduleId: scheduleId,
+        systemNotificationId: dailySummarySystemNotificationId,
+        notifyAtUtcMs: occurrenceUtcMs,
+        soundEnabled: soundEnabled,
+        showDetails: false,
+        kind: MissionNotificationKind.dailySummary,
+      ),
+    );
+    return true;
+  }
+
+  static String dailySummaryText(int missions) => switch (missions) {
+    <= 0 => 'Hoy no tienes misiones programadas.',
+    1 => 'Hoy tienes 1 misión.',
+    _ => 'Hoy tienes $missions misiones.',
+  };
+
+  Future<void> _cancelDailySummary() async {
+    try {
+      await _platform.cancel(dailySummarySystemNotificationId);
+    } on Object {
+      // Cancelar algo que quizá no estaba programado no es un fallo.
+    }
   }
 
   Future<NotificationReconciliationReport> _withBootMirror(
@@ -234,6 +357,7 @@ final class NotificationReconciliationService {
         cancelled: report.cancelled,
         failed: report.failed,
         bootMirrorSynced: false,
+        dailySummaryScheduled: report.dailySummaryScheduled,
       );
     }
   }

@@ -214,4 +214,36 @@ final class NotificationDao {
       )..where((table) => table.missionId.equals(missionId))).go();
     });
   }
+
+  /// Cuenta las misiones pendientes de un día civil local, para el resumen
+  /// diario.
+  ///
+  /// El recuento se precalcula con la aplicación desbloqueada y viaja hasta la
+  /// alarma ya cocinado: el receiver que la entrega no puede abrir la base
+  /// cifrada (ADR-002). La consecuencia aceptada es que el número es una foto
+  /// del último uso, no del amanecer.
+  ///
+  /// Se excluyen las archivadas y los estados que ya no piden acción.
+  Future<int> countOpenMissionsBetween({
+    required int fromUtcMs,
+    required int toUtcMs,
+  }) async {
+    final Expression<int> total = _database.missions.id.count();
+    final query = _database.selectOnly(_database.missions)
+      ..addColumns(<Expression<Object>>[total])
+      ..where(
+        _database.missions.scheduledAt.isBiggerOrEqualValue(fromUtcMs) &
+            _database.missions.scheduledAt.isSmallerThanValue(toUtcMs) &
+            _database.missions.archivedAt.isNull() &
+            _database.missions.status.isIn(const <String>{
+              'SCHEDULED',
+              'AVAILABLE',
+              'ACTIVE',
+              'PAUSED',
+              'RESCHEDULED',
+            }),
+      );
+    final row = await query.getSingleOrNull();
+    return row?.read(total) ?? 0;
+  }
 }

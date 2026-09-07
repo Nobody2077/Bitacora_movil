@@ -77,7 +77,15 @@ void main() {
     expect(report.failed, 0);
     expect(platform.scheduled, <String>['future-schedule']);
     expect(platform.delivered, <String>['due-schedule']);
-    expect(platform.cancelled, <int>[77]);
+    // El 77 es la alarma cancelada; el otro es el resumen diario, que se
+    // cancela en cada pasada mientras esté desactivado.
+    expect(platform.cancelled, contains(77));
+    expect(
+      platform.cancelled,
+      contains(
+        NotificationReconciliationService.dailySummarySystemNotificationId,
+      ),
+    );
 
     final rows = await database.select(database.notificationSchedules).get();
     final byId = <String, NotificationSchedule>{
@@ -113,7 +121,7 @@ void main() {
 
       expect(report.permissionGranted, isFalse);
       expect(platform.permissionRequests, 0);
-      expect(platform.cancelled, <int>[81]);
+      expect(platform.cancelled, contains(81));
       final row = await database
           .select(database.notificationSchedules)
           .getSingle();
@@ -158,6 +166,8 @@ void main() {
         quietHoursEnabled: true,
         quietStartMinutes: deliveryMinute,
         quietEndMinutes: (deliveryMinute + 1) % 1440,
+        dailySummaryEnabled: false,
+        dailySummaryMinutes: 6 * 60,
       ),
     );
     await _insertSchedule(
@@ -278,6 +288,138 @@ void main() {
       expect(report.bootMirrorSynced, isFalse);
     },
   );
+  group('resumen diario', () {
+    Future<void> enableSummary({required int minutes}) =>
+        reminderPreferencesRepository.save(
+          ReminderPreferences.defaults.copyWith(
+            leadMinutes: 0,
+            dailySummaryEnabled: true,
+            dailySummaryMinutes: minutes,
+          ),
+        );
+
+    test(
+      'programa la próxima ocurrencia con el recuento ya cocinado',
+      () async {
+        // Dos misiones abiertas y una completada el mismo día del resumen.
+        final DateTime nowLocal = DateTime.fromMillisecondsSinceEpoch(
+          _nowMs,
+          isUtc: true,
+        ).toLocal();
+        final int summaryMinutes =
+            (nowLocal.hour * 60 + nowLocal.minute + 30) % 1440;
+        await enableSummary(minutes: summaryMinutes);
+        final int occurrence = ReminderPreferences.defaults
+            .copyWith(dailySummaryMinutes: summaryMinutes)
+            .nextSummaryUtcMs(_nowMs);
+        await _insertSchedule(
+          database,
+          missionId: 'summary-a',
+          scheduleId: 'summary-a-schedule',
+          notifyAt: occurrence + 60000,
+        );
+        await _insertSchedule(
+          database,
+          missionId: 'summary-b',
+          scheduleId: 'summary-b-schedule',
+          notifyAt: occurrence + 120000,
+        );
+
+        final report = await service.reconcile();
+
+        expect(report.dailySummaryScheduled, isTrue);
+        final MissionNotificationRequest summary = platform.scheduledRequests
+            .singleWhere((r) => r.kind == MissionNotificationKind.dailySummary);
+        expect(summary.notifyAtUtcMs, occurrence);
+        expect(summary.contentText, 'Hoy tienes 2 misiones.');
+        expect(
+          summary.missionTitle,
+          isNull,
+          reason: 'el resumen no habla de ninguna misión concreta',
+        );
+        expect(
+          summary.systemNotificationId,
+          NotificationReconciliationService.dailySummarySystemNotificationId,
+        );
+      },
+    );
+
+    test('el identificador lleva la fecha, para que suene cada día', () {
+      final int day = DateTime.utc(2026, 9, 8, 12).millisecondsSinceEpoch;
+      final String id =
+          NotificationReconciliationService.dailySummaryScheduleId(day);
+      expect(id, startsWith('daily-summary-'));
+      expect(
+        id,
+        isNot(
+          NotificationReconciliationService.dailySummaryScheduleId(
+            day + const Duration(days: 1).inMilliseconds,
+          ),
+        ),
+        reason:
+            'Android descarta entregas repetidas del mismo scheduleId; con uno '
+            'fijo el resumen sonaría una sola vez',
+      );
+    });
+
+    test('el resumen entra en el espejo sin el recuento', () async {
+      final DateTime nowLocal = DateTime.fromMillisecondsSinceEpoch(
+        _nowMs,
+        isUtc: true,
+      ).toLocal();
+      await enableSummary(
+        minutes: (nowLocal.hour * 60 + nowLocal.minute + 45) % 1440,
+      );
+
+      await service.reconcile();
+
+      final MissionNotificationMirrorEntry entry = platform.mirror.singleWhere(
+        (e) => e.kind == MissionNotificationKind.dailySummary,
+      );
+      expect(
+        entry.systemNotificationId,
+        NotificationReconciliationService.dailySummarySystemNotificationId,
+      );
+      // El espejo no tiene campo de texto: tras un reinicio el resumen sale
+      // invitando a abrir la aplicación, sin dar cifras.
+      expect(entry.showDetails, isFalse);
+    });
+
+    test('desactivarlo lo cancela y lo saca del espejo', () async {
+      await reminderPreferencesRepository.save(
+        ReminderPreferences.defaults.copyWith(
+          leadMinutes: 0,
+          dailySummaryEnabled: false,
+        ),
+      );
+
+      final report = await service.reconcile();
+
+      expect(report.dailySummaryScheduled, isFalse);
+      expect(
+        platform.cancelled,
+        contains(
+          NotificationReconciliationService.dailySummarySystemNotificationId,
+        ),
+      );
+      expect(platform.mirror, isEmpty);
+    });
+
+    test('el texto se adapta a cero, una y varias misiones', () {
+      expect(
+        NotificationReconciliationService.dailySummaryText(0),
+        'Hoy no tienes misiones programadas.',
+      );
+      expect(
+        NotificationReconciliationService.dailySummaryText(1),
+        'Hoy tienes 1 misión.',
+      );
+      expect(
+        NotificationReconciliationService.dailySummaryText(8),
+        'Hoy tienes 8 misiones.',
+      );
+    });
+  });
 }
 
 Future<void> _insertSchedule(

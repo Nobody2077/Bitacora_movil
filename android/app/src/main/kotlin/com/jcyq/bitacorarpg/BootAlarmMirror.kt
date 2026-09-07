@@ -41,12 +41,17 @@ internal object BootAlarmMirror {
     private const val GCM_TAG_BITS = 128
     private const val MIRROR_VERSION = 1
 
+    const val KIND_MISSION = "mission"
+    const val KIND_DAILY_SUMMARY = "dailySummary"
+
     data class Entry(
         val scheduleId: String,
         val systemNotificationId: Int,
         val notifyAtUtcMs: Long,
         val soundEnabled: Boolean,
         val showDetails: Boolean,
+        /** Que clase de aviso es. No revela nada de la base cifrada. */
+        val kind: String = KIND_MISSION,
     )
 
     /**
@@ -70,6 +75,7 @@ internal object BootAlarmMirror {
                     put("notifyAtUtcMs", entry.notifyAtUtcMs)
                     put("soundEnabled", entry.soundEnabled)
                     put("showDetails", entry.showDetails)
+                    put("kind", entry.kind)
                 },
             )
         }
@@ -121,6 +127,8 @@ internal object BootAlarmMirror {
                     notifyAtUtcMs = item.optLong("notifyAtUtcMs"),
                     soundEnabled = item.optBoolean("soundEnabled", true),
                     showDetails = item.optBoolean("showDetails", false),
+                    kind = item.optString("kind", KIND_MISSION)
+                        .takeIf { it.isNotBlank() } ?: KIND_MISSION,
                 ),
             )
         }

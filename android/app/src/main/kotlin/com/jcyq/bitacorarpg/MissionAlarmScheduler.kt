@@ -23,6 +23,7 @@ internal object MissionAlarmScheduler {
         soundEnabled: Boolean,
         showDetails: Boolean,
         missionTitle: String?,
+        contentText: String? = null,
     ) {
         val appContext = context.applicationContext
         val alarmManager =
@@ -35,6 +36,7 @@ internal object MissionAlarmScheduler {
             soundEnabled = soundEnabled,
             showDetails = showDetails,
             missionTitle = missionTitle,
+            contentText = contentText,
             flags = PendingIntent.FLAG_UPDATE_CURRENT,
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -73,6 +75,7 @@ internal object MissionAlarmScheduler {
         soundEnabled: Boolean,
         showDetails: Boolean,
         missionTitle: String?,
+        contentText: String?,
         flags: Int,
     ): PendingIntent {
         val intent = Intent(context, MissionAlarmReceiver::class.java).apply {
@@ -82,6 +85,9 @@ internal object MissionAlarmScheduler {
             putExtra(MissionAlarmReceiver.EXTRA_SHOW_DETAILS, showDetails)
             missionTitle?.let {
                 putExtra(MissionAlarmReceiver.EXTRA_MISSION_TITLE, it)
+            }
+            contentText?.let {
+                putExtra(MissionAlarmReceiver.EXTRA_CONTENT_TEXT, it)
             }
         }
         return PendingIntent.getBroadcast(

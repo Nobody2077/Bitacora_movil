@@ -297,11 +297,7 @@ class _CompletedTodayMetric extends StatelessWidget {
             children: <Widget>[
               metric,
               const SizedBox(width: 6),
-              Icon(
-                Icons.arrow_forward,
-                size: 18,
-                color: tokens.progressGreen,
-              ),
+              Icon(Icons.arrow_forward, size: 18, color: tokens.progressGreen),
             ],
           ),
         ),

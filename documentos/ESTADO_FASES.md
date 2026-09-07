@@ -17,7 +17,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
 | A9 — Calendario y recordatorios | **PARCIAL** | El calendario y las recurrencias quedaron aprobados físicamente con `1.2.1+6` el 6 de septiembre de 2026. Los recordatorios se separaron a A11 y siguen abiertos: G9 no se cierra hasta que A11 esté verde |
 | A10 — Tablón de misiones | **COMPLETADA** | Recorrido físico de `1.2.1+6` cerrado y aprobado por el usuario el 6 de septiembre de 2026 |
-| A11 — Notificaciones | **EN PROGRESO** | Punto 1 **VALIDADO en dispositivo** el 7 de septiembre de 2026 con `1.3.0+7`; puntos 2–4 pendientes |
+| A11 — Notificaciones | **EN PROGRESO** | Punto 1 **VALIDADO en dispositivo** con `1.3.0+7`; punto 2 implementado sin validar; puntos 3 y 4 pendientes |
 
 ## A11 — Notificaciones: los cuatro puntos pactados
 
@@ -26,7 +26,7 @@ Orden acordado con el usuario. Cada punto se cierra antes de abrir el siguiente.
 | Punto | Estado | Detalle |
 | --- | --- | --- |
 | 1. Reponer alarmas tras reinicio | **COMPLETADO** | `RECEIVE_BOOT_COMPLETED`, `BootAlarmRestoreReceiver` y espejo cifrado fuera de la base (Opción A). Validado en dispositivo el 7 de septiembre de 2026 con `1.3.0+7`: misión a las 10:00, reinicio a las 9:30, aviso recibido a las ~9:47 sin abrir la aplicación, y con texto genérico pese a tener «mostrar detalles» activado |
-| 2. Resumen diario configurable | **PENDIENTE** | «Hoy tienes N misiones» a la hora que elija el usuario. Trae consigo la decisión de esquema aplazada a propósito: dónde vive el resumen, ya que `notification_schedules.mission_id` es `NOT NULL REFERENCES missions(id)` |
+| 2. Resumen diario configurable | **IMPLEMENTADO, SIN VALIDAR** | Vive fuera de `notification_schedules`, en las preferencias cifradas de A9.1. El esquema v3 no se toca. Interruptor y hora propios en Ajustes; recuento precalculado con la app desbloqueada. 230 pruebas verdes |
 | 3. Aviso de vencimiento | **PENDIENTE** | Hoy el único tipo emitido es `START`. **No necesita migración:** el `CHECK` de `notification_type` ya admite `CRITICAL` y `FOLLOW_UP` |
 | 4. Texto personalizable | **PENDIENTE** | El texto genérico está fijo en Kotlin; hay que pasarlo desde Dart |
 

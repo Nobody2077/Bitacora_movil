@@ -84,6 +84,74 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-09-07 (quinta parte) — Punto 2: resumen diario
+
+**DECISIÓN DE ESQUEMA TOMADA: el resumen vive FUERA de
+`notification_schedules`.** Se planteó al usuario y no respondió al cuadro de
+decisión, así que se siguió la recomendación, que además es la reversible: si
+más adelante se prefiere migrar, se puede; al revés no, porque una migración
+sobre datos reales sin exportación (ADR-005) no tiene vuelta atrás. **Queda
+abierto a revisión si el usuario prefiere lo contrario.**
+
+Las razones, ya con la tabla real delante (`schema.drift:320-345`): `mission_id`
+es `NOT NULL` con clave foránea, el `CHECK` de `notification_type` no admite un
+tipo de resumen y SQLite no deja alterarlo sin recrear la tabla, y con
+`mission_id` nulable el `UNIQUE` dejaría de proteger justo esas filas. El
+resumen no es un recordatorio de una misión: es una alarma diaria fija.
+
+**Dónde vive entonces.** En las preferencias cifradas que ya usaba A9.1. Se
+**extendió `ReminderPreferences`** en vez de crear una clase paralela: misma
+preocupación, mismo almacenamiento, mismo repositorio, misma pantalla. Dos
+claves nuevas de metadata, `notification_daily_summary_enabled` y
+`notification_daily_summary_minutes`. **El esquema v3 no se toca.**
+
+**Ficheros modificados:**
+
+| Fichero | Cambio |
+|---|---|
+| `reminder_preferences.dart` | `dailySummaryEnabled` y `dailySummaryMinutes`, más `nextSummaryUtcMs()`, que calcula la próxima ocurrencia sobre **fecha civil** y no sumando 24 horas, para que los cambios de horario no desplacen el aviso. |
+| `drift_reminder_preferences_repository.dart` | Las dos claves nuevas. |
+| `notification_dao.dart` | `countOpenMissionsBetween()`: cuenta misiones no archivadas del día en estados que aún piden acción. |
+| `mission_notification_platform.dart` | `contentText` en la petición y `MissionNotificationKind` en petición y espejo. |
+| `notification_reconciliation_service.dart` | Programa el resumen, lo cancela cuando está desactivado y lo mete en el espejo. |
+| `MissionAlarmReceiver.kt` | `EXTRA_CONTENT_TEXT`: si viene texto cocinado, se usa tal cual. Es además el mecanismo que necesitará el punto 4. |
+| `MissionAlarmScheduler.kt`, `MissionNotificationBridge.kt` | Pasan texto y tipo. |
+| `BootAlarmMirror.kt`, `BootAlarmRestoreReceiver.kt` | El espejo guarda el **tipo** de aviso. |
+| `notification_settings_page.dart` | Interruptor propio y selector de hora, con el mismo estilo que el horario silencioso. |
+
+**Dos trampas que se evitaron a propósito:**
+
+1. **El identificador lleva la fecha** (`daily-summary-2026-09-08`). El receiver
+   descarta entregas repetidas del mismo `scheduleId` guardándolas en
+   preferencias; con un identificador fijo, el resumen habría sonado el primer
+   día y **nunca más**. Hay una prueba que fija esto.
+2. **El identificador de sistema sí es fijo** (`747474747`). Así cada día
+   reemplaza la notificación del anterior en vez de apilarlas, y se puede
+   cancelar sin recordar qué día se programó.
+
+**Ampliación mínima del espejo, que conviene mirar.** El espejo ganó un campo
+`kind`, que distingue un recordatorio de misión de un resumen. **No es
+contenido:** no dice qué misión es ni cuántas hay. Sirve para que, tras un
+reinicio, el resumen diga *«Abre Bitácora para ver tu resumen de hoy.»* en vez
+del texto de misión, que sería mentira. Los cinco campos acordados siguen sin
+llevar dato alguno de la base. Se registra por transparencia: si el usuario
+prefiere que el espejo no crezca ni en eso, se quita y el resumen simplemente no
+sobrevive al reinicio.
+
+**El recuento es una foto, no un dato en vivo.** Se calcula al programar la
+alarma, con la aplicación desbloqueada, y viaja ya convertido en texto. El
+receiver no puede abrir la base (ADR-002). Si creas misiones después de que se
+programe el resumen y no abres la aplicación, el número se quedará corto. Es la
+consecuencia aceptada desde el principio.
+
+**Verificación:** `flutter analyze` limpio, **230 pruebas verdes** (eran 225),
+seis nuevas sobre el resumen. APK `prod-debug` compila. El único fallo de la
+matriz sigue siendo el golden `sidebar_modular_battery`, preexistente.
+
+**Sin validar en dispositivo.** No se ha subido versión ni compilado release: el
+punto 2 espera a que se decida si se valida junto con el 3 y el 4 o por
+separado.
+
 ### 2026-09-07 (cuarta parte) — Punto 1 VALIDADO en dispositivo
 
 **Recorrido físico de `1.3.0+7`: CERRADO Y APROBADO por el usuario.**
@@ -455,11 +523,11 @@ tiene fallos abiertos.
 
 ### Estado en una línea
 
-**`1.3.0+7` aprobada físicamente el 7 de septiembre de 2026. El punto 1 de A11
-está COMPLETADO:** los recordatorios sobreviven al reinicio del teléfono,
-verificado en dispositivo. El siguiente paso es el **punto 2, el resumen
-diario**, que arranca con la decisión de esquema aplazada. Personajes, Tienda e
-Inventario esperan a cerrar A11 y A8.
+**Punto 1 de A11 COMPLETADO y validado en dispositivo** con `1.3.0+7`. **Punto 2
+(resumen diario) implementado y sin validar**, con la decisión de esquema
+tomada: vive fuera de `notification_schedules` y el esquema v3 no se toca.
+Quedan los puntos 3 y 4. Personajes, Tienda e Inventario esperan a cerrar A11 y
+A8.
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 

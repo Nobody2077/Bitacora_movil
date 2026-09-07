@@ -157,13 +157,15 @@ final class RecurrenceGenerationOutcome {
 }
 
 /// Último resultado de generación, o `null` si todavía no se intentó.
-final NotifierProvider<RecurrenceGenerationOutcomeController,
-        RecurrenceGenerationOutcome?>
-    recurrenceGenerationOutcomeProvider =
-    NotifierProvider<RecurrenceGenerationOutcomeController,
-        RecurrenceGenerationOutcome?>(
-      RecurrenceGenerationOutcomeController.new,
-    );
+final NotifierProvider<
+  RecurrenceGenerationOutcomeController,
+  RecurrenceGenerationOutcome?
+>
+recurrenceGenerationOutcomeProvider =
+    NotifierProvider<
+      RecurrenceGenerationOutcomeController,
+      RecurrenceGenerationOutcome?
+    >(RecurrenceGenerationOutcomeController.new);
 
 class RecurrenceGenerationOutcomeController
     extends Notifier<RecurrenceGenerationOutcome?> {
@@ -227,7 +229,8 @@ final Provider<void> recurrenceGenerationGuardProvider = Provider<void>((
             record(
               RecurrenceGenerationOutcome(
                 attemptedAtUtc: DateTime.now().toUtc(),
-                failureMessage: 'No se pudieron generar las misiones '
+                failureMessage:
+                    'No se pudieron generar las misiones '
                     'recurrentes: $error',
               ),
             );

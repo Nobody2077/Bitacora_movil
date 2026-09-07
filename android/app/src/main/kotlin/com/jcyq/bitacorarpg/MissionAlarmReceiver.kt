@@ -19,6 +19,7 @@ class MissionAlarmReceiver : BroadcastReceiver() {
         const val EXTRA_SOUND_ENABLED = "sound_enabled"
         const val EXTRA_SHOW_DETAILS = "show_details"
         const val EXTRA_MISSION_TITLE = "mission_title"
+        const val EXTRA_CONTENT_TEXT = "content_text"
 
         private const val CHANNEL_SOUND = "mission_reminders"
         private const val CHANNEL_SILENT = "mission_reminders_silent"
@@ -33,6 +34,7 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             soundEnabled: Boolean,
             showDetails: Boolean,
             missionTitle: String?,
+            contentText: String? = null,
         ) {
             if (scheduleId.isBlank() || systemNotificationId <= 0) return
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -76,7 +78,11 @@ class MissionAlarmReceiver : BroadcastReceiver() {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(
-                    if (detailsVisible) missionTitle else "Tienes una misión programada.",
+                    when {
+                        !contentText.isNullOrBlank() -> contentText
+                        detailsVisible -> missionTitle
+                        else -> "Tienes una misión programada."
+                    },
                 )
                 .setVisibility(
                     if (detailsVisible) {
@@ -140,6 +146,7 @@ class MissionAlarmReceiver : BroadcastReceiver() {
             soundEnabled = intent.getBooleanExtra(EXTRA_SOUND_ENABLED, true),
             showDetails = intent.getBooleanExtra(EXTRA_SHOW_DETAILS, false),
             missionTitle = intent.getStringExtra(EXTRA_MISSION_TITLE),
+            contentText = intent.getStringExtra(EXTRA_CONTENT_TEXT),
         )
     }
 }

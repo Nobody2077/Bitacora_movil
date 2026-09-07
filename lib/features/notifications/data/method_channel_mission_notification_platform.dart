@@ -61,6 +61,7 @@ final class MethodChannelMissionNotificationPlatform
               'notifyAtUtcMs': entry.notifyAtUtcMs,
               'soundEnabled': entry.soundEnabled,
               'showDetails': entry.showDetails,
+              'kind': entry.kind.wireName,
             },
         ],
       });
@@ -72,7 +73,9 @@ final class MethodChannelMissionNotificationPlatform
         'soundEnabled': request.soundEnabled,
         'showDetails': request.showDetails,
         if (request.missionTitle != null) 'missionTitle': request.missionTitle!,
+        if (request.contentText != null) 'contentText': request.contentText!,
         if (request.systemNotificationId != null)
           'systemNotificationId': request.systemNotificationId!,
+        'kind': request.kind.wireName,
       };
 }

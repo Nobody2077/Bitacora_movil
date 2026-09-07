@@ -161,9 +161,7 @@ class MissionCardGrid extends StatelessWidget {
     if (children.isEmpty) {
       return const SizedBox.shrink();
     }
-    final double textScale = MediaQuery.textScalerOf(
-      context,
-    ).scale(16) / 16;
+    final double textScale = MediaQuery.textScalerOf(context).scale(16) / 16;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final int columns = _columnsFor(
