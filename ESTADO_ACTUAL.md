@@ -3,7 +3,7 @@
 - Última revisión: **6 de septiembre de 2026** (`1.2.1+6` aprobada físicamente;
   siguiente incremento: notificaciones)
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `feat/misiones-recurrentes-tablon` (3 commits sobre `main`)
+- Rama de trabajo: `main` (`feat/misiones-recurrentes-tablon` ya fusionada)
 
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
@@ -82,7 +82,7 @@ qué se tocó, qué se decidió, qué quedó abierto.
 
 ### 2026-09-06 — Validación física de `1.2.1+6` y hallazgo de descubrimiento
 
-**Rama:** `feat/misiones-recurrentes-tablon` (2 commits por delante de `main`).
+**Rama:** `feat/misiones-recurrentes-tablon`, fusionada a `main` al cerrar el recorrido.
 
 **Commits de la rama:**
 
