@@ -15,6 +15,7 @@ final class DriftReminderPreferencesRepository
   static const String _quietEndKey = 'notification_quiet_end_minutes';
   static const String _summaryEnabledKey = 'notification_daily_summary_enabled';
   static const String _summaryMinutesKey = 'notification_daily_summary_minutes';
+  static const String _genericTextKey = 'notification_generic_text';
 
   static const Set<String> _keys = <String>{
     _leadKey,
@@ -23,6 +24,7 @@ final class DriftReminderPreferencesRepository
     _quietEndKey,
     _summaryEnabledKey,
     _summaryMinutesKey,
+    _genericTextKey,
   };
 
   final SettingsDao _dao;
@@ -72,6 +74,7 @@ final class DriftReminderPreferencesRepository
         _quietEndKey: '${preferences.quietEndMinutes}',
         _summaryEnabledKey: preferences.dailySummaryEnabled ? '1' : '0',
         _summaryMinutesKey: '${preferences.dailySummaryMinutes}',
+        _genericTextKey: preferences.genericText.trim(),
       }, updatedAtUtcMs: DateTime.now().toUtc().millisecondsSinceEpoch);
       return const Success<void>(null);
     } on Object catch (error) {
@@ -109,6 +112,9 @@ final class DriftReminderPreferencesRepository
       dailySummaryMinutes:
           int.tryParse(values[_summaryMinutesKey] ?? '') ??
           defaults.dailySummaryMinutes,
+      genericText: values[_genericTextKey]?.trim().isNotEmpty == true
+          ? values[_genericTextKey]!.trim()
+          : defaults.genericText,
     );
     if (!preferences.isValid) {
       return const Failure<ReminderPreferences>(

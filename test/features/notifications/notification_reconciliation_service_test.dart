@@ -1,3 +1,4 @@
+import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/notifications/application/notification_reconciliation_service.dart';
 import 'package:bitacora_rpg_personal/features/notifications/data/drift_reminder_preferences_repository.dart';
 import 'package:bitacora_rpg_personal/features/notifications/domain/mission_notification_platform.dart';
@@ -168,6 +169,7 @@ void main() {
         quietEndMinutes: (deliveryMinute + 1) % 1440,
         dailySummaryEnabled: false,
         dailySummaryMinutes: 6 * 60,
+        genericText: ReminderPreferences.defaultGenericText,
       ),
     );
     await _insertSchedule(
@@ -418,6 +420,70 @@ void main() {
         NotificationReconciliationService.dailySummaryText(8),
         'Hoy tienes 8 misiones.',
       );
+    });
+  });
+  group('texto del aviso', () {
+    test(
+      'sin detalles usa el texto configurable, no el fijo de Kotlin',
+      () async {
+        await reminderPreferencesRepository.save(
+          ReminderPreferences.defaults.copyWith(
+            leadMinutes: 0,
+            genericText: 'Toca ponerse.',
+          ),
+        );
+        await _insertSchedule(
+          database,
+          missionId: 'custom-text',
+          scheduleId: 'custom-text-schedule',
+          notifyAt: _nowMs + 60000,
+        );
+
+        await service.reconcile();
+
+        final MissionNotificationRequest request = platform.scheduledRequests
+            .singleWhere((r) => r.kind == MissionNotificationKind.mission);
+        expect(request.contentText, 'Toca ponerse.');
+        expect(
+          request.showDetails,
+          isFalse,
+          reason: 'sin detalles no debe viajar el título',
+        );
+      },
+    );
+
+    test('con detalles el texto es el título de la misión', () async {
+      await settingsDao.putMetadata(
+        key: AppPreferences.showNotificationDetailsMetadataKey,
+        value: '1',
+        updatedAtUtcMs: _nowMs,
+      );
+      await reminderPreferencesRepository.save(
+        ReminderPreferences.defaults.copyWith(
+          leadMinutes: 0,
+          genericText: 'Toca ponerse.',
+        ),
+      );
+      await _insertSchedule(
+        database,
+        missionId: 'titled',
+        scheduleId: 'titled-schedule',
+        notifyAt: _nowMs + 60000,
+      );
+
+      await service.reconcile();
+
+      final MissionNotificationRequest request = platform.scheduledRequests
+          .singleWhere((r) => r.kind == MissionNotificationKind.mission);
+      expect(request.contentText, 'Misión privada');
+    });
+
+    test('un texto vacío no se guarda y conserva el anterior', () async {
+      final result = await reminderPreferencesRepository.save(
+        ReminderPreferences.defaults.copyWith(genericText: '   '),
+      );
+
+      expect(result, isA<Failure<void>>());
     });
   });
 }

@@ -195,6 +195,7 @@ final class DriftMissionRepository implements MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   }) async {
     final ValidationFailure? invalid = _validateWrite(
@@ -211,6 +212,11 @@ final class DriftMissionRepository implements MissionRepository {
       final startNotification = _startNotification(
         mission: mission,
         notificationId: notificationId,
+        updatedAtUtc: occurredAtUtc,
+      );
+      final expiryNotification = _expiryNotification(
+        mission: mission,
+        notificationId: expiryNotificationId,
         updatedAtUtc: occurredAtUtc,
       );
       final aggregate = await _dao.insertAggregate(
@@ -246,6 +252,7 @@ final class DriftMissionRepository implements MissionRepository {
         ],
         notifications: <drift.NotificationSchedulesCompanion>[
           ?startNotification,
+          ?expiryNotification,
         ],
       );
       return Success<Mission>(
@@ -267,6 +274,7 @@ final class DriftMissionRepository implements MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   }) async {
     final ValidationFailure? invalid = _validateWrite(
@@ -283,6 +291,11 @@ final class DriftMissionRepository implements MissionRepository {
       final startNotification = _startNotification(
         mission: mission,
         notificationId: notificationId,
+        updatedAtUtc: occurredAtUtc,
+      );
+      final expiryNotification = _expiryNotification(
+        mission: mission,
+        notificationId: expiryNotificationId,
         updatedAtUtc: occurredAtUtc,
       );
       final aggregate = await _dao.updateAggregate(
@@ -322,7 +335,10 @@ final class DriftMissionRepository implements MissionRepository {
           toStatus: Value<String?>(_status(mission.status)),
           occurredAt: occurredAtUtc.millisecondsSinceEpoch,
         ),
-        startNotification: startNotification,
+        notificationIntents: <String, drift.NotificationSchedulesCompanion?>{
+          'START': startNotification,
+          'CRITICAL': expiryNotification,
+        },
         notificationUpdatedAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
       );
       return Success<Mission>(
@@ -347,6 +363,38 @@ final class DriftMissionRepository implements MissionRepository {
         StorageFailure('No se pudo actualizar la misión.', cause: error),
       );
     }
+  }
+
+  /// Intención de aviso antes de que la misión venza.
+  ///
+  /// Solo para misiones con vencimiento real. Se descartan a propósito las
+  /// misiones de solo fecha: en ellas `expiresAt` es el final del día civil, no
+  /// un plazo puesto por el usuario, así que avisar sería sonar cada noche por
+  /// cada misión sin hora.
+  ///
+  /// La anticipación no es propia: el reconciliador resta la misma que el resto
+  /// de recordatorios, así que se configura desde el mismo sitio en Ajustes.
+  drift.NotificationSchedulesCompanion? _expiryNotification({
+    required Mission mission,
+    required String notificationId,
+    required DateTime updatedAtUtc,
+  }) {
+    final DateTime? expiresAt = mission.expiresAtUtc;
+    if (expiresAt == null ||
+        mission.isDateOnly ||
+        !expiresAt.isAfter(updatedAtUtc)) {
+      return null;
+    }
+    final int nowMs = updatedAtUtc.millisecondsSinceEpoch;
+    return drift.NotificationSchedulesCompanion.insert(
+      id: notificationId,
+      missionId: mission.id,
+      notificationType: 'CRITICAL',
+      notifyAt: expiresAt.millisecondsSinceEpoch,
+      status: 'PENDING',
+      createdAt: nowMs,
+      updatedAt: nowMs,
+    );
   }
 
   drift.NotificationSchedulesCompanion? _startNotification({

@@ -197,6 +197,11 @@ final class NotificationReconciliationService {
         soundEnabled: soundEnabled,
         showDetails: showDetails,
         missionTitle: missionTitle?.trim(),
+        // El texto se cocina aqui y viaja ya resuelto: el receiver no puede
+        // abrir la base cifrada, y asi el texto generico es configurable.
+        contentText: showDetails
+            ? missionTitle?.trim()
+            : reminderPreferences.genericText.trim(),
         systemNotificationId: schedule.systemNotificationId,
       );
       try {

@@ -10,6 +10,13 @@
 /// admitiera NULL. El resumen no es un recordatorio de una misión: es una alarma
 /// diaria fija, y modelarla como fila era forzarla.
 final class ReminderPreferences {
+  /// Texto de los avisos que no muestran el titulo de la mision.
+  static const String defaultGenericText = 'Tienes una misión programada.';
+
+  /// Limite del texto personalizado. El canal lo recorta igual; se valida
+  /// aqui para que el usuario vea el limite en vez de perder caracteres.
+  static const int genericTextMaxLength = 120;
+
   static const Set<int> supportedLeadMinutes = <int>{0, 5, 15, 30, 60};
 
   static const ReminderPreferences defaults = ReminderPreferences(
@@ -19,6 +26,7 @@ final class ReminderPreferences {
     quietEndMinutes: 7 * 60,
     dailySummaryEnabled: false,
     dailySummaryMinutes: 6 * 60,
+    genericText: defaultGenericText,
   );
 
   const ReminderPreferences({
@@ -28,6 +36,7 @@ final class ReminderPreferences {
     required this.quietEndMinutes,
     required this.dailySummaryEnabled,
     required this.dailySummaryMinutes,
+    required this.genericText,
   });
 
   final int leadMinutes;
@@ -41,6 +50,9 @@ final class ReminderPreferences {
   /// Minuto del día local en que se envía el resumen.
   final int dailySummaryMinutes;
 
+  /// Texto que se muestra cuando el aviso no lleva el título de la misión.
+  final String genericText;
+
   bool get isValid =>
       supportedLeadMinutes.contains(leadMinutes) &&
       quietStartMinutes >= 0 &&
@@ -49,7 +61,9 @@ final class ReminderPreferences {
       quietEndMinutes <= 1439 &&
       quietStartMinutes != quietEndMinutes &&
       dailySummaryMinutes >= 0 &&
-      dailySummaryMinutes <= 1439;
+      dailySummaryMinutes <= 1439 &&
+      genericText.trim().isNotEmpty &&
+      genericText.trim().length <= genericTextMaxLength;
 
   int deliveryAtUtcMs(int missionStartUtcMs) =>
       missionStartUtcMs - Duration(minutes: leadMinutes).inMilliseconds;
@@ -107,6 +121,7 @@ final class ReminderPreferences {
     int? quietEndMinutes,
     bool? dailySummaryEnabled,
     int? dailySummaryMinutes,
+    String? genericText,
   }) => ReminderPreferences(
     leadMinutes: leadMinutes ?? this.leadMinutes,
     quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
@@ -114,5 +129,6 @@ final class ReminderPreferences {
     quietEndMinutes: quietEndMinutes ?? this.quietEndMinutes,
     dailySummaryEnabled: dailySummaryEnabled ?? this.dailySummaryEnabled,
     dailySummaryMinutes: dailySummaryMinutes ?? this.dailySummaryMinutes,
+    genericText: genericText ?? this.genericText,
   );
 }

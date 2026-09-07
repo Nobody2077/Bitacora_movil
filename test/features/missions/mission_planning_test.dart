@@ -106,6 +106,96 @@ void main() {
         .get();
     expect(notifications.single.status, 'CANCELLED');
   });
+  test(
+    'una misión con hora y vencimiento crea aviso de inicio y de vencimiento',
+    () async {
+      final DateTime startUtc = DateTime.utc(2026, 8, 30, 9);
+      final DateTime expiresUtc = DateTime.utc(2026, 8, 30, 18);
+      await _save(
+        service,
+        title: 'Entrega con plazo',
+        scheduledAtUtc: startUtc,
+        expiresAtUtc: expiresUtc,
+      );
+
+      final rows = await database.select(database.notificationSchedules).get();
+      final Map<String, int> byType = <String, int>{
+        for (final row in rows) row.notificationType: row.notifyAt,
+      };
+      expect(byType.keys, containsAll(<String>['START', 'CRITICAL']));
+      expect(byType['START'], startUtc.millisecondsSinceEpoch);
+      expect(byType['CRITICAL'], expiresUtc.millisecondsSinceEpoch);
+    },
+  );
+
+  test(
+    'una misión con hora y sin vencimiento solo crea el aviso de inicio',
+    () async {
+      await _save(
+        service,
+        title: 'Sin plazo',
+        scheduledAtUtc: DateTime.utc(2026, 8, 30, 9),
+      );
+
+      final rows = await database.select(database.notificationSchedules).get();
+      expect(rows.map((row) => row.notificationType), <String>['START']);
+    },
+  );
+
+  test('un vencimiento ya pasado no genera aviso', () async {
+    await _save(
+      service,
+      title: 'Plazo vencido',
+      scheduledAtUtc: DateTime.utc(2026, 8, 29, 6),
+      expiresAtUtc: DateTime.utc(2026, 8, 29, 7),
+    );
+
+    final rows = await database.select(database.notificationSchedules).get();
+    expect(
+      rows.map((row) => row.notificationType),
+      isNot(contains('CRITICAL')),
+      reason: 'avisar de un plazo que ya pasó solo sería ruido',
+    );
+  });
+
+  test(
+    'mover el vencimiento cancela el aviso anterior y crea el nuevo',
+    () async {
+      final Mission created = await _save(
+        service,
+        title: 'Plazo movible',
+        scheduledAtUtc: DateTime.utc(2026, 8, 30, 9),
+        expiresAtUtc: DateTime.utc(2026, 8, 30, 18),
+      );
+      await _save(
+        service,
+        title: 'Plazo movible',
+        scheduledAtUtc: DateTime.utc(2026, 8, 30, 9),
+        expiresAtUtc: DateTime.utc(2026, 8, 31, 18),
+        existing: created,
+      );
+
+      final rows = await database.select(database.notificationSchedules).get();
+      final critical = rows.where((row) => row.notificationType == 'CRITICAL');
+      expect(
+        critical.where((row) => row.status == 'PENDING').single.notifyAt,
+        DateTime.utc(2026, 8, 31, 18).millisecondsSinceEpoch,
+      );
+      expect(
+        critical.where((row) => row.status == 'CANCELLED').length,
+        1,
+        reason: 'el plazo antiguo no debe seguir vivo',
+      );
+      expect(
+        rows
+            .where((row) => row.notificationType == 'START')
+            .where((row) => row.status == 'PENDING')
+            .length,
+        1,
+        reason: 'mover solo el vencimiento no debe tocar el aviso de inicio',
+      );
+    },
+  );
 }
 
 Future<Mission> _save(
@@ -114,6 +204,7 @@ Future<Mission> _save(
   DateTime? scheduledAtUtc,
   DateTime? availableFromUtc,
   DateTime? expiresAtUtc,
+  Mission? existing,
 }) async {
   final Result<Mission> result = await service.save(
     SaveMissionRequest(
@@ -126,6 +217,7 @@ Future<Mission> _save(
       scheduledAtUtc: scheduledAtUtc,
       availableFromUtc: availableFromUtc,
       expiresAtUtc: expiresAtUtc,
+      existing: existing,
       xpPlanned: 10,
       objectives: const <MissionObjectiveDraft>[],
     ),

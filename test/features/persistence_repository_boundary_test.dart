@@ -261,6 +261,7 @@ final class _FakeMissionRepository implements MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   }) async => Success<Mission>(mission);
 
@@ -287,6 +288,7 @@ final class _FakeMissionRepository implements MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   }) async => Success<Mission>(mission);
 

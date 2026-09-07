@@ -176,17 +176,20 @@ final class MissionApplicationService {
 
     final String eventId = _idGenerator.nextId();
     final String notificationId = _idGenerator.nextId();
+    final String expiryNotificationId = _idGenerator.nextId();
     return existing == null
         ? _repository.create(
             mission,
             eventId: eventId,
             notificationId: notificationId,
+            expiryNotificationId: expiryNotificationId,
             occurredAtUtc: nowUtc,
           )
         : _repository.update(
             mission,
             eventId: eventId,
             notificationId: notificationId,
+            expiryNotificationId: expiryNotificationId,
             occurredAtUtc: nowUtc,
           );
   }

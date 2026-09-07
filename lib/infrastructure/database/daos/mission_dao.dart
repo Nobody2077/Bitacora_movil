@@ -261,7 +261,7 @@ final class MissionDao {
     required MissionsCompanion changes,
     required Iterable<MissionObjectivesCompanion> objectives,
     required MissionEventsCompanion event,
-    required NotificationSchedulesCompanion? startNotification,
+    required Map<String, NotificationSchedulesCompanion?> notificationIntents,
     required int notificationUpdatedAtUtcMs,
   }) {
     _requireMissionId(event.missionId, missionId, 'event');
@@ -290,50 +290,67 @@ final class MissionDao {
         await _database.into(_database.missionObjectives).insert(objective);
       }
       await _database.into(_database.missionEvents).insert(event);
-      await _replaceStartNotificationIntent(
+      await _replaceNotificationIntents(
         missionId: missionId,
-        replacement: startNotification,
+        replacements: notificationIntents,
         updatedAtUtcMs: notificationUpdatedAtUtcMs,
       );
       return _getAggregate(missionId);
     });
   }
 
-  Future<void> _replaceStartNotificationIntent({
+  Future<void> _replaceNotificationIntents({
     required String missionId,
-    required NotificationSchedulesCompanion? replacement,
+    required Map<String, NotificationSchedulesCompanion?> replacements,
     required int updatedAtUtcMs,
   }) async {
-    if (replacement != null) {
+    // Solo se tocan los tipos que esta llamada gestiona. Antes se cancelaba
+    // cualquier intención abierta de la misión, lo cual era equivalente cuando
+    // START era el único tipo emitido; con el aviso de vencimiento ya no lo es.
+    final List<String> managedTypes = replacements.keys.toList();
+    final Map<String, NotificationSchedule> matching =
+        <String, NotificationSchedule>{};
+
+    for (final MapEntry<String, NotificationSchedulesCompanion?> entry
+        in replacements.entries) {
+      final NotificationSchedulesCompanion? replacement = entry.value;
+      if (replacement == null) {
+        continue;
+      }
       _requireMissionId(replacement.missionId, missionId, 'notification');
       if (!replacement.id.present ||
           !replacement.notificationType.present ||
-          replacement.notificationType.value != 'START' ||
+          replacement.notificationType.value != entry.key ||
           !replacement.notifyAt.present ||
           !replacement.status.present ||
           replacement.status.value != 'PENDING') {
-        throw ArgumentError('START notification replacement is incomplete.');
+        throw ArgumentError(
+          '${entry.key} notification replacement is incomplete.',
+        );
       }
-    }
-
-    NotificationSchedule? matching;
-    if (replacement != null) {
-      matching =
+      final NotificationSchedule? existing =
           await (_database.select(_database.notificationSchedules)..where(
                 (table) =>
                     table.missionId.equals(missionId) &
-                    table.notificationType.equals('START') &
+                    table.notificationType.equals(entry.key) &
                     table.notifyAt.equals(replacement.notifyAt.value),
               ))
               .getSingleOrNull();
+      if (existing != null) {
+        matching[entry.key] = existing;
+      }
     }
 
+    final List<String> keepIds = <String>[
+      for (final NotificationSchedule row in matching.values) row.id,
+    ];
     await (_database.update(_database.notificationSchedules)..where((table) {
           var predicate =
               table.missionId.equals(missionId) &
-              table.status.isIn(const <String>{'PENDING', 'SCHEDULED'});
-          if (matching != null) {
-            predicate = predicate & table.id.equals(matching.id).not();
+              table.status.isIn(const <String>{'PENDING', 'SCHEDULED'}) &
+              table.notificationType.isIn(managedTypes);
+          if (keepIds.isNotEmpty) {
+            predicate = predicate & table.id.isIn(keepIds).not();
           }
           return predicate;
         }))
@@ -344,23 +361,30 @@ final class MissionDao {
           ),
         );
 
-    if (replacement == null) {
-      return;
-    }
-    if (matching == null) {
-      await _database.into(_database.notificationSchedules).insert(replacement);
-      return;
-    }
-    if (!const <String>{'PENDING', 'SCHEDULED'}.contains(matching.status)) {
-      await (_database.update(
-        _database.notificationSchedules,
-      )..where((table) => table.id.equals(matching!.id))).write(
-        NotificationSchedulesCompanion(
-          status: const Value<String>('PENDING'),
-          systemNotificationId: const Value<int?>(null),
-          updatedAt: Value<int>(updatedAtUtcMs),
-        ),
-      );
+    for (final MapEntry<String, NotificationSchedulesCompanion?> entry
+        in replacements.entries) {
+      final NotificationSchedulesCompanion? replacement = entry.value;
+      if (replacement == null) {
+        continue;
+      }
+      final NotificationSchedule? existing = matching[entry.key];
+      if (existing == null) {
+        await _database
+            .into(_database.notificationSchedules)
+            .insert(replacement);
+        continue;
+      }
+      if (!const <String>{'PENDING', 'SCHEDULED'}.contains(existing.status)) {
+        await (_database.update(
+          _database.notificationSchedules,
+        )..where((table) => table.id.equals(existing.id))).write(
+          NotificationSchedulesCompanion(
+            status: const Value<String>('PENDING'),
+            systemNotificationId: const Value<int?>(null),
+            updatedAt: Value<int>(updatedAtUtcMs),
+          ),
+        );
+      }
     }
   }
 

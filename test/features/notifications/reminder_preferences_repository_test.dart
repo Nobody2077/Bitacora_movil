@@ -37,6 +37,7 @@ void main() {
       quietEndMinutes: 6 * 60 + 45,
       dailySummaryEnabled: false,
       dailySummaryMinutes: 6 * 60,
+      genericText: ReminderPreferences.defaultGenericText,
     );
 
     expect(await repository.save(expected), isA<Success<void>>());
@@ -60,6 +61,7 @@ void main() {
       quietEndMinutes: 300,
       dailySummaryEnabled: false,
       dailySummaryMinutes: 6 * 60,
+      genericText: ReminderPreferences.defaultGenericText,
     );
 
     expect(await repository.save(invalid), isA<Failure<void>>());
@@ -73,6 +75,7 @@ void main() {
       quietEndMinutes: 7 * 60,
       dailySummaryEnabled: false,
       dailySummaryMinutes: 6 * 60,
+      genericText: ReminderPreferences.defaultGenericText,
     );
     final DateTime now = DateTime.now();
     final DateTime late = DateTime(now.year, now.month, now.day, 23);

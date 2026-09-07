@@ -26,6 +26,7 @@ abstract interface class MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   });
 
@@ -33,6 +34,7 @@ abstract interface class MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   });
 

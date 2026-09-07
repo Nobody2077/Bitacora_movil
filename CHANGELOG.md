@@ -1,5 +1,33 @@
 # Historial de cambios
 
+## 1.4.0 — candidata `1.4.0+8`
+
+### Resumen diario
+
+- Un solo aviso al día con cuántas misiones te esperan, a la hora que elijas y
+  con interruptor propio para silenciarlo sin tocar el resto de recordatorios.
+- Vive fuera de `notification_schedules`, en las preferencias cifradas. **El
+  esquema no cambia.**
+- El recuento se calcula con la aplicación desbloqueada y viaja ya cocinado: el
+  receiver no puede abrir la base cifrada. Es una foto del último uso, no del
+  amanecer.
+
+### Aviso de vencimiento
+
+- Las misiones con hora y con plazo avisan también antes de vencer, con la
+  misma anticipación configurada para el resto.
+- Las misiones de solo fecha quedan excluidas a propósito: su vencimiento es el
+  final del día civil, no un plazo puesto por ti, y avisar ahí sería sonar cada
+  noche.
+- Editar la hora de inicio ya no cancela el aviso de vencimiento, ni al revés.
+
+### Texto configurable
+
+- El mensaje de los avisos que no muestran el título se puede cambiar en
+  Ajustes → Notificaciones. Antes estaba fijo en el código.
+- El texto se resuelve en la aplicación y viaja hasta la alarma, así que se
+  respeta también en los avisos repuestos tras un reinicio.
+
 ## 1.3.0 — candidata `1.3.0+7`
 
 ### Notificaciones que sobreviven al reinicio

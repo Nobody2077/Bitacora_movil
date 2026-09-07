@@ -290,6 +290,7 @@ final class _FakeMissionRepository implements MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   }) => throw UnimplementedError();
 
@@ -338,6 +339,7 @@ final class _FakeMissionRepository implements MissionRepository {
     Mission mission, {
     required String eventId,
     required String notificationId,
+    required String expiryNotificationId,
     required DateTime occurredAtUtc,
   }) => throw UnimplementedError();
 

@@ -84,6 +84,77 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-09-07 (sexta parte) — Puntos 3 y 4, y candidata `1.4.0+8`
+
+El usuario pidió seguir con los puntos 3 y 4 y validar los tres juntos, para
+ahorrar un ciclo de instalación.
+
+**Punto 3 — Aviso de vencimiento. IMPLEMENTADO.**
+
+No hizo falta migrar: el `CHECK` de `notification_type` ya admitía `CRITICAL`.
+Lo que sí hizo falta fue generalizar el reemplazo de intenciones del DAO, que
+estaba fijado a `START` por nombre. `_replaceStartNotificationIntent` pasó a
+`_replaceNotificationIntents`, que recibe un mapa de tipo a intención y
+**solo toca los tipos que gestiona**. Antes cancelaba cualquier intención
+abierta de la misión, lo cual era equivalente cuando `START` era el único tipo
+emitido; con dos tipos ya no lo es, y sin ese cambio editar la hora de inicio
+habría cancelado el aviso de vencimiento en silencio.
+
+**La trampa que se evitó:** `isDateOnly` usa `expiresAt` como final del día
+civil, no como plazo del usuario (`mission.dart:177-179`). Un aviso de
+vencimiento ingenuo habría sonado **cada noche por cada misión sin hora**. El
+aviso solo se crea si hay vencimiento real, la misión no es de solo fecha y el
+plazo aún no ha pasado. Hay cuatro pruebas que fijan esto, incluida la de mover
+el plazo sin tocar el aviso de inicio.
+
+**La anticipación no es propia.** El reconciliador resta la misma que al resto
+de recordatorios, así que se configura desde el mismo sitio en Ajustes. Se evitó
+inventar una segunda preferencia para lo mismo.
+
+**Punto 4 — Texto configurable. IMPLEMENTADO.**
+
+El texto ya no está fijo en Kotlin. `reconcile()` lo cocina en Dart y viaja
+resuelto por el canal: el título si «mostrar detalles» está activo, y si no, el
+texto que el usuario escriba en Ajustes → «Texto sin detalles». El campo guarda
+al confirmar o al perder el foco, no en cada tecla, para no escribir en la base
+cifrada una vez por carácter. Un texto vacío se rechaza y conserva el anterior.
+La constante de Kotlin queda como red de seguridad, no como fuente.
+
+**Hallazgo: hay una columna muerta que conviene retirar.** `app_settings` tiene
+`daily_summary`, mapeada en `settings_mapper.dart` y expuesta en
+`AppPreferences`, pero **no la usa nadie para decidir nada**. Es andamiaje de
+A0/A1. **No se reutilizó como interruptor del resumen a propósito:** su valor
+por defecto es verdadero, así que habría activado el resumen diario a todo el
+mundo sin pedirlo. El interruptor real vive en las preferencias cifradas y es
+opt-in. Queda anotado como deuda: o se cablea o se retira, pero tener dos cosas
+llamadas «resumen diario» confunde.
+
+**Candidata `1.4.0+8`, compilada, firmada y verificada.** `versionCode=8`,
+firma `a6092c6c…16b8`, idéntica a `1.2.1+6` y `1.3.0+7`: se instala encima
+conservando datos. **Sin permisos nuevos** respecto a `1.3.0+7`; sigue sin
+`INTERNET`.
+
+**Verificación:** `flutter analyze` limpio, **237 pruebas verdes** (eran 230),
+siete nuevas. Único fallo el golden `sidebar_modular_battery`, preexistente.
+
+**Recorrido físico pendiente, los tres puntos de una vez:**
+
+1. Instalar encima de `1.3.0+7`. **No desinstalar.** Comprobar que los datos
+   siguen.
+2. **Resumen diario:** Ajustes → Notificaciones → activar «Resumen diario» y
+   ponerlo unos minutos por delante. Debe llegar un solo aviso con el recuento.
+3. **Texto configurable:** cambiar «Texto sin detalles», dejar «mostrar
+   detalles» apagado, programar una misión y comprobar que el aviso usa el
+   texto nuevo.
+4. **Aviso de vencimiento:** crear una misión **con hora y con vencimiento**
+   cercano, y comprobar que llegan dos avisos: el de inicio y el del plazo.
+5. **Regresión del punto 1:** con el resumen activado, reiniciar el teléfono y
+   comprobar que sigue llegando; el resumen dirá «Abre Bitácora para ver tu
+   resumen de hoy» en vez del recuento, porque el número no vive en el espejo.
+
+Con eso A11 quedaría cerrada y tocaría G8 y el respaldo de la firma antes de
+abrir Personajes, Tienda e Inventario.
+
 ### 2026-09-07 (quinta parte) — Punto 2: resumen diario
 
 **DECISIÓN DE ESQUEMA TOMADA: el resumen vive FUERA de
@@ -523,11 +594,11 @@ tiene fallos abiertos.
 
 ### Estado en una línea
 
-**Punto 1 de A11 COMPLETADO y validado en dispositivo** con `1.3.0+7`. **Punto 2
-(resumen diario) implementado y sin validar**, con la decisión de esquema
-tomada: vive fuera de `notification_schedules` y el esquema v3 no se toca.
-Quedan los puntos 3 y 4. Personajes, Tienda e Inventario esperan a cerrar A11 y
-A8.
+**A11 completa en código: los cuatro puntos implementados.** El punto 1 ya está
+validado en dispositivo; los puntos 2, 3 y 4 esperan el recorrido físico de la
+candidata **`1.4.0+8`**, compilada, firmada y verificada. Cuando eso quede
+verde, A11 se cierra y tocan G8 y el respaldo de la firma antes de abrir
+Personajes, Tienda e Inventario.
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
@@ -541,8 +612,9 @@ A8.
    su criterio, ya sin ese malentendido. Verificar también que
    `juancristianyujraquispe@gmail.com` esté verificado en
    <https://github.com/settings/emails>.
-3. ~~El recorrido físico de `1.3.0+7`.~~ **HECHO y APROBADO el 2026-09-07.**
-   Datos intactos y prueba de reinicio superada.
+3. **El recorrido físico de `1.4.0+8`**, con los puntos 2, 3 y 4 de una vez.
+   Los cinco pasos están en la entrada «2026-09-07 (sexta parte)». El punto 1
+   ya quedó validado y aprobado con `1.3.0+7`.
 4. ~~**Decidir lo del PIN.**~~ **RESUELTO el 2026-09-07: Opción A (espejo
    completo).** Ya está implementado.
 

@@ -274,6 +274,13 @@ class _NotificationSettingsPageState
           ),
         ),
         const SizedBox(height: TerminalSpace.md),
+        _GenericTextPanel(
+          text: reminder.genericText,
+          enabled: enabled,
+          onChanged: (String value) =>
+              _saveReminderPreferences(reminder.copyWith(genericText: value)),
+        ),
+        const SizedBox(height: TerminalSpace.md),
         TerminalPanel(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,3 +488,95 @@ String _leadLabel(int minutes) => switch (minutes) {
 String _timeLabel(int minutes) =>
     '${(minutes ~/ 60).toString().padLeft(2, '0')}:'
     '${(minutes % 60).toString().padLeft(2, '0')}';
+
+/// Campo para el texto de los avisos que no muestran el título.
+///
+/// Tiene estado propio porque necesita su `TextEditingController`: guarda al
+/// confirmar o al perder el foco, no en cada tecla, para no escribir en la base
+/// cifrada una vez por carácter.
+class _GenericTextPanel extends StatefulWidget {
+  const _GenericTextPanel({
+    required this.text,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final String text;
+  final bool enabled;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_GenericTextPanel> createState() => _GenericTextPanelState();
+}
+
+class _GenericTextPanelState extends State<_GenericTextPanel> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.text,
+  );
+  late final FocusNode _focusNode = FocusNode()..addListener(_onFocusChange);
+
+  @override
+  void didUpdateWidget(_GenericTextPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.text != oldWidget.text && !_focusNode.hasFocus) {
+      _controller.text = widget.text;
+    }
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (!_focusNode.hasFocus) {
+      _submit(_controller.text);
+    }
+  }
+
+  void _submit(String value) {
+    final String trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      _controller.text = widget.text;
+      return;
+    }
+    if (trimmed == widget.text) {
+      return;
+    }
+    widget.onChanged(trimmed);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TerminalPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const TerminalSectionTitle(
+            title: 'Texto sin detalles',
+            description:
+                'Lo que dice el aviso cuando no muestra el título de la misión, '
+                'incluso después de reiniciar el teléfono.',
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          TextField(
+            key: const Key('notification-generic-text-field'),
+            controller: _controller,
+            focusNode: _focusNode,
+            enabled: widget.enabled,
+            maxLength: ReminderPreferences.genericTextMaxLength,
+            textInputAction: TextInputAction.done,
+            decoration: const InputDecoration(
+              labelText: 'Mensaje del aviso',
+              prefixIcon: Icon(Icons.short_text_outlined),
+            ),
+            onSubmitted: _submit,
+          ),
+        ],
+      ),
+    );
+  }
+}
