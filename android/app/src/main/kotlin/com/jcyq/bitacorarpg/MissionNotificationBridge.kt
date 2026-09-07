@@ -1,10 +1,6 @@
 package com.jcyq.bitacorarpg
 
 import android.Manifest
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
@@ -46,6 +42,7 @@ class MissionNotificationBridge(
             "schedule" -> schedule(call, result)
             "deliverIfNeeded" -> deliverIfNeeded(call, result)
             "cancel" -> cancel(call, result)
+            "syncBootMirror" -> syncBootMirror(call, result)
             else -> result.notImplemented()
         }
     }
@@ -79,18 +76,15 @@ class MissionNotificationBridge(
     private fun schedule(call: MethodCall, result: MethodChannel.Result) {
         try {
             val request = requestFrom(call)
-            val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val triggerAt = maxOf(request.notifyAtUtcMs, System.currentTimeMillis() + 1_000L)
-            val pendingIntent = alarmPendingIntent(request, PendingIntent.FLAG_UPDATE_CURRENT)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerAt,
-                    pendingIntent,
-                )
-            } else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
-            }
+            MissionAlarmScheduler.schedule(
+                context = activity.applicationContext,
+                scheduleId = request.scheduleId,
+                systemNotificationId = request.systemNotificationId,
+                notifyAtUtcMs = request.notifyAtUtcMs,
+                soundEnabled = request.soundEnabled,
+                showDetails = request.showDetails,
+                missionTitle = request.missionTitle,
+            )
             result.success(request.systemNotificationId)
         } catch (error: IllegalArgumentException) {
             result.error("INVALID_NOTIFICATION", error.message, null)
@@ -122,15 +116,41 @@ class MissionNotificationBridge(
             result.error("INVALID_NOTIFICATION_ID", "A positive notification id is required.", null)
             return
         }
-        val alarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        PendingIntent.getBroadcast(
-            activity,
-            systemId,
-            Intent(activity, MissionAlarmReceiver::class.java),
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
-        )?.let(alarmManager::cancel)
-        MissionAlarmReceiver.cancel(activity.applicationContext, systemId)
+        MissionAlarmScheduler.cancel(activity.applicationContext, systemId)
         result.success(null)
+    }
+
+    /**
+     * Reemplaza el espejo de arranque con las alarmas vivas.
+     *
+     * Dart manda el conjunto completo tras cada `reconcile()`. Aqui se descarta
+     * cualquier campo que no sean los cinco acordados: el titulo de la mision
+     * no debe llegar nunca al espejo, asi que ni siquiera se lee.
+     */
+    private fun syncBootMirror(call: MethodCall, result: MethodChannel.Result) {
+        val raw = call.argument<List<Map<String, Any?>>>("entries")
+        if (raw == null) {
+            result.error("INVALID_MIRROR", "entries is required.", null)
+            return
+        }
+        val entries = raw.mapNotNull { item ->
+            val scheduleId = (item["scheduleId"] as? String)?.takeIf { it.isNotBlank() }
+                ?: return@mapNotNull null
+            val systemNotificationId = (item["systemNotificationId"] as? Number)?.toInt()
+                ?.takeIf { it > 0 }
+                ?: return@mapNotNull null
+            val notifyAtUtcMs = (item["notifyAtUtcMs"] as? Number)?.toLong()
+                ?: return@mapNotNull null
+            BootAlarmMirror.Entry(
+                scheduleId = scheduleId,
+                systemNotificationId = systemNotificationId,
+                notifyAtUtcMs = notifyAtUtcMs,
+                soundEnabled = item["soundEnabled"] as? Boolean ?: true,
+                showDetails = item["showDetails"] as? Boolean ?: false,
+            )
+        }
+        BootAlarmMirror.replaceAll(activity.applicationContext, entries)
+        result.success(entries.size)
     }
 
     private fun requestFrom(call: MethodCall): AlarmRequest {
@@ -140,7 +160,8 @@ class MissionNotificationBridge(
         val notifyAtUtcMs = call.argument<Number>("notifyAtUtcMs")?.toLong()
             ?: throw IllegalArgumentException("notifyAtUtcMs is required.")
         val existingSystemId = call.argument<Int>("systemNotificationId")
-        val systemId = existingSystemId?.takeIf { it > 0 } ?: stableSystemId(scheduleId)
+        val systemId = existingSystemId?.takeIf { it > 0 }
+            ?: MissionAlarmScheduler.stableSystemId(scheduleId)
         return AlarmRequest(
             scheduleId = scheduleId,
             notifyAtUtcMs = notifyAtUtcMs,
@@ -152,29 +173,6 @@ class MissionNotificationBridge(
                 ?.take(120)
                 ?.takeIf { it.isNotEmpty() },
         )
-    }
-
-    private fun alarmPendingIntent(request: AlarmRequest, flags: Int): PendingIntent {
-        val intent = Intent(activity, MissionAlarmReceiver::class.java).apply {
-            putExtra(MissionAlarmReceiver.EXTRA_SCHEDULE_ID, request.scheduleId)
-            putExtra(MissionAlarmReceiver.EXTRA_SYSTEM_ID, request.systemNotificationId)
-            putExtra(MissionAlarmReceiver.EXTRA_SOUND_ENABLED, request.soundEnabled)
-            putExtra(MissionAlarmReceiver.EXTRA_SHOW_DETAILS, request.showDetails)
-            request.missionTitle?.let {
-                putExtra(MissionAlarmReceiver.EXTRA_MISSION_TITLE, it)
-            }
-        }
-        return PendingIntent.getBroadcast(
-            activity,
-            request.systemNotificationId,
-            intent,
-            flags or PendingIntent.FLAG_IMMUTABLE,
-        )
-    }
-
-    private fun stableSystemId(scheduleId: String): Int {
-        val value = scheduleId.hashCode() and Int.MAX_VALUE
-        return if (value == 0) 1 else value
     }
 
     private data class AlarmRequest(

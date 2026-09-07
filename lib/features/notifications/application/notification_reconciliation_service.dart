@@ -15,6 +15,7 @@ final class NotificationReconciliationReport {
     required this.fired,
     required this.cancelled,
     required this.failed,
+    this.bootMirrorSynced = true,
   });
 
   final bool permissionGranted;
@@ -22,6 +23,12 @@ final class NotificationReconciliationReport {
   final int fired;
   final int cancelled;
   final int failed;
+
+  /// Si el espejo que permite reponer alarmas tras un reinicio quedo al dia.
+  ///
+  /// Se expone en vez de tragarse el fallo: un espejo desincronizado no rompe
+  /// nada hoy, pero significa que el proximo reinicio pierde recordatorios.
+  final bool bootMirrorSynced;
 }
 
 final class NotificationReconciliationService {
@@ -66,6 +73,12 @@ final class NotificationReconciliationService {
       (item) => const <String>{'PENDING', 'SCHEDULED'}.contains(item.status),
     );
 
+    // El espejo de arranque. La consulta no tiene ventana temporal, asi que
+    // `open` es el conjunto completo de alarmas vivas y el espejo se puede
+    // reemplazar entero en cada pasada. Una lista vacia lo borra.
+    final List<MissionNotificationMirrorEntry> mirror =
+        <MissionNotificationMirrorEntry>[];
+
     int cancelled = 0;
     int failed = 0;
     for (final schedule in terminal) {
@@ -96,33 +109,42 @@ final class NotificationReconciliationService {
           failed++;
         }
       }
-      return NotificationReconciliationReport(
-        permissionGranted: false,
-        scheduled: 0,
-        fired: 0,
-        cancelled: cancelled,
-        failed: failed,
+      return _withBootMirror(
+        NotificationReconciliationReport(
+          permissionGranted: false,
+          scheduled: 0,
+          fired: 0,
+          cancelled: cancelled,
+          failed: failed,
+        ),
+        mirror,
       );
     }
 
     if (open.isEmpty) {
-      return NotificationReconciliationReport(
-        permissionGranted: true,
-        scheduled: 0,
-        fired: 0,
-        cancelled: cancelled,
-        failed: failed,
+      return _withBootMirror(
+        NotificationReconciliationReport(
+          permissionGranted: true,
+          scheduled: 0,
+          fired: 0,
+          cancelled: cancelled,
+          failed: failed,
+        ),
+        mirror,
       );
     }
 
     final bool permissionGranted = await _platform.requestPermission();
     if (!permissionGranted) {
-      return NotificationReconciliationReport(
-        permissionGranted: false,
-        scheduled: 0,
-        fired: 0,
-        cancelled: cancelled,
-        failed: failed,
+      return _withBootMirror(
+        NotificationReconciliationReport(
+          permissionGranted: false,
+          scheduled: 0,
+          fired: 0,
+          cancelled: cancelled,
+          failed: failed,
+        ),
+        mirror,
       );
     }
 
@@ -135,14 +157,16 @@ final class NotificationReconciliationService {
       final String? missionTitle = showNotificationDetails
           ? await _notificationDao.findMissionTitle(schedule.missionId)
           : null;
+      final bool soundEnabled =
+          settings.soundEnabled != 0 &&
+          !reminderPreferences.isQuietAtUtcMs(deliveryAtUtcMs);
+      final bool showDetails =
+          showNotificationDetails && missionTitle?.trim().isNotEmpty == true;
       final request = MissionNotificationRequest(
         scheduleId: schedule.id,
         notifyAtUtcMs: deliveryAtUtcMs,
-        soundEnabled:
-            settings.soundEnabled != 0 &&
-            !reminderPreferences.isQuietAtUtcMs(deliveryAtUtcMs),
-        showDetails:
-            showNotificationDetails && missionTitle?.trim().isNotEmpty == true,
+        soundEnabled: soundEnabled,
+        showDetails: showDetails,
         missionTitle: missionTitle?.trim(),
         systemNotificationId: schedule.systemNotificationId,
       );
@@ -166,6 +190,16 @@ final class NotificationReconciliationService {
             updatedAtUtcMs: nowUtcMs,
             systemNotificationId: Value<int?>(systemId),
           );
+          // Sin el titulo: el espejo vive fuera de la base cifrada.
+          mirror.add(
+            MissionNotificationMirrorEntry(
+              scheduleId: schedule.id,
+              systemNotificationId: systemId,
+              notifyAtUtcMs: deliveryAtUtcMs,
+              soundEnabled: soundEnabled,
+              showDetails: showDetails,
+            ),
+          );
           scheduledCount++;
         }
       } on Object {
@@ -173,13 +207,35 @@ final class NotificationReconciliationService {
       }
     }
 
-    return NotificationReconciliationReport(
-      permissionGranted: true,
-      scheduled: scheduledCount,
-      fired: fired,
-      cancelled: cancelled,
-      failed: failed,
+    return _withBootMirror(
+      NotificationReconciliationReport(
+        permissionGranted: true,
+        scheduled: scheduledCount,
+        fired: fired,
+        cancelled: cancelled,
+        failed: failed,
+      ),
+      mirror,
     );
+  }
+
+  Future<NotificationReconciliationReport> _withBootMirror(
+    NotificationReconciliationReport report,
+    List<MissionNotificationMirrorEntry> mirror,
+  ) async {
+    try {
+      await _platform.syncBootMirror(mirror);
+      return report;
+    } on Object {
+      return NotificationReconciliationReport(
+        permissionGranted: report.permissionGranted,
+        scheduled: report.scheduled,
+        fired: report.fired,
+        cancelled: report.cancelled,
+        failed: report.failed,
+        bootMirrorSynced: false,
+      );
+    }
   }
 
   Future<void> _cancelAndClear(

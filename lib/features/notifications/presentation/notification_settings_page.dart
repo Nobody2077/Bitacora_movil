@@ -255,6 +255,24 @@ class _NotificationSettingsPageState
             ],
           ),
         ),
+        const SizedBox(height: TerminalSpace.md),
+        TerminalPanel(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Icon(Icons.restart_alt_outlined),
+              const SizedBox(width: TerminalSpace.sm),
+              Expanded(
+                child: TerminalSectionTitle(
+                  title: 'Después de reiniciar el teléfono',
+                  description: app.showNotificationDetails
+                      ? 'Los recordatorios se reponen solos al encender, pero hasta que abras la aplicación salen sin el título: leerlo exigiría abrir la base cifrada, y eso pide tu PIN. Al abrir la aplicación recuperan el título.'
+                      : 'Los recordatorios se reponen solos al encender el teléfono, con el mismo mensaje genérico de siempre.',
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

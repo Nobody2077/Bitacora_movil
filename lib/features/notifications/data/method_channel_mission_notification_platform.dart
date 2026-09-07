@@ -50,6 +50,21 @@ final class MethodChannelMissionNotificationPlatform
     <String, Object>{'systemNotificationId': systemNotificationId},
   );
 
+  @override
+  Future<void> syncBootMirror(List<MissionNotificationMirrorEntry> entries) =>
+      _channel.invokeMethod<void>('syncBootMirror', <String, Object>{
+        'entries': <Map<String, Object>>[
+          for (final entry in entries)
+            <String, Object>{
+              'scheduleId': entry.scheduleId,
+              'systemNotificationId': entry.systemNotificationId,
+              'notifyAtUtcMs': entry.notifyAtUtcMs,
+              'soundEnabled': entry.soundEnabled,
+              'showDetails': entry.showDetails,
+            },
+        ],
+      });
+
   Map<String, Object> _arguments(MissionNotificationRequest request) =>
       <String, Object>{
         'scheduleId': request.scheduleId,

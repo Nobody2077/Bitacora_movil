@@ -198,6 +198,86 @@ void main() {
     expect(request.showDetails, isTrue);
     expect(request.missionTitle, 'Misión privada');
   });
+  test(
+    'el espejo de arranque guarda las alarmas vivas y nunca el título',
+    () async {
+      await settingsDao.putMetadata(
+        key: AppPreferences.showNotificationDetailsMetadataKey,
+        value: '1',
+        updatedAtUtcMs: _nowMs,
+      );
+      await _insertSchedule(
+        database,
+        missionId: 'mirrored',
+        scheduleId: 'mirrored-schedule',
+        notifyAt: _nowMs + 60000,
+      );
+      await _insertSchedule(
+        database,
+        missionId: 'already-due',
+        scheduleId: 'already-due-schedule',
+        notifyAt: _nowMs - 1,
+      );
+
+      final report = await service.reconcile();
+
+      expect(report.bootMirrorSynced, isTrue);
+      expect(platform.mirrorSyncs, 1);
+      final MissionNotificationMirrorEntry entry = platform.mirror.single;
+      expect(entry.scheduleId, 'mirrored-schedule');
+      expect(entry.systemNotificationId, 1001);
+      expect(entry.notifyAtUtcMs, _nowMs + 60000);
+      // El espejo solo lleva los cinco campos acordados; el título vive en la
+      // base cifrada y no puede salir de ella ni con detalles activados.
+      expect(entry.showDetails, isTrue);
+      expect(
+        platform.scheduledRequests.single.missionTitle,
+        'Misión privada',
+        reason: 'la alarma normal sí lleva título; el espejo no',
+      );
+    },
+  );
+
+  test('desactivar las notificaciones vacía el espejo de arranque', () async {
+    await _insertSchedule(
+      database,
+      missionId: 'disabled-mirror',
+      scheduleId: 'disabled-mirror-schedule',
+      notifyAt: _nowMs + 60000,
+      status: 'SCHEDULED',
+      systemNotificationId: 91,
+    );
+    await settingsDao.updateSettings(
+      const AppSettingsCompanion(
+        missionNotifications: Value<int>(0),
+        updatedAt: Value<int>(_nowMs),
+      ),
+    );
+
+    final report = await service.reconcile();
+
+    expect(report.bootMirrorSynced, isTrue);
+    expect(platform.mirrorSyncs, 1);
+    expect(platform.mirror, isEmpty);
+  });
+
+  test(
+    'un espejo que falla se reporta en vez de pasar desapercibido',
+    () async {
+      platform.mirrorSyncFails = true;
+      await _insertSchedule(
+        database,
+        missionId: 'mirror-fails',
+        scheduleId: 'mirror-fails-schedule',
+        notifyAt: _nowMs + 60000,
+      );
+
+      final report = await service.reconcile();
+
+      expect(report.scheduled, 1, reason: 'la alarma sí quedó programada');
+      expect(report.bootMirrorSynced, isFalse);
+    },
+  );
 }
 
 Future<void> _insertSchedule(
@@ -246,6 +326,10 @@ final class _FakeNotificationPlatform implements MissionNotificationPlatform {
       <MissionNotificationRequest>[];
   final List<String> delivered = <String>[];
   final List<int> cancelled = <int>[];
+  final List<MissionNotificationMirrorEntry> mirror =
+      <MissionNotificationMirrorEntry>[];
+  int mirrorSyncs = 0;
+  bool mirrorSyncFails = false;
 
   @override
   Future<bool> requestPermission() async {
@@ -264,6 +348,19 @@ final class _FakeNotificationPlatform implements MissionNotificationPlatform {
   Future<int> deliverIfNeeded(MissionNotificationRequest request) async {
     delivered.add(request.scheduleId);
     return request.systemNotificationId ?? 1002;
+  }
+
+  @override
+  Future<void> syncBootMirror(
+    List<MissionNotificationMirrorEntry> entries,
+  ) async {
+    mirrorSyncs++;
+    if (mirrorSyncFails) {
+      throw StateError('mirror unavailable');
+    }
+    mirror
+      ..clear()
+      ..addAll(entries);
   }
 
   @override

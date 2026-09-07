@@ -84,6 +84,70 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-09-07 (segunda parte) — Punto 1: reponer alarmas tras reinicio
+
+**Rama:** `main`. Implementación del punto 1 del plan de notificaciones, ya
+desbloqueado por la decisión de la primera parte de esta sesión.
+
+**Ficheros nuevos (Kotlin):**
+
+| Fichero | Contenido |
+|---|---|
+| `MissionAlarmScheduler.kt` | Programar y cancelar alarmas, extraído de `MissionNotificationBridge`. Existía atado a la `Activity`; el receiver de arranque no tiene Activity, solo contexto de aplicación. Mantiene `setAndAllowWhileIdle`. |
+| `BootAlarmMirror.kt` | El espejo cifrado fuera de la base. AES/GCM con clave de AndroidKeyStore **sin** `setUserAuthenticationRequired`, formato `v1:iv:ciphertext` y JSON dentro. Mismo patrón que `DatabaseKeyStoreBridge`, a propósito: no se añadió `androidx.security` para no meter una segunda forma de cifrar en el proyecto. |
+| `BootAlarmRestoreReceiver.kt` | Repone alarmas en `BOOT_COMPLETED` y `MY_PACKAGE_REPLACED`. Nunca abre la base. Lo vencido mientras el teléfono estaba apagado se entrega al momento; el resto se reprograma. |
+
+**Ficheros modificados:**
+
+| Fichero | Cambio |
+|---|---|
+| `AndroidManifest.xml` | Permiso `RECEIVE_BOOT_COMPLETED` y el receiver con su `intent-filter`, `exported="true"` (lo exige un broadcast del sistema). |
+| `MissionNotificationBridge.kt` | Delega en `MissionAlarmScheduler` y gana el método `syncBootMirror`, que descarta cualquier campo fuera de los cinco acordados: el título ni siquiera se lee. |
+| `mission_notification_platform.dart` | Nuevo `MissionNotificationMirrorEntry` y `syncBootMirror` en la interfaz. |
+| `method_channel_mission_notification_platform.dart` | Implementa `syncBootMirror`. |
+| `notification_reconciliation_service.dart` | Construye el espejo y lo sincroniza en **todas** las salidas de `reconcile()`. |
+| `notification_settings_page.dart` | Panel «Después de reiniciar el teléfono» que explica la degradación. |
+
+**Por qué el espejo se reemplaza entero.** `findReconciliationCandidates()` no
+tiene ventana temporal: devuelve todas las filas PENDING/SCHEDULED. Así que
+`reconcile()` ve el conjunto completo de alarmas vivas y sustituir el espejo es
+correcto, además de evitar que queden restos de alarmas ya canceladas. Una
+lista vacía lo borra, que es justo lo que debe pasar al apagar las
+notificaciones.
+
+**Un fallo del espejo no se traga en silencio.** El informe gana
+`bootMirrorSynced`. Un espejo desincronizado no rompe nada hoy, pero significa
+que el próximo reinicio pierde recordatorios, así que queda observable en vez
+de desaparecer en un `catch` mudo.
+
+**La degradación está contada al usuario, no escondida.** Es el término que se
+aceptó al aprobar la Opción A. El panel nuevo de Ajustes cambia su texto según
+«mostrar detalles»: con detalles activados avisa de que tras un reinicio los
+avisos salen sin título hasta abrir la aplicación; sin detalles, dice
+simplemente que se reponen solos.
+
+**Verificación:**
+
+- `flutter analyze`: limpio en todo el proyecto.
+- `flutter test`: **225 pruebas verdes**, 3 de ellas nuevas sobre el espejo
+  (guarda las alarmas vivas y nunca el título; desactivar notificaciones lo
+  vacía; un fallo del espejo se reporta).
+- `flutter build apk --debug --flavor prod`: compila.
+- Manifiesto **fusionado** verificado: el APK lleva de verdad el permiso, el
+  receiver y el `intent-filter` de `BOOT_COMPLETED`.
+
+**Único fallo de la matriz: el golden `sidebar_modular_battery`, preexistente.**
+Se comprobó guardando los cambios con `git stash`: falla idéntico sin ellos
+(0,26 %, 2676 px). Sigue intacto a propósito, como venía de la sesión anterior.
+
+**Lo que falta para cerrar el punto 1: la prueba física.** Programar un aviso,
+reiniciar el teléfono y comprobar que llega. Es la única verificación real; las
+pruebas de Dart cubren el contrato, no el comportamiento de Android al
+arrancar. Hasta entonces el punto 1 está implementado pero **no validado**.
+
+**No se tocó el esquema.** La decisión sobre dónde vive el resumen diario sigue
+aplazada al punto 2, tal y como se acordó.
+
 ### 2026-09-07 — Decisiones desbloqueadas para notificaciones
 
 **Rama:** `main`. Sin cambios de código; sesión de lectura, verificación y decisión.
@@ -251,25 +315,32 @@ tiene fallos abiertos.
 
 ### Estado en una línea
 
-`1.2.1+6` aprobada físicamente, todo fusionado en `main`, árbol limpio. El
-siguiente incremento es **notificaciones**. **Ya no está bloqueado:** el
-2026-09-07 el usuario eligió la **Opción A (espejo completo)** y aplazó a
-propósito la decisión de esquema hasta implementar el punto 2. Se empieza por
-el **punto 1: reprogramar alarmas tras reinicio**.
+`1.2.1+6` aprobada físicamente, todo fusionado en `main`. El **punto 1 del plan
+de notificaciones (reponer alarmas tras reinicio) está implementado** y pendiente
+de una sola cosa: **la prueba física de reinicio**. La decisión que bloqueaba
+todo se cerró el 2026-09-07 (Opción A, espejo completo). El siguiente incremento
+es el **punto 2, el resumen diario**, y con él llega la decisión de esquema que
+se aplazó a propósito.
 
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
-1. `git push origin main` — hay commits de documentación sin subir.
+1. ~~`git push origin main`~~ **HECHO el 2026-09-07.** Quedan por subir los
+   commits de esta sesión.
 2. Activar **"Include private contributions on my profile"** en
-   <https://github.com/settings/profile>. El repositorio es privado y sin ese
-   ajuste el gráfico de contribuciones queda vacío aunque los commits estén.
-   Verificar también que `juancristianyujraquispe@gmail.com` esté verificado en
+   <https://github.com/settings/profile>. **El usuario lo dejó apagado el
+   2026-09-07 creyendo que haría público el proyecto; no es así:** ese ajuste
+   solo hace que los commits cuenten en el gráfico, sin revelar el nombre del
+   repositorio ni su contenido. El repositorio sigue igual de privado. Queda a
+   su criterio, ya sin ese malentendido. Verificar también que
+   `juancristianyujraquispe@gmail.com` esté verificado en
    <https://github.com/settings/emails>.
-3. **Opcional pero útil:** dejar una notificación programada, reiniciar el
-   teléfono y ver si llega. Confirmaría empíricamente lo que motiva el punto 1
-   del plan. No bloquea: la conducta de Android está documentada.
+3. **La prueba de reinicio, que ya NO es opcional.** Programar un aviso,
+   reiniciar el teléfono y comprobar que llega. El punto 1 está implementado,
+   y esta es la única forma de validarlo: las pruebas de Dart cubren el
+   contrato, no lo que hace Android al arrancar. Hasta que se haga, el punto 1
+   está **implementado pero no validado**.
 4. ~~**Decidir lo del PIN.**~~ **RESUELTO el 2026-09-07: Opción A (espejo
-   completo).** Ya no impide arrancar a escribir código.
+   completo).** Ya está implementado.
 
 ### Decisión RESUELTA (2026-09-07) — el receiver de arranque y la base cerrada
 
@@ -332,7 +403,8 @@ reinicio? Es un ablandamiento consciente de ADR-002 y por eso lo decide él.
 
 ### Plan de notificaciones acordado (orden pactado)
 
-1. **Reprogramar tras reinicio.** `RECEIVE_BOOT_COMPLETED` + receiver + el
+1. **Reprogramar tras reinicio. IMPLEMENTADO el 2026-09-07**, pendiente solo de
+   la prueba física de reinicio. `RECEIVE_BOOT_COMPLETED` + receiver + el
    espejo que salga de la decisión anterior. Toca `AndroidManifest.xml` y Kotlin
    nuevo; no toca esquema ni pantallas. Es el cimiento de los otros tres.
 2. **Resumen diario configurable.** "Hoy tienes 8 misiones" a la hora que elija
