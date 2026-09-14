@@ -5,7 +5,7 @@
   recorrido físico**
 - Última versión aprobada en dispositivo: `1.3.0+7`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`, árbol limpio, **siete commits sin subir**
+- Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
 - En curso: **A11 — Notificaciones**, completa en código, a falta de validar los
   puntos 2, 3 y 4
 
@@ -614,7 +614,8 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 implementados.** El punto 1 ya se validó en dispositivo. Los puntos 2, 3 y 4
 esperan el recorrido físico de la candidata **`1.4.0+8`**, ya compilada, firmada
 y verificada, que está en `build/app/outputs/flutter-apk/app-prod-release.apk`.
-Árbol limpio. **Siete commits sin subir.**
+Árbol limpio y **sincronizado con `origin/main`**: los siete commits de A11 ya
+están subidos (verificado el 2026-09-13).
 
 ### Lo primero al retomar: preguntar por el recorrido
 
@@ -653,9 +654,8 @@ Instalar **encima** de `1.3.0+7`. **Nunca desinstalar** (ver «Reglas»).
    fuera del PC. Si se pierde, no se podrá volver a actualizar la aplicación
    nunca: la única salida sería desinstalar, que borra todos los datos.
    `ESTADO_ACTUAL.md` lo arrastra como pendiente desde A8.
-2. `git push origin main` — siete commits sin subir.
-3. El recorrido de `1.4.0+8` (arriba).
-4. Opcional: activar «Include private contributions on my profile» en
+2. El recorrido de `1.4.0+8` (arriba).
+3. Opcional: activar «Include private contributions on my profile» en
    <https://github.com/settings/profile>. **El usuario lo dejó apagado el
    2026-09-07 creyendo que haría público el repositorio; no es así:** solo hace
    que los commits cuenten en el gráfico, sin revelar nombre ni contenido. El
