@@ -109,13 +109,14 @@ Orden recomendado de lectura:
 4. [`documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md`](documentos/ADR-002-CONTRATO_ACCESO_PRIVACIDAD_V1.md): acceso y privacidad.
 5. [`documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md`](documentos/ADR-003-CONTRATO_TITULOS_RACHAS_V1.md): reglas de títulos, rachas y niveles.
 6. [`documentos/ADR-005-RETIRO-A6-MVP.md`](documentos/ADR-005-RETIRO-A6-MVP.md): retiro de A6 y secuencia vigente hacia A8.
-7. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): antecedente histórico superado por ADR-005.
-8. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
-9. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico aprobado que cerró A7.
-10. [`documentos/A8-VALIDACION-RELEASE.md`](documentos/A8-VALIDACION-RELEASE.md): gate, métricas y recorrido pendiente para cerrar G8.
-11. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
-12. [`documentos/ACTUALIZACION-2026-08-29.md`](documentos/ACTUALIZACION-2026-08-29.md): planificación flexible, tablón, batería, controles y esquema v3.
-13. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
+7. [`documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md`](documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md): borrador del post-MVP; decisiones abiertas y el conflicto entre gastar XP y el cálculo de nivel.
+8. [`documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md`](documentos/ADR-004-DIFERIMIENTO_A6_ACTIVACION_A7.md): antecedente histórico superado por ADR-005.
+9. [`documentos/ESTADO_FASES.md`](documentos/ESTADO_FASES.md): evidencia de gates completados.
+10. [`documentos/G7-VALIDACION-FISICA.md`](documentos/G7-VALIDACION-FISICA.md): recorrido físico aprobado que cerró A7.
+11. [`documentos/A8-VALIDACION-RELEASE.md`](documentos/A8-VALIDACION-RELEASE.md): gate, métricas y recorrido pendiente para cerrar G8.
+12. [`documentos/`](documentos/): especificación, UML, diseño, navegación y arquitectura originales.
+13. [`documentos/ACTUALIZACION-2026-08-29.md`](documentos/ACTUALIZACION-2026-08-29.md): planificación flexible, tablón, batería, controles y esquema v3.
+14. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.
 
 Cuando un documento fuente contradiga una decisión posterior, prevalecen `DECISIONES_PRE_A0.md` y los ADR aplicables.

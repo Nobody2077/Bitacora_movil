@@ -675,9 +675,21 @@ más**; loadouts, servidor y sincronización quedan **descartados**, no aplazado
 
 ### Personajes, Tienda e Inventario — qué incluye y cómo
 
-**Todavía no está diseñado ni aprobado.** Esto es el punto de partida para la
-conversación, no un plan cerrado. **Exige su propio ADR antes de escribir
-código**, porque toca esquema y economía.
+**El ADR ya está empezado: `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md`,
+en estado propuesto (borrador) desde el 2026-09-13.** No autoriza código: deja
+tres decisiones abiertas para el usuario —D1 con qué se paga, D2 volcado
+cifrado antes de migrar, D3 una ficha o varias— y ocho decisiones propuestas
+que no dependen de ellas. **Leerlo antes de retomar este bloque; no empezar
+otro ADR desde cero.**
+
+Lo que sigue es el punto de partida que originó ese borrador, conservado
+porque el ADR lo desarrolla pero no lo repite entero.
+
+**Aviso recogido en el ADR y que conviene no perder de vista:** el nivel se
+deriva de `SUM(amount)` sobre `xp_transactions` sin filtrar
+(`progress_dao.dart:173`, `rpg_level.dart:18`), así que gastar XP de ese libro
+**bajaría el nivel al comprar**. Por eso «pagar con XP» son tres salidas
+distintas y no una.
 
 **Qué hay ya construido que sirve de base.** Media ficha de personaje existe,
 solo que repartida: `xp_transactions` (XP), niveles por área en Progreso,
