@@ -1,6 +1,6 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **7 de septiembre de 2026**
+- Última revisión: **13 de septiembre de 2026**
 - Versión en `pubspec.yaml`: **`1.4.0+8`**, compilada y firmada, **pendiente de
   recorrido físico**
 - Última versión aprobada en dispositivo: `1.3.0+7`
@@ -94,12 +94,86 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   v3 sigue intacto**. El post-MVP quedó acotado a Personajes, Tienda e
   Inventario. Matriz en **237 pruebas**. Detalle completo, con lo decidido y lo
   que queda abierto, en "Bitácora de sesiones".
+- Sesión del **13 de septiembre de 2026**: sin cambios de código ni de
+  versión. Se corrigió el relevo, que daba por pendientes siete commits ya
+  subidos, y se abrió `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md` en
+  estado propuesto. El ADR documenta que el nivel se deriva de `SUM(amount)`
+  sobre `xp_transactions` sin filtrar, así que gastar XP de ese libro bajaría
+  el nivel al comprar, y deja tres decisiones al usuario (D1 con qué se paga,
+  D2 volcado cifrado antes de migrar, D3 una ficha o varias). `1.4.0+8` sigue
+  esperando recorrido físico.
 
 ## Bitácora de sesiones
 
 Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
+
+### 2026-09-13 — Sincronización con GitHub y apertura del ADR-006
+
+Sesión de documentación. **Sin cambios de código ni de versión.** `1.4.0+8`
+sigue esperando su recorrido físico: el usuario no llegó a responder si lo
+hizo, así que la primera pregunta del próximo relevo sigue siendo la misma.
+
+**Lo primero fue una corrección de estado.** El relevo daba por pendientes
+siete commits sin subir. No lo estaban: `git fetch` confirmó que `main` y
+`origin/main` apuntaban ambas a `9c35acb`, y que
+`feat/misiones-recurrentes-tablon` también estaba sincronizada. El usuario los
+había subido al cerrar la sesión anterior sin que quedara anotado. Se corrigió
+en los tres sitios donde el pendiente seguía vivo —cabecera de estado, resumen
+del RELEVO y lista de tareas del usuario— y se dejaron intactas las menciones
+de la Bitácora de sesiones del 2026-09-06, que son registro histórico.
+
+**Se abrió `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md`**, en estado
+propuesto (borrador). No autoriza código: el bloque sigue detrás de A11 y
+A8/G8.
+
+**El hallazgo de la sesión, y la razón de que el ADR valga la pena.** El nivel
+se deriva de `SUM(amount)` sobre `xp_transactions` **sin filtrar**
+(`progress_dao.dart:173` → `rpg_level.dart:18`, umbrales `100 * (n - 1)²`).
+Si una compra insertara un asiento negativo en ese libro, el personaje
+**perdería niveles al comprar**: gastar 400 XP en nivel 3 devuelve al nivel 2,
+y el jugador aprende a no comprar nunca. El esquema además lo impide hoy,
+porque `amount > 0` salvo `MANUAL_ADJUSTMENT`, que exige `reason` no vacío.
+
+Eso convierte «pagar con XP» en tres salidas distintas, no una: moneda
+separada (no toca `xp_transactions` ni ADR-003, **recomendada**), dos sumas
+sobre el mismo libro (barata en apariencia, cambia el significado de una
+consulta ya validada) o dinero real, que es otro producto.
+
+**Segundo riesgo anotado.** ADR-001 §13 documenta que el ejecutable de
+`drift_dev 2.34.0` no compila junto a `drift 2.34.3`, y que v1 se exportó con
+un procedimiento controlado y temporal. Generar `drift_schema_v4.json` volverá
+a chocar con eso. Conviene comprobarlo **antes** de comprometer fechas del
+bloque, no al llegar.
+
+**El ADR quedó enlazado** desde el README (punto 7 de la lista de lectura, con
+el resto de ADR; se renumeraron los siguientes) y desde la sección del relevo
+que antes decía «exige su propio ADR antes de escribir código». Sin ese enlace
+el próximo relevo podía no encontrarlo y volver a empezarlo de cero.
+
+**Decidido / por decidir:**
+
+- El ADR deja tres decisiones al usuario: **D1** con qué se paga, **D2** si se
+  hace un volcado cifrado antes de migrar, **D3** si «personaje» es una ficha
+  o varias. Ninguna respondida.
+- **D2 es el punto irreversible del bloque.** ADR-005 retiró la exportación y
+  `allowBackup="false"`: no hay copia de nada. Una migración v3 → v4 que salga
+  mal sobre datos reales no tiene vuelta atrás. El volcado propuesto no es
+  reabrir A6 —sería técnico, de un solo sentido y sin pantalla—, pero exige
+  decisión explícita.
+- Ocho decisiones propuestas que **no** dependen de D1–D3 quedan escritas en el
+  ADR: una sola migración v3 → v4 en vez de tres, idempotencia de compra con
+  `operation_id UNIQUE`, un solo valor nuevo en `AppArea`, archivado lógico.
+
+**Abierto / por recordar:**
+
+- El recorrido de `1.4.0+8`. Sin él A11 no cierra.
+- **El respaldo de la llave de firma sigue sin hacer.** Arrastrado desde A8 y
+  lo único irreparable del proyecto.
+- Las deudas de la tabla del relevo no se tocaron: golden
+  `sidebar_modular_battery`, columna muerta `app_settings.daily_summary`,
+  refactor aplazado.
 
 ### 2026-09-07 (sexta parte) — Puntos 3 y 4, y candidata `1.4.0+8`
 
