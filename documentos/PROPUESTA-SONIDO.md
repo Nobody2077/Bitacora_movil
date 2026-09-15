@@ -1,0 +1,233 @@
+# Propuesta — efectos de sonido
+
+- Estado: **propuesta; no implementada.** No autoriza código: quedan tres
+  decisiones abiertas para el usuario (D1, D2 y D3, al final)
+- Fecha de registro: 15 de septiembre de 2026
+- Alcance: efectos de sonido de interfaz y de recompensa dentro de la
+  aplicación. **No** cubre el sonido de las notificaciones Android, que ya
+  existe y tiene interruptor propio
+- Depende de: `DECISIONES_PRE_A0.md` §3 (dependencias fijadas), ADR-001
+  (esquema y preferencias), ADR-002 (acceso y privacidad), `ESTADO_VISUAL.md`
+- Precedencia: no altera ningún ADR. Si algún punto entrara en conflicto,
+  prevalece el ADR anterior
+
+## Contexto
+
+La aplicación es una terminal muda. La pantalla de acceso ya tiene BÚFER,
+matriz de código y una transición con barrido, códigos y estados reales
+(`AccessTerminalTransition`), pero no emite ningún sonido. La estética
+Terminal V2 y el marco RPG piden acompañamiento sonoro con más naturalidad
+que casi cualquier otra ampliación pendiente.
+
+Hay además un problema de producto que el sonido resuelve barato: **completar
+una misión hoy es un cambio de estado en una lista.** El sistema entero —XP,
+niveles, títulos, rachas— culmina en un evento que no se percibe. Un sonido de
+recompensa es la forma más económica de que ese momento se sienta ganado.
+
+Esta propuesta nace de una pregunta del usuario el 15 de septiembre de 2026:
+añadir efectos de sonido a «todo»: acceso, menús, botones y cierre de misión.
+
+## La decisión de diseño: dónde suena y dónde no
+
+**La recomendación es NO sonorizar todo**, y es el punto más importante de
+este documento.
+
+El sonido ubicuo se apaga solo. Esta no es una aplicación que se use una hora
+seguida: se abre varias veces al día para organizarse. Si suena cada botón,
+cada navegación y cada guardado, el sonido pasa de recompensa a ruido en
+pocos días y el usuario acaba desactivándolo entero, perdiendo también los
+momentos que sí valían.
+
+**El valor está en la escasez.** Cuando todo suena, nada se siente ganado,
+que es exactamente lo contrario del efecto buscado. Por eso el peso se
+concentra en los eventos raros y merecidos.
+
+### Paleta propuesta
+
+| Momento | Peso | Razón |
+| --- | --- | --- |
+| Misión completada | **Alto** — el sonido principal | Es el pago de todo el sistema de misiones |
+| Subir de nivel / ganar título | **El mayor y el más raro** | Ocurre pocas veces; debe notarse cuando ocurre |
+| Acceso concedido / denegado | Medio, dos timbres distintos | Cierra la ficción de terminal local |
+| Tecla de la matriz PIN | Muy sutil, casi un clic | Confirma el tacto sin fatigar |
+| Cronómetro iniciar / pausar | Medio | Utilidad real: confirma sin mirar la pantalla |
+| Acción crítica (archivar, anular) | Distinto y más grave | Ya son rojas; el sonido refuerza el peso |
+
+**Sin sonido, a propósito:** navegación entre módulos, menús, desplazamiento,
+filtros, guardado de formularios ordinarios, apertura de detalles y cualquier
+acción reversible y frecuente.
+
+Total: entre seis y ocho ficheros. Si la paleta crece mucho más allá, la
+propuesta ha perdido su criterio.
+
+## Restricciones de este proyecto
+
+Ocho puntos que condicionan la implementación. Casi todos derivan de
+decisiones ya tomadas; ninguno es preferencia estética.
+
+### 1. Sin paquete nuevo: puente Kotlin con SoundPool
+
+`DECISIONES_PRE_A0.md` §3 fija las dependencias de forma exacta y exige que
+toda incorporación pase por «un ADR, changelog revisado y las pruebas de la
+fase afectada en verde». Añadir `audioplayers` o `just_audio` abriría esa
+puerta a cambio de un puñado de efectos cortos.
+
+El proyecto ya tiene once puentes Kotlin (`DeviceBatteryBridge`,
+`PrivacyWindowBridge`, `MissionNotificationBridge`, `RecurrenceCivilTimeBridge`
+y el resto). `SoundPool` está diseñado exactamente para este caso —efectos
+breves, precargados, latencia baja, varios simultáneos— y un puente propio
+es pequeño, auditable y coherente con el patrón ya establecido.
+
+**Recomendación: puente propio, sin dependencia nueva.**
+
+### 2. El esquema v3 no se toca
+
+La preferencia vive en la metadata cifrada, como ya hacen `ReminderPreferences`
+(A9.1) y el resumen diario (A11). Sin migración, sin snapshot nuevo, sin
+pruebas `migrateAndValidate`.
+
+Esto no es comodidad: la próxima migración del proyecto —la v3 → v4 de
+Personajes/Tienda/Inventario— es la operación más peligrosa que tiene por
+delante, porque ADR-005 retiró la exportación y `allowBackup="false"` deja la
+base sin copia de ningún tipo. Cada cambio que **no** toca el esquema es un
+riesgo que no se acumula sobre aquel.
+
+### 3. No reutilizar `sound_enabled`
+
+`app_settings.sound_enabled` ya existe, viene sembrada en `true` desde
+ADR-001 §10, y significa **sonido de las notificaciones Android**
+(`notification_reconciliation_service.dart:189`), con interruptor propio y
+visible en Ajustes → Notificaciones
+(`notification_settings_page.dart:222`).
+
+Colgar el sonido de interfaz de esa misma preferencia repetiría exactamente
+la trampa ya anotada como deuda con la columna `app_settings.daily_summary`:
+dos cosas distintas con el mismo nombre, y un valor por defecto que activa
+algo que nadie pidió.
+
+**Clave propia, nombre propio** —del estilo `ui_sound_enabled`— y sección
+propia en Ajustes, separada de Notificaciones.
+
+### 4. Desactivado por defecto
+
+Es el criterio que el proyecto ya aplicó a capturas de pantalla, cámara al
+adjuntar y detalles en notificaciones: «las tres preferencias quedan
+desactivadas por defecto». El sonido es perceptible por terceros y debe ser
+una elección explícita, no un descubrimiento.
+
+### 5. No robar el foco de audio
+
+Es el fallo clásico de los sonidos de interfaz y arruinaría la función: si el
+efecto solicita *audio focus*, pausa la música o el pódcast del usuario cada
+vez que pulsa una tecla del PIN.
+
+- `AudioAttributes` con `USAGE_ASSISTANCE_SONIFICATION` y
+  `CONTENT_TYPE_SONIFICATION`.
+- **No** solicitar foco de audio, ni siquiera transitorio.
+- Respetar el modo silencio y vibración del teléfono.
+- Volumen propio moderado; los efectos no compiten con el contenido del
+  usuario.
+
+### 6. El sonido nunca es el único canal
+
+`ESTADO_VISUAL.md` ya impone esta disciplina al color: «todos los estados
+combinan color con texto, icono o forma». El sonido hereda la regla. Ningún
+estado, error o confirmación puede depender de que se oiga: es refuerzo
+redundante, jamás la señal única.
+
+### 7. El sonido de misión completada se dispara después del commit
+
+Regla arquitectónica 7 del proyecto: «las operaciones externas a SQLite
+ocurren después del commit». `CompleteMission` coordina misión, tiempo,
+objetivos, evento, XP, Bitácora y economía en una sola transacción. El efecto
+se emite **después** de confirmarla, igual que hoy se hace con la
+reconciliación de avisos. Nunca dentro de la transacción.
+
+### 8. Assets con licencia comprobable
+
+`ESTADO_VISUAL.md` regla 4 ya fija este criterio para las fuentes: «no añadir
+fuentes o paquetes solo para simular el diseño… hasta que se incorpore una
+licencia y assets reales». El audio sigue el mismo estándar: CC0 o comprados,
+con su procedencia registrada en este documento. Nada descargado sin licencia
+verificable.
+
+Formato OGG Vorbis mono, efectos de menos de un segundo. Ocho ficheros así
+pesan pocos KB; el tamaño del APK no es una preocupación real aquí. El
+directorio `assets/` hoy solo contiene los iconos de lanzador, así que habría
+que declarar la carpeta nueva en `pubspec.yaml`.
+
+## Accesibilidad
+
+- El interruptor de sonido es **independiente** de «reducir movimiento». Son
+  necesidades distintas y agruparlas obligaría a renunciar a una para obtener
+  la otra.
+- Los efectos no interfieren con TalkBack ni se solapan con sus anuncios.
+- Ningún efecto sustituye una etiqueta semántica existente.
+
+## Criterios de aceptación
+
+1. Con la preferencia desactivada —su estado inicial— la aplicación se
+   comporta exactamente como hoy, sin ninguna reproducción.
+2. Reproducir un efecto no pausa ni atenúa audio de otra aplicación.
+3. El teléfono en silencio no emite efectos.
+4. Ningún efecto se dispara dentro de una transacción Drift.
+5. El sonido de acceso no revela información: no distingue dígitos, ni el
+   progreso del PIN más allá de lo ya visible en el BÚFER.
+6. La paleta completa no supera los ocho efectos.
+7. `flutter analyze` limpio, matriz de pruebas en verde y un recorrido físico
+   que confirme latencia aceptable y ausencia de interferencia con música.
+
+## Fuera de alcance
+
+- El sonido de las notificaciones Android, que ya existe y se gobierna aparte.
+- Música de fondo o ambiente continuo.
+- Sonido en navegación, menús, desplazamiento y formularios ordinarios.
+- Efectos configurables o intercambiables por el usuario: la paleta es fija.
+- Cualquier recurso que exija red.
+
+## Orden y momento
+
+**No se implementa todavía**, por dos razones documentadas:
+
+1. La candidata `1.4.0+8` está construida y pendiente de recorrido físico. La
+   regla vigente es no apilar cambios sobre un APK bajo prueba: mientras
+   código y dispositivo coincidan, cada anomalía es atribuible sin ambigüedad.
+2. El post-MVP quedó acotado el 7 de septiembre de 2026 a «Personajes, Tienda
+   e Inventario, **y nada más**». El sonido no está en esa lista, así que
+   incorporarlo es una decisión consciente de ampliar el alcance, no un extra
+   que se cuela.
+
+Orden propuesto: cerrar A11 con el recorrido, cerrar A8/G8, y entonces
+decidir si este bloque va antes o después de Personajes/Tienda/Inventario.
+A favor de ponerlo antes: no toca el esquema, es de riesgo bajo y es el único
+de los dos que no depende de una migración sin red de seguridad.
+
+## Decisiones abiertas — las resuelve el usuario
+
+### D1. ¿Paleta concentrada o sonido general?
+
+Este documento recomienda la paleta corta de seis a ocho efectos, con el peso
+en misión completada y subida de nivel. La alternativa —sonorizar toda la
+interfaz, como se planteó inicialmente— es viable técnicamente, pero se
+considera peor producto por las razones de la sección «dónde suena y dónde
+no». **Queda a decisión del usuario.**
+
+### D2. ¿Un interruptor o varios?
+
+- **Uno solo** (recomendado): sonido de interfaz sí o no. Simple y coherente
+  con el resto de Ajustes.
+- **Dos**: separar los efectos de recompensa (misión, nivel, título) de los
+  de interacción (teclas, cronómetro), para poder conservar los primeros y
+  silenciar los segundos. Más control, más superficie de ajustes.
+
+### D3. ¿Cuándo entra?
+
+Antes de Personajes/Tienda/Inventario, después, o no entra. Ver «Orden y
+momento».
+
+## Qué falta para que esta propuesta pase a implementable
+
+1. Respuesta a D1, D2 y D3.
+2. Selección de los efectos concretos, con licencia verificada y su
+   procedencia anotada aquí.
+3. Recorrido físico de `1.4.0+8` cerrado y A11 en verde.

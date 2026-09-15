@@ -118,6 +118,9 @@ Orden recomendado de lectura:
 13. [`documentos/ACTUALIZACION-2026-08-29.md`](documentos/ACTUALIZACION-2026-08-29.md): planificación flexible, tablón, batería, controles y esquema v3.
 14. [`documentos/ESTADO_VISUAL.md`](documentos/ESTADO_VISUAL.md): componentes,
    reglas visuales y próxima migración de pantallas.
+15. [`documentos/PROPUESTA-SONIDO.md`](documentos/PROPUESTA-SONIDO.md): propuesta
+   de efectos de sonido, sin implementar; decisiones abiertas y las
+   restricciones que impone el proyecto.
 
 Cuando un documento fuente contradiga una decisión posterior, prevalecen `DECISIONES_PRE_A0.md` y los ADR aplicables.
 
