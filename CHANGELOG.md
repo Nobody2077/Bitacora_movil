@@ -25,8 +25,14 @@
 
 - El mensaje de los avisos que no muestran el título se puede cambiar en
   Ajustes → Notificaciones. Antes estaba fijo en el código.
-- El texto se resuelve en la aplicación y viaja hasta la alarma, así que se
-  respeta también en los avisos repuestos tras un reinicio.
+- El texto se resuelve en la aplicación y viaja ya cocinado hasta la alarma,
+  de modo que el receiver no necesita abrir la base cifrada para escribirlo.
+- **Tras reiniciar el teléfono, el texto propio no se conserva.** El espejo de
+  arranque guarda solo seis campos y ninguno es el mensaje, así que los avisos
+  repuestos usan el texto genérico fijo hasta que se abre la aplicación y se
+  reprograman completos. El resumen diario repuesto dice «Abre Bitácora para
+  ver tu resumen de hoy.». Es la misma degradación consciente que 1.3.0 ya
+  documentó para el título de la misión.
 
 ## 1.3.0 — candidata `1.3.0+7`
 
