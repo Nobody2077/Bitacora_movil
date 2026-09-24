@@ -34,6 +34,32 @@
   ver tu resumen de hoy.». Es la misma degradación consciente que 1.3.0 ya
   documentó para el título de la misión.
 
+### Calidad
+
+- `flutter analyze` sin problemas y **238/238 pruebas aprobadas**, siete de
+  ellas nuevas sobre el resumen, el vencimiento y el texto.
+- **Validada en dispositivo el 23 de septiembre de 2026.** El recorrido cubrió
+  el resumen diario, el texto configurable, el aviso de vencimiento y la
+  regresión del reinicio. Sin incidencias: A11 queda cerrada y G9 con ella.
+- El golden `sidebar_modular_battery` **ya no falla**. La causa no era el
+  antialiasing que se sospechaba: `matchesGoldenFile` sobre un `Finder` captura
+  el `RepaintBoundary` más cercano, y `TerminalSidebar` no tenía ninguno, así
+  que fotografiaba la pantalla entera con la fecha de hoy dentro. Fallaba todos
+  los días salvo el de su regeneración, y el tamaño del diff seguía a la
+  longitud del nombre del día: 0,26 % el 15 de septiembre, 0,45 % el 23. Se
+  añadió un `RepaintBoundary` a la barra lateral —que además no necesita
+  repintarse cuando cambia el módulo abierto— y el golden pasa a capturar sus
+  248 px y nada más.
+- APK `prodRelease` firmada `1.4.0+8`: 72.905.847 bytes, firma v2 válida con el
+  certificado permanente `a6092c6c…16b8`, sin permiso `INTERNET`; SHA-256
+  `c49550f3eeebe628671641f1b4514c45949ea89f6e032e2523febcb305bbf9ed`.
+- Ese hash corresponde a la recompilación del 15 de septiembre de 2026 sobre el
+  mismo código, no al artefacto original del 7 de septiembre, cuyo hash no se
+  llegó a registrar. Las compilaciones de Flutter no son reproducibles bit a
+  bit —llevan marcas de tiempo y valores de firma distintos en cada pasada—,
+  así que el tamaño coincide pero el hash no. El certificado sí es el mismo, de
+  modo que ambas se instalan indistintamente sobre `1.3.0+7`.
+
 ## 1.3.0 — candidata `1.3.0+7`
 
 ### Notificaciones que sobreviven al reinicio

@@ -1,21 +1,24 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **13 de septiembre de 2026**
-- Versión en `pubspec.yaml`: **`1.4.0+8`**, compilada y firmada, **pendiente de
-  recorrido físico**
-- Última versión aprobada en dispositivo: `1.3.0+7`
+- Última revisión: **23 de septiembre de 2026**
+- Versión en `pubspec.yaml`: **`1.4.0+8`**, compilada, firmada y **aprobada en
+  dispositivo**
+- Última versión aprobada en dispositivo: `1.4.0+8`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
-- En curso: **A11 — Notificaciones**, completa en código, a falta de validar los
-  puntos 2, 3 y 4
+- Rama de trabajo: `main`, con cambios locales sin subir
+- **A11 — Notificaciones: COMPLETADA** el 23 de septiembre de 2026. El recorrido
+  físico de `1.4.0+8` salió sin incidencias, así que los puntos 2, 3 y 4 quedan
+  validados y **G9 cierra con ella**
+- En curso: **A8 — Release**, cerrar G8
 
 > **Si retomas el proyecto, salta a "RELEVO — empezar aquí la próxima
 > sesión"**. Dice dónde quedamos, qué está decidido, qué falta y cómo hacerlo,
 > incluido el punto de partida de Personajes/Tienda/Inventario. Lo demás es
 > historia de referencia.
 >
-> **Lo primero es preguntar al usuario si hizo el recorrido de `1.4.0+8` y qué
-> pasó.** La sesión se cerró con el APK construido y sin instalar.
+> **Lo primero es leer «A8 / G8: qué falta de verdad»**, dentro del RELEVO.
+> A11 ya está cerrada; el trabajo abierto es G8 y está bloqueado por cosas
+> concretas, no por código.
 
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
@@ -100,14 +103,77 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   estado propuesto. El ADR documenta que el nivel se deriva de `SUM(amount)`
   sobre `xp_transactions` sin filtrar, así que gastar XP de ese libro bajaría
   el nivel al comprar, y deja tres decisiones al usuario (D1 con qué se paga,
-  D2 volcado cifrado antes de migrar, D3 una ficha o varias). `1.4.0+8` sigue
-  esperando recorrido físico.
+  D2 volcado cifrado antes de migrar, D3 una ficha o varias).
+- Sesión del **23 de septiembre de 2026**: el recorrido físico de `1.4.0+8`
+  salió sin incidencias, así que **A11 queda cerrada y G9 con ella**. El golden
+  `sidebar_modular_battery` se resolvió en origen —capturaba la pantalla entera
+  con la fecha de hoy dentro, no era antialiasing— y la matriz sube a
+  **238 pruebas**. Al abrir A8 se descubrió que el gate G8 llevaba inejecutable
+  desde agosto por tres motivos ya corregidos; **el preflight pasa entero por
+  primera vez**. G8 sigue rojo solo por falta de dispositivo.
 
 ## Bitácora de sesiones
 
 Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
+
+### 2026-09-23 — A11 cerrada, el golden resuelto y el gate G8 desbloqueado
+
+**A11 y G9 cerradas.** El usuario confirmó que el recorrido físico de
+`1.4.0+8` salió sin incidencias. Los cuatro puntos quedan validados en
+dispositivo y `ESTADO_FASES.md` los marca con fecha. A9 cierra con A11, porque
+su propia puerta decía que G9 no se cerraba hasta que A11 estuviera verde.
+
+**El golden `sidebar_modular_battery` no fallaba por antialiasing.** El relevo
+lo arrastraba como deuda «preexistente» desde el 15 de septiembre, con la
+hipótesis del antialiasing y la recomendación de decidir si regenerarlo. La
+causa real es otra: `matchesGoldenFile` aplicado a un `Finder` no captura ese
+widget, sino el `RepaintBoundary` más cercano hacia arriba. `TerminalSidebar`
+no tenía ninguno, así que la captura subía hasta la raíz y fotografiaba la
+pantalla entera —incluido el navegador de día de Bitácora, que imprime la fecha
+de hoy—. El test fallaba **todos los días salvo el de su regeneración**, y el
+tamaño del diff seguía a la longitud del nombre del día: 0,26 % / 2676 px el 15
+de septiembre, 0,45 % / 4644 px el 23. Regenerarlo lo habría dejado verde un
+solo día.
+
+Se confirmó midiendo: dos pasadas consecutivas dieron cifras idénticas —luego
+no era ruido de renderizado— y un volcado temporal de los `Text` de esa banda
+imprimió `miércoles, 23 de septiembre de 2026` justo en la fila que cambiaba.
+
+La corrección es un `RepaintBoundary` en `TerminalSidebar`. Acota la captura a
+los 248 px de la barra, que es lo que el test dice medir, y de paso evita que
+la barra se repinte cuando cambia el módulo abierto, cosa que no necesita.
+Golden regenerado y matriz en **238/238**.
+
+**El gate G8 llevaba inejecutable desde agosto.** Al ir a cerrar A8 salió que
+`tool/a8_preflight.ps1` no podía completarse por tres motivos independientes:
+
+1. `flutter test` estaba rojo por el golden, y `quality.ps1` aborta con eso.
+2. La aserción del esquema estaba fijada a `schemaVersion => 1`, escrita en
+   agosto. El esquema va por **v3** desde A10, así que el preflight moría en su
+   primera comprobación. Se cambió por una que lee la versión declarada y exige
+   que exista `drift_schemas/drift_schema_v<N>.json`: así no vuelve a quedarse
+   atrás en la próxima migración.
+3. El barrido de `print`/`debugPrint` invocaba `rg`, que no está en el PATH de
+   PowerShell. Sustituido por `Select-String`.
+
+También se corrigió `gate_g8.ps1`, que escribía `schemaVersion = 1` fijo en el
+manifiesto de evidencia; ahora lo lee del código.
+
+Con eso, **el preflight pasa entero por primera vez**: formato, `build_runner`,
+`analyze`, 238/238 pruebas, registro de plugins y `:app:lintProdRelease` con
+`BUILD SUCCESSFUL` en 2 m 23 s.
+
+**Lo que quedó abierto.** G8 sigue rojo por una sola razón, y no es de código:
+no hay dispositivo. `adb devices` salió vacío y el usuario no podía conectar
+ese día. Falta también el AAB de `1.4.0+8`, que saldrá de la misma pasada del
+gate.
+
+**Decisión tomada:** el criterio de los dos factores de forma **se mantiene sin
+acotar**. Se planteó rebajarlo a un solo factor o cubrir la tablet con un AVD,
+y el usuario respondió que **tiene tablet real**, así que G8 se cerrará tal como
+está escrito.
 
 ### 2026-09-13 — Sincronización con GitHub y apertura del ADR-006
 
@@ -677,35 +743,83 @@ esquema (v3 → v4) o usar un identificador sintético.
 
 ---
 
-## RELEVO — empezar aquí la próxima sesión (reescrito el 2026-09-07)
+## RELEVO — empezar aquí la próxima sesión (reescrito el 2026-09-23)
 
 Lee esta sección entera antes de tocar nada. Dice dónde quedamos, qué está
 decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
 ### Estado en una línea
 
-**A11 (Notificaciones) está completa en código: los cuatro puntos
-implementados.** El punto 1 ya se validó en dispositivo. Los puntos 2, 3 y 4
-esperan el recorrido físico de la candidata **`1.4.0+8`**, ya compilada, firmada
-y verificada, que está en `build/app/outputs/flutter-apk/app-prod-release.apk`.
-Árbol limpio y **sincronizado con `origin/main`**: los siete commits de A11 ya
-están subidos (verificado el 2026-09-13).
+**A11 está CERRADA y G9 con ella.** El recorrido físico de `1.4.0+8` salió sin
+incidencias el 23 de septiembre de 2026. Lo único abierto del MVP es **A8/G8**,
+y su preflight ya está verde: **falta exclusivamente un dispositivo conectado
+por ADB**. Hay cambios locales sin commitear (ver «Qué hay sin subir»).
 
-### Lo primero al retomar: preguntar por el recorrido
+### Qué hay sin subir
 
-La sesión se cerró con la candidata construida y **sin instalar**. Antes de
-escribir una sola línea, pregunta al usuario si llegó a hacer el recorrido de
-`1.4.0+8` y qué pasó. De su respuesta salen dos caminos:
+Al cierre del 23 de septiembre de 2026 la rama `main` tiene ocho ficheros
+modificados **sin commitear**, a la espera de que el usuario decida:
 
-- **Si el recorrido fue bien:** cerrar A11 en `ESTADO_FASES.md`, marcar los
-  puntos 2, 3 y 4 como COMPLETADOS con la fecha, y pasar a «Qué viene después».
-- **Si algo falló:** corregir eso primero. No abrir nada nuevo encima.
-- **Si no lo hizo:** el APK sigue válido; se le recuerdan los cinco pasos de
-  abajo.
+| Fichero | Qué cambió |
+| --- | --- |
+| `lib/shared/adaptive/terminal_sidebar.dart` | `RepaintBoundary` que arregla el golden. **Es el único cambio de producción.** |
+| `test/app/goldens/sidebar_modular_battery.png` | Golden regenerado: 248 px de barra en vez de la pantalla entera |
+| `tool/a8_preflight.ps1` | Aserción de esquema version-agnóstica y `rg` sustituido por `Select-String` |
+| `tool/gate_g8.ps1` | El manifiesto de evidencia ya no fija `schemaVersion = 1` |
+| `documentos/ESTADO_FASES.md` | A11 y A9 cerradas con fecha |
+| `documentos/A8-VALIDACION-RELEASE.md` | Tabla de bloqueos reales de G8 y la decisión de la tablet |
+| `ESTADO_ACTUAL.md` | Este relevo y la entrada de sesión |
+| `CHANGELOG.md` | Sección «Calidad» de 1.4.0, que ya venía sin commitear del 15 de septiembre |
 
-### El recorrido pendiente de `1.4.0+8`
+### A8 / G8: qué falta de verdad
 
-Instalar **encima** de `1.3.0+7`. **Nunca desinstalar** (ver «Reglas»).
+El 23 de septiembre de 2026 se desbloqueó el gate, que llevaba inejecutable
+desde agosto sin que nadie lo supiera. Tres cosas lo impedían y las tres están
+arregladas:
+
+1. **`flutter test` estaba rojo** por el golden `sidebar_modular_battery`, así
+   que `quality.ps1` abortaba y el preflight nunca pasaba de ahí. Resuelto: ver
+   la tabla de deudas.
+2. **`a8_preflight.ps1` exigía `schemaVersion => 1`.** La aserción se escribió
+   en agosto y el esquema va por **v3** desde A10, así que fallaba en su primera
+   comprobación. Ahora lee la versión declarada y exige que exista su snapshot
+   en `drift_schemas/drift_schema_v<N>.json`, de modo que no vuelva a quedarse
+   atrás en la próxima migración.
+3. **El barrido de `print`/`debugPrint` invocaba `rg`**, que no está en el PATH
+   de PowerShell. Sustituido por `Select-String`, sin herramientas externas.
+
+Con eso, `tool/a8_preflight.ps1` pasa entero: formato, `build_runner`,
+`analyze`, **238/238 pruebas**, registro de plugins y `:app:lintProdRelease`
+con `BUILD SUCCESSFUL`.
+
+**Lo que queda es material, no de código:**
+
+- **Un dispositivo por ADB.** El 23 de septiembre `adb devices` salió vacío y el
+  usuario no podía conectar ese día. El documento de A8 ya arrastraba que el
+  USB no está disponible, así que la vía probable es ADB inalámbrico. Sin
+  dispositivo no hay métricas, ni pruebas de integración, ni smoke.
+- **Los dos factores de forma se mantienen.** El usuario confirmó el 23 de
+  septiembre de 2026 que **tiene tablet real**, así que el criterio de cierre no
+  se acota ni se sustituye por un emulador.
+- **El AAB de `1.4.0+8` todavía no existe.** Solo está la APK. El gate
+  construye y verifica ambos, así que saldrá de la misma pasada.
+- **El respaldo de la llave sigue pendiente** y es lo único irreparable.
+
+Cuando haya dispositivo, el paso es uno solo, por cada equipo:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tool/gate_g8.ps1 -DeviceId <serial-adb>
+```
+
+Cuidado antes de lanzarlo: el gate instala el flavor `dev` para las pruebas de
+integración —eso es seguro, va con sufijo `.dev` y datos propios— y después hace
+`adb install -r` de la release sobre la instalación real. Eso último solo es
+seguro porque la llave es la misma; **nunca desinstalar** (ver «Reglas»).
+
+### El recorrido de `1.4.0+8`, ya HECHO el 2026-09-23
+
+Se conserva porque describe qué se validó exactamente. Se instaló **encima** de
+`1.3.0+7`, sin desinstalar, y los cinco pasos salieron correctos.
 
 1. Datos intactos: misiones, bitácora, economía.
 2. **Resumen diario:** Ajustes → Notificaciones → activar «Resumen diario» y
@@ -724,11 +838,18 @@ Instalar **encima** de `1.3.0+7`. **Nunca desinstalar** (ver «Reglas»).
 ### Lo que el usuario debe hacer (pendiente de su lado)
 
 1. **Respaldar la llave de firma. Es lo único irreparable del proyecto.**
-   Copiar `android/signing.properties` y el `.jks` al que apunta a dos sitios
-   fuera del PC. Si se pierde, no se podrá volver a actualizar la aplicación
-   nunca: la única salida sería desinstalar, que borra todos los datos.
-   `ESTADO_ACTUAL.md` lo arrastra como pendiente desde A8.
-2. El recorrido de `1.4.0+8` (arriba).
+   Son **dos ficheros en dos sitios distintos**, y hacen falta los dos:
+   - `android/signing.properties`, dentro del repositorio pero ignorado por
+     git, que contiene las contraseñas.
+   - `C:\Users\Usuario\.android\bitacora-rpg-release.jks` (4.460 bytes), que
+     es a donde apunta `storeFile`.
+
+   Copiar ambos a dos sitios fuera del PC. Si se pierden, no se podrá volver a
+   actualizar la aplicación nunca: la única salida sería desinstalar, que borra
+   todos los datos **y las claves de AndroidKeyStore que los descifran**.
+   Se arrastra como pendiente desde A8.
+2. **Conectar un dispositivo por ADB** para poder cerrar G8. El 23 de
+   septiembre de 2026 no fue posible. Es lo único que bloquea el MVP.
 3. Opcional: activar «Include private contributions on my profile» en
    <https://github.com/settings/profile>. **El usuario lo dejó apagado el
    2026-09-07 creyendo que haría público el repositorio; no es así:** solo hace
@@ -737,13 +858,10 @@ Instalar **encima** de `1.3.0+7`. **Nunca desinstalar** (ver «Reglas»).
 
 ### Qué viene después, en orden
 
-**1. Cerrar A11** con el recorrido de arriba.
+**1. Cerrar A8 / G8.** Es lo único abierto del MVP. Ver «A8 / G8: qué falta de
+verdad» arriba: el preflight está verde y solo falta el dispositivo.
 
-**2. Cerrar A8 / G8.** `documentos/A8-VALIDACION-RELEASE.md` dice «métricas
-pendientes, G8 permanece rojo». Necesita el recorrido en dos factores de forma
-y las métricas cifradas. Es trabajo acotado, sin diseño de por medio.
-
-**3. Personajes, Tienda e Inventario.** Solo después de 1 y 2. Alcance acotado
+**2. Personajes, Tienda e Inventario.** Solo después de 1. Alcance acotado
 por el usuario el 2026-09-07 en `DECISIONES_PRE_A0.md`: **esos tres y nada
 más**; loadouts, servidor y sincronización quedan **descartados**, no aplazados.
 
@@ -813,7 +931,7 @@ perder meses de bitácora. **Planteárselo al usuario antes de empezar.**
 
 | Deuda | Estado | Qué hacer |
 |---|---|---|
-| Golden `sidebar_modular_battery` falla (0,26 %, 2676 px) | **Preexistente**, comprobado con `git stash`: falla igual sin los cambios de esta sesión | Decidir con el usuario si se regenera el golden o se investiga el antialiasing. No se tocó a propósito. |
+| Golden `sidebar_modular_battery` falla | **RESUELTA** el 23 de septiembre de 2026 | No era antialiasing. `matchesGoldenFile` sobre un `Finder` captura el `RepaintBoundary` más cercano, y `TerminalSidebar` no tenía ninguno: fotografiaba la pantalla entera, con la fecha de hoy dentro. Por eso fallaba **todos los días salvo el de su regeneración**, y el diff crecía o menguaba con la longitud del nombre del día (0,26 % el 15 de septiembre, 0,45 % el 23). Se añadió `RepaintBoundary` en `TerminalSidebar` y se regeneró: ahora captura los 248 px de la barra y nada más. |
 | Columna muerta `app_settings.daily_summary` | Mapeada y expuesta en `AppPreferences`, **no decide nada** | O se cablea o se retira. **No** se reutilizó como interruptor del resumen porque su valor por defecto es verdadero y lo habría activado a todo el mundo sin pedirlo. Tener dos cosas llamadas «resumen diario» confunde. |
 | Descubrimiento al crear misiones | **No es tarea**: el usuario decidió conservar la disposición actual | Reabrir solo si él lo pide. Detalle en la entrada del 2026-09-06. |
 | Refactor aplazado hace varias sesiones | Sigue aplazado | Estaba condicionado a cerrar los cambios funcionales en curso. Con A11 cerrada, se puede replantear. |

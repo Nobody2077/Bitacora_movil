@@ -1,6 +1,23 @@
-# A8 — validación de release 1.0.0
+# A8 — validación de release
 
-Estado: instalación limpia y actualización aprobadas; métricas pendientes. G8 permanece rojo.
+- Candidata bajo validación: **`1.4.0+8`**, aprobada en dispositivo el 23 de
+  septiembre de 2026 (recorrido de A11).
+- Estado: instalación limpia y actualización aprobadas desde `1.0.0`; **métricas
+  pendientes**. **G8 permanece rojo.**
+- Revisado el 23 de septiembre de 2026.
+
+## Qué bloquea G8 hoy, en concreto
+
+| Bloqueo | Estado | Qué hace falta |
+| --- | --- | --- |
+| Preflight completo (`a8_preflight.ps1`) | **VERDE** el 23 de septiembre de 2026 | Pasa entero por primera vez: formato, `build_runner`, `analyze`, 238/238 pruebas, registro de plugins y `:app:lintProdRelease` con `BUILD SUCCESSFUL`. Hasta hoy moría en su primera aserción, así que el gate nunca se había ejecutado |
+| Matriz de calidad | **RESUELTO** el 23 de septiembre de 2026 | `flutter test` estaba rojo por el golden `sidebar_modular_battery`, así que `quality.ps1` abortaba el preflight y el gate nunca llegaba a correr. Ya son 238/238 |
+| `a8_preflight.ps1` exigía esquema v1 | **RESUELTO** el 23 de septiembre de 2026 | La aserción estaba fijada a `schemaVersion => 1` desde agosto; el esquema va por v3 desde A10, así que el preflight fallaba en su primera comprobación. Ahora lee la versión declarada y exige que exista `drift_schemas/drift_schema_v<N>.json` |
+| El preflight dependía de `rg` | **RESUELTO** el 23 de septiembre de 2026 | ripgrep no está en el PATH de PowerShell. El barrido de `print`/`debugPrint` usa ahora `Select-String`, sin herramientas externas |
+| Dispositivo accesible por ADB | **PENDIENTE — es el único bloqueo real que queda** | El 23 de septiembre de 2026 `adb devices` salió vacío y el usuario no podía conectar ese día. Sin dispositivo no hay métricas, ni pruebas de integración, ni smoke de instalación |
+| Segundo factor de forma (tablet) | **DECIDIDO** el 23 de septiembre de 2026 | El usuario tiene **tablet real**. El criterio de cierre se mantiene tal como está escrito: teléfono y tablet, ambos físicos. No se acota ni se sustituye por un emulador |
+| AAB firmado de `1.4.0+8` | **PENDIENTE** | Solo existe la APK. El gate construye y verifica ambos |
+| Respaldo externo de la llave de firma | **PENDIENTE, del usuario** | Es lo único irreparable del proyecto |
 
 ## Precaución de datos y firma
 
@@ -20,6 +37,9 @@ limpio dedicado. No desinstalar la instalación de uso real.
 4. Registrar modelo, versión Android, ABI y serial ADB de cada equipo.
 
 ## Gate automatizado
+
+El preflight que abre el gate está verde desde el 23 de septiembre de 2026 y no
+necesita dispositivo. Lo que sigue sí: es el único paso que falta.
 
 Ejecutar en cada dispositivo objetivo:
 

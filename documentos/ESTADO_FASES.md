@@ -1,6 +1,6 @@
 # Bitácora RPG Personal — estado de fases
 
-Última actualización: 7 de septiembre de 2026
+Última actualización: 23 de septiembre de 2026
 
 Este registro informa el avance; las decisiones de alcance y arquitectura viven en `DECISIONES_PRE_A0.md`. Una fase solo cambia a **completada** cuando toda su puerta de salida está en verde.
 
@@ -15,9 +15,9 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
 | A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
-| A9 — Calendario y recordatorios | **PARCIAL** | El calendario y las recurrencias quedaron aprobados físicamente con `1.2.1+6` el 6 de septiembre de 2026. Los recordatorios se separaron a A11 y siguen abiertos: G9 no se cierra hasta que A11 esté verde |
+| A9 — Calendario y recordatorios | **COMPLETADA** | G9 verde el 23 de septiembre de 2026. El calendario y las recurrencias se aprobaron físicamente con `1.2.1+6` el 6 de septiembre de 2026; los recordatorios, separados a A11, cerraron con el recorrido de `1.4.0+8` |
 | A10 — Tablón de misiones | **COMPLETADA** | Recorrido físico de `1.2.1+6` cerrado y aprobado por el usuario el 6 de septiembre de 2026 |
-| A11 — Notificaciones | **EN PROGRESO** | Punto 1 validado con `1.3.0+7`; puntos 2, 3 y 4 implementados y a validar juntos con `1.4.0+8` |
+| A11 — Notificaciones | **COMPLETADA** | Los cuatro puntos validados en dispositivo: el 1 con `1.3.0+7` el 7 de septiembre de 2026; los 2, 3 y 4 con `1.4.0+8` el 23 de septiembre de 2026 |
 
 ## A11 — Notificaciones: los cuatro puntos pactados
 
@@ -26,9 +26,9 @@ Orden acordado con el usuario. Cada punto se cierra antes de abrir el siguiente.
 | Punto | Estado | Detalle |
 | --- | --- | --- |
 | 1. Reponer alarmas tras reinicio | **COMPLETADO** | `RECEIVE_BOOT_COMPLETED`, `BootAlarmRestoreReceiver` y espejo cifrado fuera de la base (Opción A). Validado en dispositivo el 7 de septiembre de 2026 con `1.3.0+7`: misión a las 10:00, reinicio a las 9:30, aviso recibido a las ~9:47 sin abrir la aplicación, y con texto genérico pese a tener «mostrar detalles» activado |
-| 2. Resumen diario configurable | **IMPLEMENTADO, SIN VALIDAR** | Vive fuera de `notification_schedules`, en las preferencias cifradas de A9.1. El esquema v3 no se toca. Interruptor y hora propios en Ajustes; recuento precalculado con la app desbloqueada. 230 pruebas verdes |
-| 3. Aviso de vencimiento | **IMPLEMENTADO, SIN VALIDAR** | Usa `CRITICAL`, que el `CHECK` ya admitía: sin migración. Solo para misiones con hora y vencimiento real; las de solo fecha se excluyen porque su `expiresAt` es el final del día |
-| 4. Texto personalizable | **IMPLEMENTADO, SIN VALIDAR** | El texto se cocina en Dart y viaja por el canal; configurable en Ajustes. La constante de Kotlin queda como red de seguridad |
+| 2. Resumen diario configurable | **COMPLETADO** | Vive fuera de `notification_schedules`, en las preferencias cifradas de A9.1. El esquema v3 no se toca. Interruptor y hora propios en Ajustes; recuento precalculado con la app desbloqueada. 230 pruebas verdes. Validado en dispositivo el 23 de septiembre de 2026 con `1.4.0+8`, incluida la regresión del punto 1: tras reiniciar el teléfono el resumen sigue llegando, con el texto genérico en lugar del recuento, porque el recuento no vive en el espejo |
+| 3. Aviso de vencimiento | **COMPLETADO** | Usa `CRITICAL`, que el `CHECK` ya admitía: sin migración. Solo para misiones con hora y vencimiento real; las de solo fecha se excluyen porque su `expiresAt` es el final del día. Validado en dispositivo el 23 de septiembre de 2026 con `1.4.0+8`: una misión con hora y vencimiento cercano emite los dos avisos, inicio y plazo |
+| 4. Texto personalizable | **COMPLETADO** | El texto se cocina en Dart y viaja por el canal; configurable en Ajustes. La constante de Kotlin queda como red de seguridad. Validado en dispositivo el 23 de septiembre de 2026 con `1.4.0+8`: con «mostrar detalles» apagado, el aviso usa el texto configurado |
 
 **Restricciones que no se negocian en A11:**
 
@@ -46,7 +46,7 @@ No se abre hasta cerrar A11 y A8. Cuando se abra necesitará su propio ADR: no h
 
 | Orden | Qué | Estado | Bloquea |
 | --- | --- | --- | --- |
-| 1 | **Recorrido físico de `1.4.0+8`** (puntos 2, 3 y 4 de A11) | APK compilada, firmada y verificada; sin instalar | Cerrar A11 |
+| 1 | **Recorrido físico de `1.4.0+8`** (puntos 2, 3 y 4 de A11) | **HECHO** el 23 de septiembre de 2026, sin incidencias | Nada: cerró A11 y con ella G9 |
 | 2 | **Respaldo externo de la llave de firma** | Pendiente desde A8 | Nada técnicamente, pero es lo único irreparable: sin la llave no hay más actualizaciones y la única salida sería desinstalar, que borra los datos |
 | 3 | **Métricas cifradas y G8** | Pendiente | Cerrar A8 |
 | 4 | **Personajes, Tienda e Inventario** | Sin diseñar; exige ADR propio | Es post-MVP: no se abre antes de 1 y 3 |
