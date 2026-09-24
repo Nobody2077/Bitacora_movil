@@ -62,64 +62,69 @@ class TerminalSidebar extends StatelessWidget {
       context,
     ).extension<AppThemeTokens>()!;
     final double width = extended ? 248 : 84;
-    return Material(
-      color: tokens.surfaceLow,
-      child: SizedBox(
-        width: width,
-        child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  TerminalSpace.md,
-                  TerminalSpace.lg,
-                  TerminalSpace.md,
-                  TerminalSpace.md,
-                ),
-                child: _TerminalProfileHeader(
-                  extended: extended,
-                  displayName: displayName,
-                  avatarPath: avatarPath,
-                  missionVitals: missionVitals,
-                  batteryLevel: batteryLevel,
-                  onPressed: onProfilePressed,
-                ),
-              ),
-              TerminalDivider(
-                key: const ValueKey<String>('sidebar-profile-divider'),
-                indent: TerminalSpace.sm,
-                endIndent: TerminalSpace.sm,
-                color: tokens.structuralRed,
-              ),
-              const SizedBox(height: TerminalSpace.sm),
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: TerminalSpace.sm,
-                  ),
-                  itemCount: _items.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final _TerminalNavigationItem item = _items[index];
-                    return _SidebarDestination(
-                      item: item,
-                      extended: extended,
-                      selected: index == selectedIndex,
-                      onTap: () => onSelected(index),
-                    );
-                  },
-                ),
-              ),
-              if (extended)
+    // La barra lateral se repinta por su cuenta: su contenido no depende del
+    // módulo abierto. El límite además acota la captura de los goldens a la
+    // propia barra, en lugar de arrastrar la pantalla entera.
+    return RepaintBoundary(
+      child: Material(
+        color: tokens.surfaceLow,
+        child: SizedBox(
+          width: width,
+          child: SafeArea(
+            child: Column(
+              children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
-                    TerminalSpace.sm,
-                    TerminalSpace.xs,
-                    TerminalSpace.sm,
-                    0,
+                    TerminalSpace.md,
+                    TerminalSpace.lg,
+                    TerminalSpace.md,
+                    TerminalSpace.md,
                   ),
-                  child: _GlobalLevelPanel(level: globalLevel),
+                  child: _TerminalProfileHeader(
+                    extended: extended,
+                    displayName: displayName,
+                    avatarPath: avatarPath,
+                    missionVitals: missionVitals,
+                    batteryLevel: batteryLevel,
+                    onPressed: onProfilePressed,
+                  ),
                 ),
-            ],
+                TerminalDivider(
+                  key: const ValueKey<String>('sidebar-profile-divider'),
+                  indent: TerminalSpace.sm,
+                  endIndent: TerminalSpace.sm,
+                  color: tokens.structuralRed,
+                ),
+                const SizedBox(height: TerminalSpace.sm),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: TerminalSpace.sm,
+                    ),
+                    itemCount: _items.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final _TerminalNavigationItem item = _items[index];
+                      return _SidebarDestination(
+                        item: item,
+                        extended: extended,
+                        selected: index == selectedIndex,
+                        onTap: () => onSelected(index),
+                      );
+                    },
+                  ),
+                ),
+                if (extended)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TerminalSpace.sm,
+                      TerminalSpace.xs,
+                      TerminalSpace.sm,
+                      0,
+                    ),
+                    child: _GlobalLevelPanel(level: globalLevel),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
