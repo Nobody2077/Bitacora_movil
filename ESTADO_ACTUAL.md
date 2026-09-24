@@ -5,7 +5,7 @@
   dispositivo**
 - Última versión aprobada en dispositivo: `1.4.0+8`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`, con cambios locales sin subir
+- Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
 - **A11 — Notificaciones: COMPLETADA** el 23 de septiembre de 2026. El recorrido
   físico de `1.4.0+8` salió sin incidencias, así que los puntos 2, 3 y 4 quedan
   validados y **G9 cierra con ella**
@@ -164,6 +164,10 @@ manifiesto de evidencia; ahora lo lee del código.
 Con eso, **el preflight pasa entero por primera vez**: formato, `build_runner`,
 `analyze`, 238/238 pruebas, registro de plugins y `:app:lintProdRelease` con
 `BUILD SUCCESSFUL` en 2 m 23 s.
+
+**Todo subido.** Tres commits en `origin/main`, de `e8e4b3a` a `f16e1e1`. Se
+arrastraba además la sección «Calidad» del `CHANGELOG.md` sin commitear desde
+el 15 de septiembre; va incluida.
 
 **Lo que quedó abierto.** G8 sigue rojo por una sola razón, y no es de código:
 no hay dispositivo. `adb devices` salió vacío y el usuario no podía conectar
@@ -753,12 +757,17 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 **A11 está CERRADA y G9 con ella.** El recorrido físico de `1.4.0+8` salió sin
 incidencias el 23 de septiembre de 2026. Lo único abierto del MVP es **A8/G8**,
 y su preflight ya está verde: **falta exclusivamente un dispositivo conectado
-por ADB**. Hay cambios locales sin commitear (ver «Qué hay sin subir»).
+por ADB**. Árbol limpio y sincronizado con `origin/main`.
 
-### Qué hay sin subir
+### Qué se subió el 2026-09-23
 
-Al cierre del 23 de septiembre de 2026 la rama `main` tiene ocho ficheros
-modificados **sin commitear**, a la espera de que el usuario decida:
+Tres commits en `origin/main`, de `e8e4b3a` a `f16e1e1`:
+
+- `e8e4b3a fix(goldens)` — el `RepaintBoundary` y el golden regenerado.
+- `002eb58 fix(gate)` — el preflight de A8 desbloqueado.
+- `f16e1e1 docs` — cierre de A11 y estado real de G8.
+
+Reparto por fichero:
 
 | Fichero | Qué cambió |
 | --- | --- |
@@ -769,7 +778,7 @@ modificados **sin commitear**, a la espera de que el usuario decida:
 | `documentos/ESTADO_FASES.md` | A11 y A9 cerradas con fecha |
 | `documentos/A8-VALIDACION-RELEASE.md` | Tabla de bloqueos reales de G8 y la decisión de la tablet |
 | `ESTADO_ACTUAL.md` | Este relevo y la entrada de sesión |
-| `CHANGELOG.md` | Sección «Calidad» de 1.4.0, que ya venía sin commitear del 15 de septiembre |
+| `CHANGELOG.md` | Sección «Calidad» de 1.4.0, que venía sin commitear del 15 de septiembre y se sube ahora |
 
 ### A8 / G8: qué falta de verdad
 
