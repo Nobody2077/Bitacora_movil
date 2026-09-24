@@ -40,12 +40,20 @@ try {
     Write-Host 'A8 preflight: version, schema and Android hardening...'
     Assert-TextContains -Path 'pubspec.yaml' -Pattern '^version:\s+\d+\.\d+\.\d+\+\d+$' `
         -FailureMessage 'pubspec.yaml must declare a semantic Android release version.'
-    Assert-TextContains -Path 'lib/infrastructure/database/app_database.dart' `
-        -Pattern 'schemaVersion\s*=>\s*1' `
-        -FailureMessage 'The release must keep the explicit Drift schema version.'
+    $schemaMatch = Select-String -LiteralPath 'lib/infrastructure/database/app_database.dart' `
+        -Pattern 'int get schemaVersion => (\d+);' | Select-Object -First 1
+    if (-not $schemaMatch) {
+        throw 'The release must declare an explicit Drift schema version.'
+    }
+    $schemaVersion = [int]$schemaMatch.Matches[0].Groups[1].Value
+    $schemaSnapshot = "drift_schemas/drift_schema_v$schemaVersion.json"
+    if (-not (Test-Path -LiteralPath $schemaSnapshot -PathType Leaf)) {
+        throw "Declared schema version $schemaVersion has no snapshot at $schemaSnapshot."
+    }
+    Write-Host "A8 preflight: Drift schema version $schemaVersion has a snapshot."
     Assert-TextContains -Path 'lib/infrastructure/database/default_seed_v1.dart' `
         -Pattern "'schema_version',\s*'1'" `
-        -FailureMessage 'The schema metadata mirror is not version 1.'
+        -FailureMessage 'default_seed_v1 must insert schema_version 1 as the initial mirror value; AppDatabase raises it to the current schemaVersion afterwards.'
     Assert-TextContains -Path 'android/app/src/main/AndroidManifest.xml' `
         -Pattern 'android:allowBackup="false"' `
         -FailureMessage 'Android backup must remain disabled.'
@@ -70,12 +78,13 @@ try {
         }
     }
 
-    $logMatches = & rg -n --glob '*.dart' '\b(?:debugPrint|print)\s*\(' lib
-    if ($LASTEXITCODE -eq 0) {
-        throw "Production Dart sources contain direct logging:`n$($logMatches -join "`n")"
-    }
-    if ($LASTEXITCODE -gt 1) {
-        throw "rg failed while scanning production logging (exit $LASTEXITCODE)."
+    $logMatches = Get-ChildItem -LiteralPath 'lib' -Recurse -Filter '*.dart' -File |
+        Select-String -Pattern '\b(?:debugPrint|print)\s*\('
+    if ($logMatches) {
+        $logReport = ($logMatches | ForEach-Object {
+            "{0}:{1}: {2}" -f $_.Path, $_.LineNumber, $_.Line.Trim()
+        }) -join "`n"
+        throw "Production Dart sources contain direct logging:`n$logReport"
     }
 
     if (Select-String -LiteralPath 'android/app/build.gradle.kts' `

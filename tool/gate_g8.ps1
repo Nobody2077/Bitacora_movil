@@ -214,7 +214,8 @@ uninstall it if its local data must be preserved; use a dedicated clean device.
     $manifest = [ordered]@{
         generatedAtUtc = [DateTime]::UtcNow.ToString('o')
         version = ($versionLine -replace '^version:\s*', '')
-        schemaVersion = 1
+        schemaVersion = [int](Select-String -LiteralPath 'lib/infrastructure/database/app_database.dart' -Pattern 'int get schemaVersion => (\d+);' |
+            Select-Object -First 1).Matches[0].Groups[1].Value
         deviceId = $DeviceId
         apk = [ordered]@{
             path = $apk.Path
