@@ -938,7 +938,7 @@ hace después y no se pueden deducir del código:
    confirmación explícita.**
 
 **Paso 2 — elegir el trabajo del día según las respuestas.** `adb` no está en
-el PATH: usar `C:SERSSUARIOAPPDATAocalandroidsdkplatform-toolsdb.exe`.
+el PATH: usar `C:\Users\Usuario\AppData\Local\Android\Sdk\platform-tools\adb.exe`.
 
 - **Si hay un dispositivo limpio disponible → G8.** Antes de lanzar el gate,
   comprobar que HyperOS acepta instalar por USB con una prueba inofensiva que
