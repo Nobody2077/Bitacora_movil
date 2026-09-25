@@ -1,7 +1,7 @@
 # Propuesta — efectos de sonido
 
-- Estado: **propuesta; no implementada.** No autoriza código: quedan tres
-  decisiones abiertas para el usuario (D1, D2 y D3, al final)
+- Estado: **implementada en `1.5.0+9` el 25 de septiembre de 2026**, pendiente
+  de recorrido físico. Decisiones y desviaciones en «Implementación», al final
 - Fecha de registro: 15 de septiembre de 2026
 - Alcance: efectos de sonido de interfaz y de recompensa dentro de la
   aplicación. **No** cubre el sonido de las notificaciones Android, que ya
@@ -233,3 +233,81 @@ momento».
 2. Selección de los efectos concretos, con licencia verificada y su
    procedencia anotada aquí.
 3. Recorrido físico de `1.4.0+8` cerrado y A11 en verde.
+
+## Implementación — 25 de septiembre de 2026
+
+Decisiones del usuario del 24 de septiembre de 2026, tras revisar esta
+propuesta:
+
+- **D1 — cinco momentos**, pedidos por el usuario: acceso concedido, cambio
+  de sección en el menú, misión creada, misión completada y subida de nivel.
+  El menú contradice la recomendación de «sin sonido en navegación»; se
+  aceptó con la condición de D2.
+- **D2 — dos interruptores**, en **Ajustes → Sonido** (`/settings/sound`),
+  ambos apagados por defecto:
+  - «Sonidos de logros»: acceso, misión creada, misión completada, nivel.
+  - «Sonidos de interfaz»: el clic del menú, que puede apagarse solo si cansa.
+- **D3 — antes de Personajes/Tienda/Inventario**, porque no toca el esquema.
+- Estilo **futurista**, a petición del usuario.
+
+### Cómo quedó
+
+| Pieza | Fichero |
+| --- | --- |
+| Puente `SoundPool` | `android/.../UiSoundBridge.kt`, registrado y liberado en `MainActivity` |
+| Efectos | `android/app/src/main/res/raw/ui_*.ogg` (cinco, 77 KB en total) |
+| Servicio, paleta y reproductor | `lib/shared/sound/ui_sound.dart` |
+| Preferencias | `lib/shared/sound/ui_sound_preferences.dart` |
+| Subida de nivel | `lib/features/missions/application/mission_completion_sound.dart` |
+| Pantalla | `lib/features/settings/presentation/sound_settings_page.dart` |
+
+Se cumplen las restricciones 1 y 3 a 8: sin paquete nuevo; clave propia sin
+tocar `sound_enabled`; apagado por defecto; `USAGE_ASSISTANCE_SONIFICATION`
+sin pedir foco de audio y sin sonar si el teléfono no está en modo normal;
+refuerzo redundante, nunca señal única; misión completada después del commit;
+y licencia verificada (abajo).
+
+**Desviación de la restricción 2.** Las preferencias no viven en la metadata
+cifrada sino en un espejo no sensible, `ui_sound_v1.txt`, igual que el color
+de acceso (`access_accent_v1.txt`). El sonido de acceso concedido se decide en
+el instante de desbloquear, cuando la preferencia tiene que poder leerse sin
+depender de la base. Son dos interruptores sin contenido privado. El esquema v3
+sigue sin tocarse, que era el propósito de la restricción.
+
+**Subida de nivel.** No existe un evento de nivel: se deriva del XP. Tras el
+commit de `CompleteMission` se lee el total y se compara
+`RpgLevel.fromTotalXp(total)` con `RpgLevel.fromTotalXp(total - xpOtorgado)`.
+Si cruza un umbral suena **solo** el efecto de nivel, no los dos, para que no
+se pisen. Sin XP otorgado, o si el total no se puede leer, suena el de misión
+completada.
+
+**Acceso.** Un solo timbre al pasar a desbloqueado, con PIN o biometría. Nunca
+por dígito (criterio de aceptación 5). No hay sonido de acceso denegado: no se
+pidió.
+
+**Al activar un interruptor** suena una muestra de su grupo, para oírlo sin
+tener que provocar el evento.
+
+### Procedencia y licencia de los efectos
+
+Todos de **Kenney** (www.kenney.nl), licencia **Creative Commons CC0 1.0**
+(dominio público; el crédito no es obligatorio). Descargados el 24 de
+septiembre de 2026 de las páginas oficiales de cada pack, con su
+`License.txt`.
+
+| Fichero | Origen |
+| --- | --- |
+| `ui_access_granted.ogg` | *Sci-Fi Sounds* 1.0 — `forceField_001.ogg` |
+| `ui_navigation.ogg` | *Interface Sounds* — `tick_001.ogg` |
+| `ui_mission_created.ogg` | *Interface Sounds* — `confirmation_001.ogg` |
+| `ui_mission_completed.ogg` | *Interface Sounds* — `confirmation_002.ogg` |
+| `ui_level_up.ogg` | *Interface Sounds* — `maximize_005.ogg` |
+
+La selección se hizo por nombre, sin escucharlos. **Se valida en el recorrido
+físico** y cualquiera se sustituye cambiando solo el fichero, con el mismo
+nombre.
+
+### Pendiente
+
+- Recorrido físico de `1.5.0+9`: cada momento suena, la música del usuario no
+  se pausa, el modo silencio calla los efectos y la selección suena bien.

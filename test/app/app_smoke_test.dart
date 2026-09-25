@@ -20,6 +20,8 @@ import 'package:bitacora_rpg_personal/features/progress/domain/models/rpg_level.
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
 import 'package:bitacora_rpg_personal/shared/device/device_battery.dart';
+import 'package:bitacora_rpg_personal/shared/sound/ui_sound.dart';
+import 'package:bitacora_rpg_personal/shared/sound/ui_sound_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/widgets/terminal/terminal_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -268,15 +270,80 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
       },
     );
+
+    testWidgets(
+      'Sonido arranca apagado y al activar logros guarda y da una muestra',
+      (WidgetTester tester) async {
+        _ensureResumed(tester);
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = const Size(1280, 800);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
+        final _MemorySoundStore store = _MemorySoundStore();
+        final _RecordingSoundPlayer player = _RecordingSoundPlayer();
+
+        await tester.pumpWidget(
+          _testApp(
+            initialLocation: AppRoutes.settingsSound,
+            soundStore: store,
+            soundPlayer: player,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final Finder reward = find.byKey(const Key('reward-sound-switch'));
+        final Finder interface = find.byKey(
+          const Key('interface-sound-switch'),
+        );
+        expect(tester.widget<Switch>(reward).value, isFalse);
+        expect(tester.widget<Switch>(interface).value, isFalse);
+
+        await tester.tap(reward);
+        await tester.pumpAndSettle();
+
+        expect(store.value.rewardEnabled, isTrue);
+        expect(store.value.interfaceEnabled, isFalse);
+        expect(tester.widget<Switch>(reward).value, isTrue);
+        expect(player.played, <UiSound>[UiSound.missionCompleted]);
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
+}
+
+final class _MemorySoundStore implements UiSoundPreferenceStore {
+  UiSoundPreferences value = UiSoundPreferences.defaults;
+
+  @override
+  Future<UiSoundPreferences> read() async => value;
+
+  @override
+  Future<void> write(UiSoundPreferences preferences) async {
+    value = preferences;
+  }
+}
+
+final class _RecordingSoundPlayer implements UiSoundPlayer {
+  final List<UiSound> played = <UiSound>[];
+
+  @override
+  Future<void> play(UiSound sound) async => played.add(sound);
 }
 
 Widget _testApp({
   required String initialLocation,
   List<Mission> todayMissions = const <Mission>[],
   int batteryLevel = 62,
+  UiSoundPreferenceStore? soundStore,
+  UiSoundPlayer? soundPlayer,
 }) => ProviderScope(
   overrides: [
+    uiSoundPreferenceStoreProvider.overrideWithValue(
+      soundStore ?? _MemorySoundStore(),
+    ),
+    uiSoundPlayerProvider.overrideWithValue(
+      soundPlayer ?? _RecordingSoundPlayer(),
+    ),
     accessSessionSeedProvider.overrideWithValue(
       const AccessSessionState.unlockedForTesting(),
     ),

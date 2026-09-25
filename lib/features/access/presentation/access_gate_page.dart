@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/router/app_routes.dart';
 import '../../../app/theme/app_theme_tokens.dart';
+import '../../../shared/sound/ui_sound.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../settings/domain/models/app_preferences.dart';
 import '../application/access_session_controller.dart';
@@ -76,6 +79,19 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Un solo timbre al abrirse la sesión. Nunca por dígito: el sonido no
+    // debe revelar el progreso del PIN.
+    ref.listen<AccessSessionPhase>(
+      accessSessionProvider.select((AccessSessionState state) => state.phase),
+      (AccessSessionPhase? previous, AccessSessionPhase next) {
+        if (next == AccessSessionPhase.unlocked &&
+            previous != AccessSessionPhase.unlocked) {
+          unawaited(
+            ref.read(uiSoundServiceProvider).play(UiSound.accessGranted),
+          );
+        }
+      },
+    );
     final AccessSessionState session = ref.watch(accessSessionProvider);
     final Color accentColor = _accessAccentColor();
     return switch (session.phase) {

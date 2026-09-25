@@ -48,6 +48,14 @@ class SettingsLandingPage extends StatelessWidget {
         description: 'Anticipación, sonido y horario silencioso.',
         onTap: () => context.go(AppRoutes.settingsNotifications),
       ),
+      const SizedBox(height: TerminalSpace.sm),
+      _SettingsDestination(
+        key: const Key('open-sound-settings'),
+        icon: Icons.graphic_eq,
+        title: 'Sonido',
+        description: 'Efectos de logros y de interfaz.',
+        onTap: () => context.go(AppRoutes.settingsSound),
+      ),
     ],
   );
 }

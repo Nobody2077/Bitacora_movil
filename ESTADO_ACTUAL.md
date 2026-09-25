@@ -1,8 +1,8 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **24 de septiembre de 2026**
-- Versión en `pubspec.yaml`: **`1.4.0+8`**, compilada, firmada y **aprobada en
-  dispositivo**
+- Última revisión: **25 de septiembre de 2026**
+- Versión en `pubspec.yaml`: **`1.5.0+9`** (efectos de sonido), compilada y
+  firmada, **pendiente de recorrido físico**
 - Última versión aprobada en dispositivo: `1.4.0+8`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
@@ -125,12 +125,62 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   **ADR-006 con todas las decisiones de producto** (dinero real, mi ficha y
   Contactos, inventario con Equipado, mapa descartado) y la copia de
   seguridad pasó a ser el último bloque del post-MVP.
+- Sesión del **24–25 de septiembre de 2026** (continuación): **efectos de
+  sonido implementados** en `1.5.0+9`, antes de ADR-006 por decisión del
+  usuario. Cinco efectos futuristas CC0, dos interruptores apagados por
+  defecto, sin paquete nuevo ni cambio de esquema. 250/250 pruebas; APK
+  release firmada y sin `INTERNET`. Falta el recorrido físico.
 
 ## Bitácora de sesiones
 
 Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
+
+### 2026-09-25 — Efectos de sonido, candidata `1.5.0+9`
+
+**Qué pidió el usuario.** Sonido al entrar (login), al cambiar de sección en
+el menú, al crear una misión, al completarla y al subir de nivel, con estilo
+futurista. Se retomó `documentos/PROPUESTA-SONIDO.md` (15 de septiembre) en
+lugar de empezar de cero, y el usuario aceptó sus condiciones: dos
+interruptores, apagados por defecto, y antes de ADR-006 porque no toca el
+esquema.
+
+**Qué se hizo.** Todo el detalle está en la sección «Implementación» de la
+propuesta. En resumen:
+
+- `UiSoundBridge.kt` con `SoundPool`: sin foco de audio (no corta la música)
+  y sin sonar si el teléfono no está en modo normal. Sin paquete nuevo.
+- Cinco `.ogg` de Kenney (CC0) en `res/raw`, 77 KB. **Elegidos por nombre,
+  sin escucharlos**: se validan en el recorrido y se cambian sustituyendo el
+  fichero.
+- **Ajustes → Sonido** (`/settings/sound`, ruta 57): «Sonidos de logros» y
+  «Sonidos de interfaz». Al activar uno suena una muestra.
+- La subida de nivel se detecta comparando el nivel del XP total con el del
+  total menos lo otorgado. Si sube, suena solo el efecto de nivel.
+- `PreferenceSwitchCard` se extrajo de Apariencia para compartirla con Sonido.
+
+**Desviación documentada.** Las preferencias viven en un fichero no sensible
+(`ui_sound_v1.txt`), como el color de acceso, y no en la metadata cifrada: el
+sonido de acceso se decide al desbloquear.
+
+**Verificación.** `flutter analyze` limpio, **250/250 pruebas** (12 nuevas),
+APK `prodRelease` `1.5.0+9` de 73.000.867 bytes, SHA-256
+`2e1c1069a2f1c0f0cd42c047272c1bf38e995447f778d69033cb643f226b9202`, firmada con
+`a6092c6c…`, con los cinco `.ogg` dentro y **sin permiso `INTERNET`**.
+
+**Qué queda abierto.**
+
+- **Recorrido físico de `1.5.0+9`** en la tablet: activar los dos interruptores,
+  entrar con PIN, cambiar de sección, crear una misión, completarla (y una que
+  suba de nivel), con música sonando de fondo para comprobar que no se pausa,
+  y en silencio para comprobar que calla. Decidir si algún efecto se cambia.
+- **Cómo instalarla:** `adb install` sigue bloqueado por MIUI; la vía que
+  funcionó el 24 de septiembre es `adb push` a `/data/local/tmp` y
+  `adb shell pm install -r`. Es una actualización con la misma firma: no borra
+  datos.
+- **Orden con G8:** si G8 se cierra después, validará `1.5.0+9` en lugar de
+  `1.4.0+8`. Da igual mientras no se cambie código durante la prueba física.
 
 ### 2026-09-24 — Incidente: el gate G8 borró la app prod de la tablet
 
@@ -970,6 +1020,9 @@ Se conserva porque describe qué se validó exactamente. Se instaló **encima** 
 
 **1. Cerrar A8 / G8.** Es lo único abierto del MVP. Ver «A8 / G8: qué falta de
 verdad» arriba: el preflight está verde y solo falta el dispositivo.
+
+**1 bis. Recorrido físico de `1.5.0+9` (efectos de sonido).** Implementado el
+2026-09-25; ver la entrada de sesión de ese día.
 
 **2. Personaje, Contactos, Inventario y Tienda (ADR-006).** Solo después de 1.
 Decisiones de producto ya resueltas; falta el esquema concreto.

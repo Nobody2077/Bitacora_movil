@@ -17,6 +17,7 @@ import '../../features/profile/presentation/user_profile_edit_dialog.dart';
 import '../../features/progress/application/progress_providers.dart';
 import '../../features/progress/domain/models/progress_models.dart';
 import '../device/device_battery.dart';
+import '../sound/ui_sound.dart';
 import 'app_breakpoints.dart';
 import 'terminal_application_header.dart';
 import 'terminal_sidebar.dart';
@@ -58,14 +59,14 @@ class AdaptiveShell extends StatelessWidget {
   );
 }
 
-class _CompactShell extends StatelessWidget {
+class _CompactShell extends ConsumerWidget {
   const _CompactShell({required this.location, required this.navigationShell});
 
   final String location;
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
     appBar: AppBar(title: Text(_sectionTitle(location))),
     body: Column(
       children: <Widget>[
@@ -76,6 +77,9 @@ class _CompactShell extends StatelessWidget {
     bottomNavigationBar: NavigationBar(
       selectedIndex: _compactIndex(location),
       onDestinationSelected: (int index) {
+        if (index != _compactIndex(location)) {
+          unawaited(ref.read(uiSoundServiceProvider).play(UiSound.navigation));
+        }
         if (index == 4) {
           navigationShell.goBranch(6, initialLocation: true);
           return;
@@ -158,6 +162,11 @@ class _RailShell extends ConsumerWidget {
                   UserProfileEditDialog(initialProfile: profile),
             ),
             onSelected: (int index) {
+              if (index != _railIndex(location)) {
+                unawaited(
+                  ref.read(uiSoundServiceProvider).play(UiSound.navigation),
+                );
+              }
               navigationShell.goBranch(
                 index,
                 initialLocation: index == navigationShell.currentIndex,

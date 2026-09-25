@@ -30,6 +30,7 @@ import '../../features/recurrences/presentation/recurrence_form_page.dart';
 import '../../features/recurrences/presentation/recurrence_list_page.dart';
 import '../../features/settings/presentation/appearance_settings_page.dart';
 import '../../features/settings/presentation/more_page.dart';
+import '../../features/settings/presentation/sound_settings_page.dart';
 import 'app_route_contract.dart';
 
 abstract final class AppRoutes {
@@ -49,8 +50,9 @@ abstract final class AppRoutes {
   static const String settingsPrivacyBiometrics =
       '/settings/privacy/biometrics';
   static const String settingsNotifications = '/settings/notifications';
+  static const String settingsSound = '/settings/sound';
 
-  /// El mapa contiene 56 patrones URI (55 superficies funcionales).
+  /// El mapa contiene 57 patrones URI (56 superficies funcionales).
   /// `/more` es el único contenedor de navegación, no una superficie funcional.
   ///
   /// Cada contrato lleva su propia página en `builder`. Las superficies que aún
@@ -509,6 +511,13 @@ abstract final class AppRoutes {
       title: 'Notificaciones',
       area: AppArea.settings,
       builder: (context, state) => const NotificationSettingsPage(),
+    ),
+    AppRouteContract(
+      name: 'settingsSound',
+      path: settingsSound,
+      title: 'Sonido',
+      area: AppArea.settings,
+      builder: (context, state) => const SoundSettingsPage(),
     ),
     // Superficie diferida: sin página real todavía, cae al placeholder.
     AppRouteContract(

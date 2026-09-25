@@ -7,6 +7,7 @@ import io.flutter.embedding.engine.FlutterEngine
 
 class MainActivity : FlutterFragmentActivity() {
     private lateinit var missionNotificationBridge: MissionNotificationBridge
+    private var uiSoundBridge: UiSoundBridge? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -34,6 +35,15 @@ class MainActivity : FlutterFragmentActivity() {
         missionNotificationBridge.register(
             flutterEngine.dartExecutor.binaryMessenger,
         )
+        uiSoundBridge = UiSoundBridge(applicationContext).also {
+            it.register(flutterEngine.dartExecutor.binaryMessenger)
+        }
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        uiSoundBridge?.release()
+        uiSoundBridge = null
+        super.cleanUpFlutterEngine(flutterEngine)
     }
 
     override fun onRequestPermissionsResult(

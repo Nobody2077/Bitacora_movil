@@ -1,5 +1,33 @@
 # Historial de cambios
 
+## 1.5.0 — candidata `1.5.0+9`
+
+### Efectos de sonido
+
+- Nueva pantalla **Ajustes → Sonido** con dos interruptores, ambos
+  **desactivados por defecto**:
+  - **Sonidos de logros:** acceso concedido, misión creada, misión completada
+    y subida de nivel.
+  - **Sonidos de interfaz:** un clic breve al cambiar de sección en el menú.
+- Al completar una misión que sube de nivel suena solo el efecto de nivel, no
+  los dos.
+- Al activar un interruptor suena una muestra de ese grupo.
+- Los efectos no pausan la música de otras aplicaciones y no suenan con el
+  teléfono en silencio o vibración. Ninguna información depende de oírlos.
+- Efectos de estilo futurista de Kenney, con licencia CC0. Procedencia en
+  `documentos/PROPUESTA-SONIDO.md`.
+- **El esquema no cambia.** Los dos interruptores viven en un fichero no
+  sensible, como el color de acceso, para que el sonido de acceso pueda
+  decidirse al desbloquear.
+
+### Calidad
+
+- `flutter analyze` sin problemas y **250/250 pruebas aprobadas**, doce de
+  ellas nuevas sobre las preferencias, el servicio, la subida de nivel y la
+  pantalla de Sonido.
+- APK release `1.5.0+9` firmada con el certificado de siempre y **sin permiso
+  `INTERNET`**. Pendiente de recorrido físico.
+
 ## 1.4.0 — candidata `1.4.0+8`
 
 ### Resumen diario

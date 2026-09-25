@@ -11,7 +11,10 @@ import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/app_ui_preferences.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
+import '../../../shared/sound/ui_sound.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../progress/application/progress_providers.dart';
+import '../application/mission_completion_sound.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
 import 'mission_presentation_support.dart';
@@ -194,6 +197,18 @@ class _MissionReviewPageState extends ConsumerState<MissionReviewPage> {
       onSuccess: (MissionCompletionReceipt receipt) {
         unawaited(
           ref.read(notificationReconciliationServiceProvider).reconcile(),
+        );
+        final progress = ref.read(progressApplicationServiceProvider);
+        unawaited(
+          playMissionCompletionSound(
+            sounds: ref.read(uiSoundServiceProvider),
+            loadTotalXp: () async =>
+                (await progress.loadOverallProgress()).fold<int?>(
+                  onSuccess: (value) => value.totalXp,
+                  onFailure: (_) => null,
+                ),
+            xpAwarded: receipt.xpAwarded,
+          ),
         );
         ref.invalidate(missionDetailProvider(mission.id));
         ref.invalidate(missionCompletionReceiptProvider(mission.id));

@@ -10,6 +10,7 @@ import '../../../app/theme/app_ui_preferences.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
+import '../../../shared/sound/ui_sound.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../recurrences/application/recurrence_application_service.dart';
 import '../../recurrences/application/recurrence_providers.dart';
@@ -446,6 +447,11 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
         );
         ref.invalidate(missionDetailProvider(mission.id));
         ref.invalidate(todayMissionsProvider);
+        if (!widget.isEditing) {
+          unawaited(
+            ref.read(uiSoundServiceProvider).play(UiSound.missionCreated),
+          );
+        }
         if (widget.isEditing) {
           context.goNamed(
             'missionDetail',
@@ -533,6 +539,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
       ).showSnackBar(SnackBar(content: Text(failure.message)));
       return;
     }
+    unawaited(ref.read(uiSoundServiceProvider).play(UiSound.missionCreated));
 
     if (_dailyAvailabilityMode == TemplateAvailabilityMode.board) {
       setState(() => _saving = false);

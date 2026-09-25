@@ -10,6 +10,7 @@ import '../../../core/result/result.dart';
 import '../../../shared/adaptive/app_breakpoints.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../domain/models/app_preferences.dart';
+import 'preference_switch_card.dart';
 
 class AppearanceSettingsPage extends ConsumerStatefulWidget {
   const AppearanceSettingsPage({super.key});
@@ -128,7 +129,7 @@ class _AppearanceSettingsPageState
   }) {
     final bool saving = _savingPreference != null;
     final List<Widget> cards = <Widget>[
-      _PreferenceSwitchCard(
+      PreferenceSwitchCard(
         switchKey: const Key('large-text-switch'),
         icon: Icons.text_increase,
         title: 'Texto grande',
@@ -139,7 +140,7 @@ class _AppearanceSettingsPageState
         onChanged: (bool value) =>
             _save('largeText', preferences.copyWith(largeText: value)),
       ),
-      _PreferenceSwitchCard(
+      PreferenceSwitchCard(
         switchKey: const Key('reduce-motion-switch'),
         icon: Icons.motion_photos_off_outlined,
         title: 'Reducir movimiento',
@@ -150,7 +151,7 @@ class _AppearanceSettingsPageState
         onChanged: (bool value) =>
             _save('reduceMotion', preferences.copyWith(reduceMotion: value)),
       ),
-      _PreferenceSwitchCard(
+      PreferenceSwitchCard(
         switchKey: const Key('high-contrast-switch'),
         icon: Icons.contrast,
         title: 'Alto contraste',
@@ -161,7 +162,7 @@ class _AppearanceSettingsPageState
         onChanged: (bool value) =>
             _save('highContrast', preferences.copyWith(highContrast: value)),
       ),
-      _PreferenceSwitchCard(
+      PreferenceSwitchCard(
         switchKey: const Key('hide-amounts-switch'),
         icon: Icons.visibility_off_outlined,
         title: 'Ocultar importes',
@@ -338,70 +339,4 @@ class _AccessAccentChoice extends StatelessWidget {
       ),
     ),
   );
-}
-
-class _PreferenceSwitchCard extends StatelessWidget {
-  const _PreferenceSwitchCard({
-    required this.switchKey,
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.value,
-    required this.enabled,
-    required this.onChanged,
-  });
-
-  final Key switchKey;
-  final IconData icon;
-  final String title;
-  final String description;
-  final bool value;
-  final bool enabled;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    final VoidCallback? toggle = enabled ? () => onChanged(!value) : null;
-    return Semantics(
-      label: title,
-      hint: description,
-      toggled: value,
-      enabled: enabled,
-      button: true,
-      onTap: toggle,
-      excludeSemantics: true,
-      child: TerminalCard(
-        onTap: toggle,
-        padding: const EdgeInsets.symmetric(
-          horizontal: TerminalSpace.md,
-          vertical: TerminalSpace.sm,
-        ),
-        borderColor: value ? tokens.infoCyan : tokens.border,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 56),
-          child: Row(
-            children: <Widget>[
-              Icon(icon, color: value ? tokens.infoCyan : tokens.textSecondary),
-              const SizedBox(width: TerminalSpace.md),
-              Expanded(
-                child: TerminalSectionTitle(
-                  title: title,
-                  description: description,
-                ),
-              ),
-              const SizedBox(width: TerminalSpace.sm),
-              Switch(
-                key: switchKey,
-                value: value,
-                onChanged: enabled ? onChanged : null,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
