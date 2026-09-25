@@ -5,8 +5,7 @@
   dispositivo**
 - Última versión aprobada en dispositivo: `1.4.0+8`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`, árbol limpio y **un commit por delante de
-  `origin/main`** (el del incidente del 24 de septiembre, sin subir)
+- Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
 - **A11 — Notificaciones: COMPLETADA** el 23 de septiembre de 2026. El recorrido
   físico de `1.4.0+8` salió sin incidencias, así que los puntos 2, 3 y 4 quedan
   validados y **G9 cierra con ella**
