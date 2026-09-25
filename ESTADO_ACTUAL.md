@@ -21,9 +21,8 @@
 > incluido el punto de partida de Personajes/Tienda/Inventario. Lo demás es
 > historia de referencia.
 >
-> **Lo primero es leer «A8 / G8: qué falta de verdad»**, dentro del RELEVO.
-> A11 ya está cerrada; el trabajo abierto es G8 y está bloqueado por cosas
-> concretas, no por código.
+> **Lo primero es el bloque «▶ EMPEZAR AQUÍ»**, al principio del RELEVO: dice
+> qué comprobar, qué preguntar al usuario y qué hacer según su respuesta.
 
 Este documento permite que Claude Code, Antigravity, Codex u otro agente continúe el proyecto sin reconstruir su historia ni desmontar accidentalmente decisiones ya validadas.
 
@@ -899,40 +898,102 @@ esquema (v3 → v4) o usar un identificador sintético.
 
 ---
 
-## RELEVO — empezar aquí la próxima sesión (reescrito el 2026-09-23)
+## RELEVO — empezar aquí la próxima sesión (reescrito el 2026-09-25)
 
 Lee esta sección entera antes de tocar nada. Dice dónde quedamos, qué está
 decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
+### ▶ EMPEZAR AQUÍ — la próxima sesión, sea cuando sea
+
+**Estado al cerrar el 25 de septiembre de 2026:** `main` limpia y sincronizada
+con `origin/main`. Versión **`1.5.0+9`** (efectos de sonido) instalada en la
+tablet y **aprobada por el usuario**. 250/250 pruebas, `flutter analyze`
+limpio. Lo único abierto del MVP es **G8**, bloqueado por el dispositivo, no
+por código.
+
+**Paso 0 — comprobar que nada cambió (2 minutos, lo hace el agente).**
+
+```powershell
+git status -sb            # debe decir: ## main...origin/main, sin cambios
+git log --oneline -1      # el último commit de esta sesión, o uno posterior
+flutter analyze           # No issues found!
+```
+
+Si hay commits posteriores a los del 25 de septiembre, lee primero su entrada
+en «Bitácora de sesiones»: este bloque puede haberse quedado atrás.
+
+**Paso 1 — preguntar al usuario dos cosas antes de nada.** Condicionan qué se
+hace después y no se pueden deducir del código:
+
+1. **¿Respaldó la llave de firma?** `android/signing.properties` y
+   `C:\Users\Usuario\.android\bitacora-rpg-release.jks`, **los dos**, en dos
+   sitios fuera del PC. Es lo único irreparable del proyecto. Si no, recordarlo
+   primero.
+2. **¿Ha metido ya datos reales en la tablet?** El usuario decidió el 24 de
+   septiembre usarla **como dispositivo principal**. Si ya tiene datos, **no
+   sirve para G8**: el gate exige un dispositivo sin `com.jcyq.bitacorarpg` y
+   desinstalar borraría esos datos sin vuelta atrás. Entonces G8 necesita otro
+   equipo limpio (su teléfono u otro), y el criterio de «teléfono y tablet
+   físicos» tendría que revisarse con él. **No desinstalar nada sin su
+   confirmación explícita.**
+
+**Paso 2 — elegir el trabajo del día según las respuestas.** `adb` no está en
+el PATH: usar `C:SERSSUARIOAPPDATAocalandroidsdkplatform-toolsdb.exe`.
+
+- **Si hay un dispositivo limpio disponible → G8.** Antes de lanzar el gate,
+  comprobar que HyperOS acepta instalar por USB con una prueba inofensiva que
+  no pase por Flutter:
+
+  ```bash
+  adb -s <serial> install build/app/outputs/flutter-apk/app-dev-debug.apk
+  # si no existe: flutter build apk --debug --flavor dev -t lib/main_dev.dart
+  ```
+
+  Si responde `INSTALL_FAILED_USER_RESTRICTED`, **no lanzar el gate**: el
+  usuario tiene que resolverlo en el dispositivo (cuenta Mi con sesión
+  iniciada, conexión a internet, reactivar «Instalar vía USB» y, si no basta,
+  desactivar la optimización de MIUI). Cuando la prueba pase, entonces sí:
+  `powershell -ExecutionPolicy Bypass -File tool/gate_g8.ps1 -DeviceId <serial>`.
+  El gate aborta solo si encuentra la app prod instalada.
+- **Si no hay dispositivo limpio → ADR-006, diseño del esquema v4.** No
+  necesita dispositivo y no es código de producción. Leer
+  `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md` (decisiones D1–D5 ya
+  resueltas, **no reabrirlas**) y producir sus tres pendientes:
+  1. Tablas concretas: contactos, vínculo misión–contacto (N:M), objetos de
+     inventario, zona del cuerpo para Equipado, fotos cifradas (reutilizando el
+     patrón de `journal_attachments`) y la columna «ubicación» de texto en
+     `missions`. Preguntar al usuario si categorías y zonas del cuerpo son
+     lista cerrada o configurables.
+  2. Comprobar si `drift_dev` puede generar `drift_schema_v4.json` (ADR-001
+     §13 documenta que falló con v1). No editar el JSON a mano.
+  3. Plan de migración v1→v4, v2→v4 y v3→v4 con sus pruebas.
+
+  **El código de ADR-006 no empieza hasta cerrar G8**, y la migración irá sin
+  copia de seguridad (riesgo aceptado por el usuario, ADR-006 D2).
+
+**Instalar una APK nueva en la tablet.** HyperOS 3 rechaza hoy toda
+instalación por USB. La vía que funciona: `adb push` de la APK a
+`/sdcard/Download/`, avisar al escáner de medios
+(`adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Download/<nombre>.apk`)
+y que el usuario la instale desde el gestor de archivos. En Git Bash, prefijar
+con `MSYS_NO_PATHCONV=1` o las rutas `/sdcard` se reescriben.
+
 ### Estado en una línea
 
-**A11 está CERRADA y G9 con ella.** El recorrido físico de `1.4.0+8` salió sin
-incidencias el 23 de septiembre de 2026. Lo único abierto del MVP es **A8/G8**,
-y su preflight ya está verde: **falta un dispositivo por ADB sin la app prod
-instalada** y que MIUI acepte `adb install`. El 24 de septiembre el primer
-intento borró la app prod de la tablet (datos de prueba); el gate ahora se
-protege contra eso.
+**MVP casi cerrado: solo falta G8**, con el preflight verde y la protección
+contra borrar la app prod ya en el gate. Post-MVP: **sonido hecho y aprobado**
+(`1.5.0+9`); **ADR-006** con decisiones de producto resueltas y sin esquema;
+**copia de seguridad** al final de todo.
 
-### Qué se subió el 2026-09-23
+### Qué se subió el 24 y 25 de septiembre de 2026
 
-Tres commits en `origin/main`, de `e8e4b3a` a `f16e1e1`:
-
-- `e8e4b3a fix(goldens)` — el `RepaintBoundary` y el golden regenerado.
-- `002eb58 fix(gate)` — el preflight de A8 desbloqueado.
-- `f16e1e1 docs` — cierre de A11 y estado real de G8.
-
-Reparto por fichero:
-
-| Fichero | Qué cambió |
-| --- | --- |
-| `lib/shared/adaptive/terminal_sidebar.dart` | `RepaintBoundary` que arregla el golden. **Es el único cambio de producción.** |
-| `test/app/goldens/sidebar_modular_battery.png` | Golden regenerado: 248 px de barra en vez de la pantalla entera |
-| `tool/a8_preflight.ps1` | Aserción de esquema version-agnóstica y `rg` sustituido por `Select-String` |
-| `tool/gate_g8.ps1` | El manifiesto de evidencia ya no fija `schemaVersion = 1` |
-| `documentos/ESTADO_FASES.md` | A11 y A9 cerradas con fecha |
-| `documentos/A8-VALIDACION-RELEASE.md` | Tabla de bloqueos reales de G8 y la decisión de la tablet |
-| `ESTADO_ACTUAL.md` | Este relevo y la entrada de sesión |
-| `CHANGELOG.md` | Sección «Calidad» de 1.4.0, que venía sin commitear del 15 de septiembre y se sube ahora |
+- `2c5e9b2 fix(gate)` — el gate y `process_restart_g2.ps1` abortan si la app
+  prod está instalada, tras el incidente de la tablet.
+- `f399173 docs(adr-006)` — decisiones D1–D5 y la copia de seguridad al final,
+  anotada en todos los `.md` que citan A6.
+- `0724f20 feat(sonido)` — efectos de sonido, candidata `1.5.0+9`.
+- `886f22a docs(sonido)` — aprobación física de `1.5.0+9`.
+- Más dos commits de solo documentación: sincronización y este relevo.
 
 ### A8 / G8: qué falta de verdad
 
@@ -957,15 +1018,17 @@ con `BUILD SUCCESSFUL`.
 
 **Lo que queda es material, no de código:**
 
-- **Un dispositivo por ADB.** El 23 de septiembre `adb devices` salió vacío y el
-  usuario no podía conectar ese día. El documento de A8 ya arrastraba que el
-  USB no está disponible, así que la vía probable es ADB inalámbrico. Sin
-  dispositivo no hay métricas, ni pruebas de integración, ni smoke.
+- **Un dispositivo limpio por ADB en el que HyperOS deje instalar.** Desde el
+  24 de septiembre la tablet conecta por USB (serial `biuonrrcey45lvrs`,
+  Xiaomi `25040RP0AL`, HyperOS 3, Android 16), pero **tiene la app prod
+  instalada**, es ya el dispositivo principal del usuario y **HyperOS rechaza
+  toda instalación por USB**. Ver el paso 1 y el paso 2 de «▶ EMPEZAR AQUÍ».
 - **Los dos factores de forma se mantienen.** El usuario confirmó el 23 de
   septiembre de 2026 que **tiene tablet real**, así que el criterio de cierre no
-  se acota ni se sustituye por un emulador.
-- **El AAB de `1.4.0+8` todavía no existe.** Solo está la APK. El gate
-  construye y verifica ambos, así que saldrá de la misma pasada.
+  se acota ni se sustituye por un emulador. Si la tablet queda como dispositivo
+  de uso real, esto hay que volver a hablarlo con él.
+- **Candidata actual: `1.5.0+9`**, no `1.4.0+8`. Su AAB aún no existe; el gate
+  construye y verifica APK y AAB en la misma pasada.
 - **El respaldo de la llave sigue pendiente** y es lo único irreparable.
 
 Cuando haya dispositivo, el paso es uno solo, por cada equipo:
