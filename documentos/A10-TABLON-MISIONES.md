@@ -53,7 +53,8 @@ Snapshots conservados:
 - Migraciones v1→v3 y v2→v3 verificadas con datos anteriores.
 - Pantalla probada con una misión disponible y otra ya tomada.
 - Contrato de rutas actualizado a 61 patrones URI (posteriormente reducido a 56
-  al retirar las rutas `settingsData*` de A6 por ADR-005).
+  al retirar las rutas `settingsData*` de A6 por ADR-005; la copia vuelve como
+  último bloque del post-MVP según ADR-006 D2, del 24-09-2026).
 - `flutter analyze` sin problemas y 219 pruebas aprobadas.
 - APK de 72.741.699 bytes, firma APK v2 válida con el certificado permanente,
   versión `1.2.0+5` y sin permiso `INTERNET`.

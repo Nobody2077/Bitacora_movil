@@ -28,6 +28,10 @@ A6 fue retirada, desinstalar la app elimina datos sin una vía portable de
 restauración. La primera validación release debe hacerse en un dispositivo
 limpio dedicado. No desinstalar la instalación de uso real.
 
+La copia de seguridad no llegará hasta el final del post-MVP: el usuario
+decidió el 24 de septiembre de 2026 cerrarla después de Personaje, Contactos,
+Inventario y Tienda (ADR-006 D2; adenda de ADR-005).
+
 «Limpio» significa **sin `com.jcyq.bitacorarpg` instalado**, no solo sin datos
 valiosos. Aunque las pruebas usan `--flavor dev`, si su instalación falla
 Flutter puede desinstalar el paquete prod como recuperación: así se perdió la

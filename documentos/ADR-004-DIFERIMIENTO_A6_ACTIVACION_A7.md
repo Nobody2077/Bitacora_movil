@@ -7,6 +7,10 @@
 > Conservado como registro histórico. Desde el 28 de agosto de 2026,
 > `ADR-005-RETIRO-A6-MVP.md` retira A6 del MVP y elimina G6 como requisito de
 > A8.
+>
+> Adenda del 24 de septiembre de 2026: la copia de seguridad vuelve como
+> último bloque del post-MVP, tras Personaje, Contactos, Inventario y Tienda
+> (ADR-006, D2). Detalle en la adenda de ADR-005.
 
 ## Contexto
 

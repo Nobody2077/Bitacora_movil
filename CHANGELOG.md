@@ -215,5 +215,7 @@ Aprobada físicamente por el usuario el 6 de septiembre de 2026.
 ### Limitaciones conocidas
 
 - A6 (copia/restauración) fue retirada del MVP; no existe exportación portable.
+  *(Nota del 24-09-2026: la copia vuelve como último bloque del post-MVP,
+  ADR-006 D2.)*
 - Una instalación `prod` antigua firmada con debug no puede actualizarse con la
   nueva firma de producción. No debe desinstalarse si contiene datos valiosos.

@@ -157,4 +157,5 @@ A5 y G5 fueron aprobadas técnica y físicamente en la Redmi Pad el 27 de agosto
 de 2026. A7.4 aprobó `flutter analyze`, 182 pruebas, tres goldens canónicos y la
 APK `prod-debug`. El usuario aprobó la validación física el 28 de agosto de 2026;
 A7 queda completada y G7 verde. A6/G6 fueron retiradas del MVP por ADR-005 y A8
-queda autorizada.
+queda autorizada. La copia de seguridad vuelve como último bloque del post-MVP
+(ADR-006 D2, 24 de septiembre de 2026).

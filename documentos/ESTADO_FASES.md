@@ -12,7 +12,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A3 — Misiones | **COMPLETADA** | G3 verde el 26 de agosto de 2026 |
 | A4 — Economía | **COMPLETADA** | G4 verde el 27 de agosto de 2026 |
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
-| A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005 |
+| A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005. La copia vuelve como último bloque del post-MVP (ADR-006 D2, 24 de septiembre de 2026) |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
 | A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
 | A9 — Calendario y recordatorios | **COMPLETADA** | G9 verde el 23 de septiembre de 2026. El calendario y las recurrencias se aprobaron físicamente con `1.2.1+6` el 6 de septiembre de 2026; los recordatorios, separados a A11, cerraron con el recorrido de `1.4.0+8` |
@@ -42,6 +42,13 @@ Orden acordado con el usuario. Cada punto se cierra antes de abrir el siguiente.
 
 No se abre hasta cerrar A11 y A8. Cuando se abra necesitará su propio ADR: no hay tablas de tienda ni inventario en el esquema, así que implica migración v3 → v4, y hay una decisión de diseño pendiente sobre con qué se paga (XP ganado en misiones frente al dinero real de `transactions`).
 
+**Actualización del 24 de septiembre de 2026.** Las decisiones de producto
+están resueltas en `ADR-006-PERSONAJES-TIENDA-INVENTARIO.md`: dinero real para
+la Tienda; Personaje como ficha del usuario más Contactos vinculados a
+misiones; Inventario de pertenencias con Equipado por zona del cuerpo; mapa
+descartado. La copia de seguridad (antes A6) vuelve como **último** bloque, y
+la migración v3 → v4 se hará sin ella con el riesgo aceptado por el usuario.
+
 ## Qué falta para cerrar el MVP, en orden
 
 | Orden | Qué | Estado | Bloquea |
@@ -49,7 +56,8 @@ No se abre hasta cerrar A11 y A8. Cuando se abra necesitará su propio ADR: no h
 | 1 | **Recorrido físico de `1.4.0+8`** (puntos 2, 3 y 4 de A11) | **HECHO** el 23 de septiembre de 2026, sin incidencias | Nada: cerró A11 y con ella G9 |
 | 2 | **Respaldo externo de la llave de firma** | Pendiente desde A8 | Nada técnicamente, pero es lo único irreparable: sin la llave no hay más actualizaciones y la única salida sería desinstalar, que borra los datos |
 | 3 | **Métricas cifradas y G8** | Pendiente | Cerrar A8 |
-| 4 | **Personajes, Tienda e Inventario** | Sin diseñar; exige ADR propio | Es post-MVP: no se abre antes de 1 y 3 |
+| 4 | **Personaje, Contactos, Inventario y Tienda** | ADR-006 con decisiones de producto resueltas el 24 de septiembre de 2026; falta el esquema | Es post-MVP: no se abre antes de 1 y 3 |
+| 5 | **Copia de seguridad** (antes A6) | Decidido el 24 de septiembre de 2026 que va al final | Último bloque del post-MVP |
 
 Los cinco pasos del recorrido pendiente están en `ESTADO_ACTUAL.md`, sección
 «RELEVO», y el punto de partida de Personajes/Tienda/Inventario también.
@@ -222,6 +230,9 @@ autorizada; A6 permanece bloqueada hasta completar G5.
 
 - `ADR-005-RETIRO-A6-MVP.md` registra la decisión explícita de retirar A6 del
   MVP. G6 deja de aplicar y A8 queda condicionada únicamente a G7.
+- Adenda del 24 de septiembre de 2026: la copia de seguridad vuelve como
+  último bloque del post-MVP (ADR-006 D2); la migración v3 → v4 se hará sin
+  ella, con el riesgo aceptado por el usuario.
 - `/settings/appearance` dejó de ser placeholder y persiste Texto grande,
   Reducir movimiento, Alto contraste y Ocultar importes.
 - La raíz observa los ajustes solo con sesión desbloqueada y aplica texto de

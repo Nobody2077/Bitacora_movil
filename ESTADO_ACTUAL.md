@@ -121,7 +121,10 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   al recuperarse, desinstaló el paquete prod** con su base cifrada. Los datos
   eran de prueba; se reinstaló `1.4.0+8` con la misma firma. `gate_g8.ps1` y
   `process_restart_g2.ps1` se niegan ahora a correr si el dispositivo tiene
-  instalado `com.jcyq.bitacorarpg`. G8 sigue rojo.
+  instalado `com.jcyq.bitacorarpg`. G8 sigue rojo. Después se reescribió
+  **ADR-006 con todas las decisiones de producto** (dinero real, mi ficha y
+  Contactos, inventario con Equipado, mapa descartado) y la copia de
+  seguridad pasó a ser el último bloque del post-MVP.
 
 ## Bitácora de sesiones
 
@@ -189,6 +192,22 @@ sesión iniciada y conexión a internet), no rodearlo.
 - La instalación por USB en MIUI, sin resolver.
 - Una copia `Descargas/Bitacora-1.4.0+8.apk` quedó en la tablet; se puede
   borrar.
+
+**Más tarde, esa misma sesión: G8 en la tablet y ADR-006.**
+
+- El usuario decidió usar **la tablet como dispositivo principal** y cerrar G8
+  en ella, autorizando desinstalar la instalación vacía para correr el gate.
+  **No se desinstaló**: una prueba inofensiva (`adb install` directo de la APK
+  `dev`, sin Flutter de por medio) volvió a dar
+  `INSTALL_FAILED_USER_RESTRICTED`, así que el gate fallaría igual. Pendiente
+  del usuario: sesión de cuenta Mi, conexión a internet y reactivar «Instalar
+  vía USB» (o desactivar la optimización de MIUI). Repetir la misma prueba
+  antes de desinstalar nada.
+- **ADR-006 reescrito con todas las decisiones de producto** a partir de
+  capturas de *Cyberpunk 2077* que aportó el usuario. Resumen en el RELEVO,
+  «Personaje, Contactos, Inventario y Tienda».
+- **D2 anotada en todos los `.md` que mencionan A6**, con una adenda en
+  ADR-005: la copia de seguridad vuelve como último bloque del post-MVP.
 
 ### 2026-09-23 — A11 cerrada, el golden resuelto y el gate G8 desbloqueado
 
@@ -952,55 +971,36 @@ Se conserva porque describe qué se validó exactamente. Se instaló **encima** 
 **1. Cerrar A8 / G8.** Es lo único abierto del MVP. Ver «A8 / G8: qué falta de
 verdad» arriba: el preflight está verde y solo falta el dispositivo.
 
-**2. Personajes, Tienda e Inventario.** Solo después de 1. Alcance acotado
-por el usuario el 2026-09-07 en `DECISIONES_PRE_A0.md`: **esos tres y nada
-más**; loadouts, servidor y sincronización quedan **descartados**, no aplazados.
+**2. Personaje, Contactos, Inventario y Tienda (ADR-006).** Solo después de 1.
+Decisiones de producto ya resueltas; falta el esquema concreto.
 
-### Personajes, Tienda e Inventario — qué incluye y cómo
+**3. Copia de seguridad.** Último bloque del post-MVP, por decisión del
+usuario del 2026-09-24 (ADR-006 D2, adenda de ADR-005).
 
-**El ADR ya está empezado: `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md`,
-en estado propuesto (borrador) desde el 2026-09-13.** No autoriza código: deja
-tres decisiones abiertas para el usuario —D1 con qué se paga, D2 volcado
-cifrado antes de migrar, D3 una ficha o varias— y ocho decisiones propuestas
-que no dependen de ellas. **Leerlo antes de retomar este bloque; no empezar
-otro ADR desde cero.**
+### Personaje, Contactos, Inventario y Tienda — estado de ADR-006
 
-Lo que sigue es el punto de partida que originó ese borrador, conservado
-porque el ADR lo desarrolla pero no lo repite entero.
+**`documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md` se reescribió el
+2026-09-24 con todas las decisiones del usuario.** Sigue «propuesto» solo por
+lo técnico: esquema concreto, snapshot v4 y plan de migración. **Leerlo antes
+de retomar; no reabrir las decisiones.** Resumen, tomando como referencia el
+menú de *Cyberpunk 2077* que el usuario aportó en capturas:
 
-**Aviso recogido en el ADR y que conviene no perder de vista:** el nivel se
-deriva de `SUM(amount)` sobre `xp_transactions` sin filtrar
-(`progress_dao.dart:173`, `rpg_level.dart:18`), así que gastar XP de ese libro
-**bajaría el nivel al comprar**. Por eso «pagar con XP» son tres salidas
-distintas y no una.
-
-**Qué hay ya construido que sirve de base.** Media ficha de personaje existe,
-solo que repartida: `xp_transactions` (XP), niveles por área en Progreso,
-`title_definitions` y `title_history` (títulos), rachas, y el perfil con nombre
-y foto de la barra lateral. Personajes sería sobre todo **reunir** eso en una
-ficha, no inventarlo.
-
-**Qué falta de verdad.** No hay ninguna tabla de tienda ni de inventario. Eso
-significa **migración v3 → v4**, la primera del proyecto desde el tablón.
-
-**La decisión de diseño que hay que tomar antes de nada:** ¿con qué se paga?
-
-- **Con XP** (`xp_transactions`): sistema cerrado. Cumples misiones, ganas XP,
-  lo gastas en recompensas que tú defines («dos horas de videojuegos»). Es lo
-  que encaja con el marco RPG y con que la aplicación sea de un solo usuario.
-- **Con dinero real** (`transactions`): eso ya no es un juego, es contabilidad.
-  La Economía del proyecto registra gasto e ingreso reales.
-
-Son dos productos distintos. **Lo decide el usuario**, y conviene preguntárselo
-con esta disyuntiva delante, no dar por hecho ninguna.
-
-**Riesgo que hay que resolver antes de migrar, no después.** ADR-005 retiró la
-exportación y `allowBackup="false"`: **no hay copia de seguridad de nada**. Hoy
-eso es asumible porque el esquema está quieto. Una migración v3 → v4 que salga
-mal sobre datos reales **no tiene vuelta atrás**. Antes de tocar el esquema
-conviene poder volcar la base a un fichero cifrado, aunque no haya pantalla de
-restauración. No es reabrir A6; es la diferencia entre un error recuperable y
-perder meses de bitácora. **Planteárselo al usuario antes de empezar.**
+- **D1 — dinero real.** Cada compra de la Tienda es un `EXPENSE` en
+  `transactions` y crea un objeto en el inventario. El XP no se gasta, así que
+  el problema de `progress_dao.dart:173` (comprar bajaría el nivel) desaparece.
+- **D2 — copia al final.** La migración v3 → v4 se hace **sin copia**, con el
+  riesgo aceptado por escrito. Anotado en todos los `.md` que citan A6.
+- **D3 — Personaje = mi ficha + Contactos.** Mi ficha es un hexágono con cada
+  **área de vida como atributo**, que sube **solo con el XP** (sin puntos
+  manuales), y el nivel global al centro: sin tabla nueva. **Contactos** son
+  personas reales (nombre, descripción, foto; todo opcional y editable), en
+  pestaña propia dentro de Personaje, **varias por misión**; se ven como
+  miniaturas en el detalle de la misión y en «Mostrar más detalles».
+- **D4 — Inventario de pertenencias**, compradas o añadidas a mano, por
+  categoría y con foto, más **Equipado**: una silueta con zonas del cuerpo
+  para los accesorios que lleva puestos (una zona por objeto, **no loadouts**).
+- **D5 — Mapa descartado** (exigiría `INTERNET`). Queda un campo
+  **«Ubicación» de texto** en la misión.
 
 ### Decisiones ya tomadas que NO se reabren
 

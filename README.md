@@ -39,7 +39,7 @@ El proyecto está construido con Flutter, Riverpod, GoRouter y Drift sobre una b
 | A3 — Misiones | Completada | G3 verde; además incluye archivado lógico seguro con cancelación de avisos |
 | A4 — Economía | Completada | G4 verde: código, gate y validación física aprobados |
 | A5 — Bitácora y progreso | Completada | G5 verde: evidencia automatizada y validación física aprobadas |
-| A6 — Copia y restauración | Retirada del MVP | ADR-005; G6 retirada / no aplica |
+| A6 — Copia y restauración | Retirada del MVP | ADR-005; G6 retirada / no aplica. La copia vuelve como último bloque post-MVP (ADR-006 D2, 24-09-2026) |
 | A7 — UI v2 y accesibilidad | Completada | G7 verde: auditoría, 3 goldens, 182 pruebas y validación física |
 | A8 — Release | En progreso | Instalación y actualización release aprobadas; faltan métricas físicas y respaldo de firma |
 | A9 — Calendario y recordatorios | En validación | Día/semana/mes, planificación flexible, anticipación, privacidad configurable y 215 pruebas verdes |
@@ -170,6 +170,7 @@ flutter build appbundle --release --flavor prod -t lib/main_prod.dart
 
 No desinstalar una APK `prod` firmada con debug si contiene datos valiosos: una
 APK con la nueva firma de producción no puede actualizarla y A6 fue retirada.
+La copia de seguridad no llegará hasta el final del post-MVP (ADR-006, D2).
 Usar un dispositivo limpio dedicado para el primer smoke release.
 
 ## Verificación disponible

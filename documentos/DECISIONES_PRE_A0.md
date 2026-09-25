@@ -28,6 +28,14 @@ El MVP permanece Android, local-first, de un solo usuario, tablet-first y adapta
 > tablas de tienda ni inventario, así que implica migración v3 → v4, y queda
 > abierta la decisión de con qué se paga —el XP de `xp_transactions` o el
 > dinero real de `transactions`—, que son dos productos distintos.
+>
+> **Precisión del 24 de septiembre de 2026.** Resuelto en ADR-006: la Tienda
+> se paga con **dinero real**; «Personaje» es la ficha del usuario (áreas de
+> vida como atributos) más **Contactos** (personas reales vinculadas a
+> misiones); el Inventario son pertenencias con **Equipado** por zona del
+> cuerpo, sin loadouts. El **mapa queda descartado**. La copia de seguridad
+> vuelve como último bloque del post-MVP y la migración v3 → v4 se hará sin
+> ella, con el riesgo aceptado por el usuario.
 
 ## 2. Identidad y entorno del proyecto
 
@@ -263,7 +271,7 @@ Variantes obligatorias: `412×915`, `1280×800`, texto `2.0×`, alto contraste y
 | A3 | Misiones, tiempo, recurrencia, avisos y CompleteMission | hay duplicación o escritura parcial |
 | A4 | Ledger, reservas y saldos derivados | ledger y resúmenes divergen |
 | A5 | Bitácora, adjuntos, XP, niveles y Dashboard diario/semanal | read models o navegación a fuente fallan |
-| A6 | Retirada del MVP por ADR-005 | G6 retirada / no aplica |
+| A6 | Retirada del MVP por ADR-005; la copia vuelve al final del post-MVP (ADR-006 D2) | G6 retirada / no aplica |
 | A7 | UI v2 adaptativa, accesible y goldens canónicos | compacto, expandido o texto 2.0 fallan |
 | A8 | Rendimiento, regresión, APK/AAB y firma de producción | queda un caso bloqueante o evidencia incompleta |
 
@@ -283,7 +291,9 @@ en un ADR. ADR-005 retira A6/G6 del MVP; A8 queda condicionada únicamente a G7.
 - A4: completada; gate G4 en verde el 27 de agosto de 2026.
 - A5: completada; G5 quedó verde el 27 de agosto de 2026 después de aprobar la
   matriz automatizada y la validación física final de Progreso.
-- A6: retirada del MVP por decisión explícita; G6 retirada / no aplica.
+- A6: retirada del MVP por decisión explícita; G6 retirada / no aplica. El 24
+  de septiembre de 2026 se decidió que la copia vuelva como último bloque del
+  post-MVP (adenda de ADR-005, ADR-006 D2).
 - A7: completada; G7 verde el 28 de agosto de 2026.
 - A8: en progreso; G8 permanece rojo hasta validar firma, artefactos,
   rendimiento, regresión y smoke en dispositivo dedicado.

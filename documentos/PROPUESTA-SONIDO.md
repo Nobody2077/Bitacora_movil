@@ -89,7 +89,9 @@ pruebas `migrateAndValidate`.
 Esto no es comodidad: la próxima migración del proyecto —la v3 → v4 de
 Personajes/Tienda/Inventario— es la operación más peligrosa que tiene por
 delante, porque ADR-005 retiró la exportación y `allowBackup="false"` deja la
-base sin copia de ningún tipo. Cada cambio que **no** toca el esquema es un
+base sin copia de ningún tipo —y el 24 de septiembre de 2026 el usuario decidió
+migrar sin copia y construirla al final (ADR-006 D2)—. Cada cambio que **no**
+toca el esquema es un
 riesgo que no se acumula sobre aquel.
 
 ### 3. No reutilizar `sound_enabled`
