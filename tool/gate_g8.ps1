@@ -35,6 +35,29 @@ function Get-LocalProperty {
     return ($line.Substring($line.IndexOf('=') + 1) -replace '\\\\', '\')
 }
 
+function Assert-ProdPackageAbsent {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Adb
+    )
+
+    # Si falla la instalacion del flavor dev, Flutter desinstala por su cuenta
+    # y puede apuntar al paquete prod sin sufijo. El 2026-09-24 borro asi la
+    # instalacion real de la tablet, con su base cifrada y sus claves.
+    $packages = & $Adb -s $DeviceId shell pm list packages com.jcyq.bitacorarpg
+    if ($LASTEXITCODE -ne 0) {
+        throw "adb could not list packages on $DeviceId."
+    }
+    if ($packages | Where-Object { $_.Trim() -eq 'package:com.jcyq.bitacorarpg' }) {
+        throw @"
+$DeviceId has the prod package com.jcyq.bitacorarpg installed. G8 runs
+Flutter integration tests on this device, and Flutter may uninstall the prod
+package if an install fails, deleting its encrypted data and keys. Use a clean
+dedicated device. Never uninstall an installation that holds real data.
+"@
+    }
+}
+
 function Test-SigningConfigured {
     $environmentNames = @(
         'BITACORA_RELEASE_STORE_FILE',
@@ -92,6 +115,7 @@ G8 never falls back to the debug key.
     if ($LASTEXITCODE -ne 0 -or $deviceState -ne 'device') {
         throw "Android device $DeviceId is not connected and authorized."
     }
+    Assert-ProdPackageAbsent -Adb $adb
 
     Write-Host 'G8: encrypted database, access and restart regressions...'
     Invoke-NativeChecked 'flutter' @(
@@ -186,7 +210,7 @@ G8 never falls back to the debug key.
         throw 'The prod release APK unexpectedly requests INTERNET.'
     }
 
-    Write-Host 'G8: non-destructive release smoke install...'
+    Write-Host 'G8: release smoke install on the clean device...'
     & $adb -s $DeviceId install -r $apk.Path
     if ($LASTEXITCODE -ne 0) {
         throw @'

@@ -4,7 +4,7 @@
   septiembre de 2026 (recorrido de A11).
 - Estado: instalación limpia y actualización aprobadas desde `1.0.0`; **métricas
   pendientes**. **G8 permanece rojo.**
-- Revisado el 23 de septiembre de 2026.
+- Revisado el 24 de septiembre de 2026.
 
 ## Qué bloquea G8 hoy, en concreto
 
@@ -14,7 +14,8 @@
 | Matriz de calidad | **RESUELTO** el 23 de septiembre de 2026 | `flutter test` estaba rojo por el golden `sidebar_modular_battery`, así que `quality.ps1` abortaba el preflight y el gate nunca llegaba a correr. Ya son 238/238 |
 | `a8_preflight.ps1` exigía esquema v1 | **RESUELTO** el 23 de septiembre de 2026 | La aserción estaba fijada a `schemaVersion => 1` desde agosto; el esquema va por v3 desde A10, así que el preflight fallaba en su primera comprobación. Ahora lee la versión declarada y exige que exista `drift_schemas/drift_schema_v<N>.json` |
 | El preflight dependía de `rg` | **RESUELTO** el 23 de septiembre de 2026 | ripgrep no está en el PATH de PowerShell. El barrido de `print`/`debugPrint` usa ahora `Select-String`, sin herramientas externas |
-| Dispositivo accesible por ADB | **PENDIENTE — es el único bloqueo real que queda** | El 23 de septiembre de 2026 `adb devices` salió vacío y el usuario no podía conectar ese día. Sin dispositivo no hay métricas, ni pruebas de integración, ni smoke de instalación |
+| Dispositivo accesible por ADB | **PENDIENTE — es el único bloqueo real que queda** | La tablet conecta por USB desde el 24 de septiembre de 2026, pero tiene la app prod instalada (el gate aborta) y MIUI rechaza `adb install` con `INSTALL_FAILED_USER_RESTRICTED`. Sin dispositivo no hay métricas, ni pruebas de integración, ni smoke de instalación |
+| El gate podía borrar la app prod | **RESUELTO** el 24 de septiembre de 2026 | En el primer intento, al fallar la instalación `dev`, Flutter desinstaló `com.jcyq.bitacorarpg` de la tablet con sus datos (eran de prueba). `gate_g8.ps1` y `process_restart_g2.ps1` abortan ahora si el paquete prod está instalado |
 | Segundo factor de forma (tablet) | **DECIDIDO** el 23 de septiembre de 2026 | El usuario tiene **tablet real**. El criterio de cierre se mantiene tal como está escrito: teléfono y tablet, ambos físicos. No se acota ni se sustituye por un emulador |
 | AAB firmado de `1.4.0+8` | **PENDIENTE** | Solo existe la APK. El gate construye y verifica ambos |
 | Respaldo externo de la llave de firma | **PENDIENTE, del usuario** | Es lo único irreparable del proyecto |
@@ -26,6 +27,12 @@ llave de producción. Android no permite actualizarla con `prod-release`. Como
 A6 fue retirada, desinstalar la app elimina datos sin una vía portable de
 restauración. La primera validación release debe hacerse en un dispositivo
 limpio dedicado. No desinstalar la instalación de uso real.
+
+«Limpio» significa **sin `com.jcyq.bitacorarpg` instalado**, no solo sin datos
+valiosos. Aunque las pruebas usan `--flavor dev`, si su instalación falla
+Flutter puede desinstalar el paquete prod como recuperación: así se perdió la
+instalación de la tablet el 24 de septiembre de 2026. El gate lo comprueba y
+aborta; el smoke final instala entonces la release sobre un dispositivo vacío.
 
 ## Preparación
 

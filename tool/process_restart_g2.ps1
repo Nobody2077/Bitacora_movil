@@ -77,6 +77,23 @@ function Get-PackagePid {
     return $value
 }
 
+function Assert-ProdPackageAbsent {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$AdbExecutable
+    )
+
+    # Mismo riesgo que en gate_g8.ps1: si falla la instalacion dev, Flutter
+    # puede desinstalar el paquete prod y borrar sus datos cifrados.
+    $packages = & $AdbExecutable -s $DeviceId shell pm list packages com.jcyq.bitacorarpg
+    if ($LASTEXITCODE -ne 0) {
+        throw "adb could not list packages on $DeviceId."
+    }
+    if ($packages | Where-Object { $_.Trim() -eq 'package:com.jcyq.bitacorarpg' }) {
+        throw "$DeviceId has the prod package com.jcyq.bitacorarpg installed. Use a clean dedicated device."
+    }
+}
+
 function Wait-ForPackagePid {
     param(
         [Parameter(Mandatory = $true)]
@@ -99,6 +116,7 @@ Push-Location -LiteralPath $ProjectRoot
 
 try {
     Invoke-NativeChecked $AdbExecutable @('-s', $DeviceId, 'get-state')
+    Assert-ProdPackageAbsent -AdbExecutable $AdbExecutable
 
     Write-Host 'G2 process restart: seeding encrypted access state...'
     Invoke-NativeChecked 'flutter' @(

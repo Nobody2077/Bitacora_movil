@@ -1,15 +1,21 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **23 de septiembre de 2026**
+- Última revisión: **24 de septiembre de 2026**
 - Versión en `pubspec.yaml`: **`1.4.0+8`**, compilada, firmada y **aprobada en
   dispositivo**
 - Última versión aprobada en dispositivo: `1.4.0+8`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
+- Rama de trabajo: `main`, árbol limpio y **un commit por delante de
+  `origin/main`** (el del incidente del 24 de septiembre, sin subir)
 - **A11 — Notificaciones: COMPLETADA** el 23 de septiembre de 2026. El recorrido
   físico de `1.4.0+8` salió sin incidencias, así que los puntos 2, 3 y 4 quedan
   validados y **G9 cierra con ella**
 - En curso: **A8 — Release**, cerrar G8
+- **Incidente del 24 de septiembre de 2026:** al lanzar el gate G8 sobre la
+  tablet, Flutter **desinstaló la app prod real** con sus datos. Eran datos de
+  prueba y la app ya está reinstalada, pero **el gate solo puede correr en un
+  dispositivo sin `com.jcyq.bitacorarpg` instalado**, y ahora lo comprueba él
+  mismo. Detalle en «Bitácora de sesiones»
 
 > **Si retomas el proyecto, salta a "RELEVO — empezar aquí la próxima
 > sesión"**. Dice dónde quedamos, qué está decidido, qué falta y cómo hacerlo,
@@ -111,12 +117,79 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   **238 pruebas**. Al abrir A8 se descubrió que el gate G8 llevaba inejecutable
   desde agosto por tres motivos ya corregidos; **el preflight pasa entero por
   primera vez**. G8 sigue rojo solo por falta de dispositivo.
+- Sesión del **24 de septiembre de 2026**: primer intento real del gate G8,
+  sobre la tablet. MIUI rechazó la instalación de la APK `dev` y **Flutter,
+  al recuperarse, desinstaló el paquete prod** con su base cifrada. Los datos
+  eran de prueba; se reinstaló `1.4.0+8` con la misma firma. `gate_g8.ps1` y
+  `process_restart_g2.ps1` se niegan ahora a correr si el dispositivo tiene
+  instalado `com.jcyq.bitacorarpg`. G8 sigue rojo.
 
 ## Bitácora de sesiones
 
 Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
+
+### 2026-09-24 — Incidente: el gate G8 borró la app prod de la tablet
+
+**Qué pasó.** Con la tablet conectada por USB (Xiaomi `25040RP0AL`, Android 16,
+serial `biuonrrcey45lvrs`) se comprobó que tenía instalada la release
+`1.4.0+8` con el certificado de siempre (`a6092c6c…`) y se lanzó
+`tool/gate_g8.ps1`. El preflight salió verde entero (238/238 y
+`lintProdRelease`). En el primer paso con dispositivo, MIUI rechazó la
+instalación de `app-dev-debug.apk` con `INSTALL_FAILED_USER_RESTRICTED`, y
+**Flutter, como recuperación, desinstaló `com.jcyq.bitacorarpg` —el paquete
+prod, sin sufijo `.dev`—**. Logcat de la tablet:
+
+```
+22:09:35.873 PKMSImpl: ... packageName: com.jcyq.bitacorarpg.dev, msg=Install canceled by user
+22:09:36.292 PackageManager: Uninstall pkg: com.jcyq.bitacorarpg u0 flags:2 from u2000/27237
+22:09:36.706 RollbackManager: broadcast=ACTION_PACKAGE_FULLY_REMOVED pkg=com.jcyq.bitacorarpg
+```
+
+`FULLY_REMOVED` significa base cifrada y claves de AndroidKeyStore borradas.
+Sin `allowBackup` ni exportación (ADR-005) **no hay recuperación posible**.
+
+**Consecuencia.** El usuario confirmó que eran **datos de prueba** y que
+recrearlos le sirve para encontrar fallos. Se reinstaló `1.4.0+8` desde
+`build/app/outputs/flutter-apk/app-prod-release.apk`: versión 8, misma firma
+(`cfba7fb9`), así que las próximas release siguen instalándose encima.
+
+**Por qué el relevo no lo evitó.** `A8-VALIDACION-RELEASE.md` pedía «un
+dispositivo limpio dedicado», pero este relevo decía que instalar el flavor
+`dev` era «seguro» y que el `install -r` final era la única precaución. Nada en
+los scripts lo comprobaba. Además, tras el primer fallo se afirmó al usuario
+que su app no se había tocado **sin verificarlo en el dispositivo**; se
+descubrió al revisar `pm path` después de la segunda pasada.
+
+**Causa probable, no confirmada en el código de Flutter.** En la primera pasada
+la APK `dev` aún no existía cuando Flutter resolvió el paquete, y tomó el
+`applicationId` del proyecto sin el sufijo del flavor. En la segunda pasada,
+con la APK ya construida, el `uninstall` de recuperación apuntó correctamente a
+`.dev`, que no existía, y no hizo daño.
+
+**Qué se cambió.** `tool/gate_g8.ps1` y `tool/process_restart_g2.ps1` tienen
+`Assert-ProdPackageAbsent`: antes de lanzar Flutter contra el dispositivo,
+listan los paquetes y **abortan si `com.jcyq.bitacorarpg` está instalado**, o
+si `adb` no puede listarlos. Probado aislado: bloquea con la tablet real, deja
+pasar con solo `.dev` o dispositivo vacío. Sin interruptor para saltárselo, a
+propósito.
+
+**MIUI y la instalación por USB.** Con «Instalar vía USB» activado, `adb
+install` siguió fallando con `INSTALL_FAILED_USER_RESTRICTED`. Lo que sí
+funcionó fue copiar la APK a `/data/local/tmp` y lanzar `pm install` desde
+`adb shell`. Flutter usa `adb install`, así que para que el gate funcione en
+esta tablet hay que resolver el aviso de MIUI (suele pedir cuenta Mi con
+sesión iniciada y conexión a internet), no rodearlo.
+
+**Qué queda abierto.**
+
+- **G8 sigue rojo.** Para correrlo en la tablet ahora hace falta que no tenga
+  la app prod: la instalación actual está vacía, así que es el momento de
+  decidir si se desinstala para el gate antes de volver a meter datos.
+- La instalación por USB en MIUI, sin resolver.
+- Una copia `Descargas/Bitacora-1.4.0+8.apk` quedó en la tablet; se puede
+  borrar.
 
 ### 2026-09-23 — A11 cerrada, el golden resuelto y el gate G8 desbloqueado
 
@@ -756,8 +829,10 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
 **A11 está CERRADA y G9 con ella.** El recorrido físico de `1.4.0+8` salió sin
 incidencias el 23 de septiembre de 2026. Lo único abierto del MVP es **A8/G8**,
-y su preflight ya está verde: **falta exclusivamente un dispositivo conectado
-por ADB**. Árbol limpio y sincronizado con `origin/main`.
+y su preflight ya está verde: **falta un dispositivo por ADB sin la app prod
+instalada** y que MIUI acepte `adb install`. El 24 de septiembre el primer
+intento borró la app prod de la tablet (datos de prueba); el gate ahora se
+protege contra eso.
 
 ### Qué se subió el 2026-09-23
 
@@ -820,10 +895,16 @@ Cuando haya dispositivo, el paso es uno solo, por cada equipo:
 powershell -ExecutionPolicy Bypass -File tool/gate_g8.ps1 -DeviceId <serial-adb>
 ```
 
-Cuidado antes de lanzarlo: el gate instala el flavor `dev` para las pruebas de
-integración —eso es seguro, va con sufijo `.dev` y datos propios— y después hace
-`adb install -r` de la release sobre la instalación real. Eso último solo es
-seguro porque la llave es la misma; **nunca desinstalar** (ver «Reglas»).
+**Solo en un dispositivo SIN la app prod instalada.** Hasta el 2026-09-24 este
+párrafo decía que instalar el flavor `dev` era seguro. **No lo es:** si esa
+instalación falla, Flutter puede desinstalar `com.jcyq.bitacorarpg` por su
+cuenta, y así borró la instalación de la tablet (ver la entrada de sesión del
+2026-09-24). Desde entonces el gate lo comprueba y aborta si el paquete prod
+está presente. No añadirle un interruptor para saltarlo.
+
+En Xiaomi, `adb install` puede fallar con `INSTALL_FAILED_USER_RESTRICTED`
+aunque «Instalar vía USB» esté activado; hay que resolverlo antes de lanzar el
+gate.
 
 ### El recorrido de `1.4.0+8`, ya HECHO el 2026-09-23
 
@@ -857,8 +938,10 @@ Se conserva porque describe qué se validó exactamente. Se instaló **encima** 
    actualizar la aplicación nunca: la única salida sería desinstalar, que borra
    todos los datos **y las claves de AndroidKeyStore que los descifran**.
    Se arrastra como pendiente desde A8.
-2. **Conectar un dispositivo por ADB** para poder cerrar G8. El 23 de
-   septiembre de 2026 no fue posible. Es lo único que bloquea el MVP.
+2. **Conectar un dispositivo por ADB** para poder cerrar G8. La tablet ya
+   conecta por USB desde el 24 de septiembre de 2026, pero el gate exige que
+   **no tenga la app prod instalada** y MIUI aún rechaza `adb install`. Es lo
+   único que bloquea el MVP.
 3. Opcional: activar «Include private contributions on my profile» en
    <https://github.com/settings/profile>. **El usuario lo dejó apagado el
    2026-09-07 creyendo que haría público el repositorio; no es así:** solo hace
@@ -958,6 +1041,12 @@ perder meses de bitácora. **Planteárselo al usuario antes de empezar.**
   sufijo `.dev` y datos propios. Para probar de verdad: release firmada con la
   versión subida, comprobando antes con
   `apksigner verify --print-certs` que el SHA-256 coincide con el instalado.
+- **Nunca lanzar `flutter test`, `flutter drive`, `flutter run` ni el gate G8
+  contra un dispositivo con la app prod instalada.** Aunque sea `--flavor dev`:
+  si la instalación falla, Flutter puede desinstalar el paquete prod. Ocurrió
+  el 2026-09-24. Y tras cualquier fallo en dispositivo, comprobar con
+  `adb shell pm path com.jcyq.bitacorarpg` antes de afirmar que la app sigue
+  intacta.
 - **No apilar cambios sobre un APK que esté bajo prueba física.** Mientras
   código y dispositivo coincidan, cada anomalía es atribuible sin ambigüedad.
 - **Documentar cada sesión** en «Bitácora de sesiones», entrada nueva arriba.
