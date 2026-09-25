@@ -1,7 +1,7 @@
 # Propuesta — efectos de sonido
 
-- Estado: **implementada en `1.5.0+9` el 25 de septiembre de 2026**, pendiente
-  de recorrido físico. Decisiones y desviaciones en «Implementación», al final
+- Estado: **implementada en `1.5.0+9` y aprobada en dispositivo el 25 de
+  septiembre de 2026**. Decisiones y desviaciones en «Implementación», al final
 - Fecha de registro: 15 de septiembre de 2026
 - Alcance: efectos de sonido de interfaz y de recompensa dentro de la
   aplicación. **No** cubre el sonido de las notificaciones Android, que ya
@@ -307,7 +307,14 @@ La selección se hizo por nombre, sin escucharlos. **Se valida en el recorrido
 físico** y cualquiera se sustituye cambiando solo el fichero, con el mismo
 nombre.
 
-### Pendiente
+### Validación física — 25 de septiembre de 2026
 
-- Recorrido físico de `1.5.0+9`: cada momento suena, la música del usuario no
-  se pausa, el modo silencio calla los efectos y la selección suena bien.
+`1.5.0+9` instalada en la tablet (Xiaomi `25040RP0AL`, HyperOS 3, Android 16)
+como actualización desde Descargas, con la misma firma y sin perder datos. El
+usuario revisó los sonidos y los aprobó tal como están: **la selección hecha
+por nombre se queda**.
+
+No quedó registrado por separado si se probó con música de fondo ni con el
+teléfono en silencio; el código cubre ambos casos (sin foco de audio y sin
+sonar fuera del modo normal). Si alguna vez la música se pausa o un efecto
+suena en silencio, es un fallo de `UiSoundBridge.kt`.

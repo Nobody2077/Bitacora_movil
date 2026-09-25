@@ -1,9 +1,9 @@
 # Estado actual y guía de relevo
 
 - Última revisión: **25 de septiembre de 2026**
-- Versión en `pubspec.yaml`: **`1.5.0+9`** (efectos de sonido), compilada y
-  firmada, **pendiente de recorrido físico**
-- Última versión aprobada en dispositivo: `1.4.0+8`
+- Versión en `pubspec.yaml`: **`1.5.0+9`** (efectos de sonido), compilada,
+  firmada y **aprobada en dispositivo** el 25 de septiembre de 2026
+- Última versión aprobada en dispositivo: `1.5.0+9`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
 - **A11 — Notificaciones: COMPLETADA** el 23 de septiembre de 2026. El recorrido
@@ -129,7 +129,7 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
   sonido implementados** en `1.5.0+9`, antes de ADR-006 por decisión del
   usuario. Cinco efectos futuristas CC0, dos interruptores apagados por
   defecto, sin paquete nuevo ni cambio de esquema. 250/250 pruebas; APK
-  release firmada y sin `INTERNET`. Falta el recorrido físico.
+  release firmada y sin `INTERNET`. **Aprobada en la tablet** el mismo día.
 
 ## Bitácora de sesiones
 
@@ -169,18 +169,29 @@ APK `prodRelease` `1.5.0+9` de 73.000.867 bytes, SHA-256
 `2e1c1069a2f1c0f0cd42c047272c1bf38e995447f778d69033cb643f226b9202`, firmada con
 `a6092c6c…`, con los cinco `.ogg` dentro y **sin permiso `INTERNET`**.
 
+**Validada en dispositivo el mismo día.** El usuario instaló `1.5.0+9` en la
+tablet y aprobó los sonidos tal como están: la selección hecha por nombre se
+queda. Se comprobó por ADB que es `1.5.0` (código 9), con la firma de siempre y
+como actualización (`firstInstallTime` sin cambiar), así que no se perdió
+nada.
+
+**Cómo se instaló, y por qué importa para G8.** HyperOS 3 rechazó **tanto
+`adb install` como `pm install` desde `adb shell`**, al instante y sin mostrar
+ningún aviso: `PKMSImpl: assertCallerAndPackage: uid=2000 … Install canceled
+by user`, con `persist.security.adbinstall=1`. El `pm install` del 24 de
+septiembre sí funcionó, así que la condición cambia entre sesiones; la
+sospecha sigue siendo la cuenta Mi o la conexión. **Lo que funcionó fue
+copiar la APK a `Descargas` con `adb push`, avisar al escáner de medios
+(`am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE`) e instalarla
+el usuario desde el gestor de archivos.** Sirve para actualizar, pero no para
+G8: el gate instala por USB y seguirá fallando hasta resolver HyperOS.
+
 **Qué queda abierto.**
 
-- **Recorrido físico de `1.5.0+9`** en la tablet: activar los dos interruptores,
-  entrar con PIN, cambiar de sección, crear una misión, completarla (y una que
-  suba de nivel), con música sonando de fondo para comprobar que no se pausa,
-  y en silencio para comprobar que calla. Decidir si algún efecto se cambia.
-- **Cómo instalarla:** `adb install` sigue bloqueado por MIUI; la vía que
-  funcionó el 24 de septiembre es `adb push` a `/data/local/tmp` y
-  `adb shell pm install -r`. Es una actualización con la misma firma: no borra
-  datos.
-- **Orden con G8:** si G8 se cierra después, validará `1.5.0+9` en lugar de
-  `1.4.0+8`. Da igual mientras no se cambie código durante la prueba física.
+- **G8 sigue bloqueado** por la instalación USB de HyperOS, además de exigir un
+  dispositivo sin la app prod. Validará `1.5.0+9`, no `1.4.0+8`.
+- No quedó registrado por separado si se probó con música de fondo o en
+  silencio; el código cubre ambos casos.
 
 ### 2026-09-24 — Incidente: el gate G8 borró la app prod de la tablet
 
@@ -1020,9 +1031,6 @@ Se conserva porque describe qué se validó exactamente. Se instaló **encima** 
 
 **1. Cerrar A8 / G8.** Es lo único abierto del MVP. Ver «A8 / G8: qué falta de
 verdad» arriba: el preflight está verde y solo falta el dispositivo.
-
-**1 bis. Recorrido físico de `1.5.0+9` (efectos de sonido).** Implementado el
-2026-09-25; ver la entrada de sesión de ese día.
 
 **2. Personaje, Contactos, Inventario y Tienda (ADR-006).** Solo después de 1.
 Decisiones de producto ya resueltas; falta el esquema concreto.

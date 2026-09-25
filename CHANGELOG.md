@@ -26,7 +26,8 @@
   ellas nuevas sobre las preferencias, el servicio, la subida de nivel y la
   pantalla de Sonido.
 - APK release `1.5.0+9` firmada con el certificado de siempre y **sin permiso
-  `INTERNET`**. Pendiente de recorrido físico.
+  `INTERNET`**. **Validada en dispositivo el 25 de septiembre de 2026**: el
+  usuario aprobó los cinco efectos tal como están.
 
 ## 1.4.0 — candidata `1.4.0+8`
 
