@@ -964,7 +964,10 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >       instalada con `adb install` (nunca `flutter test`/`flutter run`). La
 >       prod siguió intacta en `1.6.2`.
 >    2. El usuario crea misiones, movimientos y una entrada con foto.
->    3. Instalar encima la `dev` v4 de esta rama y comprobar que todo sigue.
+>    2–3. **Hecho el 1 de octubre de 2026**: el usuario creó PIN, misiones,
+>       ingreso, gasto y entrada con foto en `dev` v3; se instaló encima la
+>       `dev` v4 de esta rama (`adb install -r`, `firstInstallTime` intacto) y
+>       el usuario confirmó «datos bien». **Ensayo de D2 superado.**
 > 2. **Datos**: DAOs y repositorios de personajes (`contacts`, fotos,
 >    vínculos con misiones y entradas), foto y ubicación de la misión. Con
 >    unidades de trabajo e idempotencia como el resto del proyecto.
