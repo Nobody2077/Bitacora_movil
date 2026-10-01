@@ -905,6 +905,30 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
 ### ▶ EMPEZAR AQUÍ — la próxima sesión, sea cuando sea
 
+> **Actualización del 30 de septiembre de 2026 — prevalece sobre lo de abajo.**
+> - **G8 casi cerrado, solo con la tablet** (decisión del usuario: no tiene
+>   teléfono). Gate automatizado, métricas, release `1.5.0+9` firmada y
+>   verificada, recorrido manual y logcat: todo en verde. Detalle y hashes en
+>   `documentos/A8-VALIDACION-RELEASE.md`. **Falta solo el punto 9:**
+>   `adb install -r` de `app-prod-release.apk` encima de la instalación con
+>   datos, con el usuario delante para aceptar la ventana de HyperOS (la
+>   cancela sola a los ~30 s). Después confirmar con él que sus datos siguen.
+> - La tablet **ya instala por USB**, pero cada instalación pide confirmación.
+>   Tiene la release con datos de uso real desde hoy: **no lanzar el gate ni
+>   `flutter test` sobre ella** sin preguntar.
+> - **La llave de firma sigue sin respaldo** (el usuario lo confirmó hoy).
+> - Siguiente trabajo acordado, en orden:
+>   1. `1.5.1+10`: botón «Copiar» del código de recuperación (contenido
+>      marcado como sensible y portapapeles borrado a los 60 s) y botón
+>      «Pegar» al recuperar; actualizar ADR-002.
+>   2. ADR-006 ampliado con lo decidido hoy: menú tipo juego CIBERWARE ·
+>      INVENTARIO · MAPA (aplazado, OSM sin conexión) · PERSONAJE · DIARIO
+>      (Bitácora renombrada, solo visual) con personajes; Creación
+>      (componentes por dificultad, recompensas, armar/desarmar piezas reales),
+>      lista de deseos, Reputación configurable, compra como acción con
+>      animación, ☰ para la barra lateral y tema Vino. El usuario hará los SVG
+>      de las siluetas con Claude chat. Todo en **una sola migración v4**.
+
 **Estado al cerrar el 25 de septiembre de 2026:** `main` limpia y sincronizada
 con `origin/main`. Versión **`1.5.0+9`** (efectos de sonido) instalada en la
 tablet y **aprobada por el usuario**. 250/250 pruebas, `flutter analyze`
