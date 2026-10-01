@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:bitacora_rpg_personal/features/access/application/access_session_sounds.dart';
+import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
 import 'package:bitacora_rpg_personal/features/missions/application/mission_completion_sound.dart';
 import 'package:bitacora_rpg_personal/shared/sound/ui_sound.dart';
 import 'package:bitacora_rpg_personal/shared/sound/ui_sound_preferences.dart';
@@ -41,7 +43,30 @@ void main() {
         '${directory.path}${Platform.pathSeparator}'
         '${FileUiSoundPreferenceStore.fileName}',
       );
-      expect(await mirror.readAsString(), 'reward=1\ninterface=0\n');
+      expect(await mirror.readAsString(), 'reward=1\ninterface=0\naccess=0\n');
+    });
+
+    test('un espejo anterior sin la clave de acceso la deja apagada', () async {
+      final Directory directory = await Directory.systemTemp.createTemp(
+        'bitacora-sound-legacy-',
+      );
+      addTearDown(() => directory.delete(recursive: true));
+      await File(
+        '${directory.path}${Platform.pathSeparator}'
+        '${FileUiSoundPreferenceStore.fileName}',
+      ).writeAsString('reward=1\ninterface=1\n');
+      final FileUiSoundPreferenceStore store = FileUiSoundPreferenceStore(
+        directoryLocator: () async => directory,
+      );
+
+      final UiSoundPreferences read = await store.read();
+
+      expect(read.rewardEnabled, isTrue);
+      expect(read.interfaceEnabled, isTrue);
+      expect(read.accessEnabled, isFalse);
+
+      await store.write(read.copyWith(accessEnabled: true));
+      expect((await store.read()).accessEnabled, isTrue);
     });
 
     test('un contenido desconocido falla de forma segura a silencio', () async {
@@ -107,6 +132,103 @@ void main() {
 
       expect(brokenPlayer.play(UiSound.levelUp), completes);
       expect(brokenPreferences.play(UiSound.levelUp), completes);
+      expect(brokenPlayer.stop(UiSound.accessLoading), completes);
+    });
+
+    test('los sonidos de acceso dependen solo de su interruptor', () async {
+      final _RecordingPlayer player = _RecordingPlayer();
+      final UiSoundService service = UiSoundService(
+        readPreferences: () async => const UiSoundPreferences(
+          rewardEnabled: true,
+          interfaceEnabled: true,
+        ),
+        player: player,
+      );
+      await service.play(UiSound.accessKeypad);
+      await service.play(UiSound.accessLoading);
+      await service.play(UiSound.accessDenied);
+      expect(player.played, isEmpty);
+
+      final UiSoundService accessOnly = UiSoundService(
+        readPreferences: () async => const UiSoundPreferences(
+          rewardEnabled: false,
+          interfaceEnabled: false,
+          accessEnabled: true,
+        ),
+        player: player,
+      );
+      await accessOnly.play(UiSound.accessKeypad);
+      await accessOnly.play(UiSound.navigation);
+      expect(player.played, <UiSound>[UiSound.accessKeypad]);
+    });
+
+    test('cortar un efecto no depende de las preferencias', () async {
+      final _RecordingPlayer player = _RecordingPlayer();
+      final UiSoundService service = UiSoundService(
+        readPreferences: () async => UiSoundPreferences.defaults,
+        player: player,
+      );
+
+      await service.stop(UiSound.accessLoading);
+
+      expect(player.stopped, <UiSound>[UiSound.accessLoading]);
+    });
+  });
+
+  group('accessSoundCommands', () {
+    const AccessSessionState unlocked = AccessSessionState.unlockedForTesting();
+    final AccessSessionState locked = unlocked.copyWith(
+      phase: AccessSessionPhase.locked,
+      notice: null,
+    );
+    final AccessSessionState validating = locked.copyWith(
+      phase: AccessSessionPhase.authenticating,
+      isBusy: true,
+    );
+
+    test('validar arranca la carga; abrir la corta y suena el acceso', () {
+      expect(
+        accessSoundCommands(locked, validating),
+        const <AccessSoundCommand>[
+          AccessSoundCommand(AccessSoundAction.play, UiSound.accessLoading),
+        ],
+      );
+      expect(
+        accessSoundCommands(validating, unlocked),
+        const <AccessSoundCommand>[
+          AccessSoundCommand(AccessSoundAction.stop, UiSound.accessLoading),
+          AccessSoundCommand(AccessSoundAction.play, UiSound.accessGranted),
+        ],
+      );
+    });
+
+    test('un PIN rechazado corta la carga y suena el error', () {
+      for (final AccessNotice notice in <AccessNotice>[
+        AccessNotice.invalidCredential,
+        AccessNotice.progressiveWait,
+      ]) {
+        expect(
+          accessSoundCommands(validating, locked.copyWith(notice: notice)),
+          const <AccessSoundCommand>[
+            AccessSoundCommand(AccessSoundAction.stop, UiSound.accessLoading),
+            AccessSoundCommand(AccessSoundAction.play, UiSound.accessDenied),
+          ],
+        );
+      }
+    });
+
+    test('volver a bloqueado sin rechazo solo corta la carga', () {
+      expect(
+        accessSoundCommands(validating, locked),
+        const <AccessSoundCommand>[
+          AccessSoundCommand(AccessSoundAction.stop, UiSound.accessLoading),
+        ],
+      );
+    });
+
+    test('sin cambio de fase no suena nada', () {
+      expect(accessSoundCommands(locked, locked), isEmpty);
+      expect(accessSoundCommands(unlocked, unlocked), isEmpty);
     });
   });
 
@@ -179,12 +301,19 @@ void main() {
 
 final class _RecordingPlayer implements UiSoundPlayer {
   final List<UiSound> played = <UiSound>[];
+  final List<UiSound> stopped = <UiSound>[];
 
   @override
   Future<void> play(UiSound sound) async => played.add(sound);
+
+  @override
+  Future<void> stop(UiSound sound) async => stopped.add(sound);
 }
 
 final class _ThrowingPlayer implements UiSoundPlayer {
   @override
   Future<void> play(UiSound sound) async => throw StateError('sin audio');
+
+  @override
+  Future<void> stop(UiSound sound) async => throw StateError('sin audio');
 }

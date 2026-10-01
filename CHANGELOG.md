@@ -1,5 +1,27 @@
 # Historial de cambios
 
+## 1.6.0 — candidata `1.6.0+11`
+
+### Sonidos de acceso
+
+- Nuevo interruptor **Ajustes → Sonido → «Sonidos de acceso»**, desactivado
+  por defecto.
+- Un chasquido al pulsar cada tecla del PIN, **el mismo para todas**, también
+  borrar y limpiar, para que el sonido no revele dígitos.
+- Sonido de **terminal cargando** mientras se valida el PIN; se corta en
+  cuanto termina.
+- Aviso sonoro de **PIN incorrecto**.
+- Efectos de Kenney (CC0): `click_001`, `computerNoise_000` y `error_006`.
+  Procedencia en `documentos/PROPUESTA-SONIDO.md`. **El esquema no cambia.**
+
+### Calidad
+
+- `flutter analyze` sin problemas y **265/265 pruebas aprobadas**, siete nuevas
+  (interruptor, espejo anterior y qué suena en cada cambio del acceso).
+- APK release `1.6.0+11` firmada con el certificado de siempre y **sin permiso
+  `INTERNET`**. Instalada encima de `1.5.1+10` con datos reales y **validada en
+  la tablet el 1 de octubre de 2026**: el usuario aprobó los tres sonidos.
+
 ## 1.5.1 — candidata `1.5.1+10`
 
 ### Copiar y pegar el código de recuperación

@@ -302,6 +302,9 @@ septiembre de 2026 de las páginas oficiales de cada pack, con su
 | `ui_mission_created.ogg` | *Interface Sounds* — `confirmation_001.ogg` |
 | `ui_mission_completed.ogg` | *Interface Sounds* — `confirmation_002.ogg` |
 | `ui_level_up.ogg` | *Interface Sounds* — `maximize_005.ogg` |
+| `ui_access_keypad.ogg` | *Interface Sounds* — `click_001.ogg` (añadido en `1.6.0`) |
+| `ui_access_loading.ogg` | *Sci-Fi Sounds* 1.0 — `computerNoise_000.ogg` (añadido en `1.6.0`) |
+| `ui_access_denied.ogg` | *Interface Sounds* — `error_006.ogg` (añadido en `1.6.0`) |
 
 La selección se hizo por nombre, sin escucharlos. **Se valida en el recorrido
 físico** y cualquiera se sustituye cambiando solo el fichero, con el mismo
@@ -318,3 +321,39 @@ No quedó registrado por separado si se probó con música de fondo ni con el
 teléfono en silencio; el código cubre ambos casos (sin foco de audio y sin
 sonar fuera del modo normal). Si alguna vez la música se pausa o un efecto
 suena en silencio, es un fallo de `UiSoundBridge.kt`.
+
+## Adenda del 1 de octubre de 2026 — sonidos de acceso (`1.6.0`)
+
+A petición del usuario, el acceso deja de tener un solo timbre:
+
+- **Tercer interruptor, «Sonidos de acceso»**, desactivado por defecto como
+  los otros dos. Se guarda en el mismo espejo no sensible
+  (`ui_sound_v1.txt`, clave `access`); un espejo anterior sin la clave lo deja
+  apagado.
+- **Tecla del PIN**: un chasquido por pulsación, **el mismo para los diez
+  dígitos, borrar y limpiar**. Cumple el criterio 5: el sonido no distingue
+  dígitos; el número de pulsaciones ya es visible en el BÚFER y la longitud
+  del PIN es fija y conocida. Solo suena con la pantalla bloqueada esperando
+  el PIN; los borrados que hace la app tras un intento no suenan.
+- **Carga de la terminal**: arranca al pasar a validación y **se corta** al
+  salir de ella, para que el sonido nunca alargue la entrada (volumen 0,35).
+- **PIN incorrecto**: suena al volver a bloqueado con «credencial no válida»
+  o «espera progresiva». Solo dice lo que la pantalla ya muestra.
+- Reglas sin cambio: no pide foco de audio, no suena en silencio ni en
+  vibración, y ninguna información depende de oírlo.
+
+**Criterio 6** (no más de ocho efectos): con estos tres la paleta llega
+exactamente a **ocho**. Los efectos previstos para el menú Personaje (pestañas,
+☰, compra, Creación) lo superan; se ampliará el criterio, con decisión del
+usuario, cuando lleguen esas fases.
+
+Selección por nombre y duración, sin escucharlos, igual que la primera vez:
+se validan en la tablet y cualquiera se sustituye cambiando solo el fichero.
+Packs descargados de nuevo el 1 de octubre de 2026 de las páginas oficiales,
+con su `License.txt` CC0.
+
+### Validación física — 1 de octubre de 2026
+
+`1.6.0+11` instalada encima de `1.5.1+10` en la tablet, con datos reales. El
+usuario probó teclas, carga y PIN incorrecto y **aprobó los tres sonidos tal
+como están**.

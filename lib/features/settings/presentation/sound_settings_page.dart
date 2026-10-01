@@ -139,6 +139,21 @@ class _SoundSettingsPageState extends ConsumerState<SoundSettingsPage> {
           preview: value ? UiSound.navigation : null,
         ),
       ),
+      const SizedBox(height: TerminalSpace.sm),
+      PreferenceSwitchCard(
+        switchKey: const Key('access-sound-switch'),
+        icon: Icons.dialpad,
+        title: 'Sonidos de acceso',
+        description:
+            'Un chasquido al pulsar cada tecla del PIN (el mismo para todas), '
+            'la carga de la terminal y un aviso si el PIN es incorrecto.',
+        value: preferences.accessEnabled,
+        enabled: !_saving,
+        onChanged: (bool value) => _save(
+          preferences.copyWith(accessEnabled: value),
+          preview: value ? UiSound.accessKeypad : null,
+        ),
+      ),
       const SizedBox(height: TerminalSpace.md),
       const Text(
         'Los efectos no pausan tu música y no suenan con el teléfono en '

@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'ui_sound_preferences.dart';
 
-enum UiSoundGroup { reward, interface }
+enum UiSoundGroup { reward, interface, access }
 
 /// Paleta cerrada de efectos. Cada nombre coincide con un fichero de
 /// `android/app/src/main/res/raw` registrado en `UiSoundBridge`.
@@ -13,7 +13,13 @@ enum UiSound {
   navigation('NAVIGATION', UiSoundGroup.interface),
   missionCreated('MISSION_CREATED', UiSoundGroup.reward),
   missionCompleted('MISSION_COMPLETED', UiSoundGroup.reward),
-  levelUp('LEVEL_UP', UiSoundGroup.reward);
+  levelUp('LEVEL_UP', UiSoundGroup.reward),
+
+  // Acceso: todas las teclas usan el mismo efecto, también borrar, para que
+  // el sonido no distinga dígitos (PROPUESTA-SONIDO, criterio 5).
+  accessKeypad('ACCESS_KEYPAD', UiSoundGroup.access),
+  accessLoading('ACCESS_LOADING', UiSoundGroup.access),
+  accessDenied('ACCESS_DENIED', UiSoundGroup.access);
 
   const UiSound(this.channelName, this.group);
 
@@ -23,6 +29,8 @@ enum UiSound {
 
 abstract interface class UiSoundPlayer {
   Future<void> play(UiSound sound);
+
+  Future<void> stop(UiSound sound);
 }
 
 final class MethodChannelUiSoundPlayer implements UiSoundPlayer {
@@ -37,6 +45,12 @@ final class MethodChannelUiSoundPlayer implements UiSoundPlayer {
   @override
   Future<void> play(UiSound sound) => _channel.invokeMethod<void>(
     'play',
+    <String, Object?>{'sound': sound.channelName},
+  );
+
+  @override
+  Future<void> stop(UiSound sound) => _channel.invokeMethod<void>(
+    'stop',
     <String, Object?>{'sound': sound.channelName},
   );
 }
@@ -61,6 +75,7 @@ final class UiSoundService {
       return switch (sound.group) {
         UiSoundGroup.reward => preferences.rewardEnabled,
         UiSoundGroup.interface => preferences.interfaceEnabled,
+        UiSoundGroup.access => preferences.accessEnabled,
       };
     } on Object {
       return false;
@@ -75,6 +90,16 @@ final class UiSoundService {
       await _player.play(sound);
     } on Object {
       // Sin sonido: la acción ya se completó y se ve en pantalla.
+    }
+  }
+
+  /// Corta un efecto largo, como la carga de la terminal. No consulta las
+  /// preferencias: cortar algo que no suena no tiene efecto.
+  Future<void> stop(UiSound sound) async {
+    try {
+      await _player.stop(sound);
+    } on Object {
+      // Nada que hacer: el efecto termina solo.
     }
   }
 }

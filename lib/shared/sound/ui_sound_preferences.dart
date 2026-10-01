@@ -2,17 +2,19 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 
-/// Qué grupos de efectos de sonido están activos. Ambos, desactivados por
+/// Qué grupos de efectos de sonido están activos. Todos, desactivados por
 /// defecto: el sonido lo oyen terceros y debe ser una elección explícita.
 final class UiSoundPreferences {
   const UiSoundPreferences({
     required this.rewardEnabled,
     required this.interfaceEnabled,
+    this.accessEnabled = false,
   });
 
   static const UiSoundPreferences defaults = UiSoundPreferences(
     rewardEnabled: false,
     interfaceEnabled: false,
+    accessEnabled: false,
   );
 
   /// Acceso, misión creada, misión completada y subida de nivel.
@@ -22,20 +24,30 @@ final class UiSoundPreferences {
   /// cansar sin que por ello se quiera perder el resto.
   final bool interfaceEnabled;
 
-  UiSoundPreferences copyWith({bool? rewardEnabled, bool? interfaceEnabled}) =>
-      UiSoundPreferences(
-        rewardEnabled: rewardEnabled ?? this.rewardEnabled,
-        interfaceEnabled: interfaceEnabled ?? this.interfaceEnabled,
-      );
+  /// Teclas del PIN, carga de la terminal y PIN incorrecto. Aparte porque
+  /// suena en cada pulsación y en un momento sensible.
+  final bool accessEnabled;
+
+  UiSoundPreferences copyWith({
+    bool? rewardEnabled,
+    bool? interfaceEnabled,
+    bool? accessEnabled,
+  }) => UiSoundPreferences(
+    rewardEnabled: rewardEnabled ?? this.rewardEnabled,
+    interfaceEnabled: interfaceEnabled ?? this.interfaceEnabled,
+    accessEnabled: accessEnabled ?? this.accessEnabled,
+  );
 
   @override
   bool operator ==(Object other) =>
       other is UiSoundPreferences &&
       other.rewardEnabled == rewardEnabled &&
-      other.interfaceEnabled == interfaceEnabled;
+      other.interfaceEnabled == interfaceEnabled &&
+      other.accessEnabled == accessEnabled;
 
   @override
-  int get hashCode => Object.hash(rewardEnabled, interfaceEnabled);
+  int get hashCode =>
+      Object.hash(rewardEnabled, interfaceEnabled, accessEnabled);
 }
 
 abstract interface class UiSoundPreferenceStore {
@@ -47,7 +59,7 @@ abstract interface class UiSoundPreferenceStore {
 /// Espejo no sensible disponible antes de abrir la base cifrada, igual que el
 /// color de acceso: el sonido de acceso concedido suena justo al desbloquear.
 ///
-/// Solo guarda dos interruptores. No almacena PIN, credenciales ni contenido
+/// Solo guarda tres interruptores. No almacena PIN, credenciales ni contenido
 /// privado.
 final class FileUiSoundPreferenceStore implements UiSoundPreferenceStore {
   const FileUiSoundPreferenceStore({required this.directoryLocator});
@@ -55,6 +67,7 @@ final class FileUiSoundPreferenceStore implements UiSoundPreferenceStore {
   static const String fileName = 'ui_sound_v1.txt';
   static const String _rewardKey = 'reward';
   static const String _interfaceKey = 'interface';
+  static const String _accessKey = 'access';
 
   final Future<Directory> Function() directoryLocator;
 
@@ -74,6 +87,7 @@ final class FileUiSoundPreferenceStore implements UiSoundPreferenceStore {
     return UiSoundPreferences(
       rewardEnabled: values[_rewardKey] == '1',
       interfaceEnabled: values[_interfaceKey] == '1',
+      accessEnabled: values[_accessKey] == '1',
     );
   }
 
@@ -83,7 +97,8 @@ final class FileUiSoundPreferenceStore implements UiSoundPreferenceStore {
     await file.parent.create(recursive: true);
     await file.writeAsString(
       '$_rewardKey=${preferences.rewardEnabled ? 1 : 0}\n'
-      '$_interfaceKey=${preferences.interfaceEnabled ? 1 : 0}\n',
+      '$_interfaceKey=${preferences.interfaceEnabled ? 1 : 0}\n'
+      '$_accessKey=${preferences.accessEnabled ? 1 : 0}\n',
       flush: true,
     );
   }

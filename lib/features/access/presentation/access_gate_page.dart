@@ -11,6 +11,7 @@ import '../../../shared/sound/ui_sound.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../settings/domain/models/app_preferences.dart';
 import '../application/access_session_controller.dart';
+import '../application/access_session_sounds.dart';
 import '../application/access_session_state.dart';
 import '../domain/biometric_authenticator.dart';
 import 'access_widgets.dart';
@@ -28,9 +29,37 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
       TextEditingController();
   final TextEditingController _recoveryConfirmationController =
       TextEditingController();
+  int _lastPinLength = 0;
+  bool _clearingPinProgrammatically = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pinController.addListener(_onPinChanged);
+  }
+
+  /// Un chasquido por tecla: el mismo para cada dígito, borrar y limpiar, y
+  /// solo con la pantalla bloqueada esperando el PIN. Los borrados que hace
+  /// la propia app tras un intento no suenan.
+  void _onPinChanged() {
+    final int length = _pinController.text.length;
+    if (length == _lastPinLength) {
+      return;
+    }
+    _lastPinLength = length;
+    if (_clearingPinProgrammatically) {
+      return;
+    }
+    final AccessSessionState session = ref.read(accessSessionProvider);
+    if (session.phase != AccessSessionPhase.locked || session.isBusy) {
+      return;
+    }
+    unawaited(ref.read(uiSoundServiceProvider).play(UiSound.accessKeypad));
+  }
 
   @override
   void dispose() {
+    _pinController.removeListener(_onPinChanged);
     _pinController.clear();
     _pinConfirmationController.clear();
     _recoveryConfirmationController.clear();
@@ -69,7 +98,9 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
     await ref
         .read(accessSessionProvider.notifier)
         .unlockWithPin(_pinController.text);
+    _clearingPinProgrammatically = true;
     _pinController.clear();
+    _clearingPinProgrammatically = false;
   }
 
   void _openRecovery() {
@@ -79,19 +110,22 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Un solo timbre al abrirse la sesión. Nunca por dígito: el sonido no
-    // debe revelar el progreso del PIN.
-    ref.listen<AccessSessionPhase>(
-      accessSessionProvider.select((AccessSessionState state) => state.phase),
-      (AccessSessionPhase? previous, AccessSessionPhase next) {
-        if (next == AccessSessionPhase.unlocked &&
-            previous != AccessSessionPhase.unlocked) {
-          unawaited(
-            ref.read(uiSoundServiceProvider).play(UiSound.accessGranted),
-          );
-        }
-      },
-    );
+    // Carga, acceso concedido y PIN rechazado; ver accessSoundCommands.
+    ref.listen<AccessSessionState>(accessSessionProvider, (
+      AccessSessionState? previous,
+      AccessSessionState next,
+    ) {
+      final UiSoundService sounds = ref.read(uiSoundServiceProvider);
+      for (final AccessSoundCommand command in accessSoundCommands(
+        previous,
+        next,
+      )) {
+        unawaited(switch (command.action) {
+          AccessSoundAction.play => sounds.play(command.sound),
+          AccessSoundAction.stop => sounds.stop(command.sound),
+        });
+      }
+    });
     final AccessSessionState session = ref.watch(accessSessionProvider);
     final Color accentColor = _accessAccentColor();
     return switch (session.phase) {

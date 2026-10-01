@@ -918,6 +918,21 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >   1. ~~`1.5.1+10`~~ **Hecho y aprobado en la tablet el 1 de octubre de 2026**:
 >      copiar/pegar el código de recuperación (ADR-002 §4.1) y botón «Salir»
 >      bajo Ajustes. Instalada en la tablet con datos reales.
+>   1b. ~~`1.6.0+11`~~ **Hecho y aprobado el 1 de octubre de 2026**: sonidos de
+>      acceso (tecla del PIN igual para todas, carga que se corta, PIN
+>      incorrecto) con su propio interruptor. La paleta llega a 8 efectos, el
+>      tope del criterio 6 de PROPUESTA-SONIDO.
+>   2. **En curso:** el borrador de ADR-006 (sin commit en la sesión del 1 de
+>      octubre) ya tiene el esquema v4 completo y validado en SQLite. Pendiente
+>      de incorporar lo que decidió el usuario después: Proyecto con tipos
+>      Armar y Reunir (cada elemento: mío del inventario o de la lista de
+>      deseos, de un personaje o de otra persona con nombre libre; progreso
+>      «4 de 6» y dificultad económica en color según el saldo), recompensas
+>      que apuntan a un deseo o a un proyecto, foto opcional en la misión y
+>      tarjeta de misión con foto y personajes. Respuestas ya dadas: sin
+>      dificultad = 1 común; una foto opcional; categorías y zonas tal cual;
+>      dependencias sí, verificadas; usar un vale crea entrada en el Diario.
+>      El usuario dirá «congelamos» antes de cerrar el alcance de v4.
 >   2. ADR-006 ampliado con lo decidido hoy: menú tipo juego CIBERWARE ·
 >      INVENTARIO · MAPA (aplazado, OSM sin conexión) · PERSONAJE · DIARIO
 >      (Bitácora renombrada, solo visual) con personajes; Creación

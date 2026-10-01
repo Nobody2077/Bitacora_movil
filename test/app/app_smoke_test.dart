@@ -390,6 +390,9 @@ final class _RecordingSoundPlayer implements UiSoundPlayer {
 
   @override
   Future<void> play(UiSound sound) async => played.add(sound);
+
+  @override
+  Future<void> stop(UiSound sound) async {}
 }
 
 Widget _testApp({

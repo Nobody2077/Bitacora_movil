@@ -29,6 +29,7 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
                     .build(),
             )
             .build()
+    private val activeStreams = mutableMapOf<String, Int>()
     private val soundIds: Map<String, Int> =
         mapOf(
             "ACCESS_GRANTED" to soundPool.load(appContext, R.raw.ui_access_granted, 1),
@@ -36,6 +37,9 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
             "MISSION_CREATED" to soundPool.load(appContext, R.raw.ui_mission_created, 1),
             "MISSION_COMPLETED" to soundPool.load(appContext, R.raw.ui_mission_completed, 1),
             "LEVEL_UP" to soundPool.load(appContext, R.raw.ui_level_up, 1),
+            "ACCESS_KEYPAD" to soundPool.load(appContext, R.raw.ui_access_keypad, 1),
+            "ACCESS_LOADING" to soundPool.load(appContext, R.raw.ui_access_loading, 1),
+            "ACCESS_DENIED" to soundPool.load(appContext, R.raw.ui_access_denied, 1),
         )
 
     fun register(messenger: BinaryMessenger) {
@@ -43,6 +47,7 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
     }
 
     fun release() {
+        activeStreams.clear()
         soundPool.release()
     }
 
@@ -56,8 +61,20 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
                     return
                 }
                 if (audioManager?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                    soundPool.play(soundId, VOLUME, VOLUME, 1, 0, 1f)
+                    val volume = if (sound == "ACCESS_LOADING") LOADING_VOLUME else VOLUME
+                    val streamId = soundPool.play(soundId, volume, volume, 1, 0, 1f)
+                    if (streamId != 0 && sound != null) {
+                        activeStreams[sound] = streamId
+                    }
                 }
+                result.success(null)
+            }
+
+            "stop" -> {
+                // Solo la carga de la terminal dura más que su acción; se corta
+                // en cuanto termina para no alargar la entrada.
+                val sound = call.argument<String>("sound")
+                activeStreams.remove(sound)?.let { soundPool.stop(it) }
                 result.success(null)
             }
 
@@ -69,5 +86,6 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
         const val CHANNEL = "com.jcyq.bitacorarpg/ui_sound"
         const val MAX_STREAMS = 3
         const val VOLUME = 0.6f
+        const val LOADING_VOLUME = 0.35f
     }
 }
