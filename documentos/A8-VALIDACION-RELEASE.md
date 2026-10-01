@@ -116,7 +116,8 @@ En teléfono y tablet, sin red:
 8. Confirmar que no aparecen títulos, notas, importes, PIN ni identificadores
    sensibles en notificaciones, capturas o logs.
 9. Reinstalar con `adb install -r` usando otra APK firmada con la misma llave y
-   confirmar que datos, acceso y esquema v1 se conservan.
+   confirmar que datos, acceso y el esquema declarado (v3 desde A10) se
+   conservan.
 
 ## Criterio de cierre G8
 
@@ -124,3 +125,39 @@ G8 solo queda verde cuando no hay defectos S0/S1, ambos factores de forma pasan,
 las métricas cumplen, APK y AAB están firmados/verificados, los hashes quedan
 registrados y el usuario aprueba este recorrido. Una prueba omitida mantiene A8
 en progreso.
+
+**Decisión del usuario, 30 de septiembre de 2026: G8 se cierra solo con la
+tablet.** El usuario no dispone de teléfono Android. El factor de forma
+teléfono queda sin validación física; la adaptación compacta sigue cubierta
+por las pruebas de widget y golden. Si en el futuro hay un teléfono, el
+recorrido se repite allí sin reabrir G8 salvo que aparezca un defecto S0/S1.
+
+### Ejecución del 30 de septiembre de 2026 (tablet `biuonrrcey45lvrs`)
+
+- Xiaomi `25040RP0AL`, HyperOS 3, Android 16, sin `com.jcyq.bitacorarpg`
+  instalado al empezar (desinstalado con confirmación del usuario; sin datos
+  reales).
+- Completado en dos tandas, porque HyperOS cancela la instalación por USB si
+  nadie acepta su ventana en unos 30 s:
+  1. `gate_g8.ps1 -SkipQuality` (tercera ejecución; la primera pasó la matriz
+     completa de calidad, 250/250): base cifrada, acceso y reinicio de
+     proceso G2 en verde.
+  2. Por separado, con los mismos comandos del gate: rendimiento, build y
+     verificación release, instalación limpia y arranque.
+- `a8_performance_test.dart` exigía `user_version == 1` desde agosto y nunca
+  había corrido con el esquema v3; ahora compara con `schemaVersion`.
+- Métricas: apertura segura 96 ms, primera lectura 9 ms (1000 misiones),
+  dashboard 3 ms (5000 movimientos), +0,4 MB de RSS.
+- `1.5.0+9`: APK 73.000.867 bytes, SHA-256
+  `7b40fca43bbc6577a5b5fe5e61ce363f2a7c49e744502e2c0af83546aa268543`; AAB
+  56.042.317 bytes, SHA-256
+  `30b7e58eddf0349eed517d70fddaa3471f87d60a6764aa37aea274a2d40c73e1`.
+  Certificado SHA-256 `a6092c6c…16b8`, el mismo desde `1.0.0+1`. Sin
+  `INTERNET`. Arranque en frío de la release: 2,3 s.
+- Recorrido manual (puntos 1–8) hecho por el usuario el 30 de septiembre de
+  2026 en la tablet, sin defectos reportados.
+- Logcat revisado tras el recorrido: el proceso release solo emite la línea de
+  Impeller; ningún PIN, código, importe ni título.
+- **Pendiente para cerrar G8: el punto 9** (`adb install -r` encima de la
+  instalación con datos). HyperOS canceló su ventana dos veces; los datos no
+  se tocaron (`firstInstallTime` sin cambios).

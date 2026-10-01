@@ -105,11 +105,11 @@ void main() {
         .getSingle();
     secureOpen.stop();
 
-    expect(schemaVersion.data.values.single, 1);
+    expect(schemaVersion.data.values.single, database.schemaVersion);
     expect(secureOpen.elapsedMilliseconds, lessThan(1000));
 
     final metrics = <String, Object>{
-      'schemaVersion': 1,
+      'schemaVersion': database.schemaVersion,
       'missions': 1000,
       'transactions': 5000,
       'secureOpenMs': secureOpen.elapsedMilliseconds,
