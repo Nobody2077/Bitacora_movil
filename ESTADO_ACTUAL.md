@@ -959,8 +959,10 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 > 1. **Prueba de migración en la tablet con el flavor `dev`** (ADR-006 D2),
 >    antes de que v4 toque la app real. El flavor `dev` es otro paquete
 >    (`com.jcyq.bitacorarpg.dev`), así que no toca los datos de prod:
->    1. Instalar `dev` v3 (compilada desde `main`) con `adb install`, no con
->       `flutter test`/`flutter run` (ver incidente del 24 de septiembre).
+>    1. ~~Instalar `dev` v3~~ **Hecho el 1 de octubre de 2026**: compilada desde
+>       `main` en el worktree `G:DesarrolloProyectositacora-main-v3` e
+>       instalada con `adb install` (nunca `flutter test`/`flutter run`). La
+>       prod siguió intacta en `1.6.2`.
 >    2. El usuario crea misiones, movimientos y una entrada con foto.
 >    3. Instalar encima la `dev` v4 de esta rama y comprobar que todo sigue.
 > 2. **Datos**: DAOs y repositorios de personajes (`contacts`, fotos,
