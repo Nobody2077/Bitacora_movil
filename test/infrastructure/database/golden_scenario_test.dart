@@ -3,6 +3,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fixtures/golden_scenario.dart';
+import 'schema_v4_expectations.dart';
 
 void main() {
   late AppDatabase database;
@@ -35,7 +36,7 @@ void main() {
 }
 
 Future<void> _expectSchemaAndIntegrity(AppDatabase database) async {
-  const expectedTables = <String>{
+  final expectedTables = <String>{
     'life_areas',
     'mission_templates',
     'mission_template_objectives',
@@ -55,6 +56,7 @@ Future<void> _expectSchemaAndIntegrity(AppDatabase database) async {
     'title_history',
     'app_settings',
     'schema_metadata',
+    ...schemaV4NewTables,
   };
 
   final tableRows = await database.customSelect('''

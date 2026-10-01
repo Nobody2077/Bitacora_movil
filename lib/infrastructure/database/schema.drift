@@ -1,4 +1,4 @@
--- Bitacora RPG Personal - persistence schema v1.
+-- Bitacora RPG Personal - persistence schema (v4; v1 base, see ADRs 001 and 006).
 -- Source of truth: ADR-001-CONTRATO_PERSISTENCIA_V1.md.
 -- All *_at columns store Unix epoch milliseconds in UTC.
 
@@ -65,7 +65,10 @@ CREATE TABLE mission_templates (
   availability_mode TEXT NOT NULL DEFAULT 'AUTOMATIC' CHECK (
     availability_mode IN ('AUTOMATIC', 'BOARD')
   ),
-  is_active INTEGER NOT NULL CHECK (is_active IN (0, 1))
+  is_active INTEGER NOT NULL CHECK (is_active IN (0, 1)),
+  location TEXT CHECK (
+    location IS NULL OR length(trim(location)) BETWEEN 1 AND 120
+  )
 );
 
 CREATE TABLE mission_template_objectives (
@@ -198,6 +201,9 @@ CREATE TABLE missions (
   completed_at INTEGER,
   archived_at INTEGER,
   row_version INTEGER NOT NULL DEFAULT 1 CHECK (row_version >= 1),
+  location TEXT CHECK (
+    location IS NULL OR length(trim(location)) BETWEEN 1 AND 120
+  ),
   CHECK (
     (status IN ('COMPLETED', 'PARTIAL') AND completed_at IS NOT NULL)
     OR
@@ -566,3 +572,273 @@ CREATE TABLE schema_metadata (
   value TEXT NOT NULL,
   updated_at INTEGER NOT NULL
 );
+
+-- ADR-006 (schema v4): personajes, inventario, proyectos y creacion.
+
+CREATE TABLE contacts (
+  id TEXT NOT NULL PRIMARY KEY,
+  display_name TEXT CHECK (
+    display_name IS NULL OR length(trim(display_name)) BETWEEN 1 AND 80
+  ),
+  role TEXT CHECK (role IS NULL OR length(trim(role)) BETWEEN 1 AND 80),
+  description TEXT CHECK (description IS NULL OR length(description) <= 4000),
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  archived_at INTEGER,
+  row_version INTEGER NOT NULL DEFAULT 1 CHECK (row_version >= 1)
+);
+
+CREATE TABLE contact_photos (
+  id TEXT NOT NULL PRIMARY KEY,
+  contact_id TEXT NOT NULL REFERENCES contacts(id) ON DELETE RESTRICT,
+  storage_name TEXT NOT NULL UNIQUE,
+  mime_type TEXT NOT NULL CHECK (mime_type IN (
+    'image/jpeg', 'image/png', 'image/webp'
+  )),
+  byte_length INTEGER NOT NULL CHECK (byte_length > 0),
+  cipher_sha256 TEXT NOT NULL CHECK (
+    length(cipher_sha256) = 64 AND cipher_sha256 NOT GLOB '*[^0-9a-f]*'
+  ),
+  width_px INTEGER NOT NULL CHECK (width_px > 0),
+  height_px INTEGER NOT NULL CHECK (height_px > 0),
+  created_at INTEGER NOT NULL,
+  archived_at INTEGER
+);
+
+CREATE UNIQUE INDEX uq_contact_photo_current
+  ON contact_photos(contact_id) WHERE archived_at IS NULL;
+
+CREATE TABLE mission_contacts (
+  mission_id TEXT NOT NULL REFERENCES missions(id) ON DELETE CASCADE,
+  contact_id TEXT NOT NULL REFERENCES contacts(id) ON DELETE RESTRICT,
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (mission_id, contact_id)
+);
+
+CREATE INDEX idx_mission_contacts_contact ON mission_contacts(contact_id);
+
+CREATE TABLE journal_entry_contacts (
+  journal_entry_id TEXT NOT NULL
+    REFERENCES journal_entries(id) ON DELETE CASCADE,
+  contact_id TEXT NOT NULL REFERENCES contacts(id) ON DELETE RESTRICT,
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (journal_entry_id, contact_id)
+);
+
+CREATE INDEX idx_journal_contacts_contact ON journal_entry_contacts(contact_id);
+
+CREATE TABLE mission_photos (
+  id TEXT NOT NULL PRIMARY KEY,
+  mission_id TEXT NOT NULL REFERENCES missions(id) ON DELETE RESTRICT,
+  storage_name TEXT NOT NULL UNIQUE,
+  mime_type TEXT NOT NULL CHECK (mime_type IN (
+    'image/jpeg', 'image/png', 'image/webp'
+  )),
+  byte_length INTEGER NOT NULL CHECK (byte_length > 0),
+  cipher_sha256 TEXT NOT NULL CHECK (
+    length(cipher_sha256) = 64 AND cipher_sha256 NOT GLOB '*[^0-9a-f]*'
+  ),
+  width_px INTEGER NOT NULL CHECK (width_px > 0),
+  height_px INTEGER NOT NULL CHECK (height_px > 0),
+  created_at INTEGER NOT NULL,
+  archived_at INTEGER
+);
+
+CREATE UNIQUE INDEX uq_mission_photo_current
+  ON mission_photos(mission_id) WHERE archived_at IS NULL;
+
+CREATE TABLE inventory_items (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
+  description TEXT CHECK (description IS NULL OR length(description) <= 4000),
+  category TEXT NOT NULL CHECK (category IN (
+    'TECHNOLOGY', 'CLOTHING', 'ACCESSORY', 'BOOK', 'PART', 'HOME', 'OTHER'
+  )),
+  icon_key TEXT NOT NULL CHECK (length(icon_key) BETWEEN 1 AND 64),
+  color_hex TEXT CHECK (
+    color_hex IS NULL OR color_hex GLOB
+    '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]'
+  ),
+  status TEXT NOT NULL CHECK (status IN (
+    'WISHED', 'OWNED', 'INTEGRATED', 'RETIRED'
+  )),
+  origin TEXT CHECK (origin IS NULL OR origin IN (
+    'PURCHASE', 'GIFT', 'PREEXISTING', 'ASSEMBLED'
+  )),
+  body_zone TEXT CHECK (body_zone IS NULL OR body_zone IN (
+    'HEAD', 'EYES', 'EARS', 'TORSO', 'LEGS', 'FEET',
+    'WRIST', 'HANDS', 'BACK', 'DEVICE'
+  )),
+  is_equipped INTEGER NOT NULL DEFAULT 0 CHECK (is_equipped IN (0, 1)),
+  purchase_transaction_id TEXT UNIQUE
+    REFERENCES transactions(id) ON DELETE RESTRICT,
+  parent_item_id TEXT REFERENCES inventory_items(id) ON DELETE RESTRICT,
+  wish_priority TEXT CHECK (wish_priority IS NULL OR wish_priority IN (
+    'LOW', 'MEDIUM', 'HIGH'
+  )),
+  wish_price_minor INTEGER CHECK (
+    wish_price_minor IS NULL OR wish_price_minor > 0
+  ),
+  wish_goal_id TEXT REFERENCES savings_goals(id) ON DELETE SET NULL,
+  acquired_at INTEGER,
+  retired_at INTEGER,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  archived_at INTEGER,
+  row_version INTEGER NOT NULL DEFAULT 1 CHECK (row_version >= 1),
+  CHECK ((status = 'WISHED') = (wish_priority IS NOT NULL)),
+  CHECK (status <> 'WISHED' OR (origin IS NULL AND acquired_at IS NULL)),
+  CHECK (status = 'WISHED' OR (origin IS NOT NULL AND acquired_at IS NOT NULL)),
+  CHECK (is_equipped = 0 OR (status = 'OWNED' AND body_zone IS NOT NULL)),
+  CHECK ((status = 'INTEGRATED') = (parent_item_id IS NOT NULL)),
+  CHECK ((status = 'RETIRED') = (retired_at IS NOT NULL)),
+  CHECK (purchase_transaction_id IS NULL OR origin = 'PURCHASE'),
+  CHECK (parent_item_id IS NULL OR parent_item_id <> id)
+);
+
+CREATE INDEX idx_items_status_category ON inventory_items(status, category);
+
+CREATE INDEX idx_items_equipped_zone
+  ON inventory_items(body_zone) WHERE is_equipped = 1;
+
+CREATE INDEX idx_items_parent ON inventory_items(parent_item_id);
+
+CREATE TABLE item_photos (
+  id TEXT NOT NULL PRIMARY KEY,
+  item_id TEXT NOT NULL REFERENCES inventory_items(id) ON DELETE RESTRICT,
+  storage_name TEXT NOT NULL UNIQUE,
+  mime_type TEXT NOT NULL CHECK (mime_type IN (
+    'image/jpeg', 'image/png', 'image/webp'
+  )),
+  byte_length INTEGER NOT NULL CHECK (byte_length > 0),
+  cipher_sha256 TEXT NOT NULL CHECK (
+    length(cipher_sha256) = 64 AND cipher_sha256 NOT GLOB '*[^0-9a-f]*'
+  ),
+  width_px INTEGER NOT NULL CHECK (width_px > 0),
+  height_px INTEGER NOT NULL CHECK (height_px > 0),
+  created_at INTEGER NOT NULL,
+  archived_at INTEGER
+);
+
+CREATE UNIQUE INDEX uq_item_photo_current
+  ON item_photos(item_id) WHERE archived_at IS NULL;
+
+CREATE TABLE projects (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
+  description TEXT CHECK (description IS NULL OR length(description) <= 4000),
+  icon_key TEXT NOT NULL CHECK (length(icon_key) BETWEEN 1 AND 64),
+  kind TEXT NOT NULL CHECK (kind IN ('ASSEMBLY', 'COLLECTION')),
+  status TEXT NOT NULL CHECK (status IN (
+    'PLANNING', 'COMPLETED', 'ASSEMBLED', 'DISASSEMBLED'
+  )),
+  mission_id TEXT UNIQUE REFERENCES missions(id) ON DELETE SET NULL,
+  result_item_id TEXT UNIQUE REFERENCES inventory_items(id) ON DELETE RESTRICT,
+  completed_at INTEGER,
+  disassembled_at INTEGER,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  archived_at INTEGER,
+  row_version INTEGER NOT NULL DEFAULT 1 CHECK (row_version >= 1),
+  CHECK (kind = 'ASSEMBLY' OR status IN ('PLANNING', 'COMPLETED')),
+  CHECK (kind = 'COLLECTION' OR status <> 'COMPLETED'),
+  CHECK (kind = 'ASSEMBLY' OR result_item_id IS NULL),
+  CHECK ((status = 'PLANNING') = (completed_at IS NULL)),
+  CHECK ((status IN ('ASSEMBLED', 'DISASSEMBLED')) = (result_item_id IS NOT NULL)),
+  CHECK ((status = 'DISASSEMBLED') = (disassembled_at IS NOT NULL))
+);
+
+CREATE TABLE project_items (
+  id TEXT NOT NULL PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  owner_type TEXT NOT NULL CHECK (owner_type IN ('SELF', 'CONTACT', 'OTHER')),
+  item_id TEXT REFERENCES inventory_items(id) ON DELETE RESTRICT,
+  contact_id TEXT REFERENCES contacts(id) ON DELETE RESTRICT,
+  owner_name TEXT CHECK (
+    owner_name IS NULL OR length(trim(owner_name)) BETWEEN 1 AND 80
+  ),
+  label TEXT CHECK (label IS NULL OR length(trim(label)) BETWEEN 1 AND 120),
+  position INTEGER NOT NULL CHECK (position >= 0),
+  created_at INTEGER NOT NULL,
+  CHECK ((owner_type = 'SELF') = (item_id IS NOT NULL)),
+  CHECK ((owner_type = 'CONTACT') = (contact_id IS NOT NULL)),
+  CHECK ((owner_type = 'OTHER') = (owner_name IS NOT NULL)),
+  CHECK (owner_type = 'SELF' OR label IS NOT NULL),
+  UNIQUE (project_id, position)
+);
+
+CREATE INDEX idx_project_items_item ON project_items(item_id);
+
+CREATE INDEX idx_project_items_contact ON project_items(contact_id);
+
+CREATE TABLE craft_operations (
+  id TEXT NOT NULL PRIMARY KEY,
+  operation_id TEXT NOT NULL UNIQUE,
+  kind TEXT NOT NULL CHECK (kind IN (
+    'MISSION_GRANT', 'CONVERT', 'REDEEM', 'ABANDON_REFUND',
+    'ASSEMBLE', 'DISASSEMBLE', 'PROJECT_COMPLETE'
+  )),
+  mission_id TEXT REFERENCES missions(id) ON DELETE RESTRICT,
+  occurred_at INTEGER NOT NULL,
+  CHECK ((kind = 'MISSION_GRANT') = (mission_id IS NOT NULL))
+);
+
+CREATE UNIQUE INDEX uq_craft_mission_grant
+  ON craft_operations(mission_id) WHERE kind = 'MISSION_GRANT';
+
+CREATE TABLE craft_component_ledger (
+  id TEXT NOT NULL PRIMARY KEY,
+  craft_operation_id TEXT NOT NULL
+    REFERENCES craft_operations(id) ON DELETE RESTRICT,
+  rarity TEXT NOT NULL CHECK (rarity IN (
+    'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY'
+  )),
+  amount INTEGER NOT NULL CHECK (amount <> 0),
+  UNIQUE (craft_operation_id, rarity)
+);
+
+CREATE INDEX idx_craft_ledger_rarity ON craft_component_ledger(rarity);
+
+CREATE TABLE reward_specs (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 120),
+  description TEXT CHECK (description IS NULL OR length(description) <= 2000),
+  icon_key TEXT NOT NULL CHECK (length(icon_key) BETWEEN 1 AND 64),
+  is_repeatable INTEGER NOT NULL DEFAULT 1 CHECK (is_repeatable IN (0, 1)),
+  unlock_level INTEGER CHECK (unlock_level IS NULL OR unlock_level >= 1),
+  target_item_id TEXT REFERENCES inventory_items(id) ON DELETE SET NULL,
+  target_project_id TEXT REFERENCES projects(id) ON DELETE SET NULL,
+  created_at INTEGER NOT NULL,
+  archived_at INTEGER,
+  CHECK (target_item_id IS NULL OR target_project_id IS NULL)
+);
+
+CREATE TABLE reward_spec_costs (
+  reward_spec_id TEXT NOT NULL
+    REFERENCES reward_specs(id) ON DELETE CASCADE,
+  rarity TEXT NOT NULL CHECK (rarity IN (
+    'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY'
+  )),
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  PRIMARY KEY (reward_spec_id, rarity)
+);
+
+CREATE TABLE reward_vouchers (
+  id TEXT NOT NULL PRIMARY KEY,
+  reward_spec_id TEXT NOT NULL
+    REFERENCES reward_specs(id) ON DELETE RESTRICT,
+  redeem_operation_id TEXT NOT NULL UNIQUE
+    REFERENCES craft_operations(id) ON DELETE RESTRICT,
+  refund_operation_id TEXT UNIQUE
+    REFERENCES craft_operations(id) ON DELETE RESTRICT,
+  status TEXT NOT NULL CHECK (status IN ('AVAILABLE', 'USED', 'ABANDONED')),
+  journal_entry_id TEXT REFERENCES journal_entries(id) ON DELETE SET NULL,
+  redeemed_at INTEGER NOT NULL,
+  used_at INTEGER,
+  abandoned_at INTEGER,
+  CHECK ((status = 'USED') = (used_at IS NOT NULL)),
+  CHECK ((status = 'ABANDONED') = (abandoned_at IS NOT NULL)),
+  CHECK ((status = 'ABANDONED') = (refund_operation_id IS NOT NULL))
+);
+
+CREATE INDEX idx_vouchers_status ON reward_vouchers(status, redeemed_at);

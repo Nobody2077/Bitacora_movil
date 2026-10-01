@@ -905,7 +905,7 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
 ### ▶ EMPEZAR AQUÍ — la próxima sesión, sea cuando sea
 
-> **Actualización del 30 de septiembre de 2026 — prevalece sobre lo de abajo.**
+> **Actualización del 1 de octubre de 2026 — prevalece sobre lo de abajo. La fase 1 de ADR-006 está en la rama `feat/v4-fase1`; ver «▶ FASE 1 — dónde quedó».**
 > - **G8 VERDE: el MVP está cerrado.** Validado solo con la tablet (decisión
 >   del usuario: no tiene teléfono). Gate, métricas, release `1.5.0+9`
 >   firmada y verificada, recorrido manual, logcat y `install -r` con datos:
@@ -927,24 +927,63 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >      prueba, ignorado por Git, que **nunca se sube**) y pantalla completa
 >      (modo inmersivo, interruptor en Apariencia). Pendiente: la carga suena
 >      baja; se mejorarán los audios más adelante.
->   2. **En curso:** el borrador de ADR-006 (sin commit en la sesión del 1 de
->      octubre) ya tiene el esquema v4 completo y validado en SQLite. Pendiente
->      de incorporar lo que decidió el usuario después: Proyecto con tipos
->      Armar y Reunir (cada elemento: mío del inventario o de la lista de
->      deseos, de un personaje o de otra persona con nombre libre; progreso
->      «4 de 6» y dificultad económica en color según el saldo), recompensas
->      que apuntan a un deseo o a un proyecto, foto opcional en la misión y
->      tarjeta de misión con foto y personajes. Respuestas ya dadas: sin
->      dificultad = 1 común; una foto opcional; categorías y zonas tal cual;
->      dependencias sí, verificadas; usar un vale crea entrada en el Diario.
->      El usuario dirá «congelamos» antes de cerrar el alcance de v4.
->   2. ADR-006 ampliado con lo decidido hoy: menú tipo juego CIBERWARE ·
->      INVENTARIO · MAPA (aplazado, OSM sin conexión) · PERSONAJE · DIARIO
->      (Bitácora renombrada, solo visual) con personajes; Creación
->      (componentes por dificultad, recompensas, armar/desarmar piezas reales),
->      lista de deseos, Reputación configurable, compra como acción con
->      animación, ☰ para la barra lateral y tema Vino. El usuario hará los SVG
->      de las siluetas con Claude chat. Todo en **una sola migración v4**.
+>   2. **ADR-006 ACEPTADO el 1 de octubre de 2026** (`ecccec9` en `main`),
+>      alcance de v4 congelado. **Fase 1 EN CURSO en la rama
+>      `feat/v4-fase1`** (no fusionada en `main`).
+>
+> ### ▶ FASE 1 — dónde quedó (1 de octubre de 2026)
+>
+> **Hecho y probado (rama `feat/v4-fase1`):**
+> - `schema.drift`: 14 tablas nuevas (`contacts`, `contact_photos`,
+>   `mission_contacts`, `journal_entry_contacts`, `mission_photos`,
+>   `inventory_items`, `item_photos`, `projects`, `project_items`,
+>   `craft_operations`, `craft_component_ledger`, `reward_specs`,
+>   `reward_spec_costs`, `reward_vouchers`) y `location` en `missions` y
+>   `mission_templates`, al final de cada tabla como la deja `ALTER TABLE`.
+> - `app_database.dart`: `schemaVersion = 4`; el paso `from <= 3` solo añade
+>   (dos `addColumn` y `create` de las entidades de `_schemaV4Entities`).
+> - `drift_schemas/drift_schema_v4.json` generado con el **procedimiento
+>   controlado** (pubspec temporal con `drift: 2.34.0`, `schema dump`,
+>   restaurar `pubspec.yaml` y `pubspec.lock` copiados). Subir `drift_dev` no
+>   es posible con Flutter 3.41.5 (`meta 1.17.0`); comprobado.
+> - Pruebas: `schema_migration_v3_to_v4_test.dart` (cada fila v3 idéntica tras
+>   migrar; reabrir no remigra), v1→v4 y v2→v4, `schema_contract_test` (33
+>   tablas, 34 índices, 43 FK exactas), snapshot v4 y
+>   `schema_constraints_v4_test.dart` (un caso que falla por cada regla
+>   nueva). Ayudante común: `schema_v4_expectations.dart`.
+>   **276/276, `analyze` limpio.**
+> - Aún **no hay** DAOs, repositorios ni pantallas para las tablas nuevas, y
+>   la versión sigue en `1.6.2+13`.
+>
+> **Pendiente de la fase 1, en este orden:**
+> 1. **Prueba de migración en la tablet con el flavor `dev`** (ADR-006 D2),
+>    antes de que v4 toque la app real. El flavor `dev` es otro paquete
+>    (`com.jcyq.bitacorarpg.dev`), así que no toca los datos de prod:
+>    1. Instalar `dev` v3 (compilada desde `main`) con `adb install`, no con
+>       `flutter test`/`flutter run` (ver incidente del 24 de septiembre).
+>    2. El usuario crea misiones, movimientos y una entrada con foto.
+>    3. Instalar encima la `dev` v4 de esta rama y comprobar que todo sigue.
+> 2. **Datos**: DAOs y repositorios de personajes (`contacts`, fotos,
+>    vínculos con misiones y entradas), foto y ubicación de la misión. Con
+>    unidades de trabajo e idempotencia como el resto del proyecto.
+> 3. **Pantallas**: entrada **Personaje** en la barra lateral con las cinco
+>    pestañas (CIBERWARE e INVENTARIO vacías hasta la fase 2, MAPA
+>    «aplazado», PERSONAJE con el hexágono de áreas y el panel lateral,
+>    DIARIO = la Bitácora renombrada solo en lo visual + Personajes con su
+>    ficha y «+ Crear personaje»). La Bitácora convive en la barra lateral
+>    hasta que el usuario confirme que DIARIO la sustituye.
+> 4. **Misiones**: elegir personajes y ubicación al crear, foto opcional y
+>    tarjeta con foto y miniaturas de personajes.
+> 5. Versión `1.7.0`, APK, instalación **encima** en la tablet (con datos
+>    reales) y aprobación del usuario. Después, fusionar la rama en `main`.
+>
+> Referencias: ADR-006 (contrato), maqueta privada «Bitácora · Personaje» v5
+> (solo orientativa), `escaner_corporal.svg` del usuario en
+> `G:\Usuario\Downloadss\` (fase 2).
+>
+> **Otros pendientes vivos:** respaldo de la llave de firma; mejorar los
+> audios (la carga suena baja y usa un sonido local de prueba que **nunca se
+> sube**: `res/raw/ui_access_loading_test.mp3`, en `.gitignore`).
 
 **Estado al cerrar el 25 de septiembre de 2026:** `main` limpia y sincronizada
 con `origin/main`. Versión **`1.5.0+9`** (efectos de sonido) instalada en la

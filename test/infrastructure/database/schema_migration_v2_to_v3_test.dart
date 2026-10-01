@@ -6,10 +6,12 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
 
+import 'schema_v4_expectations.dart';
+
 const int _nowMs = 1788000000000;
 
 void main() {
-  test('migra v2 a v3 y conserva plantillas como automáticas', () async {
+  test('migra v2 a v4 y conserva plantillas como automáticas', () async {
     final Database rawDatabase = sqlite3.openInMemory();
     _createSchemaV2(rawDatabase);
     rawDatabase.execute('''
@@ -36,21 +38,10 @@ void main() {
     final template = await (database.select(
       database.missionTemplates,
     )..where((row) => row.id.equals('legacy-template'))).getSingle();
-    expect(database.schemaVersion, 3);
+    expect(database.schemaVersion, 4);
     expect(template.availabilityMode, 'AUTOMATIC');
 
-    final version = await database
-        .customSelect('PRAGMA user_version')
-        .getSingle();
-    expect(version.read<int>('user_version'), 3);
-    final mirror = await database.customSelect('''
-      SELECT value FROM schema_metadata WHERE "key" = 'schema_version'
-    ''').getSingle();
-    expect(mirror.read<String>('value'), '3');
-    expect(
-      await database.customSelect('PRAGMA foreign_key_check').get(),
-      isEmpty,
-    );
+    await expectMigratedToV4(database);
   });
 }
 

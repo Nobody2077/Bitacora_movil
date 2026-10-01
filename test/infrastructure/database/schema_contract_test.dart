@@ -27,6 +27,21 @@ const Set<String> _expectedTables = <String>{
   'title_history',
   'app_settings',
   'schema_metadata',
+  // v4 (ADR-006)
+  'contacts',
+  'contact_photos',
+  'mission_contacts',
+  'journal_entry_contacts',
+  'mission_photos',
+  'inventory_items',
+  'item_photos',
+  'projects',
+  'project_items',
+  'craft_operations',
+  'craft_component_ledger',
+  'reward_specs',
+  'reward_spec_costs',
+  'reward_vouchers',
 };
 
 const Map<String, _IndexContract> _expectedIndexes = <String, _IndexContract>{
@@ -126,6 +141,68 @@ const Map<String, _IndexContract> _expectedIndexes = <String, _IndexContract>{
     unique: true,
     partial: true,
   ),
+  // v4 (ADR-006)
+  'uq_contact_photo_current': _IndexContract(
+    table: 'contact_photos',
+    columns: <String>['contact_id'],
+    unique: true,
+    partial: true,
+  ),
+  'idx_mission_contacts_contact': _IndexContract(
+    table: 'mission_contacts',
+    columns: <String>['contact_id'],
+  ),
+  'idx_journal_contacts_contact': _IndexContract(
+    table: 'journal_entry_contacts',
+    columns: <String>['contact_id'],
+  ),
+  'uq_mission_photo_current': _IndexContract(
+    table: 'mission_photos',
+    columns: <String>['mission_id'],
+    unique: true,
+    partial: true,
+  ),
+  'idx_items_status_category': _IndexContract(
+    table: 'inventory_items',
+    columns: <String>['status', 'category'],
+  ),
+  'idx_items_equipped_zone': _IndexContract(
+    table: 'inventory_items',
+    columns: <String>['body_zone'],
+    partial: true,
+  ),
+  'idx_items_parent': _IndexContract(
+    table: 'inventory_items',
+    columns: <String>['parent_item_id'],
+  ),
+  'uq_item_photo_current': _IndexContract(
+    table: 'item_photos',
+    columns: <String>['item_id'],
+    unique: true,
+    partial: true,
+  ),
+  'idx_project_items_item': _IndexContract(
+    table: 'project_items',
+    columns: <String>['item_id'],
+  ),
+  'idx_project_items_contact': _IndexContract(
+    table: 'project_items',
+    columns: <String>['contact_id'],
+  ),
+  'uq_craft_mission_grant': _IndexContract(
+    table: 'craft_operations',
+    columns: <String>['mission_id'],
+    unique: true,
+    partial: true,
+  ),
+  'idx_craft_ledger_rarity': _IndexContract(
+    table: 'craft_component_ledger',
+    columns: <String>['rarity'],
+  ),
+  'idx_vouchers_status': _IndexContract(
+    table: 'reward_vouchers',
+    columns: <String>['status', 'redeemed_at'],
+  ),
 };
 
 const Set<String> _expectedForeignKeys = <String>{
@@ -148,10 +225,35 @@ const Set<String> _expectedForeignKeys = <String>{
   'xp_transactions.mission_id->missions.id:RESTRICT',
   'xp_transactions.journal_entry_id->journal_entries.id:SET NULL',
   'title_history.title_id->title_definitions.id:RESTRICT',
+  // v4 (ADR-006)
+  'contact_photos.contact_id->contacts.id:RESTRICT',
+  'mission_contacts.mission_id->missions.id:CASCADE',
+  'mission_contacts.contact_id->contacts.id:RESTRICT',
+  'journal_entry_contacts.journal_entry_id->journal_entries.id:CASCADE',
+  'journal_entry_contacts.contact_id->contacts.id:RESTRICT',
+  'mission_photos.mission_id->missions.id:RESTRICT',
+  'inventory_items.purchase_transaction_id->transactions.id:RESTRICT',
+  'inventory_items.parent_item_id->inventory_items.id:RESTRICT',
+  'inventory_items.wish_goal_id->savings_goals.id:SET NULL',
+  'item_photos.item_id->inventory_items.id:RESTRICT',
+  'projects.mission_id->missions.id:SET NULL',
+  'projects.result_item_id->inventory_items.id:RESTRICT',
+  'project_items.project_id->projects.id:CASCADE',
+  'project_items.item_id->inventory_items.id:RESTRICT',
+  'project_items.contact_id->contacts.id:RESTRICT',
+  'craft_operations.mission_id->missions.id:RESTRICT',
+  'craft_component_ledger.craft_operation_id->craft_operations.id:RESTRICT',
+  'reward_specs.target_item_id->inventory_items.id:SET NULL',
+  'reward_specs.target_project_id->projects.id:SET NULL',
+  'reward_spec_costs.reward_spec_id->reward_specs.id:CASCADE',
+  'reward_vouchers.reward_spec_id->reward_specs.id:RESTRICT',
+  'reward_vouchers.redeem_operation_id->craft_operations.id:RESTRICT',
+  'reward_vouchers.refund_operation_id->craft_operations.id:RESTRICT',
+  'reward_vouchers.journal_entry_id->journal_entries.id:SET NULL',
 };
 
 void main() {
-  group('schema v3 catalog', () {
+  group('schema v4 catalog', () {
     late AppDatabase database;
 
     setUp(() {
@@ -163,7 +265,7 @@ void main() {
 
     tearDown(() => database.close());
 
-    test('contains exactly the 19 approved tables', () async {
+    test('contains exactly the 33 approved tables', () async {
       final rows = await database.customSelect('''
         SELECT name
         FROM sqlite_master
@@ -174,10 +276,10 @@ void main() {
           .toSet();
 
       expect(actual, _expectedTables);
-      expect(actual, hasLength(19));
+      expect(actual, hasLength(33));
     });
 
-    test('contains exactly the 21 approved explicit indexes', () async {
+    test('contains exactly the 34 approved explicit indexes', () async {
       final rows = await database.customSelect('''
         SELECT name
         FROM sqlite_master
@@ -188,7 +290,7 @@ void main() {
           .toSet();
 
       expect(actualNames, _expectedIndexes.keys.toSet());
-      expect(actualNames, hasLength(21));
+      expect(actualNames, hasLength(34));
 
       for (final MapEntry<String, _IndexContract> expected
           in _expectedIndexes.entries) {
@@ -216,7 +318,7 @@ void main() {
       }
     });
 
-    test('contains exactly the 19 approved foreign keys and actions', () async {
+    test('contains exactly the 43 approved foreign keys and actions', () async {
       final actual = <String>[];
 
       for (final String table in _expectedTables) {
@@ -232,7 +334,7 @@ void main() {
         }
       }
 
-      expect(actual, hasLength(19));
+      expect(actual, hasLength(43));
       expect(actual.toSet(), _expectedForeignKeys);
     });
 
@@ -242,7 +344,7 @@ void main() {
         final userVersion = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(userVersion.read<int>('user_version'), 3);
+        expect(userVersion.read<int>('user_version'), 4);
 
         final metadataRows = await database.customSelect('''
         SELECT "key", value, updated_at
@@ -258,7 +360,7 @@ void main() {
         };
         expect(metadata, <String, ({String value, int updatedAt})>{
           'created_with': (value: '0.1.0+1', updatedAt: _seedTime),
-          'schema_version': (value: '3', updatedAt: _seedTime),
+          'schema_version': (value: '4', updatedAt: _seedTime),
           'seed_version': (value: '1', updatedAt: _seedTime),
         });
 
@@ -405,7 +507,7 @@ void main() {
     });
   });
 
-  test('reopening the same v3 database is idempotent', () async {
+  test('reopening the same v4 database is idempotent', () async {
     final Directory directory = await Directory.systemTemp.createTemp(
       'bitacora_g1_reopen_',
     );

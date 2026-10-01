@@ -11,10 +11,12 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
 
+import 'schema_v4_expectations.dart';
+
 const int _nowMs = 1788000000000;
 
 void main() {
-  test('migra v1 a v3, conserva el ánimo y añade el modo del tablón', () async {
+  test('migra v1 a v4, conserva el ánimo y añade el modo del tablón', () async {
     final Database rawDatabase = sqlite3.openInMemory();
     _createSchemaV1(rawDatabase);
     rawDatabase.execute('''
@@ -39,7 +41,7 @@ void main() {
     final domain.JournalEntry? legacy = _success(
       await repository.findById('legacy-entry'),
     );
-    expect(database.schemaVersion, 3);
+    expect(database.schemaVersion, 4);
     expect(legacy?.mood, domain.JournalMood.focused);
 
     final domain.JournalEntry happy = domain.JournalEntry(
@@ -77,10 +79,7 @@ void main() {
       await database.customSelect('PRAGMA foreign_key_check').get(),
       isEmpty,
     );
-    final schemaMirror = await database.customSelect('''
-      SELECT value FROM schema_metadata WHERE "key" = 'schema_version'
-    ''').getSingle();
-    expect(schemaMirror.read<String>('value'), '3');
+    await expectMigratedToV4(database);
   });
 }
 

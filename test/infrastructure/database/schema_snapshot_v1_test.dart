@@ -25,11 +25,26 @@ const Set<String> _applicationTables = <String>{
   'title_history',
   'app_settings',
   'schema_metadata',
+  // v4 (ADR-006)
+  'contacts',
+  'contact_photos',
+  'mission_contacts',
+  'journal_entry_contacts',
+  'mission_photos',
+  'inventory_items',
+  'item_photos',
+  'projects',
+  'project_items',
+  'craft_operations',
+  'craft_component_ledger',
+  'reward_specs',
+  'reward_spec_costs',
+  'reward_vouchers',
 };
 
 void main() {
-  test('drift_schema_v3.json matches the current schema exactly', () async {
-    final snapshotFile = File('drift_schemas/drift_schema_v3.json');
+  test('drift_schema_v4.json matches the current schema exactly', () async {
+    final snapshotFile = File('drift_schemas/drift_schema_v4.json');
     expect(await snapshotFile.exists(), isTrue);
 
     final snapshot =
@@ -42,8 +57,8 @@ void main() {
     final tableNames = _entityNames(entities, 'table');
     final indexNames = _entityNames(entities, 'index');
     expect(tableNames, _applicationTables);
-    expect(tableNames, hasLength(19));
-    expect(indexNames, hasLength(21));
+    expect(tableNames, hasLength(33));
+    expect(indexNames, hasLength(34));
 
     final snapshotSql = <String, String>{};
     for (final fixed
@@ -68,7 +83,7 @@ void main() {
     final version = await database
         .customSelect('PRAGMA user_version')
         .getSingle();
-    expect(version.read<int>('user_version'), 3);
+    expect(version.read<int>('user_version'), 4);
 
     final rows = await database.customSelect('''
       SELECT name, sql
