@@ -906,13 +906,10 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 ### ▶ EMPEZAR AQUÍ — la próxima sesión, sea cuando sea
 
 > **Actualización del 30 de septiembre de 2026 — prevalece sobre lo de abajo.**
-> - **G8 casi cerrado, solo con la tablet** (decisión del usuario: no tiene
->   teléfono). Gate automatizado, métricas, release `1.5.0+9` firmada y
->   verificada, recorrido manual y logcat: todo en verde. Detalle y hashes en
->   `documentos/A8-VALIDACION-RELEASE.md`. **Falta solo el punto 9:**
->   `adb install -r` de `app-prod-release.apk` encima de la instalación con
->   datos, con el usuario delante para aceptar la ventana de HyperOS (la
->   cancela sola a los ~30 s). Después confirmar con él que sus datos siguen.
+> - **G8 VERDE: el MVP está cerrado.** Validado solo con la tablet (decisión
+>   del usuario: no tiene teléfono). Gate, métricas, release `1.5.0+9`
+>   firmada y verificada, recorrido manual, logcat y `install -r` con datos:
+>   todo en verde. Detalle y hashes en `documentos/A8-VALIDACION-RELEASE.md`.
 > - La tablet **ya instala por USB**, pero cada instalación pide confirmación.
 >   Tiene la release con datos de uso real desde hoy: **no lanzar el gate ni
 >   `flutter test` sobre ella** sin preguntar.

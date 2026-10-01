@@ -14,7 +14,7 @@ Este registro informa el avance; las decisiones de alcance y arquitectura viven 
 | A5 — Bitácora y progreso | **COMPLETADA** | G5 verde el 27 de agosto de 2026 |
 | A6 — Copia y restauración | **RETIRADA DEL MVP** | G6 retirada / no aplica; ADR-005. La copia vuelve como último bloque del post-MVP (ADR-006 D2, 24 de septiembre de 2026) |
 | A7 — UI v2 y accesibilidad | **COMPLETADA** | G7 verde el 28 de agosto de 2026 |
-| A8 — Release | **EN PROGRESO** | Preflight verde; G8 pendiente |
+| A8 — Release | **COMPLETADA** | G8 verde el 30 de septiembre de 2026, solo con la tablet (`1.5.0+9`) |
 | A9 — Calendario y recordatorios | **COMPLETADA** | G9 verde el 23 de septiembre de 2026. El calendario y las recurrencias se aprobaron físicamente con `1.2.1+6` el 6 de septiembre de 2026; los recordatorios, separados a A11, cerraron con el recorrido de `1.4.0+8` |
 | A10 — Tablón de misiones | **COMPLETADA** | Recorrido físico de `1.2.1+6` cerrado y aprobado por el usuario el 6 de septiembre de 2026 |
 | A11 — Notificaciones | **COMPLETADA** | Los cuatro puntos validados en dispositivo: el 1 con `1.3.0+7` el 7 de septiembre de 2026; los 2, 3 y 4 con `1.4.0+8` el 23 de septiembre de 2026 |
@@ -55,7 +55,7 @@ la migración v3 → v4 se hará sin ella con el riesgo aceptado por el usuario.
 | --- | --- | --- | --- |
 | 1 | **Recorrido físico de `1.4.0+8`** (puntos 2, 3 y 4 de A11) | **HECHO** el 23 de septiembre de 2026, sin incidencias | Nada: cerró A11 y con ella G9 |
 | 2 | **Respaldo externo de la llave de firma** | Pendiente desde A8 | Nada técnicamente, pero es lo único irreparable: sin la llave no hay más actualizaciones y la única salida sería desinstalar, que borra los datos |
-| 3 | **Métricas cifradas y G8** | Pendiente | Cerrar A8 |
+| 3 | **Métricas cifradas y G8** | **Hecho** el 30 de septiembre de 2026 | — |
 | 4 | **Personaje, Contactos, Inventario y Tienda** | ADR-006 con decisiones de producto resueltas el 24 de septiembre de 2026; falta el esquema | Es post-MVP: no se abre antes de 1 y 3 |
 | 5 | **Copia de seguridad** (antes A6) | Decidido el 24 de septiembre de 2026 que va al final | Último bloque del post-MVP |
 
@@ -307,7 +307,8 @@ autorizada; A6 permanece bloqueada hasta completar G5.
   aprobada. La conexión USB no está disponible.
 - Pendiente: respaldo externo de llave/credenciales, métricas físicas mediante
   ADB inalámbrico u otro dispositivo accesible y cierre documental. **A8 y G8
-  no están cerradas.**
+  no están cerradas.** (Superado: G8 verde el 30 de septiembre de 2026; ver
+  `A8-VALIDACION-RELEASE.md`.)
 
 ## Evidencia parcial A9 — calendario y recordatorios
 

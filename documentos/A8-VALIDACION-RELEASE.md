@@ -1,10 +1,9 @@
 # A8 — validación de release
 
-- Candidata bajo validación: **`1.4.0+8`**, aprobada en dispositivo el 23 de
-  septiembre de 2026 (recorrido de A11).
-- Estado: instalación limpia y actualización aprobadas desde `1.0.0`; **métricas
-  pendientes**. **G8 permanece rojo.**
-- Revisado el 24 de septiembre de 2026.
+- Candidata validada: **`1.5.0+9`**.
+- Estado: **G8 VERDE desde el 30 de septiembre de 2026**, solo con la tablet
+  por decisión del usuario. Ver «Ejecución del 30 de septiembre de 2026».
+- Revisado el 30 de septiembre de 2026.
 
 ## Qué bloquea G8 hoy, en concreto
 
@@ -158,6 +157,7 @@ recorrido se repite allí sin reabrir G8 salvo que aparezca un defecto S0/S1.
   2026 en la tablet, sin defectos reportados.
 - Logcat revisado tras el recorrido: el proceso release solo emite la línea de
   Impeller; ningún PIN, código, importe ni título.
-- **Pendiente para cerrar G8: el punto 9** (`adb install -r` encima de la
-  instalación con datos). HyperOS canceló su ventana dos veces; los datos no
-  se tocaron (`firstInstallTime` sin cambios).
+- Punto 9: `adb install -r` de la misma release encima de la instalación con
+  datos (`firstInstallTime` 23:38 sin cambios, `lastUpdateTime` 23:46). El
+  usuario desbloqueó y confirmó que sus datos siguen intactos.
+- **G8 cerrado el 30 de septiembre de 2026.**
