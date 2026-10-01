@@ -53,3 +53,7 @@ app.*.map.json
 
 # Diferencias que genera flutter test cuando falla un golden
 **/failures/*.png
+
+# Sonidos de prueba locales (audio con copyright): nunca al repositorio
+android/app/src/main/res/raw/*_test.*
+android/app/src/main/res/raw/keep_local_test.xml

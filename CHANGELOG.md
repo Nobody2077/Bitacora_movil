@@ -1,5 +1,16 @@
 # Historial de cambios
 
+## 1.6.1 — candidata `1.6.1+12`
+
+### Sonidos de acceso elegidos por el usuario
+
+- Tecla del PIN: `glitch_001`; acceso concedido: `forceField_003`; PIN
+  incorrecto: `error_008` (Kenney, CC0), elegidos escuchándolos.
+- La carga admite un sonido **local de prueba**, ignorado por Git, que
+  sustituye al de serie si existe. Detalle en `documentos/PROPUESTA-SONIDO.md`.
+- Instalada en la tablet y **aprobada por el usuario el 1 de octubre de
+  2026**. Pendiente: la carga suena baja.
+
 ## 1.6.0 — candidata `1.6.0+11`
 
 ### Sonidos de acceso

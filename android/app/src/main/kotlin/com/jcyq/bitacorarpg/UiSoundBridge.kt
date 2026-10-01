@@ -1,5 +1,6 @@
 package com.jcyq.bitacorarpg
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -38,7 +39,7 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
             "MISSION_COMPLETED" to soundPool.load(appContext, R.raw.ui_mission_completed, 1),
             "LEVEL_UP" to soundPool.load(appContext, R.raw.ui_level_up, 1),
             "ACCESS_KEYPAD" to soundPool.load(appContext, R.raw.ui_access_keypad, 1),
-            "ACCESS_LOADING" to soundPool.load(appContext, R.raw.ui_access_loading, 1),
+            "ACCESS_LOADING" to soundPool.load(appContext, loadingResource(appContext), 1),
             "ACCESS_DENIED" to soundPool.load(appContext, R.raw.ui_access_denied, 1),
         )
 
@@ -80,6 +81,21 @@ internal class UiSoundBridge(context: Context) : MethodChannel.MethodCallHandler
 
             else -> result.notImplemented()
         }
+    }
+
+    /**
+     * Un sonido de carga local para probar (`res/raw/ui_access_loading_test.*`,
+     * ignorado por Git) sustituye al de serie si existe. Nunca se versiona: puede
+     * ser audio con derechos de autor.
+     */
+    @SuppressLint("DiscouragedApi")
+    private fun loadingResource(context: Context): Int {
+        val localTest = context.resources.getIdentifier(
+            "ui_access_loading_test",
+            "raw",
+            context.packageName,
+        )
+        return if (localTest != 0) localTest else R.raw.ui_access_loading
     }
 
     private companion object {

@@ -297,14 +297,14 @@ septiembre de 2026 de las páginas oficiales de cada pack, con su
 
 | Fichero | Origen |
 | --- | --- |
-| `ui_access_granted.ogg` | *Sci-Fi Sounds* 1.0 — `forceField_001.ogg` |
+| `ui_access_granted.ogg` | *Sci-Fi Sounds* 1.0 — `forceField_003.ogg` (antes `forceField_001`; cambiado en `1.6.1`) |
 | `ui_navigation.ogg` | *Interface Sounds* — `tick_001.ogg` |
 | `ui_mission_created.ogg` | *Interface Sounds* — `confirmation_001.ogg` |
 | `ui_mission_completed.ogg` | *Interface Sounds* — `confirmation_002.ogg` |
 | `ui_level_up.ogg` | *Interface Sounds* — `maximize_005.ogg` |
-| `ui_access_keypad.ogg` | *Interface Sounds* — `click_001.ogg` (añadido en `1.6.0`) |
+| `ui_access_keypad.ogg` | *Interface Sounds* — `glitch_001.ogg` (en `1.6.0` era `click_001`) |
 | `ui_access_loading.ogg` | *Sci-Fi Sounds* 1.0 — `computerNoise_000.ogg` (añadido en `1.6.0`) |
-| `ui_access_denied.ogg` | *Interface Sounds* — `error_006.ogg` (añadido en `1.6.0`) |
+| `ui_access_denied.ogg` | *Interface Sounds* — `error_008.ogg` (en `1.6.0` era `error_006`) |
 
 La selección se hizo por nombre, sin escucharlos. **Se valida en el recorrido
 físico** y cualquiera se sustituye cambiando solo el fichero, con el mismo
@@ -357,3 +357,19 @@ con su `License.txt` CC0.
 `1.6.0+11` instalada encima de `1.5.1+10` en la tablet, con datos reales. El
 usuario probó teclas, carga y PIN incorrecto y **aprobó los tres sonidos tal
 como están**.
+
+## Adenda del 1 de octubre de 2026 — elección por escucha (`1.6.1`)
+
+El usuario escuchó candidatos de Kenney en un banco de sonidos y eligió:
+tecla `glitch_001`, acceso concedido `forceField_003` y PIN incorrecto
+`error_008` (los de `1.6.0` sonaban «a Tetris»). Ningún candidato de carga le
+convenció, ni de Kenney ni generados.
+
+**Sonido de carga de prueba, local y fuera de Git.** Para probar en la tablet,
+`UiSoundBridge` usa `res/raw/ui_access_loading_test.*` si existe y, si no,
+`ui_access_loading.ogg` (CC0). El fichero de prueba es audio con derechos de
+autor que el usuario aportó como referencia: está en `.gitignore`, junto con
+el `keep_local_test.xml` que evita que el shrinker lo quite, y **nunca se
+versiona**. Una compilación hecha desde el repositorio no lo lleva. Antes de
+cualquier distribución hay que sustituirlo por un sonido propio o con
+licencia. Pendiente: suena bajo (volumen de carga 0,35).
