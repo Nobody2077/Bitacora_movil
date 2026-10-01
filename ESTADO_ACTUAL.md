@@ -922,6 +922,11 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >      acceso (tecla del PIN igual para todas, carga que se corta, PIN
 >      incorrecto) con su propio interruptor. La paleta llega a 8 efectos, el
 >      tope del criterio 6 de PROPUESTA-SONIDO.
+>   1c. ~~`1.6.1+12` y `1.6.2+13`~~ **Hechas y aprobadas el 1 de octubre**:
+>      sonidos de acceso elegidos por escucha (la carga usa un sonido local de
+>      prueba, ignorado por Git, que **nunca se sube**) y pantalla completa
+>      (modo inmersivo, interruptor en Apariencia). Pendiente: la carga suena
+>      baja; se mejorarán los audios más adelante.
 >   2. **En curso:** el borrador de ADR-006 (sin commit en la sesión del 1 de
 >      octubre) ya tiene el esquema v4 completo y validado en SQLite. Pendiente
 >      de incorporar lo que decidió el usuario después: Proyecto con tipos

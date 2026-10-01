@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/access/presentation/privacy_boundary.dart';
 import '../features/settings/domain/models/app_preferences.dart';
+import '../shared/adaptive/immersive_mode_boundary.dart';
 import 'config/app_environment.dart';
 import 'providers/app_preferences_provider.dart';
 import 'router/app_router.dart';
@@ -36,9 +37,11 @@ class BitacoraApp extends ConsumerWidget {
       routerConfig: router,
       builder: (context, child) => AppUiPreferencesBoundary(
         preferences: uiPreferences,
-        child: AppPrivacyBoundary(
-          allowScreenshots: preferences.allowScreenshots,
-          child: child ?? const SizedBox.shrink(),
+        child: ImmersiveModeBoundary(
+          child: AppPrivacyBoundary(
+            allowScreenshots: preferences.allowScreenshots,
+            child: child ?? const SizedBox.shrink(),
+          ),
         ),
       ),
     );

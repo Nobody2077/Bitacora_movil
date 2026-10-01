@@ -24,6 +24,34 @@ class _AppearanceSettingsPageState
     extends ConsumerState<AppearanceSettingsPage> {
   String? _savingPreference;
 
+  /// Va a un espejo no sensible, no a la base: debe aplicarse también en la
+  /// pantalla del PIN, antes de abrir los datos cifrados.
+  Future<void> _saveImmersive(bool enabled) async {
+    if (_savingPreference != null) {
+      return;
+    }
+    setState(() => _savingPreference = 'immersive');
+    bool saved = false;
+    try {
+      await ref.read(immersiveModePreferenceStoreProvider).write(enabled);
+      ref.invalidate(immersiveModeProvider);
+      saved = true;
+    } on Object {
+      saved = false;
+    }
+    if (!mounted) {
+      return;
+    }
+    setState(() => _savingPreference = null);
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo guardar la pantalla completa.'),
+        ),
+      );
+    }
+  }
+
   Future<void> _save(String preference, AppPreferences nextPreferences) async {
     if (_savingPreference != null) {
       return;
@@ -128,6 +156,17 @@ class _AppearanceSettingsPageState
     required double availableWidth,
   }) {
     final bool saving = _savingPreference != null;
+    final Widget immersiveCard = PreferenceSwitchCard(
+      switchKey: const Key('immersive-mode-switch'),
+      icon: Icons.fullscreen,
+      title: 'Pantalla completa',
+      description:
+          'Oculta la barra de estado y la de navegación. Desliza desde el '
+          'borde para verlas un momento.',
+      value: ref.watch(immersiveModeProvider).value ?? true,
+      enabled: !saving,
+      onChanged: _saveImmersive,
+    );
     final List<Widget> cards = <Widget>[
       PreferenceSwitchCard(
         switchKey: const Key('large-text-switch'),
@@ -214,6 +253,8 @@ class _AppearanceSettingsPageState
         ),
         const SizedBox(height: TerminalSpace.lg),
         content,
+        const SizedBox(height: TerminalSpace.md),
+        immersiveCard,
       ],
     );
   }

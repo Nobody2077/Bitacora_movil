@@ -4,6 +4,7 @@ import 'package:bitacora_rpg_personal/app/providers/app_preferences_provider.dar
 import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
 import 'package:bitacora_rpg_personal/app/router/app_routes.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme_tokens.dart';
+import 'package:bitacora_rpg_personal/app/theme/immersive_mode_preference_store.dart';
 import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_controller.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
@@ -19,6 +20,7 @@ import 'package:bitacora_rpg_personal/features/progress/domain/models/progress_m
 import 'package:bitacora_rpg_personal/features/progress/domain/models/rpg_level.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/app_exit.dart';
+import 'package:bitacora_rpg_personal/shared/adaptive/immersive_mode_boundary.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
 import 'package:bitacora_rpg_personal/shared/device/device_battery.dart';
 import 'package:bitacora_rpg_personal/shared/sound/ui_sound.dart';
@@ -333,6 +335,35 @@ void main() {
       },
     );
 
+    testWidgets('Pantalla completa arranca activada y se puede desactivar', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 800));
+      final _MemoryImmersiveStore store = _MemoryImmersiveStore(true);
+      final List<bool> applied = <bool>[];
+      await tester.pumpWidget(
+        _testApp(
+          initialLocation: AppRoutes.settingsAppearance,
+          immersiveStore: store,
+          immersiveApplied: applied,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(applied, <bool>[true]);
+
+      final Finder immersiveSwitch = find.byKey(
+        const Key('immersive-mode-switch'),
+      );
+      await tester.ensureVisible(immersiveSwitch);
+      await tester.pumpAndSettle();
+      await tester.tap(immersiveSwitch);
+      await tester.pumpAndSettle();
+
+      expect(store.value, isFalse);
+      expect(applied, <bool>[true, false]);
+    });
+
     testWidgets(
       'Sonido arranca apagado y al activar logros guarda y da una muestra',
       (WidgetTester tester) async {
@@ -385,6 +416,18 @@ final class _MemorySoundStore implements UiSoundPreferenceStore {
   }
 }
 
+final class _MemoryImmersiveStore implements ImmersiveModePreferenceStore {
+  _MemoryImmersiveStore(this.value);
+
+  bool value;
+
+  @override
+  Future<bool> read() async => value;
+
+  @override
+  Future<void> write(bool enabled) async => value = enabled;
+}
+
 final class _RecordingSoundPlayer implements UiSoundPlayer {
   final List<UiSound> played = <UiSound>[];
 
@@ -402,8 +445,16 @@ Widget _testApp({
   UiSoundPreferenceStore? soundStore,
   UiSoundPlayer? soundPlayer,
   Future<void> Function()? onAppExit,
+  ImmersiveModePreferenceStore? immersiveStore,
+  List<bool>? immersiveApplied,
 }) => ProviderScope(
   overrides: [
+    immersiveModePreferenceStoreProvider.overrideWithValue(
+      immersiveStore ?? _MemoryImmersiveStore(true),
+    ),
+    systemUiModeApplierProvider.overrideWithValue(
+      (bool immersive) async => immersiveApplied?.add(immersive),
+    ),
     appExitProvider.overrideWithValue(onAppExit ?? () async {}),
     uiSoundPreferenceStoreProvider.overrideWithValue(
       soundStore ?? _MemorySoundStore(),

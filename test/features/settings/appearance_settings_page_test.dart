@@ -5,6 +5,7 @@ import 'package:bitacora_rpg_personal/app/providers/persistence_providers.dart';
 import 'package:bitacora_rpg_personal/app/theme/access_accent_preference_store.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_theme.dart';
 import 'package:bitacora_rpg_personal/app/theme/app_ui_preferences.dart';
+import 'package:bitacora_rpg_personal/app/theme/immersive_mode_preference_store.dart';
 import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/repositories/settings_repository.dart';
@@ -192,6 +193,9 @@ Future<void> _pumpAppearance(
         accessAccentPreferenceStoreProvider.overrideWithValue(
           accentStore ?? _MemoryAccessAccentPreferenceStore(),
         ),
+        immersiveModePreferenceStoreProvider.overrideWithValue(
+          _MemoryImmersiveStore(),
+        ),
         appPreferencesProvider.overrideWith(
           (ref) => repository.watch().map(
             (Result<AppPreferences> result) => result.fold(
@@ -222,6 +226,16 @@ Future<void> _pumpAppearance(
     ),
   );
   await tester.pumpAndSettle();
+}
+
+final class _MemoryImmersiveStore implements ImmersiveModePreferenceStore {
+  bool current = true;
+
+  @override
+  Future<bool> read() async => current;
+
+  @override
+  Future<void> write(bool enabled) async => current = enabled;
 }
 
 final class _MemoryAccessAccentPreferenceStore

@@ -1,5 +1,24 @@
 # Historial de cambios
 
+## 1.6.2 — candidata `1.6.2+13`
+
+### Pantalla completa
+
+- Nuevo interruptor **Ajustes → Apariencia → «Pantalla completa»**,
+  **activado por defecto**: oculta la barra de estado y la de navegación
+  (modo inmersivo de Android). Un gesto desde el borde las muestra un momento
+  y se ocultan solas.
+- Se aplica también en la pantalla del PIN: la preferencia vive en un espejo
+  no sensible (`immersive_v1.txt`), como el color de acceso. Se vuelve a
+  aplicar al regresar a la app.
+- La hora, la fecha y la batería ya las muestra la propia app en la cabecera
+  y la barra lateral. **El esquema no cambia.**
+- `flutter analyze` sin problemas y **268/268 pruebas**, tres nuevas; golden de
+  Apariencia expandida regenerado (la tarjeta va a todo el ancho, debajo de la
+  cuadrícula).
+- Instalada encima de `1.6.1+12` con datos reales y **aprobada en la tablet
+  el 1 de octubre de 2026**.
+
 ## 1.6.1 — candidata `1.6.1+12`
 
 ### Sonidos de acceso elegidos por el usuario
