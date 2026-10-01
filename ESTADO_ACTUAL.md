@@ -915,9 +915,9 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >   `flutter test` sobre ella** sin preguntar.
 > - **La llave de firma sigue sin respaldo** (el usuario lo confirmó hoy).
 > - Siguiente trabajo acordado, en orden:
->   1. `1.5.1+10`: botón «Copiar» del código de recuperación (contenido
->      marcado como sensible y portapapeles borrado a los 60 s) y botón
->      «Pegar» al recuperar; actualizar ADR-002.
+>   1. ~~`1.5.1+10`~~ **Hecho y aprobado en la tablet el 1 de octubre de 2026**:
+>      copiar/pegar el código de recuperación (ADR-002 §4.1) y botón «Salir»
+>      bajo Ajustes. Instalada en la tablet con datos reales.
 >   2. ADR-006 ampliado con lo decidido hoy: menú tipo juego CIBERWARE ·
 >      INVENTARIO · MAPA (aplazado, OSM sin conexión) · PERSONAJE · DIARIO
 >      (Bitácora renombrada, solo visual) con personajes; Creación

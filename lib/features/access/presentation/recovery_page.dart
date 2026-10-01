@@ -128,7 +128,7 @@ class _RecoveryPageState extends ConsumerState<RecoveryPage> {
             RecoveryCodeField(
               fieldKey: const Key('replacement-recovery-confirmation'),
               controller: _replacementConfirmationController,
-              label: 'Confirma el código nuevo',
+              label: 'Pega o escribe el código nuevo desde donde lo guardaste',
               enabled: !session.isBusy,
             ),
             const SizedBox(height: 16),

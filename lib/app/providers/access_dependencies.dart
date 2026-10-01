@@ -4,6 +4,7 @@ import '../../features/access/data/local_biometric_authenticator.dart';
 import '../../features/access/data/method_channel_access_credential_store.dart';
 import '../../features/access/data/pbkdf2_access_credential_hasher.dart';
 import '../../features/access/data/secure_random_byte_source.dart';
+import '../../features/access/data/sensitive_clipboard.dart';
 import '../../features/access/domain/access_clock.dart';
 import '../../features/access/domain/access_credential_hasher.dart';
 import '../../features/access/domain/access_credential_store.dart';
@@ -57,4 +58,9 @@ final Provider<CredentialService> credentialServiceProvider =
 final Provider<BiometricAuthenticator> biometricAuthenticatorProvider =
     Provider<BiometricAuthenticator>(
       (Ref ref) => LocalBiometricAuthenticator(),
+    );
+
+final Provider<SensitiveClipboard> sensitiveClipboardProvider =
+    Provider<SensitiveClipboard>(
+      (Ref ref) => MethodChannelSensitiveClipboard(),
     );

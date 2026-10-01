@@ -1,5 +1,33 @@
 # Historial de cambios
 
+## 1.5.1 — candidata `1.5.1+10`
+
+### Copiar y pegar el código de recuperación
+
+- Botón **«Copiar código»** donde el código se muestra una sola vez (alta del
+  PIN y rotación tras recuperar). El contenido se marca como sensible y **se
+  borra del portapapeles a los 60 segundos** si sigue siendo ese código.
+- Botón **«Pegar código»** en cada campo del código: recuperar acceso y las
+  dos confirmaciones. Lo pegado se pasa a mayúsculas y se limpia.
+- Los textos recomiendan guardarlo en un gestor de contraseñas o en papel.
+- Contrato en ADR-002 §4.1. **El esquema no cambia.**
+
+### Botón Salir
+
+- Nueva entrada **«Salir»** en la barra lateral, justo debajo de Ajustes.
+- Pide confirmación (**«¿Deseas salir?»**); al aceptar **bloquea la sesión**
+  (cierra la base cifrada) **y cierra la app**. Al volver se pide el PIN.
+- Golden `sidebar_modular_battery` regenerado por la entrada nueva.
+
+### Calidad
+
+- `flutter analyze` sin problemas y **258/258 pruebas aprobadas**, ocho nuevas
+  (portapapeles sensible, pegar y Salir).
+- APK release `1.5.1+10` firmada con el certificado de siempre y **sin permiso
+  `INTERNET`**. Instalada encima de `1.5.0+9` con datos reales y **validada en
+  la tablet el 1 de octubre de 2026**: datos intactos, Salir, copiar y pegar
+  aprobados por el usuario.
+
 ## 1.5.0 — candidata `1.5.0+9`
 
 ### Efectos de sonido

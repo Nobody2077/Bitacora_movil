@@ -56,6 +56,29 @@ SQLite. Fortalecer esa frontera requerirá otro ADR y una migración nativa.
 - Perder PIN y código de recuperación solo permite un borrado local destructivo
   explícito. No existen PIN maestro, preguntas de seguridad ni puerta trasera.
 
+### 4.1 Copiar y pegar el código (adenda del 30 de septiembre de 2026, `1.5.1+10`)
+
+A petición del usuario, escribir 32 caracteres a mano dejó de ser la única
+vía. El riesgo nuevo es el portapapeles de Android, legible por el teclado y,
+en algunos teclados, guardado en un historial. Reglas:
+
+- **Copiar** solo existe donde el código se muestra una vez (alta y rotación).
+  El contenido se marca como sensible (`ClipDescription.EXTRA_IS_SENSITIVE`,
+  Android 13+): el sistema no lo previsualiza y los teclados que respetan la
+  marca no lo guardan. En Android 12 o anterior la marca no tiene efecto.
+- **El portapapeles se borra a los 60 segundos**, y solo si todavía contiene
+  ese mismo código: nunca se pisa algo que el usuario copió después. Si el
+  proceso muere antes, el código queda hasta la siguiente copia; es un riesgo
+  aceptado.
+- **Pegar** es un botón explícito en cada campo del código, además del menú
+  estándar. El texto se sanea (mayúsculas, alfabeto permitido, 39 caracteres)
+  antes de llegar al campo; la validación sigue siendo la del verificador.
+- La confirmación del alta acepta el código pegado: su función pasa a ser
+  «pégalo desde donde lo guardaste». La pantalla recomienda un gestor de
+  contraseñas o papel, no una nota sin protección.
+- Ni el código ni nada derivado de él pasa por logs ni por Dart fuera de
+  `SensitiveClipboard`.
+
 ## 5. Estado de acceso y AndroidKeyStore
 
 - El estado de acceso es un registro versionado, cifrado y autenticado con

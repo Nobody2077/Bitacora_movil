@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers/access_dependencies.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
@@ -1475,7 +1477,17 @@ class PinTextField extends StatelessWidget {
   );
 }
 
-class RecoveryCodeField extends StatelessWidget {
+/// Caracteres aceptados por el campo del código, en mayúsculas y con el mismo
+/// límite que el teclado. Se aplica también a lo que llega del portapapeles.
+String sanitizeRecoveryCodeInput(String raw) {
+  final String filtered = raw
+      .replaceAll(RegExp('[^A-Za-z0-9 -]'), '')
+      .trim()
+      .toUpperCase();
+  return filtered.length > 39 ? filtered.substring(0, 39) : filtered;
+}
+
+class RecoveryCodeField extends ConsumerWidget {
   const RecoveryCodeField({
     required this.controller,
     required this.label,
@@ -1489,8 +1501,31 @@ class RecoveryCodeField extends StatelessWidget {
   final bool enabled;
   final Key? fieldKey;
 
+  Future<void> _paste(BuildContext context, WidgetRef ref) async {
+    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
+      context,
+    );
+    String? text;
+    try {
+      text = await ref.read(sensitiveClipboardProvider).readText();
+    } on Object {
+      text = null;
+    }
+    final String value = sanitizeRecoveryCodeInput(text ?? '');
+    if (value.isEmpty) {
+      messenger?.showSnackBar(
+        const SnackBar(content: Text('No hay un código para pegar.')),
+      );
+      return;
+    }
+    controller.value = TextEditingValue(
+      text: value,
+      selection: TextSelection.collapsed(offset: value.length),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => Semantics(
+  Widget build(BuildContext context, WidgetRef ref) => Semantics(
     label: label,
     textField: true,
     child: TextField(
@@ -1506,18 +1541,52 @@ class RecoveryCodeField extends StatelessWidget {
         FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9 -]')),
         LengthLimitingTextInputFormatter(39),
       ],
-      decoration: InputDecoration(labelText: label, counterText: ''),
+      decoration: InputDecoration(
+        labelText: label,
+        counterText: '',
+        suffixIcon: IconButton(
+          key: switch (fieldKey) {
+            final ValueKey<String> key => Key('${key.value}-paste'),
+            _ => null,
+          },
+          tooltip: 'Pegar código',
+          onPressed: enabled ? () => _paste(context, ref) : null,
+          icon: const Icon(Icons.content_paste),
+        ),
+      ),
     ),
   );
 }
 
-class OneTimeRecoveryCode extends StatelessWidget {
+class OneTimeRecoveryCode extends ConsumerWidget {
   const OneTimeRecoveryCode({required this.code, super.key});
 
   final String code;
 
+  Future<void> _copy(BuildContext context, WidgetRef ref) async {
+    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
+      context,
+    );
+    try {
+      await ref.read(sensitiveClipboardProvider).copy(code);
+    } on Object {
+      messenger?.showSnackBar(
+        const SnackBar(content: Text('No se pudo copiar. Escríbelo a mano.')),
+      );
+      return;
+    }
+    messenger?.showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Código copiado. Pégalo en un lugar seguro: se borrará del '
+          'portapapeles en 60 segundos.',
+        ),
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens =
         Theme.of(context).extension<AppThemeTokens>() ??
         AppThemeTokens.terminal;
@@ -1529,15 +1598,26 @@ class OneTimeRecoveryCode extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: tokens.valueYellow),
       ),
-      child: Text(
-        code,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: tokens.valueYellow,
-          fontFamily: 'monospace',
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.1,
-        ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            code,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: tokens.valueYellow,
+              fontFamily: 'monospace',
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            key: const Key('copy-recovery-code'),
+            onPressed: code.isEmpty ? null : () => _copy(context, ref),
+            icon: const Icon(Icons.content_copy),
+            label: const Text('Copiar código'),
+          ),
+        ],
       ),
     );
   }

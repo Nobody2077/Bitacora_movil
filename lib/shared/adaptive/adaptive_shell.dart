@@ -8,6 +8,7 @@ import '../../app/router/app_routes.dart';
 import '../../app/theme/app_theme_tokens.dart';
 import '../../core/errors/app_failure.dart';
 import '../../core/result/result.dart';
+import '../../features/access/application/access_session_controller.dart';
 import '../../features/missions/application/mission_providers.dart';
 import '../../features/missions/domain/models/mission.dart';
 import '../../features/missions/presentation/mission_presentation_support.dart';
@@ -19,6 +20,7 @@ import '../../features/progress/domain/models/progress_models.dart';
 import '../device/device_battery.dart';
 import '../sound/ui_sound.dart';
 import 'app_breakpoints.dart';
+import 'app_exit.dart';
 import 'terminal_application_header.dart';
 import 'terminal_sidebar.dart';
 
@@ -161,6 +163,7 @@ class _RailShell extends ConsumerWidget {
               builder: (BuildContext context) =>
                   UserProfileEditDialog(initialProfile: profile),
             ),
+            onExit: () => unawaited(_confirmExit(context, ref)),
             onSelected: (int index) {
               if (index != _railIndex(location)) {
                 unawaited(
@@ -191,6 +194,42 @@ class _RailShell extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Bloquea la sesión (cierra la base cifrada) y cierra la app. Al volver se
+/// pedirá el PIN. Es reversible, así que la acción usa el estilo normal.
+Future<void> _confirmExit(BuildContext context, WidgetRef ref) async {
+  final bool? accepted = await showDialog<bool>(
+    context: context,
+    builder: (BuildContext dialogContext) => AlertDialog(
+      title: const Text('¿Deseas salir?'),
+      content: const Text(
+        'La app se bloqueará y se cerrará. Para volver a entrar necesitarás '
+        'tu PIN.',
+      ),
+      actions: <Widget>[
+        TextButton(
+          key: const Key('exit-cancel'),
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton.icon(
+          key: const Key('exit-confirm'),
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          icon: const Icon(Icons.logout),
+          label: const Text('Salir'),
+        ),
+      ],
+    ),
+  );
+  if (accepted != true || !context.mounted) {
+    return;
+  }
+  ref
+      .read(accessSessionProvider.notifier)
+      .lock(reason: AccessLockReason.manual);
+  context.go(AppRoutes.lock);
+  await ref.read(appExitProvider)();
 }
 
 SidebarMissionVitals? _sidebarMissionVitals(

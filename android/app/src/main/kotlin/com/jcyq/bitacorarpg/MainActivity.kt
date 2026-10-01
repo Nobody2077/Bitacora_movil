@@ -22,6 +22,9 @@ class MainActivity : FlutterFragmentActivity() {
         AccessCredentialStoreBridge(applicationContext).register(
             flutterEngine.dartExecutor.binaryMessenger,
         )
+        SensitiveClipboardBridge(applicationContext).register(
+            flutterEngine.dartExecutor.binaryMessenger,
+        )
         PrivacyWindowBridge(this).register(
             flutterEngine.dartExecutor.binaryMessenger,
         )

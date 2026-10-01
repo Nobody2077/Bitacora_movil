@@ -158,8 +158,9 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
       return AccessScaffold(
         title: 'Guarda tu código de recuperación',
         subtitle:
-            'Es la única vía local si olvidas el PIN. Guárdalo fuera del '
-            'teléfono; no podremos volver a mostrarlo.',
+            'Es la única vía local si olvidas el PIN. Cópialo a un gestor de '
+            'contraseñas o escríbelo en papel, fuera del teléfono; no podremos '
+            'volver a mostrarlo.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -169,7 +170,7 @@ class _AccessGatePageState extends ConsumerState<AccessGatePage> {
             RecoveryCodeField(
               fieldKey: const Key('setup-recovery-confirmation'),
               controller: _recoveryConfirmationController,
-              label: 'Escribe el código completo para confirmarlo',
+              label: 'Pega o escribe el código desde donde lo guardaste',
               enabled: !session.isBusy,
             ),
             const SizedBox(height: 16),

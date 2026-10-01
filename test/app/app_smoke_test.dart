@@ -18,6 +18,7 @@ import 'package:bitacora_rpg_personal/features/progress/application/progress_pro
 import 'package:bitacora_rpg_personal/features/progress/domain/models/progress_models.dart';
 import 'package:bitacora_rpg_personal/features/progress/domain/models/rpg_level.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
+import 'package:bitacora_rpg_personal/shared/adaptive/app_exit.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
 import 'package:bitacora_rpg_personal/shared/device/device_battery.dart';
 import 'package:bitacora_rpg_personal/shared/sound/ui_sound.dart';
@@ -213,6 +214,67 @@ void main() {
       expect(find.text('Guardar nombre'), findsOneWidget);
     });
 
+    testWidgets('Salir pide confirmación, bloquea la sesión y cierra la app', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 800));
+      var exits = 0;
+      await tester.pumpWidget(
+        _testApp(
+          initialLocation: AppRoutes.journal,
+          onAppExit: () async => exits++,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final Finder exit = find.byKey(
+        const ValueKey<String>('sidebar-destination-Salir'),
+      );
+      expect(
+        find.descendant(of: exit, matching: find.text('SALIR')),
+        findsOneWidget,
+      );
+      expect(
+        tester.getTopLeft(exit).dy,
+        greaterThan(
+          tester
+              .getTopLeft(
+                find.byKey(
+                  const ValueKey<String>('sidebar-destination-Ajustes'),
+                ),
+              )
+              .dy,
+        ),
+      );
+
+      await tester.tap(exit);
+      await tester.pumpAndSettle();
+      expect(find.text('¿Deseas salir?'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('exit-cancel')));
+      await tester.pumpAndSettle();
+      expect(exits, 0);
+      final ProviderContainer container = ProviderScope.containerOf(
+        tester.element(find.byType(TerminalSidebar)),
+      );
+      expect(
+        container.read(accessSessionProvider).phase,
+        AccessSessionPhase.unlocked,
+      );
+
+      await tester.tap(exit);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('exit-confirm')));
+      await tester.pumpAndSettle();
+
+      expect(exits, 1);
+      expect(
+        container.read(accessSessionProvider).phase,
+        AccessSessionPhase.locked,
+      );
+    });
+
     testWidgets('conecta la raíz de Bitácora a la cronología funcional', (
       WidgetTester tester,
     ) async {
@@ -336,8 +398,10 @@ Widget _testApp({
   int batteryLevel = 62,
   UiSoundPreferenceStore? soundStore,
   UiSoundPlayer? soundPlayer,
+  Future<void> Function()? onAppExit,
 }) => ProviderScope(
   overrides: [
+    appExitProvider.overrideWithValue(onAppExit ?? () async {}),
     uiSoundPreferenceStoreProvider.overrideWithValue(
       soundStore ?? _MemorySoundStore(),
     ),

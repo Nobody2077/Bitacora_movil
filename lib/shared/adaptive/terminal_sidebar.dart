@@ -35,6 +35,7 @@ class TerminalSidebar extends StatelessWidget {
     this.globalLevel,
     this.missionVitals,
     this.batteryLevel,
+    this.onExit,
   });
 
   final int selectedIndex;
@@ -46,6 +47,14 @@ class TerminalSidebar extends StatelessWidget {
   final SidebarMissionVitals? missionVitals;
   final int? batteryLevel;
   final VoidCallback onProfilePressed;
+
+  /// Bloquea la sesión y cierra la app. Se muestra justo debajo de Ajustes.
+  final VoidCallback? onExit;
+
+  static const _TerminalNavigationItem _exitItem = _TerminalNavigationItem(
+    'Salir',
+    Icons.logout,
+  );
 
   static const List<_TerminalNavigationItem> _items = <_TerminalNavigationItem>[
     _TerminalNavigationItem('Inicio', Icons.home_outlined),
@@ -101,8 +110,16 @@ class TerminalSidebar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       horizontal: TerminalSpace.sm,
                     ),
-                    itemCount: _items.length,
+                    itemCount: _items.length + (onExit == null ? 0 : 1),
                     itemBuilder: (BuildContext context, int index) {
+                      if (index == _items.length) {
+                        return _SidebarDestination(
+                          item: _exitItem,
+                          extended: extended,
+                          selected: false,
+                          onTap: onExit!,
+                        );
+                      }
                       final _TerminalNavigationItem item = _items[index];
                       return _SidebarDestination(
                         item: item,
