@@ -12,6 +12,9 @@ import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/sound/ui_sound.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../contacts/application/contact_providers.dart';
+import '../../contacts/domain/models/contact.dart';
+import '../../contacts/presentation/contact_widgets.dart';
 import '../../recurrences/application/recurrence_application_service.dart';
 import '../../recurrences/application/recurrence_providers.dart';
 import '../../recurrences/domain/models/recurrence_template.dart';
@@ -49,6 +52,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _budgetController = TextEditingController();
   final TextEditingController _xpController = TextEditingController(text: '25');
+  final TextEditingController _locationController = TextEditingController();
   final List<_ObjectiveEditor> _objectives = <_ObjectiveEditor>[];
 
   Mission? _existing;
@@ -65,6 +69,10 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
   bool _initialized = false;
   bool _saving = false;
 
+  /// `null` mientras no se toquen los personajes: al editar, guardar sin
+  /// tocarlos no los cambia.
+  Set<String>? _contactIds;
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -72,6 +80,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     _durationController.dispose();
     _budgetController.dispose();
     _xpController.dispose();
+    _locationController.dispose();
     for (final objective in _objectives) {
       objective.dispose();
     }
@@ -249,6 +258,8 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
                         ],
                       ),
                     const SizedBox(height: TerminalSpace.md),
+                    _buildContextPanel(),
+                    const SizedBox(height: TerminalSpace.md),
                     _FormActions(
                       saving: _saving,
                       editing: widget.isEditing,
@@ -265,6 +276,65 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     );
   }
 
+  /// Ubicación y personajes (ADR-006 D5 y D15). La foto se pone desde el
+  /// detalle, como en los personajes, porque necesita que la misión exista.
+  Widget _buildContextPanel() {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    // Las misiones diarias nuevas se guardan como plantilla, que no tiene
+    // personajes: solo se ofrece la ubicación, que sí se copia.
+    final bool templateOnly = !widget.isEditing && _type == MissionType.daily;
+    final List<Contact> linked = widget.missionId == null
+        ? const <Contact>[]
+        : ref.watch(missionContactsProvider(widget.missionId!)).value ??
+              const <Contact>[];
+    return TerminalPanel(
+      borderColor: tokens.structuralRed,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const _PanelTitle(label: 'Lugar y personajes', icon: Icons.place),
+          const SizedBox(height: 16),
+          TextFormField(
+            key: const Key('mission-location'),
+            controller: _locationController,
+            maxLength: Mission.maxLocationLength,
+            decoration: const InputDecoration(
+              labelText: 'Ubicación (opcional)',
+              hintText: 'Por ejemplo, «Biblioteca central»',
+              prefixIcon: Icon(Icons.place_outlined),
+            ),
+          ),
+          const SizedBox(height: TerminalSpace.sm),
+          if (templateOnly)
+            Text(
+              'Las misiones diarias no guardan personajes; puedes añadirlos '
+              'después en cada misión generada.',
+              style: TextStyle(color: tokens.textSecondary),
+            )
+          else
+            ContactPickerField(
+              selectedIds:
+                  _contactIds ??
+                  linked.map((Contact contact) => contact.id).toSet(),
+              knownContacts: linked,
+              enabled: !_saving,
+              onChanged: (Set<String> ids) => setState(() => _contactIds = ids),
+            ),
+          if (!widget.isEditing) ...<Widget>[
+            const SizedBox(height: TerminalSpace.sm),
+            Text(
+              'La foto de la misión se añade desde su detalle, después de '
+              'guardarla.',
+              style: TextStyle(color: tokens.textSecondary, fontSize: 12),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   void _initialize(List<MissionArea> areas, Mission? existing) {
     if (_initialized) {
       return;
@@ -277,6 +347,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
     if (existing != null) {
       _titleController.text = existing.title;
       _descriptionController.text = existing.description ?? '';
+      _locationController.text = existing.location ?? '';
       _durationController.text = existing.estimatedMinutes?.toString() ?? '';
       _budgetController.text = existing.budgetMinor == null
           ? ''
@@ -416,6 +487,8 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
             title: _titleController.text,
             description: _descriptionController.text,
             type: _type,
+            location: _locationController.text,
+            contactIds: _contactIds?.toList(),
             importance: _importance,
             priority: _priority,
             isRequired: _isRequired,
@@ -446,6 +519,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
           ref.read(notificationReconciliationServiceProvider).reconcile(),
         );
         ref.invalidate(missionDetailProvider(mission.id));
+        ref.invalidate(missionContactsProvider(mission.id));
         ref.invalidate(todayMissionsProvider);
         if (!widget.isEditing) {
           unawaited(
@@ -506,6 +580,7 @@ class _MissionFormPageState extends ConsumerState<MissionFormPage> {
             title: _titleController.text,
             description: _descriptionController.text,
             missionType: MissionType.daily,
+            location: _locationController.text,
             availabilityMode: _dailyAvailabilityMode,
             importance: _importance,
             priority: _priority,

@@ -11,6 +11,7 @@ import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
+import 'mission_context_widgets.dart';
 import 'mission_presentation_support.dart';
 
 class MissionDetailPage extends ConsumerWidget {
@@ -172,6 +173,8 @@ class _MissionDetailContent extends StatelessWidget {
                 ),
                 const SizedBox(height: TerminalSpace.lg),
                 _IdentityPanel(mission: mission, area: area),
+                const SizedBox(height: TerminalSpace.md),
+                MissionContextPanel(mission: mission),
                 const SizedBox(height: TerminalSpace.md),
                 if (compact) ...<Widget>[
                   _ObjectivesPanel(mission: mission),

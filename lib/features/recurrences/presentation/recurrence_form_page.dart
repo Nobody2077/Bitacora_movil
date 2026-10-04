@@ -33,6 +33,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   final TextEditingController _xpController = TextEditingController(text: '25');
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _budgetController = TextEditingController();
@@ -62,6 +63,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     _xpController.dispose();
     _durationController.dispose();
     _budgetController.dispose();
@@ -138,6 +140,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                       _InfoPanel(
                         titleController: _titleController,
                         descriptionController: _descriptionController,
+                        locationController: _locationController,
                         areas: availableAreas,
                         areaId: _areaId,
                         type: _type,
@@ -195,6 +198,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
                             child: _InfoPanel(
                               titleController: _titleController,
                               descriptionController: _descriptionController,
+                              locationController: _locationController,
                               areas: availableAreas,
                               areaId: _areaId,
                               type: _type,
@@ -291,6 +295,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
     if (existing != null) {
       _titleController.text = existing.title;
       _descriptionController.text = existing.description ?? '';
+      _locationController.text = existing.location ?? '';
       _xpController.text = existing.xpReward.toString();
       _durationController.text = existing.estimatedMinutes?.toString() ?? '';
       _budgetController.text = existing.budgetMinor == null
@@ -459,6 +464,7 @@ class _RecurrenceFormPageState extends ConsumerState<RecurrenceFormPage> {
             areaId: _areaId!,
             title: _titleController.text,
             description: _descriptionController.text,
+            location: _locationController.text,
             missionType: _type,
             availabilityMode: _availabilityMode,
             importance: _importance,
@@ -561,6 +567,7 @@ class _InfoPanel extends StatelessWidget {
   const _InfoPanel({
     required this.titleController,
     required this.descriptionController,
+    required this.locationController,
     required this.areas,
     required this.areaId,
     required this.type,
@@ -580,6 +587,7 @@ class _InfoPanel extends StatelessWidget {
 
   final TextEditingController titleController;
   final TextEditingController descriptionController;
+  final TextEditingController locationController;
   final List<MissionArea> areas;
   final String? areaId;
   final MissionType type;
@@ -636,6 +644,16 @@ class _InfoPanel extends StatelessWidget {
             minLines: 2,
             maxLines: 4,
             decoration: const InputDecoration(labelText: 'Descripción'),
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: locationController,
+            maxLength: 120,
+            decoration: const InputDecoration(
+              labelText: 'Ubicación (opcional)',
+              helperText: 'Se copia a cada misión que genere.',
+              prefixIcon: Icon(Icons.place_outlined),
+            ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<MissionImportance>(

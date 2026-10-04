@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
@@ -15,6 +14,7 @@ import '../../missions/application/mission_providers.dart';
 import '../../missions/domain/models/mission.dart';
 import '../../photos/application/entity_photo_providers.dart';
 import '../../photos/domain/entity_photo.dart';
+import '../../photos/presentation/entity_photo_actions.dart';
 import '../../photos/presentation/entity_photo_avatar.dart';
 import '../application/contact_application_service.dart';
 import '../application/contact_providers.dart';
@@ -296,60 +296,28 @@ class _ContactDetailPageState extends ConsumerState<ContactDetailPage> {
     );
   }
 
-  Future<void> _pickPhoto(Contact contact) async {
-    bool useCamera = false;
-    final bool allowCamera =
-        ref.read(appPreferencesProvider).value?.allowCameraAttachments ?? false;
-    if (allowCamera) {
-      final bool? fromCamera = await showModalBottomSheet<bool>(
-        context: context,
-        builder: (BuildContext sheetContext) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo_camera_outlined),
-                title: const Text('Sacar foto'),
-                onTap: () => Navigator.of(sheetContext).pop(true),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: const Text('Elegir de la galería'),
-                onTap: () => Navigator.of(sheetContext).pop(false),
-              ),
-            ],
-          ),
-        ),
-      );
-      if (fromCamera == null || !mounted) return;
-      useCamera = fromCamera;
-    }
-    await _run(
-      () => ref
-          .read(entityPhotoApplicationServiceProvider)
-          .pickAndSet(
-            EntityPhotoOwner.contact,
-            contact.id,
-            useCamera: useCamera,
-          ),
-      success: 'Foto cifrada y guardada.',
-      cancelled: (EntityPhoto? photo) => photo == null,
-    );
-  }
+  Future<void> _pickPhoto(Contact contact) => _busy(
+    () => pickEntityPhoto(
+      context,
+      ref,
+      owner: EntityPhotoOwner.contact,
+      ownerId: contact.id,
+    ),
+  );
 
-  Future<void> _removePhoto(Contact contact) async {
-    final bool confirmed = await _confirm(
-      title: 'Quitar foto',
-      message: 'Se borrará el archivo cifrado de la foto de este personaje.',
-      action: 'Quitar',
-    );
-    if (!confirmed) return;
-    await _run(
-      () => ref
-          .read(entityPhotoApplicationServiceProvider)
-          .remove(EntityPhotoOwner.contact, contact.id),
-      success: 'Foto quitada.',
-    );
+  Future<void> _removePhoto(Contact contact) => _busy(
+    () => removeEntityPhoto(
+      context,
+      ref,
+      owner: EntityPhotoOwner.contact,
+      ownerId: contact.id,
+    ),
+  );
+
+  Future<void> _busy(Future<void> Function() action) async {
+    setState(() => _working = true);
+    await action();
+    if (mounted) setState(() => _working = false);
   }
 
   Future<void> _archive(Contact contact) async {
@@ -376,22 +344,21 @@ class _ContactDetailPageState extends ConsumerState<ContactDetailPage> {
   Future<void> _run<T>(
     Future<Result<T>> Function() action, {
     required String success,
-    bool Function(T value)? cancelled,
   }) async {
     setState(() => _working = true);
     final Result<T> result = await action();
     if (!mounted) return;
     setState(() => _working = false);
-    final String message = result.fold(
-      onSuccess: (T value) =>
-          cancelled != null && cancelled(value) ? '' : success,
-      onFailure: (AppFailure failure) => failure.message,
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result.fold(
+            onSuccess: (_) => success,
+            onFailure: (AppFailure failure) => failure.message,
+          ),
+        ),
+      ),
     );
-    if (message.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
-    }
   }
 
   Future<bool> _confirm({

@@ -1030,6 +1030,23 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >      la misión se suman al leer). Detalle de entrada: panel «Personajes».
 > 4. **Misiones**: elegir personajes y ubicación al crear, foto opcional y
 >    tarjeta con foto y miniaturas de personajes.
+>    **Código hecho el 3 de octubre de 2026 (320/320, `analyze` limpio);
+>    falta verlo en la tablet.** Qué hay:
+>    - Formulario de misión: panel «Lugar y personajes» con ubicación y
+>      selector de personajes. Al editar, la ubicación se precarga (ya no se
+>      borra) y los personajes solo se reescriben si se tocan. Una diaria
+>      nueva se guarda como plantilla, que no tiene personajes: solo ofrece
+>      ubicación. El formulario de plantilla recurrente también tiene
+>      ubicación.
+>    - Detalle de misión: panel «Lugar, foto y personajes» con añadir,
+>      cambiar o quitar foto (no en archivadas) y miniaturas que abren la
+>      ficha. La foto se pone desde el detalle, como en los personajes.
+>    - Tarjetas de Hoy y de las colecciones: `MissionContextStrip` con foto,
+>      ubicación y miniaturas; no ocupa sitio si la misión no tiene nada.
+>    - Acciones de foto comunes en `photos/presentation/entity_photo_actions.dart`
+>      (las usan la ficha de personaje y el detalle de misión).
+>    - Aplazado a la fase 3 (proyectos): la foto de respaldo «del objeto que
+>      se arma o del primer elemento del proyecto» de D15.
 > 5. Versión `1.7.0`, APK, instalación **encima** en la tablet (con datos
 >    reales) y aprobación del usuario. Después, fusionar la rama en `main`.
 >

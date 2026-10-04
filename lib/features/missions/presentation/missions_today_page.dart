@@ -7,6 +7,7 @@ import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
+import 'mission_context_widgets.dart';
 import 'mission_presentation_support.dart';
 
 /// Lista operativa: filtros, búsqueda y tarjetas trabajan sobre el stream real.
@@ -557,6 +558,7 @@ class _MissionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 identity,
+                MissionContextStrip(mission: mission),
                 const SizedBox(height: TerminalSpace.sm),
                 values,
                 if (total > 0) ...<Widget>[
@@ -572,6 +574,7 @@ class _MissionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               identity,
+              MissionContextStrip(mission: mission),
               const SizedBox(height: TerminalSpace.sm),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,

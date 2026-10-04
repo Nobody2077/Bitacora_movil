@@ -6,6 +6,7 @@ import '../../../app/theme/app_theme_tokens.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../application/mission_providers.dart';
 import '../domain/models/mission.dart';
+import 'mission_context_widgets.dart';
 import 'mission_presentation_support.dart';
 
 enum MissionCollection { upcoming, all }
@@ -379,6 +380,7 @@ class _CollectionMissionCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ],
+            MissionContextStrip(mission: mission),
           ],
         ),
       ),
