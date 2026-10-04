@@ -1004,8 +1004,11 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >    DIARIO = la Bitácora renombrada solo en lo visual + Personajes con su
 >    ficha y «+ Crear personaje»). La Bitácora convive en la barra lateral
 >    hasta que el usuario confirme que DIARIO la sustituye.
->    **Código hecho el 3 de octubre de 2026 (317/317, `analyze` limpio);
->    falta que el usuario lo vea en la tablet.** Qué hay:
+>    **Hecho y aprobado el 3 de octubre de 2026** (317/317, `analyze`
+>    limpio, `5c8f637`): instalado en la tablet como `dev` encima de la
+>    anterior (`firstInstallTime` intacto, prod intacta) y el usuario dijo
+>    «se ve bien». `adb install` volvió a dar `INSTALL_FAILED_USER_RESTRICTED`
+>    dos veces; se instaló desde Descargas. Qué hay:
 >    - Rutas nuevas (área `character`, rama 7 del shell): `/character`
 >      (`?tab=ciberware|inventario|mapa|personaje|diario`, abre en
 >      PERSONAJE), `/character/contacts/new`, `…/:contactId` y
