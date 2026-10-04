@@ -905,7 +905,27 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 
 ### ▶ EMPEZAR AQUÍ — la próxima sesión, sea cuando sea
 
-> **Actualización del 1 de octubre de 2026 — prevalece sobre lo de abajo. La fase 1 de ADR-006 está en la rama `feat/v4-fase1`; ver «▶ FASE 1 — dónde quedó».**
+> **Actualización del 3 de octubre de 2026 — prevalece sobre todo lo de abajo.**
+> - **FASE 1 DE ADR-006 CERRADA.** `1.7.0+14` (release firmada, SHA-256
+>   `62db58482512d067c8056b411aed228a26d1cbc5bc43cba222b359d4f07c6095`,
+>   misma llave que la instalada) instalada **encima** de `1.6.2+13` en la
+>   tablet con datos reales: migración v3 → v4 sin pérdidas y el usuario
+>   confirmó «mis datos siguen acá». Preflight A8 verde, 320/320.
+> - `feat/v4-fase1` **fusionada en `main`** (avance rápido) el mismo día.
+>   Las próximas fases salen de `main` en ramas nuevas.
+> - **Siguiente: fase 2** de ADR-006 (Inventario, Ciberware y + Compra:
+>   siluetas, barras, mochila, iconos y compra con animación). Antes de
+>   añadir `flutter_svg` y la biblioteca de iconos, comprobar editor,
+>   licencia, permisos del manifiesto fusionado y que siga sin `INTERNET`
+>   (ADR-006 D16).
+> - **Instalar en la tablet:** `adb install -r` falla casi siempre con
+>   `INSTALL_FAILED_USER_RESTRICTED`. Intentarlo una vez; si falla, `adb
+>   push` a `/sdcard/Download/`, aviso al escáner de medios, que el usuario
+>   instale desde el gestor de archivos, y borrar la APK después.
+> - **Sigue pendiente:** respaldo de la llave de firma (dos sitios fuera del
+>   PC) y mejorar los audios.
+>
+> **Actualización del 1 de octubre de 2026. La fase 1 de ADR-006 está en la rama `feat/v4-fase1`; ver «▶ FASE 1 — dónde quedó».**
 > - **G8 VERDE: el MVP está cerrado.** Validado solo con la tablet (decisión
 >   del usuario: no tiene teléfono). Gate, métricas, release `1.5.0+9`
 >   firmada y verificada, recorrido manual, logcat y `install -r` con datos:
@@ -1050,6 +1070,8 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >      se arma o del primer elemento del proyecto» de D15.
 > 5. Versión `1.7.0`, APK, instalación **encima** en la tablet (con datos
 >    reales) y aprobación del usuario. Después, fusionar la rama en `main`.
+>    **Hecho y aprobado el 3 de octubre de 2026** y fusionado en `main`
+>    (ver «▶ EMPEZAR AQUÍ»).
 >
 > Referencias: ADR-006 (contrato), maqueta privada «Bitácora · Personaje» v5
 > (solo orientativa), `escaner_corporal.svg` del usuario en

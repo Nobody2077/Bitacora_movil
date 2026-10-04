@@ -1,5 +1,30 @@
 # Historial de cambios
 
+## 1.7.0 — candidata `1.7.0+14`
+
+### Menú Personaje y esquema v4 (ADR-006, fase 1)
+
+- **Esquema v4**: catorce tablas nuevas (personajes, fotos, inventario,
+  proyectos, creación) y la columna `location` en misiones y plantillas. La
+  migración v1/v2/v3 → v4 **solo añade**; ensayada en `dev` sobre datos de
+  prueba el 1 de octubre de 2026.
+- Nueva entrada **Personaje** en la barra lateral (en teléfono, en «Más») con
+  las pestañas CIBERWARE · INVENTARIO · MAPA · PERSONAJE · DIARIO.
+  CIBERWARE e INVENTARIO llegan en la fase 2; MAPA está aplazado.
+- **PERSONAJE**: hexágono con tus áreas de vida y su nivel, y panel de nivel,
+  constancia y títulos. La reputación llega en la fase 3.
+- **DIARIO**: la Bitácora con otro nombre, más **Personajes**: personas reales
+  con nombre, rol, descripción y foto cifrada, todo opcional; «Eliminar»
+  archiva. Las entradas eligen sus personajes y suman los de su misión.
+- **Misiones**: ubicación en texto, foto cifrada opcional y personajes; las
+  tarjetas muestran foto, ubicación y miniaturas. Las plantillas recurrentes
+  copian su ubicación.
+- Las fotos nuevas se cifran en su propia carpeta y clave (`entity_photos`).
+- `flutter analyze` sin problemas y **320/320 pruebas**.
+- Release firmada (misma llave, SHA-256 `62db5848…7c6095`), instalada encima
+  de `1.6.2+13` con datos reales: migración v3 → v4 sin pérdidas y
+  **aprobada en la tablet el 3 de octubre de 2026**.
+
 ## 1.6.2 — candidata `1.6.2+13`
 
 ### Pantalla completa
