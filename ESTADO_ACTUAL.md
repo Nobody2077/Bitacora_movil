@@ -984,6 +984,15 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >   Las próximas fases salen de `main` en ramas nuevas.
 > - **Siguiente: fase 2** de ADR-006 (Inventario, Ciberware y + Compra).
 >   Plan propuesto para la próxima sesión, en orden:
+>   **PRIMERO (pedido por el usuario el 3 de octubre): adelgazar este
+>   documento.** Pasa de 2050 líneas. Dejar aquí solo lo vigente (estado,
+>   «▶ EMPEZAR AQUÍ», reglas en pie, comandos; unas 150–200 líneas), mover
+>   «Bitácora de sesiones» intacta a `documentos/HISTORIAL-SESIONES.md` y los
+>   relevos viejos o cerrados (Terminal V2, recurrencias, A11, G8) a historia
+>   o eliminarlos si ya están en ADR/CHANGELOG. Solo texto, sin código; commit
+>   aparte. Desde ahí, cada paso de una fase empieza con una mini-spec de
+>   5–10 líneas (qué hace, qué no, cómo se prueba, cuándo se da por bueno)
+>   que el usuario aprueba antes de programar.
 >   0. Comprobar: `git status` limpio y al día en el worktree de `main`,
 >      `flutter analyze` y `flutter test` (320/320). Crear la rama
 >      `feat/v4-fase2` desde `main`.
