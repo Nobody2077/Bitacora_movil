@@ -1,11 +1,17 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **25 de septiembre de 2026**
-- Versión en `pubspec.yaml`: **`1.5.0+9`** (efectos de sonido), compilada,
-  firmada y **aprobada en dispositivo** el 25 de septiembre de 2026
-- Última versión aprobada en dispositivo: `1.5.0+9`
+- Última revisión: **3 de octubre de 2026**
+- Versión en `pubspec.yaml`: **`1.7.0+14`** (menú Personaje y esquema v4,
+  fase 1 de ADR-006), firmada y **aprobada en la tablet con datos reales** el
+  3 de octubre de 2026
+- Última versión aprobada en dispositivo: `1.7.0+14`
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama de trabajo: `main`, árbol limpio y **sincronizada con `origin/main`**
+- Rama de trabajo: `main` (incluye la fase 1), sincronizada con `origin/main`.
+  `main` está abierta en el worktree `G:\Desarrollo\Proyectos\bitacora-main-v3`
+- **Siguiente: fase 2 de ADR-006** (Inventario, Ciberware y + Compra). Ver
+  «▶ EMPEZAR AQUÍ»
+- Lo de abajo de esta lista es historia del MVP (ya cerrado: G8 verde el 30 de
+  septiembre)
 - **A11 — Notificaciones: COMPLETADA** el 23 de septiembre de 2026. El recorrido
   físico de `1.4.0+8` salió sin incidencias, así que los puntos 2, 3 y 4 quedan
   validados y **G9 cierra con ella**
@@ -135,6 +141,69 @@ Este documento permite que Claude Code, Antigravity, Codex u otro agente contin�
 Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
+
+### 2026-10-03 — Fase 1 de ADR-006 terminada: `1.7.0+14` en la tablet y en `main`
+
+**Qué pidió el usuario.** Retomar la fase 1 donde quedó (ensayo de migración
+superado el 1 de octubre) y completarla: datos, pantallas, misiones y versión.
+Cada paso se revisó en la tablet antes de seguir.
+
+**Qué se hizo, paso a paso (todo en `feat/v4-fase1`, ya fusionada):**
+
+1. **Datos (`8b818cb`).** `ContactDao` y `features/contacts/` (crear
+   idempotente por id, editar con `row_version`, archivar/restaurar);
+   vínculos con misiones y entradas escritos **dentro** de la transacción de
+   la misión o la entrada (`contact_link_support.dart`; solo los vínculos
+   nuevos exigen personaje activo); foto única de personaje y misión
+   (`EntityPhotoDao`, `features/photos/`) en su **propia carpeta y clave
+   `entity_photos`**, añadida a la lista permitida de
+   `DatabaseKeyStoreBridge.kt`; el cifrado de Bitácora pasó a
+   `infrastructure/photos/encrypted_photo_vault.dart` sin cambiar carpeta,
+   clave ni formato; `location` en misiones y plantillas (la plantilla la
+   copia a cada misión generada o tomada del tablón).
+2. **Pantallas (`5c8f637`).** Entrada **Personaje** en la barra lateral
+   (cuarta; rama 7 del shell, traducida con `_railBranches`) y en «Más» en
+   teléfono; rutas `/character…` (61 en total); menú con NIVEL, REPUTACIÓN
+   («--»), saldo y cinco pestañas; hexágono de áreas (`CustomPainter`) y
+   panel; DIARIO = Bitácora con miniaturas de personajes + vista Personajes
+   (cuadrícula, archivados, ficha, formulario); selector de personajes en
+   las entradas. Golden de la barra lateral regenerado a propósito.
+   **Aprobado en la tablet (dev).**
+3. **Misiones (`ae08ba7`).** Panel «Lugar y personajes» en el formulario
+   (la ubicación se precarga al editar; los personajes solo cambian si se
+   tocan; las diarias nuevas, que son plantillas, solo ofrecen ubicación);
+   ubicación en el formulario de plantilla; panel de foto, ubicación y
+   personajes en el detalle; franja en las tarjetas de Hoy y colecciones;
+   acciones de foto comunes (`entity_photo_actions.dart`).
+   **Aprobado en la tablet (dev).**
+4. **Versión (`43dfd42`).** `1.7.0+14`, preflight A8 verde, release firmada
+   (SHA-256 `62db5848…7c6095`, certificado `a6092c6c…16b8`, sin
+   `INTERNET`), instalada **encima** de `1.6.2+13` con datos reales:
+   `firstInstallTime` intacto, versión 14 y el usuario confirmó «mis datos
+   siguen acá». `main` avanzó por fast-forward hasta `43dfd42`.
+
+**Decisiones de esta sesión.**
+
+- La foto de personaje y de misión se pone desde su ficha o detalle, no al
+  crear, porque necesita que el registro exista (igual que en Bitácora).
+- REPUTACIÓN se muestra como «--» y no hay «+ Compra» ni «Tiempo
+  registrado» hasta sus fases; la foto de respaldo «del proyecto» (D15)
+  espera a la fase 3.
+- En la barra lateral, Personaje va entre Bitácora y Economía. La Bitácora
+  sigue en la barra hasta que el usuario confirme que DIARIO la sustituye.
+
+**Incidencias.** `adb install -r` dio `INSTALL_FAILED_USER_RESTRICTED` en
+todas las instalaciones de hoy (dos `dev` y la release); la tablet además pidió
+reautorizar la depuración USB. Todas se instalaron por Descargas sin pérdida
+de datos. `main` estaba abierta en el worktree `bitacora-main-v3`, así que la
+fusión se hizo desde allí.
+
+**Verificación.** `flutter analyze` limpio y **320/320 pruebas** (44 nuevas
+sobre las 276 del inicio de la sesión).
+
+**Qué queda abierto.** Ver «▶ EMPEZAR AQUÍ»: fase 2, respaldo de la llave de
+firma, audios y la retirada de «Bitácora» de la barra cuando el usuario lo
+decida.
 
 ### 2026-09-25 — Efectos de sonido, candidata `1.5.0+9`
 
@@ -913,11 +982,30 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >   confirmó «mis datos siguen acá». Preflight A8 verde, 320/320.
 > - `feat/v4-fase1` **fusionada en `main`** (avance rápido) el mismo día.
 >   Las próximas fases salen de `main` en ramas nuevas.
-> - **Siguiente: fase 2** de ADR-006 (Inventario, Ciberware y + Compra:
->   siluetas, barras, mochila, iconos y compra con animación). Antes de
->   añadir `flutter_svg` y la biblioteca de iconos, comprobar editor,
->   licencia, permisos del manifiesto fusionado y que siga sin `INTERNET`
->   (ADR-006 D16).
+> - **Siguiente: fase 2** de ADR-006 (Inventario, Ciberware y + Compra).
+>   Plan propuesto para la próxima sesión, en orden:
+>   0. Comprobar: `git status` limpio y al día en el worktree de `main`,
+>      `flutter analyze` y `flutter test` (320/320). Crear la rama
+>      `feat/v4-fase2` desde `main`.
+>   1. Preguntar al usuario si ya respaldó la llave de firma.
+>   2. **Dependencias (D16):** `flutter_svg` y una biblioteca de iconos MIT
+>      (Tabler o Phosphor). Antes de añadir cada una: editor verificado,
+>      licencia, permisos del manifiesto fusionado y APK sin `INTERNET`.
+>   3. **Datos:** DAO/repositorio de `inventory_items` (estados, categoría y
+>      zona fijas, equipar con zona), foto de objeto (`item_photos`; añadir
+>      `item` a `PhotoOwnerKind`/`EntityPhotoOwner`) y la unidad de trabajo
+>      de **compra** (D1/D12): gasto `EXPENSE` en `transactions` **y** objeto
+>      en el inventario, todo o nada, idempotente por `operation_id`.
+>   4. **Pantallas:** CIBERWARE (silueta `escaner_corporal.svg` del usuario,
+>      en `G:\Usuario\Downloadss\`, puntos por zona y línea de escaneo) e
+>      INVENTARIO (ropa por zona, avatar fijo con prendas como iconos,
+>      mochila); barras laterales de capacidad y resiliencia (D8, solo
+>      avisan); botón **+ Compra** en la cabecera con el saldo bajando en
+>      naranja (D12; sin animar con movimiento reducido, enmascarado con
+>      importes ocultos).
+>   5. Versión `1.8.0`, APK, instalación encima en la tablet y aprobación.
+>   Cada paso, como en la fase 1: pruebas, `dev` en la tablet, aprobación y
+>   commit.
 > - **Instalar en la tablet:** `adb install -r` falla casi siempre con
 >   `INSTALL_FAILED_USER_RESTRICTED`. Intentarlo una vez; si falla, `adb
 >   push` a `/sdcard/Download/`, aviso al escáner de medios, que el usuario
