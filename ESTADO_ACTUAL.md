@@ -1030,8 +1030,9 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >      la misión se suman al leer). Detalle de entrada: panel «Personajes».
 > 4. **Misiones**: elegir personajes y ubicación al crear, foto opcional y
 >    tarjeta con foto y miniaturas de personajes.
->    **Código hecho el 3 de octubre de 2026 (320/320, `analyze` limpio);
->    falta verlo en la tablet.** Qué hay:
+>    **Hecho y aprobado el 3 de octubre de 2026** (320/320, `ae08ba7`):
+>    instalado como `dev` desde Descargas (`adb install` falló otra vez) y
+>    el usuario dijo «funciona bien». Qué hay:
 >    - Formulario de misión: panel «Lugar y personajes» con ubicación y
 >      selector de personajes. Al editar, la ubicación se precarga (ya no se
 >      borra) y los personajes solo se reescriben si se tocan. Una diaria
