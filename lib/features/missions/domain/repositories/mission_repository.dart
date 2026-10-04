@@ -22,20 +22,25 @@ abstract interface class MissionRepository {
 
   Stream<Result<List<Mission>>> watchAll();
 
+  /// [contactIds] son los personajes de la misión (ADR-006 D15), escritos en
+  /// la misma transacción.
   Future<Result<Mission>> create(
     Mission mission, {
     required String eventId,
     required String notificationId,
     required String expiryNotificationId,
     required DateTime occurredAtUtc,
+    Iterable<String> contactIds = const <String>[],
   });
 
+  /// Con [contactIds] `null` los personajes de la misión no se tocan.
   Future<Result<Mission>> update(
     Mission mission, {
     required String eventId,
     required String notificationId,
     required String expiryNotificationId,
     required DateTime occurredAtUtc,
+    Iterable<String>? contactIds,
   });
 
   Future<Result<Mission>> startTimer({

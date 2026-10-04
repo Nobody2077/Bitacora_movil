@@ -25,6 +25,7 @@ internal class DatabaseKeyStoreBridge(private val context: Context) :
         const val MATERIAL_VERSION = "v1"
         const val PRIMARY_STORAGE_ID = "primary"
         const val JOURNAL_ATTACHMENTS_STORAGE_ID = "journal_attachments"
+        const val ENTITY_PHOTOS_STORAGE_ID = "entity_photos"
         const val DATABASE_KEY_BYTES = 32
         const val GCM_TAG_BITS = 128
         val STORAGE_ID_PATTERN = Regex("[a-z0-9_]{1,32}")
@@ -210,6 +211,7 @@ internal class DatabaseKeyStoreBridge(private val context: Context) :
         if (
             storageId != PRIMARY_STORAGE_ID &&
             storageId != JOURNAL_ATTACHMENTS_STORAGE_ID &&
+            storageId != ENTITY_PHOTOS_STORAGE_ID &&
             !isDebuggable
         ) {
             throw KeyStoreFailure("TEST_STORAGE_NOT_ALLOWED")

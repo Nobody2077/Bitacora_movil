@@ -1,6 +1,8 @@
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../infrastructure/database/app_database.dart' as drift;
+import '../../../infrastructure/database/daos/contact_link_support.dart';
+import '../../../infrastructure/database/daos/dao_support.dart';
 import '../../../infrastructure/database/daos/journal_dao.dart';
 import '../domain/models/journal_entry.dart';
 import '../domain/models/journal_photo.dart';
@@ -13,14 +15,22 @@ final class DriftJournalRepository implements JournalRepository {
   final JournalDao _dao;
 
   @override
-  Future<Result<JournalEntry>> create(JournalEntry entry) async {
-    final AppFailure? failure = _validateEntry(entry);
+  Future<Result<JournalEntry>> create(
+    JournalEntry entry, {
+    Iterable<String> contactIds = const <String>[],
+  }) async {
+    final AppFailure? failure =
+        _validateEntry(entry) ?? _validateContactIds(contactIds);
     if (failure != null) {
       return Failure<JournalEntry>(failure);
     }
     try {
       final aggregate = await _dao.insertAggregate(
         entry: JournalMapper.toInsert(entry),
+        contacts: ContactLinksWrite(
+          contactIds: contactIds,
+          createdAtUtcMs: entry.updatedAtUtc.millisecondsSinceEpoch,
+        ),
       );
       return Success<JournalEntry>(
         JournalMapper.fromDrift(
@@ -28,6 +38,8 @@ final class DriftJournalRepository implements JournalRepository {
           attachmentCount: aggregate.attachments.length,
         ),
       );
+    } on InactiveContactLinkException {
+      return const Failure<JournalEntry>(_unavailableContacts);
     } on Object catch (error) {
       return Failure<JournalEntry>(
         StorageFailure('No se pudo crear la entrada.', cause: error),
@@ -81,8 +93,13 @@ final class DriftJournalRepository implements JournalRepository {
   }
 
   @override
-  Future<Result<JournalEntry>> update(JournalEntry entry) async {
-    final AppFailure? failure = _validateEntry(entry);
+  Future<Result<JournalEntry>> update(
+    JournalEntry entry, {
+    Iterable<String>? contactIds,
+  }) async {
+    final AppFailure? failure =
+        _validateEntry(entry) ??
+        (contactIds == null ? null : _validateContactIds(contactIds));
     if (failure != null) {
       return Failure<JournalEntry>(failure);
     }
@@ -90,6 +107,12 @@ final class DriftJournalRepository implements JournalRepository {
       final updated = await _dao.updateEntry(
         entryId: entry.id,
         changes: JournalMapper.toUpdate(entry),
+        contacts: contactIds == null
+            ? null
+            : ContactLinksWrite(
+                contactIds: contactIds,
+                createdAtUtcMs: entry.updatedAtUtc.millisecondsSinceEpoch,
+              ),
       );
       return Success<JournalEntry>(
         JournalMapper.fromDrift(
@@ -97,6 +120,8 @@ final class DriftJournalRepository implements JournalRepository {
           attachmentCount: entry.attachmentCount,
         ),
       );
+    } on InactiveContactLinkException {
+      return const Failure<JournalEntry>(_unavailableContacts);
     } on Object catch (error) {
       return Failure<JournalEntry>(
         StorageFailure('No se pudo actualizar la entrada.', cause: error),
@@ -375,6 +400,21 @@ final class DriftJournalRepository implements JournalRepository {
         !photo.createdAtUtc.isUtc) {
       return const ValidationFailure(
         'La fotografía contiene valores inválidos.',
+      );
+    }
+    return null;
+  }
+
+  static const ConflictFailure _unavailableContacts = ConflictFailure(
+    'Uno de los personajes elegidos ya no está disponible.',
+  );
+
+  static AppFailure? _validateContactIds(Iterable<String> contactIds) {
+    final Set<String> unique = contactIds.toSet();
+    if (unique.length > ContactLinksWrite.maxLinks ||
+        unique.any((String id) => id.trim().isEmpty)) {
+      return const ValidationFailure(
+        'Una entrada admite hasta ${ContactLinksWrite.maxLinks} personajes.',
       );
     }
     return null;

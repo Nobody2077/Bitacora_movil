@@ -194,8 +194,10 @@ final class _PhotoRepository implements JournalRepository {
       Success<List<JournalPhoto>>(List<JournalPhoto>.from(photos));
 
   @override
-  Future<Result<JournalEntry>> create(JournalEntry entry) =>
-      throw UnimplementedError();
+  Future<Result<JournalEntry>> create(
+    JournalEntry entry, {
+    Iterable<String> contactIds = const <String>[],
+  }) => throw UnimplementedError();
 
   @override
   Future<Result<JournalEntry?>> findById(String id) =>
@@ -209,8 +211,10 @@ final class _PhotoRepository implements JournalRepository {
   }) => throw UnimplementedError();
 
   @override
-  Future<Result<JournalEntry>> update(JournalEntry entry) =>
-      throw UnimplementedError();
+  Future<Result<JournalEntry>> update(
+    JournalEntry entry, {
+    Iterable<String>? contactIds,
+  }) => throw UnimplementedError();
 
   @override
   Stream<Result<List<JournalEntry>>> watchRecent({

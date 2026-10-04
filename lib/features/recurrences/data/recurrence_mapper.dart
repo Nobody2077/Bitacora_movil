@@ -20,6 +20,7 @@ abstract final class RecurrenceMapper {
       xpReward: t.xpReward,
       estimatedMinutes: t.estimatedMinutes,
       budgetMinor: t.budgetMinor,
+      location: t.location,
       availabilityMode: _availabilityMode(t.availabilityMode),
       isActive: t.isActive == 1,
       objectives: bundle.objectives

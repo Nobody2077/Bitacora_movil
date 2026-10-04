@@ -13,6 +13,7 @@ abstract final class MissionMapper {
     areaId: value.areaId,
     title: value.title,
     description: value.description,
+    location: value.location,
     type: _missionType(value.missionType),
     importance: _importance(value.importance),
     priority: _priority(value.priority),

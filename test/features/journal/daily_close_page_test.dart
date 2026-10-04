@@ -90,13 +90,19 @@ final class _FakeJournalRepository implements JournalRepository {
   final Map<String, JournalEntry> _entries = <String, JournalEntry>{};
 
   @override
-  Future<Result<JournalEntry>> create(JournalEntry entry) async {
+  Future<Result<JournalEntry>> create(
+    JournalEntry entry, {
+    Iterable<String> contactIds = const <String>[],
+  }) async {
     _entries[entry.id] = entry;
     return Success<JournalEntry>(entry);
   }
 
   @override
-  Future<Result<JournalEntry>> update(JournalEntry entry) async {
+  Future<Result<JournalEntry>> update(
+    JournalEntry entry, {
+    Iterable<String>? contactIds,
+  }) async {
     _entries[entry.id] = entry;
     return Success<JournalEntry>(entry);
   }

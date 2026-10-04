@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../app_database.dart';
+import 'contact_link_support.dart';
 import 'dao_support.dart';
 
 final class JournalEntryAggregate {
@@ -125,6 +126,7 @@ final class JournalDao {
     required JournalEntriesCompanion entry,
     Iterable<JournalAttachmentsCompanion> attachments =
         const <JournalAttachmentsCompanion>[],
+    ContactLinksWrite? contacts,
   }) {
     if (!entry.id.present) {
       throw ArgumentError('Journal entry id must be present.');
@@ -137,6 +139,14 @@ final class JournalDao {
       for (final attachment in attachments) {
         _requireEntryId(attachment.journalEntryId, entryId);
         await _database.into(_database.journalAttachments).insert(attachment);
+      }
+      if (contacts != null) {
+        await replaceContactLinks(
+          _database,
+          target: ContactLinkTarget.journalEntry,
+          ownerId: entryId,
+          links: contacts,
+        );
       }
       final inserted = await _findAggregate(entryId);
       if (inserted == null) {
@@ -203,6 +213,7 @@ final class JournalDao {
   Future<JournalEntry> updateEntry({
     required String entryId,
     required JournalEntriesCompanion changes,
+    ContactLinksWrite? contacts,
   }) {
     if (changes.id.present) {
       throw ArgumentError('Journal entry id cannot be changed.');
@@ -221,6 +232,14 @@ final class JournalDao {
       )..where((table) => table.id.equals(entryId))).write(changes);
       if (affected != 1) {
         throw RecordNotFoundException(table: 'journal_entries', key: entryId);
+      }
+      if (contacts != null) {
+        await replaceContactLinks(
+          _database,
+          target: ContactLinkTarget.journalEntry,
+          ownerId: entryId,
+          links: contacts,
+        );
       }
       return (_database.select(
         _database.journalEntries,

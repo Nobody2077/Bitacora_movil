@@ -40,6 +40,15 @@ final class DatabaseInvariantException extends DatabaseContractException {
   const DatabaseInvariantException(super.message);
 }
 
+/// Se intentó vincular a una misión o entrada un personaje que no existe o
+/// está archivado.
+final class InactiveContactLinkException extends DatabaseContractException {
+  InactiveContactLinkException(this.contactIds)
+    : super('Contacts must exist and be active to be linked: $contactIds.');
+
+  final Set<String> contactIds;
+}
+
 final class ActiveTimerConflictException extends DatabaseContractException {
   const ActiveTimerConflictException({required this.activeMissionId})
     : super('Another mission already has an active timer.');

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../app_database.dart';
+import 'contact_link_support.dart';
 import 'dao_support.dart';
 
 final class MissionAggregate {
@@ -182,6 +183,7 @@ final class MissionDao {
     Iterable<MissionEventsCompanion> events = const <MissionEventsCompanion>[],
     Iterable<NotificationSchedulesCompanion> notifications =
         const <NotificationSchedulesCompanion>[],
+    ContactLinksWrite? contacts,
   }) {
     if (!mission.id.present) {
       throw ArgumentError('Mission id must be present.');
@@ -203,6 +205,14 @@ final class MissionDao {
         await _database
             .into(_database.notificationSchedules)
             .insert(notification);
+      }
+      if (contacts != null) {
+        await replaceContactLinks(
+          _database,
+          target: ContactLinkTarget.mission,
+          ownerId: missionId,
+          links: contacts,
+        );
       }
       return _getAggregate(missionId);
     });
@@ -263,6 +273,7 @@ final class MissionDao {
     required MissionEventsCompanion event,
     required Map<String, NotificationSchedulesCompanion?> notificationIntents,
     required int notificationUpdatedAtUtcMs,
+    ContactLinksWrite? contacts,
   }) {
     _requireMissionId(event.missionId, missionId, 'event');
     if (!event.id.present ||
@@ -295,6 +306,14 @@ final class MissionDao {
         replacements: notificationIntents,
         updatedAtUtcMs: notificationUpdatedAtUtcMs,
       );
+      if (contacts != null) {
+        await replaceContactLinks(
+          _database,
+          target: ContactLinkTarget.mission,
+          ownerId: missionId,
+          links: contacts,
+        );
+      }
       return _getAggregate(missionId);
     });
   }

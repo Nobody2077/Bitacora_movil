@@ -292,6 +292,7 @@ final class _FakeMissionRepository implements MissionRepository {
     required String notificationId,
     required String expiryNotificationId,
     required DateTime occurredAtUtc,
+    Iterable<String> contactIds = const <String>[],
   }) => throw UnimplementedError();
 
   @override
@@ -341,6 +342,7 @@ final class _FakeMissionRepository implements MissionRepository {
     required String notificationId,
     required String expiryNotificationId,
     required DateTime occurredAtUtc,
+    Iterable<String>? contactIds,
   }) => throw UnimplementedError();
 
   @override

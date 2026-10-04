@@ -952,8 +952,8 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >   `schema_constraints_v4_test.dart` (un caso que falla por cada regla
 >   nueva). Ayudante común: `schema_v4_expectations.dart`.
 >   **276/276, `analyze` limpio.**
-> - Aún **no hay** DAOs, repositorios ni pantallas para las tablas nuevas, y
->   la versión sigue en `1.6.2+13`.
+> - Aún **no hay** pantallas para las tablas nuevas, y la versión sigue en
+>   `1.6.2+13`. La capa de datos de personajes ya existe (ver punto 2).
 >
 > **Pendiente de la fase 1, en este orden:**
 > 1. **Prueba de migración en la tablet con el flavor `dev`** (ADR-006 D2),
@@ -968,9 +968,36 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >       ingreso, gasto y entrada con foto en `dev` v3; se instaló encima la
 >       `dev` v4 de esta rama (`adb install -r`, `firstInstallTime` intacto) y
 >       el usuario confirmó «datos bien». **Ensayo de D2 superado.**
-> 2. **Datos**: DAOs y repositorios de personajes (`contacts`, fotos,
->    vínculos con misiones y entradas), foto y ubicación de la misión. Con
->    unidades de trabajo e idempotencia como el resto del proyecto.
+> 2. ~~**Datos**~~ **Hecho el 3 de octubre de 2026**, subido a GitHub en esta rama.
+>    **312/312, `analyze` limpio.** Qué hay y dónde:
+>    - `ContactDao` + `features/contacts/` (modelo, repositorio, servicio,
+>      proveedores): crear (idempotente por id), editar con `row_version`,
+>      archivar/restaurar; listas activos/archivados; personajes por misión,
+>      por entrada (los suyos **más** los de su misión, sin repetir) y
+>      misiones/entradas de un personaje.
+>    - Vínculos: `contact_link_support.dart`. Se escriben **dentro** de la
+>      transacción de la misión o la entrada (`contacts:` en
+>      `MissionDao.insertAggregate/updateAggregate` y
+>      `JournalDao.insertAggregate/updateEntry`; `null` = no tocar). Solo los
+>      vínculos **nuevos** exigen personaje activo
+>      (`InactiveContactLinkException`); archivar no quita a nadie de sus
+>      misiones. Máximo 50 por registro.
+>    - `SaveMissionRequest` y `SaveJournalEntryRequest` llevan `contactIds`
+>      (`null` al editar = sin cambios); la misión y la plantilla recurrente
+>      llevan `location` (1–120, en blanco = sin ubicación) y la plantilla la
+>      copia a cada misión generada o tomada del tablón. **Ojo para el paso
+>      4**: el formulario de misión aún no envía `location`, así que al
+>      editar la borraría; hay que pasarla cuando se añada el campo.
+>    - Fotos de personaje y misión: `EntityPhotoDao` (una vigente; cambiarla
+>      archiva la anterior en la misma transacción; `revertReplacement` si el
+>      fichero no se confirma) y `features/photos/`. Se cifran en su **propia
+>      carpeta y clave `entity_photos`**, añadida a la lista permitida de
+>      `DatabaseKeyStoreBridge.kt` (sin eso, la release rechazaría la clave;
+>      la debug no lo nota). El cifrado de Bitácora pasó a
+>      `infrastructure/photos/encrypted_photo_vault.dart` sin cambiar
+>      carpeta, clave ni formato. La limpieza de huérfanos de `entity_photos`
+>      (`entityPhotoCleanupProvider`) aún no se dispara: lo hará la pantalla
+>      de Personajes.
 > 3. **Pantallas**: entrada **Personaje** en la barra lateral con las cinco
 >    pestañas (CIBERWARE e INVENTARIO vacías hasta la fase 2, MAPA
 >    «aplazado», PERSONAJE con el hexágono de áreas y el panel lateral,

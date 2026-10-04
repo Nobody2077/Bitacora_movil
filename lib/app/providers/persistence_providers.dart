@@ -7,6 +7,8 @@ import '../../core/errors/app_failure.dart';
 import '../../core/result/result.dart';
 import '../../features/access/application/access_session_controller.dart';
 import '../../features/access/application/access_session_state.dart';
+import '../../features/contacts/data/drift_contact_repository.dart';
+import '../../features/contacts/domain/repositories/contact_repository.dart';
 import '../../features/economy/data/drift_economy_repository.dart';
 import '../../features/economy/domain/repositories/economy_repository.dart';
 import '../../features/journal/data/drift_daily_close_repository.dart';
@@ -22,6 +24,8 @@ import '../../features/notifications/data/drift_reminder_preferences_repository.
 import '../../features/notifications/data/method_channel_mission_notification_platform.dart';
 import '../../features/notifications/domain/mission_notification_platform.dart';
 import '../../features/notifications/domain/reminder_preferences_repository.dart';
+import '../../features/photos/data/drift_entity_photo_repository.dart';
+import '../../features/photos/domain/entity_photo.dart';
 import '../../features/progress/data/drift_progress_repository.dart';
 import '../../features/progress/domain/repositories/progress_repository.dart';
 import '../../features/recurrences/application/recurrence_application_service.dart';
@@ -32,8 +36,10 @@ import '../../features/settings/data/drift_settings_repository.dart';
 import '../../features/settings/domain/repositories/settings_repository.dart';
 import '../../infrastructure/database/app_database.dart';
 import '../../infrastructure/database/connection/encrypted_database_connection.dart';
+import '../../infrastructure/database/daos/contact_dao.dart';
 import '../../infrastructure/database/daos/daily_close_dao.dart';
 import '../../infrastructure/database/daos/economy_dao.dart';
+import '../../infrastructure/database/daos/entity_photo_dao.dart';
 import '../../infrastructure/database/daos/journal_dao.dart';
 import '../../infrastructure/database/daos/mission_dao.dart';
 import '../../infrastructure/database/daos/notification_dao.dart';
@@ -291,6 +297,15 @@ final Provider<JournalDao> journalDaoProvider = Provider<JournalDao>(
   (Ref ref) => JournalDao(ref.watch(appDatabaseProvider)),
 );
 
+final Provider<ContactDao> contactDaoProvider = Provider<ContactDao>(
+  (Ref ref) => ContactDao(ref.watch(appDatabaseProvider)),
+);
+
+final Provider<EntityPhotoDao> entityPhotoDaoProvider =
+    Provider<EntityPhotoDao>(
+      (Ref ref) => EntityPhotoDao(ref.watch(appDatabaseProvider)),
+    );
+
 final Provider<ProgressDao> progressDaoProvider = Provider<ProgressDao>(
   (Ref ref) => ProgressDao(ref.watch(appDatabaseProvider)),
 );
@@ -323,6 +338,17 @@ final Provider<EconomyRepository> economyRepositoryProvider =
 final Provider<JournalRepository> journalRepositoryProvider =
     Provider<JournalRepository>(
       (Ref ref) => DriftJournalRepository(ref.watch(journalDaoProvider)),
+    );
+
+final Provider<ContactRepository> contactRepositoryProvider =
+    Provider<ContactRepository>(
+      (Ref ref) => DriftContactRepository(ref.watch(contactDaoProvider)),
+    );
+
+final Provider<EntityPhotoRepository> entityPhotoRepositoryProvider =
+    Provider<EntityPhotoRepository>(
+      (Ref ref) =>
+          DriftEntityPhotoRepository(ref.watch(entityPhotoDaoProvider)),
     );
 
 final Provider<DailyCloseRepository> dailyCloseRepositoryProvider =

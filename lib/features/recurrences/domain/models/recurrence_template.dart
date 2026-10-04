@@ -103,6 +103,7 @@ final class RecurrenceTemplate {
     this.difficulty,
     this.estimatedMinutes,
     this.budgetMinor,
+    this.location,
     this.rule,
   });
 
@@ -118,6 +119,7 @@ final class RecurrenceTemplate {
   final int xpReward;
   final int? estimatedMinutes;
   final int? budgetMinor;
+  final String? location;
   final TemplateAvailabilityMode availabilityMode;
 
   /// `true` mientras la plantilla genera nuevas ocurrencias.
@@ -140,6 +142,7 @@ final class RecurrenceTemplate {
     int? xpReward,
     int? estimatedMinutes,
     int? budgetMinor,
+    String? location,
     TemplateAvailabilityMode? availabilityMode,
     bool? isActive,
     List<RecurrenceObjective>? objectives,
@@ -157,6 +160,7 @@ final class RecurrenceTemplate {
     xpReward: xpReward ?? this.xpReward,
     estimatedMinutes: estimatedMinutes,
     budgetMinor: budgetMinor,
+    location: location,
     availabilityMode: availabilityMode ?? this.availabilityMode,
     isActive: isActive ?? this.isActive,
     objectives: objectives ?? this.objectives,

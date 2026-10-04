@@ -17,9 +17,17 @@ abstract interface class JournalRepository {
 
   Future<Result<JournalEntry?>> findById(String id);
 
-  Future<Result<JournalEntry>> create(JournalEntry entry);
+  /// [contactIds] son los personajes propios de la entrada (ADR-006 D3).
+  Future<Result<JournalEntry>> create(
+    JournalEntry entry, {
+    Iterable<String> contactIds = const <String>[],
+  });
 
-  Future<Result<JournalEntry>> update(JournalEntry entry);
+  /// Con [contactIds] `null` los personajes de la entrada no se tocan.
+  Future<Result<JournalEntry>> update(
+    JournalEntry entry, {
+    Iterable<String>? contactIds,
+  });
 
   Future<Result<List<JournalEntry>>> search(JournalSearchCriteria criteria);
 

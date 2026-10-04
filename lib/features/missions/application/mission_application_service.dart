@@ -73,12 +73,18 @@ final class SaveMissionRequest {
     this.expiresAtUtc,
     this.estimatedMinutes,
     this.budgetMinor,
+    this.location,
+    this.contactIds,
   });
 
   final Mission? existing;
   final String areaId;
   final String title;
   final String? description;
+  final String? location;
+
+  /// Personajes de la misión. `null` al editar los deja como estaban.
+  final List<String>? contactIds;
   final MissionType type;
   final MissionImportance importance;
   final MissionPriority priority;
@@ -132,6 +138,7 @@ final class MissionApplicationService {
             areaId: request.areaId,
             title: request.title,
             description: request.description,
+            location: request.location,
             type: request.type,
             importance: request.importance,
             priority: request.priority,
@@ -153,6 +160,7 @@ final class MissionApplicationService {
             areaId: request.areaId,
             title: request.title,
             description: request.description,
+            location: request.location,
             type: request.type,
             importance: request.importance,
             priority: request.priority,
@@ -184,6 +192,7 @@ final class MissionApplicationService {
             notificationId: notificationId,
             expiryNotificationId: expiryNotificationId,
             occurredAtUtc: nowUtc,
+            contactIds: request.contactIds ?? const <String>[],
           )
         : _repository.update(
             mission,
@@ -191,6 +200,7 @@ final class MissionApplicationService {
             notificationId: notificationId,
             expiryNotificationId: expiryNotificationId,
             occurredAtUtc: nowUtc,
+            contactIds: request.contactIds,
           );
   }
 

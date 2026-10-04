@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../infrastructure/database/app_database.dart' as drift;
+import '../../../infrastructure/database/daos/contact_link_support.dart';
 import '../../../infrastructure/database/daos/dao_support.dart';
 import '../../../infrastructure/database/daos/mission_dao.dart';
 import '../domain/models/mission.dart';
@@ -197,6 +198,7 @@ final class DriftMissionRepository implements MissionRepository {
     required String notificationId,
     required String expiryNotificationId,
     required DateTime occurredAtUtc,
+    Iterable<String> contactIds = const <String>[],
   }) async {
     final ValidationFailure? invalid = _validateWrite(
       mission,
@@ -206,6 +208,9 @@ final class DriftMissionRepository implements MissionRepository {
     );
     if (invalid != null) {
       return Failure<Mission>(invalid);
+    }
+    if (!_validContactIds(contactIds)) {
+      return const Failure<Mission>(_invalidContacts);
     }
 
     try {
@@ -225,6 +230,7 @@ final class DriftMissionRepository implements MissionRepository {
           areaId: mission.areaId,
           title: mission.title.trim(),
           description: Value<String?>(_trimmedOrNull(mission.description)),
+          location: Value<String?>(_trimmedOrNull(mission.location)),
           missionType: _missionType(mission.type),
           importance: Value<String>(_importance(mission.importance)),
           priority: Value<String>(_priority(mission.priority)),
@@ -254,6 +260,10 @@ final class DriftMissionRepository implements MissionRepository {
           ?startNotification,
           ?expiryNotification,
         ],
+        contacts: ContactLinksWrite(
+          contactIds: contactIds,
+          createdAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
+        ),
       );
       return Success<Mission>(
         MissionMapper.fromDrift(
@@ -262,6 +272,8 @@ final class DriftMissionRepository implements MissionRepository {
           timeEntries: aggregate.timeEntries,
         ),
       );
+    } on InactiveContactLinkException {
+      return const Failure<Mission>(_unavailableContacts);
     } on Object catch (error) {
       return Failure<Mission>(
         StorageFailure('No se pudo crear la misión.', cause: error),
@@ -276,6 +288,7 @@ final class DriftMissionRepository implements MissionRepository {
     required String notificationId,
     required String expiryNotificationId,
     required DateTime occurredAtUtc,
+    Iterable<String>? contactIds,
   }) async {
     final ValidationFailure? invalid = _validateWrite(
       mission,
@@ -285,6 +298,9 @@ final class DriftMissionRepository implements MissionRepository {
     );
     if (invalid != null) {
       return Failure<Mission>(invalid);
+    }
+    if (contactIds != null && !_validContactIds(contactIds)) {
+      return const Failure<Mission>(_invalidContacts);
     }
 
     try {
@@ -305,6 +321,7 @@ final class DriftMissionRepository implements MissionRepository {
           areaId: Value<String>(mission.areaId),
           title: Value<String>(mission.title.trim()),
           description: Value<String?>(_trimmedOrNull(mission.description)),
+          location: Value<String?>(_trimmedOrNull(mission.location)),
           missionType: Value<String>(_missionType(mission.type)),
           importance: Value<String>(_importance(mission.importance)),
           priority: Value<String>(_priority(mission.priority)),
@@ -340,6 +357,12 @@ final class DriftMissionRepository implements MissionRepository {
           'CRITICAL': expiryNotification,
         },
         notificationUpdatedAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
+        contacts: contactIds == null
+            ? null
+            : ContactLinksWrite(
+                contactIds: contactIds,
+                createdAtUtcMs: occurredAtUtc.millisecondsSinceEpoch,
+              ),
       );
       return Success<Mission>(
         MissionMapper.fromDrift(
@@ -358,11 +381,27 @@ final class DriftMissionRepository implements MissionRepository {
       return const Failure<Mission>(
         ConflictFailure('La misión ya no está disponible.'),
       );
+    } on InactiveContactLinkException {
+      return const Failure<Mission>(_unavailableContacts);
     } on Object catch (error) {
       return Failure<Mission>(
         StorageFailure('No se pudo actualizar la misión.', cause: error),
       );
     }
+  }
+
+  static const ValidationFailure _invalidContacts = ValidationFailure(
+    'Una misión admite hasta ${ContactLinksWrite.maxLinks} personajes.',
+  );
+
+  static const ConflictFailure _unavailableContacts = ConflictFailure(
+    'Uno de los personajes elegidos ya no está disponible.',
+  );
+
+  static bool _validContactIds(Iterable<String> contactIds) {
+    final Set<String> unique = contactIds.toSet();
+    return unique.length <= ContactLinksWrite.maxLinks &&
+        unique.every((String id) => id.trim().isNotEmpty);
   }
 
   /// Intención de aviso antes de que la misión venza.
@@ -729,6 +768,8 @@ final class DriftMissionRepository implements MissionRepository {
         mission.xpPlanned < 0 ||
         (mission.estimatedMinutes != null && mission.estimatedMinutes! <= 0) ||
         (mission.budgetMinor != null && mission.budgetMinor! < 0) ||
+        (_trimmedOrNull(mission.location)?.length ?? 0) >
+            Mission.maxLocationLength ||
         (requireExisting && mission.rowVersion < 1)) {
       return const ValidationFailure(
         'La misión contiene datos obligatorios o valores inválidos.',

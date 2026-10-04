@@ -40,6 +40,7 @@ final class SaveTemplateRequest {
     this.difficulty,
     this.estimatedMinutes,
     this.budgetMinor,
+    this.location,
     this.weekdaysMask,
     this.localTimeMinutes,
     this.endDate,
@@ -58,6 +59,9 @@ final class SaveTemplateRequest {
   final int xpReward;
   final int? estimatedMinutes;
   final int? budgetMinor;
+
+  /// Se copia a cada misión que genera la plantilla (ADR-006).
+  final String? location;
   final RecurrenceFrequency frequency;
   final int intervalValue;
   final int? weekdaysMask;
@@ -115,6 +119,11 @@ final class RecurrenceApplicationService {
         (request.budgetMinor != null && request.budgetMinor! < 0)) {
       return const Failure<RecurrenceTemplate>(
         ValidationFailure('XP, duración o presupuesto no son válidos.'),
+      );
+    }
+    if ((_trimmedOrNull(request.location)?.length ?? 0) > 120) {
+      return const Failure<RecurrenceTemplate>(
+        ValidationFailure('La ubicación admite hasta 120 caracteres.'),
       );
     }
     if (!_isCivilDate(request.startDate) ||
@@ -214,6 +223,7 @@ final class RecurrenceApplicationService {
       xpReward: request.xpReward,
       estimatedMinutes: request.estimatedMinutes,
       budgetMinor: request.budgetMinor,
+      location: _trimmedOrNull(request.location),
       availabilityMode: request.availabilityMode,
       isActive: existing?.isActive ?? true,
       objectives: objectives,
@@ -420,6 +430,7 @@ final class RecurrenceApplicationService {
           xpPlanned: Value<int>(bundle.template.xpReward),
           estimatedMinutes: Value<int?>(bundle.template.estimatedMinutes),
           budgetMinor: Value<int?>(bundle.template.budgetMinor),
+          location: Value<String?>(bundle.template.location),
         ),
         createdAtUtcMs: nowUtcMs,
         objectiveIdFactory: _idGenerator.nextId,
@@ -529,6 +540,7 @@ final class RecurrenceApplicationService {
           xpPlanned: Value<int>(bundle.template.xpReward),
           estimatedMinutes: Value<int?>(bundle.template.estimatedMinutes),
           budgetMinor: Value<int?>(bundle.template.budgetMinor),
+          location: Value<String?>(bundle.template.location),
         ),
         createdAtUtcMs: nowUtcMs,
         processedLocalDate: localDate,
@@ -678,4 +690,9 @@ final class RecurrenceApplicationService {
 
   static String _maxDate(String a, String b) => a.compareTo(b) >= 0 ? a : b;
   static String _minDate(String a, String b) => a.compareTo(b) <= 0 ? a : b;
+
+  static String? _trimmedOrNull(String? value) {
+    final String? trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
+  }
 }

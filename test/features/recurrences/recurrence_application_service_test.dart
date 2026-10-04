@@ -270,6 +270,63 @@ void main() {
 
     expect(changed, isA<Failure<RecurrenceTemplate>>());
   });
+
+  test('la plantilla guarda su ubicación y la copia a cada misión', () async {
+    final RecurrenceTemplate automatic =
+        (await service.saveTemplate(
+                  _request(
+                    frequency: RecurrenceFrequency.daily,
+                    startDate: '2026-08-26',
+                    location: '  Biblioteca central  ',
+                  ),
+                )
+                as Success<RecurrenceTemplate>)
+            .value;
+    expect(automatic.location, 'Biblioteca central');
+
+    await service.generatePendingOccurrences(localTodayOverride: '2026-08-26');
+    final generated = await database.select(database.missions).get();
+    expect(generated, isNotEmpty);
+    expect(
+      generated.every((row) => row.location == 'Biblioteca central'),
+      isTrue,
+    );
+
+    final RecurrenceTemplate board =
+        (await service.saveTemplate(
+                  _request(
+                    frequency: RecurrenceFrequency.daily,
+                    startDate: '2026-08-26',
+                    missionType: MissionType.daily,
+                    availabilityMode: TemplateAvailabilityMode.board,
+                    title: 'Del tablón',
+                    location: 'Gimnasio',
+                  ),
+                )
+                as Success<RecurrenceTemplate>)
+            .value;
+    final MissionBoardTake take =
+        (await service.takeMissionFromBoard(board.id)
+                as Success<MissionBoardTake>)
+            .value;
+    final taken = await (database.select(
+      database.missions,
+    )..where((table) => table.id.equals(take.missionId))).getSingle();
+    expect(taken.location, 'Gimnasio');
+  });
+
+  test('rechaza una ubicación de más de 120 caracteres', () async {
+    final Result<RecurrenceTemplate> saved = await service.saveTemplate(
+      _request(
+        frequency: RecurrenceFrequency.daily,
+        startDate: '2026-08-26',
+        location: 'x' * 121,
+      ),
+    );
+
+    expect(saved, isA<Failure<RecurrenceTemplate>>());
+    expect(await database.select(database.missionTemplates).get(), isEmpty);
+  });
 }
 
 SaveTemplateRequest _request({
@@ -280,6 +337,7 @@ SaveTemplateRequest _request({
   TemplateAvailabilityMode availabilityMode =
       TemplateAvailabilityMode.automatic,
   String title = 'Rutina recurrente',
+  String? location,
   int intervalValue = 1,
   int? localTimeMinutes,
   List<RecurrenceObjectiveDraft> objectives = const <RecurrenceObjectiveDraft>[
@@ -287,6 +345,7 @@ SaveTemplateRequest _request({
   ],
 }) => SaveTemplateRequest(
   existing: existing,
+  location: location,
   areaId: DefaultSeedV1.studiesAreaId,
   title: title,
   missionType: missionType,

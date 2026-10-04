@@ -52,7 +52,12 @@ final class SaveJournalEntryRequest {
     this.origin = JournalOrigin.manual,
     this.missionId,
     this.transactionId,
+    this.contactIds,
   });
+
+  /// Personajes propios de la entrada (los de su misión se suman al leer).
+  /// `null` al editar los deja como estaban.
+  final List<String>? contactIds;
 
   final JournalEntry? existing;
   final String title;
@@ -115,8 +120,11 @@ final class JournalApplicationService {
       attachmentCount: existing?.attachmentCount ?? 0,
     );
     return existing == null
-        ? _repository.create(entry)
-        : _repository.update(entry);
+        ? _repository.create(
+            entry,
+            contactIds: request.contactIds ?? const <String>[],
+          )
+        : _repository.update(entry, contactIds: request.contactIds);
   }
 
   Future<Result<JournalEntry>> archive(JournalEntry entry) {

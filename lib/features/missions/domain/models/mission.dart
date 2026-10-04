@@ -130,6 +130,7 @@ final class Mission {
     required this.rowVersion,
     this.templateId,
     this.description,
+    this.location,
     this.difficulty,
     this.scheduledAtUtc,
     this.availableFromUtc,
@@ -144,11 +145,16 @@ final class Mission {
     this.timeEntries = const <MissionTimeEntry>[],
   });
 
+  static const int maxLocationLength = 120;
+
   final String id;
   final String? templateId;
   final String areaId;
   final String title;
   final String? description;
+
+  /// Ubicación en texto libre (ADR-006 D5); el mapa queda aplazado.
+  final String? location;
   final MissionType type;
   final MissionImportance importance;
   final MissionPriority priority;
@@ -202,6 +208,7 @@ final class Mission {
     String? areaId,
     String? title,
     String? description,
+    String? location,
     MissionType? type,
     MissionImportance? importance,
     MissionPriority? priority,
@@ -219,6 +226,7 @@ final class Mission {
     areaId: areaId ?? this.areaId,
     title: title ?? this.title,
     description: description,
+    location: location,
     type: type ?? this.type,
     importance: importance ?? this.importance,
     priority: priority ?? this.priority,

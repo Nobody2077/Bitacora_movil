@@ -555,8 +555,10 @@ final class _SmokeJournalRepository implements JournalRepository {
   );
 
   @override
-  Future<Result<JournalEntry>> create(JournalEntry entry) =>
-      throw UnimplementedError();
+  Future<Result<JournalEntry>> create(
+    JournalEntry entry, {
+    Iterable<String> contactIds = const <String>[],
+  }) => throw UnimplementedError();
 
   @override
   Future<Result<List<JournalEntry>>> findRecent({
@@ -570,8 +572,10 @@ final class _SmokeJournalRepository implements JournalRepository {
       const Success<JournalEntry?>(null);
 
   @override
-  Future<Result<JournalEntry>> update(JournalEntry entry) =>
-      throw UnimplementedError();
+  Future<Result<JournalEntry>> update(
+    JournalEntry entry, {
+    Iterable<String>? contactIds,
+  }) => throw UnimplementedError();
 
   @override
   Future<Result<JournalPhoto>> addPhoto(JournalPhoto photo) =>
