@@ -49,6 +49,7 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           _branch(ref, AppArea.dashboard, AppRoutes.dashboardDaily),
           _branch(ref, AppArea.settings, AppRoutes.settings),
           _branch(ref, AppArea.navigation, AppRoutes.more),
+          _branch(ref, AppArea.character, AppRoutes.character),
         ],
       ),
     ],

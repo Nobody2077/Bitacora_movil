@@ -61,6 +61,52 @@ final contactJournalEntryIdsProvider =
           .map(_unwrap<List<String>>),
     );
 
+/// Conjunto de ids con igualdad por valor, para usarlo como clave de familia.
+final class IdSet {
+  IdSet(Iterable<String> ids) : ids = Set<String>.unmodifiable(ids);
+
+  final Set<String> ids;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdSet &&
+      other.ids.length == ids.length &&
+      other.ids.containsAll(ids);
+
+  @override
+  int get hashCode => Object.hashAllUnordered(ids);
+}
+
+/// Personajes de cada misión pedida (para tarjetas y listas).
+final missionsContactsProvider =
+    StreamProvider.family<Map<String, List<Contact>>, IdSet>(
+      (Ref ref, IdSet missionIds) => ref
+          .watch(contactRepositoryProvider)
+          .watchForMissions(missionIds.ids)
+          .map(_unwrap<Map<String, List<Contact>>>),
+    );
+
+/// Personajes de cada entrada: los suyos más los de su misión.
+final journalEntriesContactsProvider =
+    StreamProvider.family<Map<String, List<Contact>>, IdSet>(
+      (Ref ref, IdSet entryIds) => ref
+          .watch(contactRepositoryProvider)
+          .watchForJournalEntries(entryIds.ids)
+          .map(_unwrap<Map<String, List<Contact>>>),
+    );
+
+/// Solo los vinculados a la entrada; lo que su formulario puede editar.
+final journalEntryOwnContactsProvider =
+    FutureProvider.family<List<Contact>, String>((
+      Ref ref,
+      String entryId,
+    ) async {
+      final Result<List<Contact>> result = await ref
+          .watch(contactRepositoryProvider)
+          .findOwnForJournalEntry(entryId);
+      return _unwrap(result);
+    });
+
 T _unwrap<T>(Result<T> result) => result.fold(
   onSuccess: (T value) => value,
   onFailure: (failure) => throw failure,

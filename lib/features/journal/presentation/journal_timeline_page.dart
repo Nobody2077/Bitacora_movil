@@ -5,13 +5,20 @@ import 'package:go_router/go_router.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../contacts/application/contact_providers.dart';
+import '../../contacts/domain/models/contact.dart';
+import '../../contacts/presentation/contact_widgets.dart';
 import '../application/daily_close_application_service.dart';
 import '../application/journal_providers.dart';
 import '../domain/models/journal_entry.dart';
 import 'journal_presentation_support.dart';
 
 class JournalTimelinePage extends ConsumerStatefulWidget {
-  const JournalTimelinePage({super.key});
+  const JournalTimelinePage({super.key, this.title = 'Bitácora'});
+
+  /// «Diario» dentro del menú Personaje (ADR-006 D7): solo cambia el nombre
+  /// visible; por dentro sigue siendo la Bitácora.
+  final String title;
 
   @override
   ConsumerState<JournalTimelinePage> createState() =>
@@ -32,8 +39,8 @@ class _JournalTimelinePageState extends ConsumerState<JournalTimelinePage> {
     return ListView(
       padding: compact ? TerminalSpace.pageCompact : TerminalSpace.pageTablet,
       children: <Widget>[
-        const TerminalPageHeader(
-          title: 'Bitácora',
+        TerminalPageHeader(
+          title: widget.title,
           subtitle: 'Memoria diaria local, privada y vinculada a tus acciones',
         ),
         const SizedBox(height: TerminalSpace.md),
@@ -172,13 +179,25 @@ class _DayNavigator extends StatelessWidget {
   }
 }
 
-class _JournalDayContent extends StatelessWidget {
+class _JournalDayContent extends ConsumerWidget {
   const _JournalDayContent({required this.items});
 
   final List<JournalEntry> items;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Personajes de cada entrada (los suyos más los de su misión); si la
+    // lectura falla, las tarjetas se muestran sin miniaturas.
+    final Map<String, List<Contact>> contacts = items.isEmpty
+        ? const <String, List<Contact>>{}
+        : ref
+                  .watch(
+                    journalEntriesContactsProvider(
+                      IdSet(items.map((JournalEntry item) => item.id)),
+                    ),
+                  )
+                  .value ??
+              const <String, List<Contact>>{};
     if (items.isEmpty) {
       return TerminalEmptyState(
         title: 'Este día aún está en blanco',
@@ -204,7 +223,10 @@ class _JournalDayContent extends StatelessWidget {
         ),
         const SizedBox(height: TerminalSpace.sm),
         for (final JournalEntry item in items) ...<Widget>[
-          _JournalEntryCard(entry: item),
+          _JournalEntryCard(
+            entry: item,
+            contacts: contacts[item.id] ?? const <Contact>[],
+          ),
           const SizedBox(height: TerminalSpace.sm),
         ],
       ],
@@ -269,9 +291,10 @@ class _DaySummary extends StatelessWidget {
 }
 
 class _JournalEntryCard extends StatelessWidget {
-  const _JournalEntryCard({required this.entry});
+  const _JournalEntryCard({required this.entry, required this.contacts});
 
   final JournalEntry entry;
+  final List<Contact> contacts;
 
   @override
   Widget build(BuildContext context) {
@@ -341,6 +364,10 @@ class _JournalEntryCard extends StatelessWidget {
                       ),
                   ],
                 ),
+                if (contacts.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 8),
+                  ContactAvatarStrip(contacts: contacts),
+                ],
               ],
             ),
           ),

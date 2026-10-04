@@ -6,6 +6,7 @@ enum AppArea {
   home,
   missions,
   journal,
+  character,
   finance,
   dashboard,
   settings,

@@ -137,6 +137,7 @@ class _LocalStatus extends StatelessWidget {
 String _locationLabel(String location) {
   if (location.startsWith('/missions')) return 'Centro de misiones';
   if (location.startsWith('/journal')) return 'Bitácora';
+  if (location.startsWith('/character')) return 'Personaje';
   if (location.startsWith('/finance')) return 'Economía';
   if (location.startsWith('/dashboard')) return 'Progreso';
   if (location.startsWith('/settings')) return 'Ajustes';

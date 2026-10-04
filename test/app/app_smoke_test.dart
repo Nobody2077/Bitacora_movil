@@ -77,6 +77,7 @@ void main() {
         'Inicio': 'INICIO',
         'Misiones': 'MISIONES',
         'Bitácora': 'BITÁCORA',
+        'Personaje': 'PERSONAJE',
         'Economía': 'ECONOMÍA',
         'Progreso': 'PROGRESO',
         'Ajustes': 'AJUSTES',
@@ -276,6 +277,42 @@ void main() {
         AccessSessionPhase.locked,
       );
     });
+
+    testWidgets(
+      'Personaje abre su menú y las entradas siguientes no se corren',
+      (WidgetTester tester) async {
+        _ensureResumed(tester);
+        _setSurface(tester, const Size(1280, 1000));
+        await tester.pumpWidget(_testApp(initialLocation: AppRoutes.journal));
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byKey(const ValueKey<String>('sidebar-destination-Personaje')),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey<String>('character-tab-personaje')),
+          findsOneWidget,
+        );
+        expect(find.text('DATOS LOCALES · PERSONAJE'), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(const ValueKey<String>('sidebar-destination-Economía')),
+        );
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(
+          find.byKey(const ValueKey<String>('character-tab-personaje')),
+          findsNothing,
+        );
+        expect(find.text('DATOS LOCALES · ECONOMÍA'), findsOneWidget);
+
+        await tester.tap(
+          find.byKey(const ValueKey<String>('sidebar-destination-Ajustes')),
+        );
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(find.text('DATOS LOCALES · AJUSTES'), findsOneWidget);
+      },
+    );
 
     testWidgets('conecta la raíz de Bitácora a la cronología funcional', (
       WidgetTester tester,

@@ -170,9 +170,10 @@ class _RailShell extends ConsumerWidget {
                   ref.read(uiSoundServiceProvider).play(UiSound.navigation),
                 );
               }
+              final int branch = _railBranches[index];
               navigationShell.goBranch(
-                index,
-                initialLocation: index == navigationShell.currentIndex,
+                branch,
+                initialLocation: branch == navigationShell.currentIndex,
               );
             },
           ),
@@ -474,11 +475,18 @@ int _compactIndex(String location) {
   }
   if (location.startsWith('/dashboard') ||
       location.startsWith('/settings') ||
+      location.startsWith(AppRoutes.character) ||
       location == AppRoutes.more) {
     return 4;
   }
   return 0;
 }
+
+/// Rama del shell que abre cada entrada de la barra lateral, en su orden:
+/// Inicio, Misiones, Bitácora, Personaje, Economía, Progreso y Ajustes.
+/// Personaje es la última rama del router (ADR-006 D6) pero va cuarta en la
+/// barra.
+const List<int> _railBranches = <int>[0, 1, 2, 7, 3, 4, 5];
 
 int _railIndex(String location) {
   if (location.startsWith('/missions') ||
@@ -488,19 +496,25 @@ int _railIndex(String location) {
   if (location.startsWith('/journal')) {
     return 2;
   }
-  if (location.startsWith('/finance')) {
+  if (location.startsWith(AppRoutes.character)) {
     return 3;
   }
-  if (location.startsWith('/dashboard') || location == AppRoutes.more) {
+  if (location.startsWith('/finance')) {
     return 4;
   }
-  if (location.startsWith('/settings')) {
+  if (location.startsWith('/dashboard') || location == AppRoutes.more) {
     return 5;
+  }
+  if (location.startsWith('/settings')) {
+    return 6;
   }
   return 0;
 }
 
 String _sectionTitle(String location) {
+  if (location.startsWith(AppRoutes.character)) {
+    return 'Personaje';
+  }
   switch (_compactIndex(location)) {
     case 1:
       return 'Misiones';

@@ -1,6 +1,8 @@
 import '../../features/access/presentation/access_gate_page.dart';
 import '../../features/access/presentation/privacy_settings_pages.dart';
 import '../../features/access/presentation/recovery_page.dart';
+import '../../features/character/presentation/character_menu_page.dart';
+import '../../features/contacts/presentation/contact_pages.dart';
 import '../../features/economy/domain/models/economy_models.dart';
 import '../../features/economy/presentation/economy_analysis_page.dart';
 import '../../features/economy/presentation/economy_overview_page.dart';
@@ -41,6 +43,7 @@ abstract final class AppRoutes {
   static const String missionsToday = '/missions/today';
   static const String missionsBoard = '/missions/board';
   static const String journal = '/journal';
+  static const String character = '/character';
   static const String finance = '/finance';
   static const String dashboardDaily = '/dashboard/daily';
   static const String settings = '/settings';
@@ -52,7 +55,7 @@ abstract final class AppRoutes {
   static const String settingsNotifications = '/settings/notifications';
   static const String settingsSound = '/settings/sound';
 
-  /// El mapa contiene 57 patrones URI (56 superficies funcionales).
+  /// El mapa contiene 61 patrones URI (60 superficies funcionales).
   /// `/more` es el único contenedor de navegación, no una superficie funcional.
   ///
   /// Cada contrato lleva su propia página en `builder`. Las superficies que aún
@@ -325,6 +328,45 @@ abstract final class AppRoutes {
       title: 'Bitácora',
       area: AppArea.journal,
       builder: (context, state) => const JournalTimelinePage(),
+    ),
+    AppRouteContract(
+      name: 'contactNew',
+      path: '/character/contacts/new',
+      title: 'Crear personaje',
+      area: AppArea.character,
+      builder: (context, state) => const ContactFormPage(),
+    ),
+    AppRouteContract(
+      name: 'contactEdit',
+      path: '/character/contacts/:contactId/edit',
+      title: 'Editar personaje',
+      area: AppArea.character,
+      builder: (context, state) {
+        final String? contactId = state.pathParameters['contactId'];
+        return contactId != null ? ContactFormPage(contactId: contactId) : null;
+      },
+    ),
+    AppRouteContract(
+      name: 'contactDetail',
+      path: '/character/contacts/:contactId',
+      title: 'Ficha de personaje',
+      area: AppArea.character,
+      builder: (context, state) {
+        final String? contactId = state.pathParameters['contactId'];
+        return contactId != null
+            ? ContactDetailPage(contactId: contactId)
+            : null;
+      },
+    ),
+    AppRouteContract(
+      name: 'character',
+      path: character,
+      title: 'Personaje',
+      area: AppArea.character,
+      queryParameters: const <String>{'tab'},
+      builder: (context, state) => CharacterMenuPage(
+        initialTab: CharacterTab.fromQuery(state.uri.queryParameters['tab']),
+      ),
     ),
     AppRouteContract(
       name: 'financeTransactions',

@@ -6,6 +6,9 @@ import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../contacts/application/contact_providers.dart';
+import '../../contacts/domain/models/contact.dart';
+import '../../contacts/presentation/contact_widgets.dart';
 import '../../economy/application/economy_providers.dart';
 import '../../economy/domain/models/economy_models.dart';
 import '../../economy/presentation/economy_presentation_support.dart';
@@ -41,6 +44,10 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
   TimeOfDay _time = TimeOfDay.now();
   bool _initialized = false;
   bool _saving = false;
+
+  /// `null` mientras el usuario no toque los personajes: al editar, guardar
+  /// sin tocarlos no los cambia.
+  Set<String>? _contactIds;
 
   @override
   void dispose() {
@@ -271,6 +278,8 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
               ),
             ),
             const SizedBox(height: TerminalSpace.md),
+            TerminalPanel(child: _buildContactPicker()),
+            const SizedBox(height: TerminalSpace.md),
             TerminalPanel(
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -318,6 +327,21 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildContactPicker() {
+    final List<Contact> linked = widget.entryId == null
+        ? const <Contact>[]
+        : ref.watch(journalEntryOwnContactsProvider(widget.entryId!)).value ??
+              const <Contact>[];
+    return ContactPickerField(
+      selectedIds:
+          _contactIds ?? linked.map((Contact contact) => contact.id).toSet(),
+      knownContacts: linked,
+      enabled: !_saving,
+      helper: 'Los personajes de la misión vinculada se suman solos.',
+      onChanged: (Set<String> ids) => setState(() => _contactIds = ids),
     );
   }
 
@@ -409,6 +433,7 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
             transactionId: _origin == JournalOrigin.transaction
                 ? _sourceId
                 : null,
+            contactIds: _contactIds?.toList(),
           ),
         );
     if (!mounted) {
@@ -418,6 +443,7 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
     result.fold<void>(
       onSuccess: (JournalEntry entry) {
         ref.invalidate(journalEntryDetailProvider(entry.id));
+        ref.invalidate(journalEntryOwnContactsProvider(entry.id));
         context.goNamed(
           'journalDetail',
           pathParameters: <String, String>{'entryId': entry.id},

@@ -1004,6 +1004,27 @@ decidido, qué falta y **cómo** hacerlo. Lo demás del documento es historia.
 >    DIARIO = la Bitácora renombrada solo en lo visual + Personajes con su
 >    ficha y «+ Crear personaje»). La Bitácora convive en la barra lateral
 >    hasta que el usuario confirme que DIARIO la sustituye.
+>    **Código hecho el 3 de octubre de 2026 (317/317, `analyze` limpio);
+>    falta que el usuario lo vea en la tablet.** Qué hay:
+>    - Rutas nuevas (área `character`, rama 7 del shell): `/character`
+>      (`?tab=ciberware|inventario|mapa|personaje|diario`, abre en
+>      PERSONAJE), `/character/contacts/new`, `…/:contactId` y
+>      `…/:contactId/edit`. 61 rutas. En la barra lateral va **cuarta**
+>      (`_railBranches` en `adaptive_shell.dart` traduce posición → rama); en
+>      teléfono está en «Más». Golden `sidebar_modular_battery` regenerado a
+>      propósito (una entrada más).
+>    - `features/character/presentation/`: menú con NIVEL, REPUTACIÓN («--»
+>      hasta la fase 3), saldo disponible y las cinco pestañas; hexágono
+>      (`CustomPainter`, todas las áreas visibles, máx. 8, las sin XP en
+>      nivel 1) y panel (nivel, reputación pendiente, constancia, títulos).
+>      **Sin «+ Compra»** (fase 2) ni «tiempo registrado» (no hay dato global).
+>    - DIARIO: ENTRADAS = `JournalTimelinePage(title: 'Diario')` con
+>      miniaturas de personajes en cada tarjeta; PERSONAJES = cuadrícula,
+>      archivados, ficha (foto, editar, quitar foto, «Eliminar» = archivar,
+>      restaurar, misiones y entradas donde aparece) y formulario. La foto se
+>      pone desde la ficha (necesita que el personaje exista).
+>    - Formulario de entrada: selector de personajes (solo los propios; los de
+>      la misión se suman al leer). Detalle de entrada: panel «Personajes».
 > 4. **Misiones**: elegir personajes y ubicación al crear, foto opcional y
 >    tarjeta con foto y miniaturas de personajes.
 > 5. Versión `1.7.0`, APK, instalación **encima** en la tablet (con datos

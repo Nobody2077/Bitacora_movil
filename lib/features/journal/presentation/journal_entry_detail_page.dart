@@ -8,6 +8,9 @@ import '../../../app/providers/app_preferences_provider.dart';
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
+import '../../contacts/application/contact_providers.dart';
+import '../../contacts/domain/models/contact.dart';
+import '../../contacts/presentation/contact_widgets.dart';
 import '../../economy/application/economy_providers.dart';
 import '../../economy/domain/models/economy_models.dart';
 import '../../economy/presentation/economy_presentation_support.dart';
@@ -157,6 +160,8 @@ class JournalEntryDetailPage extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: TerminalSpace.md),
+        _EntryContactsPanel(entryId: entry.id),
+        const SizedBox(height: TerminalSpace.md),
         _JournalPhotosPanel(entry: entry),
         if (entry.origin == JournalOrigin.mission ||
             entry.origin == JournalOrigin.transaction) ...<Widget>[
@@ -249,6 +254,48 @@ class JournalEntryDetailPage extends ConsumerWidget {
     ref.invalidate(journalEntriesProvider);
     ref.invalidate(journalSearchProvider);
     ref.invalidate(archivedJournalEntriesProvider);
+  }
+}
+
+/// Personajes de la entrada: los suyos más los de su misión (ADR-006).
+class _EntryContactsPanel extends ConsumerWidget {
+  const _EntryContactsPanel({required this.entryId});
+
+  final String entryId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final AsyncValue<Map<String, List<Contact>>> contacts = ref.watch(
+      journalEntriesContactsProvider(IdSet(<String>[entryId])),
+    );
+    return TerminalPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const TerminalSectionTitle(overline: 'Diario', title: 'Personajes'),
+          const SizedBox(height: TerminalSpace.sm),
+          contacts.when(
+            data: (Map<String, List<Contact>> grouped) {
+              final List<Contact> items = grouped[entryId] ?? const <Contact>[];
+              return items.isEmpty
+                  ? Text(
+                      'Sin personajes. Puedes elegirlos al editar la entrada.',
+                      style: TextStyle(color: tokens.textSecondary),
+                    )
+                  : ContactThumbnailRow(contacts: items);
+            },
+            loading: () =>
+                const TerminalInlineLoadingState(message: 'Cargando…'),
+            error: (_, _) => const TerminalInlineErrorState(
+              message: 'No se pudieron leer los personajes.',
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

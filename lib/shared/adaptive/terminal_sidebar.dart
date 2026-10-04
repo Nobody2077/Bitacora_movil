@@ -60,6 +60,7 @@ class TerminalSidebar extends StatelessWidget {
     _TerminalNavigationItem('Inicio', Icons.home_outlined),
     _TerminalNavigationItem('Misiones', Icons.flag_outlined),
     _TerminalNavigationItem('Bitácora', Icons.menu_book_outlined),
+    _TerminalNavigationItem('Personaje', Icons.hexagon_outlined),
     _TerminalNavigationItem('Economía', Icons.account_balance_wallet_outlined),
     _TerminalNavigationItem('Progreso', Icons.query_stats),
     _TerminalNavigationItem('Ajustes', Icons.settings_outlined),
