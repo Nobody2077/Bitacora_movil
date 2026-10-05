@@ -138,7 +138,21 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
      ☰), `SidebarToggleButton`, `HeaderClock`, `HeaderSeparator`. El saldo
      animado pasó a `shop/presentation/animated_balance.dart`.
    - Teléfono sin cambios.
-8. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
+8. ~~Fuera MAPA y «Bitácora» del lateral~~ **Hecho y aprobado el 5 de
+   octubre de 2026** (ADR-006 **D18**; huella verificada). 408/408.
+   Menú TIENDA · PERSONAJE · DIARIO; barra lateral sin «Bitácora» (las rutas
+   `/journal…` marcan Personaje); «Volver al Diario» (`goToDiary`) en lugar
+   de `goNamed('journal')`; en teléfono el tercer botón es «Personaje» y
+   salió de «Más». Captura `sidebar_modular_battery` regenerada.
+9. **Diario nuevo** (D18, maqueta privada «Diario de Bitácora», mini-spec
+   aprobada): tablet en dos columnas — lista continua por fechas con
+   resumen por día, filtros TODAS · MISIONES · LIBRES · MOVIMIENTOS e iconos
+   (buscar, archivo, cierre, nueva) a la izquierda; entrada abierta a la
+   derecha con título rojo, ◆ objetivos de su misión, texto, ánimo, fotos,
+   personajes, editar y archivar. 100 primeras + «Cargar más». Teléfono:
+   lista y entrada a pantalla completa.
+10. **Personajes** con el mismo patrón (lista y ficha en dos columnas).
+11. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
    aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
    Después, fusionar la rama en `main`.
 

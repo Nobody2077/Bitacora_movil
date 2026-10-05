@@ -89,7 +89,7 @@ class JournalEntryDetailPage extends ConsumerWidget {
             TerminalOutlineButton(
               label: entry.isArchived
                   ? 'Volver al archivo'
-                  : 'Volver a Bitácora',
+                  : 'Volver al Diario',
               icon: Icons.arrow_back,
               color: tokens.textSecondary,
               onPressed: () => context.goNamed(
@@ -755,9 +755,9 @@ class _Unavailable extends StatelessWidget {
       description: 'No existe o no se pudo leer desde la base local.',
       icon: Icons.error_outline,
       action: TerminalOutlineButton(
-        label: 'Volver a Bitácora',
+        label: 'Volver al Diario',
         icon: Icons.arrow_back,
-        onPressed: () => context.goNamed('journal'),
+        onPressed: () => goToDiary(context),
       ),
     ),
   );

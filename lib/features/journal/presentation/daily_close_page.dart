@@ -54,10 +54,10 @@ class _DailyClosePageState extends ConsumerState<DailyClosePage> {
           Align(
             alignment: Alignment.centerLeft,
             child: TerminalOutlineButton(
-              label: 'Volver a Bitácora',
+              label: 'Volver al Diario',
               icon: Icons.arrow_back,
               color: tokens.textSecondary,
-              onPressed: () => context.goNamed('journal'),
+              onPressed: () => goToDiary(context),
             ),
           ),
           const SizedBox(height: TerminalSpace.md),

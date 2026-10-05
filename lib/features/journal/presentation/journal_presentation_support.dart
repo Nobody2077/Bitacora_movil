@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/terminal_foundations.dart';
 import '../domain/models/journal_entry.dart';
@@ -101,3 +102,10 @@ class JournalPageFrame extends StatelessWidget {
         ),
   );
 }
+
+/// La Bitácora vive dentro de Personaje → DIARIO (ADR-006 D18): volver a
+/// ella es volver al Diario.
+void goToDiary(BuildContext context) => context.goNamed(
+  'character',
+  queryParameters: const <String, String>{'tab': 'diario'},
+);

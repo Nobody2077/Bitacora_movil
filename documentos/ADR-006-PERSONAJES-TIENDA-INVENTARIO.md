@@ -257,6 +257,24 @@ y 5 de D16** en lo que se contradigan.
   la respuesta 1a, y con sus pruebas de migración y el ensayo `dev` en la
   tablet antes de tocar la prod.
 
+### D18. Fuera MAPA; «Bitácora» deja la barra lateral; Diario al estilo del juego — RESUELTA (5 oct)
+
+Decisiones del usuario del 5 de octubre de 2026, con la maqueta privada
+«Diario de Bitácora» delante. **Sustituye a D5** (mapa aplazado) y completa
+D7.
+
+- **MAPA, descartado.** Requiere demasiado trabajo para lo que aporta. Sale
+  del menú Personaje, que queda en **TIENDA · PERSONAJE · DIARIO**.
+- **«Bitácora» sale de la barra lateral**: DIARIO la sustituye. Por dentro
+  sigue siendo `journal` (tablas, rutas, servicios, buscar, archivo y cierre
+  del día); volver a la Bitácora es volver a Personaje → DIARIO. En teléfono,
+  su botón de la barra inferior pasa a ser «Personaje».
+- **Diario como en el juego** (paso siguiente): dos columnas en tablet, lista
+  continua por fechas con filtros por origen (misiones, libres, movimientos)
+  y la entrada abierta al lado con título rojo, ◆ objetivos de su misión,
+  texto, ánimo, fotos y personajes. Los personajes siguen el mismo patrón.
+  En teléfono, lista y entrada a pantalla completa.
+
 ## Esquema v4
 
 Una sola migración, con todo lo anterior (decisión propuesta 2 de la versión

@@ -156,7 +156,7 @@ class _JournalSearchPageState extends ConsumerState<JournalSearchPage> {
           results.when(
             data: (List<JournalEntry> entries) => _SearchResults(
               entries: entries,
-              onBack: () => context.goNamed('journal'),
+              onBack: () => goToDiary(context),
             ),
             loading: () =>
                 const TerminalLoadingState(message: 'Buscando en la Bitácora…'),
@@ -233,7 +233,7 @@ class _SearchResults extends StatelessWidget {
         description: 'Amplía el período o elimina algún filtro.',
         icon: Icons.manage_search,
         action: TerminalOutlineButton(
-          label: 'Volver a Bitácora',
+          label: 'Volver al Diario',
           icon: Icons.arrow_back,
           onPressed: onBack,
         ),
@@ -277,9 +277,9 @@ class JournalArchivePage extends ConsumerWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: TerminalOutlineButton(
-              label: 'Volver a Bitácora',
+              label: 'Volver al Diario',
               icon: Icons.arrow_back,
-              onPressed: () => context.goNamed('journal'),
+              onPressed: () => goToDiary(context),
             ),
           ),
           const SizedBox(height: TerminalSpace.md),

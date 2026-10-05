@@ -23,14 +23,6 @@ class MorePage extends StatelessWidget {
         ),
         const SizedBox(height: TerminalSpace.xl),
         _MoreDestination(
-          icon: Icons.hexagon_outlined,
-          title: 'Personaje',
-          description: 'Tus áreas de vida, el Diario y sus personajes.',
-          color: tokens.infoCyan,
-          onTap: () => context.go(AppRoutes.character),
-        ),
-        const SizedBox(height: TerminalSpace.sm),
-        _MoreDestination(
           icon: Icons.query_stats,
           title: 'Dashboard y progreso',
           description: 'Patrones diarios, semanales, XP y niveles.',

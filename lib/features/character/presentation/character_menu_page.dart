@@ -21,7 +21,6 @@ import 'character_hexagon.dart';
 /// de CIBERWARE e INVENTARIO, retiradas.
 enum CharacterTab {
   tienda('tienda', 'Tienda'),
-  mapa('mapa', 'Mapa'),
   personaje('personaje', 'Personaje'),
   diario('diario', 'Diario');
 
@@ -39,7 +38,7 @@ enum CharacterTab {
 }
 
 /// Menú Personaje (ADR-006 D6 y D17): cabecera con nivel, reputación y saldo,
-/// y las pestañas TIENDA, MAPA (aplazado), PERSONAJE y DIARIO.
+/// y las pestañas TIENDA, PERSONAJE y DIARIO (MAPA descartado, D18).
 class CharacterMenuPage extends ConsumerStatefulWidget {
   const CharacterMenuPage({
     super.key,
@@ -81,7 +80,6 @@ class _CharacterMenuPageState extends ConsumerState<CharacterMenuPage> {
             key: ValueKey<CharacterTab>(_tab),
             child: switch (_tab) {
               CharacterTab.tienda => const ShopSection(),
-              CharacterTab.mapa => const _MapPostponed(),
               CharacterTab.personaje => const _CharacterSheet(),
               CharacterTab.diario => const _DiaryView(),
             },
@@ -280,21 +278,15 @@ class _TabStrip extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Opacity(
-                    // MAPA está aplazado (ADR-006 D5).
-                    opacity: tab == CharacterTab.mapa && tab != selected
-                        ? 0.55
-                        : 1,
-                    child: Text(
-                      tab.label.toUpperCase(),
-                      style: TextStyle(
-                        color: tab == selected
-                            ? tokens.infoCyan
-                            : tokens.terminalRed,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.1,
-                      ),
+                  child: Text(
+                    tab.label.toUpperCase(),
+                    style: TextStyle(
+                      color: tab == selected
+                          ? tokens.infoCyan
+                          : tokens.terminalRed,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.1,
                     ),
                   ),
                 ),
@@ -302,46 +294,6 @@ class _TabStrip extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _MapPostponed extends StatelessWidget {
-  const _MapPostponed();
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    return ListView(
-      padding: TerminalSpace.pageTablet,
-      children: <Widget>[
-        TerminalPanel(
-          borderColor: tokens.valueYellow,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'MAPA · APLAZADO',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: tokens.valueYellow,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: TerminalSpace.sm),
-              const Text(
-                'Más adelante: un mapa de tu ciudad de OpenStreetMap que '
-                'funciona sin conexión. Lo descargas en el PC y lo importas, '
-                'sin permiso de internet. Tendría estilo del juego, tus '
-                'lugares de referencia y las misiones que tienes en cada uno. '
-                'Por ahora, la ubicación de una misión es un texto.',
-                style: TextStyle(height: 1.5),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

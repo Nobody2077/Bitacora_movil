@@ -63,6 +63,31 @@ void main() {
       );
     });
 
+    testWidgets('en teléfono el tercer botón es Personaje, no Bitácora', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(412, 915));
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.home));
+      await tester.pumpAndSettle();
+
+      final Finder bar = find.byType(NavigationBar);
+      expect(
+        find.descendant(of: bar, matching: find.text('Bitácora')),
+        findsNothing,
+      );
+      await tester.tap(
+        find.descendant(of: bar, matching: find.text('Personaje')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<NavigationBar>(bar).selectedIndex, 2);
+      expect(
+        find.byKey(const ValueKey<String>('character-tab-diario')),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('☰ desliza la barra lateral de la tablet y lo recuerda', (
       WidgetTester tester,
     ) async {
@@ -217,7 +242,6 @@ void main() {
       for (final MapEntry<String, String> item in const <String, String>{
         'Inicio': 'INICIO',
         'Misiones': 'MISIONES',
-        'Bitácora': 'BITÁCORA',
         'Personaje': 'PERSONAJE',
         'Economía': 'ECONOMÍA',
         'Progreso': 'PROGRESO',
@@ -231,6 +255,11 @@ void main() {
           findsOneWidget,
         );
       }
+      // Bitácora salió de la barra lateral (ADR-006 D18).
+      expect(
+        find.byKey(const ValueKey<String>('sidebar-destination-Bitácora')),
+        findsNothing,
+      );
       expect(find.text('Usuario local'), findsOneWidget);
       expect(find.text('SISTEMA PERSONAL'), findsNothing);
 
@@ -248,10 +277,11 @@ void main() {
           matching: find.text('MISIONES'),
         ),
       );
+      // Una ruta de la Bitácora marca Personaje: vive en su DIARIO.
       final Text journalLabel = tester.widget<Text>(
         find.descendant(
           of: find.byType(TerminalSidebar),
-          matching: find.text('BITÁCORA'),
+          matching: find.text('PERSONAJE'),
         ),
       );
       final Text profileName = tester.widget<Text>(
@@ -322,7 +352,7 @@ void main() {
       expect(globalProgress.value, closeTo(400 / 1300, 0.0001));
       final AnimatedContainer selectedDestination = tester
           .widget<AnimatedContainer>(
-            find.byKey(const ValueKey<String>('sidebar-destination-Bitácora')),
+            find.byKey(const ValueKey<String>('sidebar-destination-Personaje')),
           );
       final ShapeDecoration selectedDecoration =
           selectedDestination.decoration! as ShapeDecoration;

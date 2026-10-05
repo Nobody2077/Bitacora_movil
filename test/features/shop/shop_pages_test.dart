@@ -61,22 +61,21 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('las pestañas son TIENDA, MAPA, PERSONAJE y DIARIO', (
+  testWidgets('las pestañas son TIENDA, PERSONAJE y DIARIO, sin MAPA', (
     WidgetTester tester,
   ) async {
     await pumpMenu(tester);
 
-    for (final String tab in <String>[
-      'tienda',
-      'mapa',
-      'personaje',
-      'diario',
-    ]) {
+    for (final String tab in <String>['tienda', 'personaje', 'diario']) {
       expect(
         find.byKey(ValueKey<String>('character-tab-$tab')),
         findsOneWidget,
       );
     }
+    expect(
+      find.byKey(const ValueKey<String>('character-tab-mapa')),
+      findsNothing,
+    );
     expect(
       find.byKey(const ValueKey<String>('character-tab-ciberware')),
       findsNothing,

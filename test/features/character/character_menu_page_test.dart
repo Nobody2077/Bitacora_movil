@@ -52,16 +52,6 @@ void main() {
     );
   });
 
-  testWidgets('MAPA avisa que está aplazado', (WidgetTester tester) async {
-    _tabletView(tester);
-    await tester.pumpWidget(_app(_ContactRepository()));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const ValueKey<String>('character-tab-mapa')));
-    await tester.pumpAndSettle();
-    expect(find.text('MAPA · APLAZADO'), findsOneWidget);
-  });
-
   testWidgets('DIARIO muestra los personajes y su contador', (
     WidgetTester tester,
   ) async {

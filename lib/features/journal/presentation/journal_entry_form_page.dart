@@ -453,8 +453,7 @@ class _JournalEntryFormPageState extends ConsumerState<JournalEntryFormPage> {
     );
   }
 
-  void _cancel() =>
-      context.canPop() ? context.pop() : context.goNamed('journal');
+  void _cancel() => context.canPop() ? context.pop() : goToDiary(context);
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(
@@ -570,9 +569,9 @@ class _JournalUnavailable extends StatelessWidget {
       description: message,
       icon: Icons.error_outline,
       action: TerminalOutlineButton(
-        label: 'Volver a Bitácora',
+        label: 'Volver al Diario',
         icon: Icons.arrow_back,
-        onPressed: () => context.goNamed('journal'),
+        onPressed: () => goToDiary(context),
       ),
     ),
   );

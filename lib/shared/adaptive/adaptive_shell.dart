@@ -108,9 +108,11 @@ class _CompactShell extends ConsumerWidget {
           navigationShell.goBranch(6, initialLocation: true);
           return;
         }
+        // El tercer botón es Personaje (rama 7); DIARIO sustituye a Bitácora.
+        final int branch = index == 2 ? 7 : index;
         navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
+          branch,
+          initialLocation: branch == navigationShell.currentIndex,
         );
       },
       destinations: const <NavigationDestination>[
@@ -120,8 +122,8 @@ class _CompactShell extends ConsumerWidget {
           label: 'Misiones',
         ),
         NavigationDestination(
-          icon: Icon(Icons.menu_book_outlined),
-          label: 'Bitácora',
+          icon: Icon(Icons.hexagon_outlined),
+          label: 'Personaje',
         ),
         NavigationDestination(
           icon: Icon(Icons.account_balance_wallet_outlined),
@@ -564,7 +566,8 @@ int _compactIndex(String location) {
       location.startsWith('/mission-templates')) {
     return 1;
   }
-  if (location.startsWith('/journal')) {
+  if (location.startsWith(AppRoutes.character) ||
+      location.startsWith('/journal')) {
     return 2;
   }
   if (location.startsWith('/finance')) {
@@ -572,7 +575,6 @@ int _compactIndex(String location) {
   }
   if (location.startsWith('/dashboard') ||
       location.startsWith('/settings') ||
-      location.startsWith(AppRoutes.character) ||
       location == AppRoutes.more) {
     return 4;
   }
@@ -583,27 +585,28 @@ int _compactIndex(String location) {
 /// Inicio, Misiones, Bitácora, Personaje, Economía, Progreso y Ajustes.
 /// Personaje es la última rama del router (ADR-006 D6) pero va cuarta en la
 /// barra.
-const List<int> _railBranches = <int>[0, 1, 2, 7, 3, 4, 5];
+/// Rama de cada entrada de la barra lateral. «Bitácora» salió el 5 de
+/// octubre de 2026 (ADR-006 D18): vive dentro de Personaje → DIARIO.
+const List<int> _railBranches = <int>[0, 1, 7, 3, 4, 5];
 
 int _railIndex(String location) {
   if (location.startsWith('/missions') ||
       location.startsWith('/mission-templates')) {
     return 1;
   }
-  if (location.startsWith('/journal')) {
+  // Las pantallas de la Bitácora se abren desde DIARIO, dentro de Personaje.
+  if (location.startsWith(AppRoutes.character) ||
+      location.startsWith('/journal')) {
     return 2;
   }
-  if (location.startsWith(AppRoutes.character)) {
+  if (location.startsWith('/finance')) {
     return 3;
   }
-  if (location.startsWith('/finance')) {
+  if (location.startsWith('/dashboard') || location == AppRoutes.more) {
     return 4;
   }
-  if (location.startsWith('/dashboard') || location == AppRoutes.more) {
-    return 5;
-  }
   if (location.startsWith('/settings')) {
-    return 6;
+    return 5;
   }
   return 0;
 }
@@ -616,7 +619,7 @@ String _sectionTitle(String location) {
     case 1:
       return 'Misiones';
     case 2:
-      return 'Bitácora';
+      return 'Diario';
     case 3:
       return 'Economía';
     case 4:
