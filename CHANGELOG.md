@@ -1,5 +1,33 @@
 # Historial de cambios
 
+## 1.8.0 — candidata `1.8.0+15`
+
+### Tienda, Diario al estilo del juego y apariencia (ADR-006, fase 2)
+
+- **Esquema v5**: `area_id` opcional en `inventory_items` (área de vida de
+  cada deseo). La migración v4 → v5 **solo añade**; ensayada en `dev` sobre
+  datos de prueba el 5 de octubre de 2026.
+- **TIENDA** (lista de deseos, D17): deseos con área, tipo (icono), prioridad,
+  precio e información; color e indicación según el saldo disponible («Te
+  alcanza», «Faltan Bs X», «Sin precio»); comprar un deseo registra el gasto
+  en Economía (categoría «Tienda») y lo pasa a Comprados, todo o nada; el
+  saldo baja en naranja con «− Bs X». Aviso «Ya puedes comprar…» en la app y
+  «N deseos a tu alcance» en el resumen diario.
+- **Menú Personaje**: TIENDA · PERSONAJE · DIARIO. Fuera CIBERWARE,
+  INVENTARIO y MAPA (D17, D18). «Bitácora» sale de la barra lateral: DIARIO
+  la sustituye.
+- **DIARIO al estilo del juego**: en tablet, lista continua por fechas con
+  filtros (misiones, libres, movimientos) y la entrada abierta al lado con
+  título rojo, objetivos ◆ en cian, descripción de la misión en rojo, y solo
+  lo que la entrada tiene.
+- **Ficha de personaje al estilo del juego**: foto grande, panel de borde
+  rojo con nombre cian y descripción roja, códigos decorativos y «CERRAR».
+- **☰** desliza y oculta la barra lateral (se recuerda). **Cabecera** más
+  limpia: ☰, hora y saldo.
+- **Apariencia → Tema**: fondo Negro o **Vino** y texto **Blanco o Cian**;
+  contraste medido (≥ 4,5:1).
+- `flutter analyze` sin problemas y **425/425 pruebas**.
+
 ## 1.7.0 — candidata `1.7.0+14`
 
 ### Menú Personaje y esquema v4 (ADR-006, fase 1)

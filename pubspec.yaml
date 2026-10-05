@@ -1,7 +1,7 @@
 ﻿name: bitacora_rpg_personal
 description: "AplicaciÃ³n personal local-first para organizar misiones, economÃ­a, progreso y bitÃ¡cora."
 publish_to: 'none'
-version: 1.7.0+14
+version: 1.8.0+15
 
 environment:
   sdk: '>=3.11.3 <3.12.0'
