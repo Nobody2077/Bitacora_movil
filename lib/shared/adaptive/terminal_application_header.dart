@@ -10,9 +10,20 @@ import '../widgets/terminal/terminal_widgets.dart';
 ///
 /// Mantiene el contexto de la aplicación visible sin depender de cada módulo.
 class TerminalApplicationHeader extends StatefulWidget {
-  const TerminalApplicationHeader({required this.location, super.key});
+  const TerminalApplicationHeader({
+    required this.location,
+    super.key,
+    this.sidebarVisible = true,
+    this.onToggleSidebar,
+  });
 
   final String location;
+
+  /// Estado de la barra lateral, para el texto del botón ☰ (ADR-006 D13).
+  final bool sidebarVisible;
+
+  /// Sin él no se muestra el botón ☰.
+  final VoidCallback? onToggleSidebar;
 
   @override
   State<TerminalApplicationHeader> createState() =>
@@ -57,6 +68,20 @@ class _TerminalApplicationHeaderState extends State<TerminalApplicationHeader> {
             ),
             child: Row(
               children: <Widget>[
+                if (widget.onToggleSidebar != null) ...<Widget>[
+                  IconButton(
+                    key: const Key('sidebar-toggle'),
+                    tooltip: widget.sidebarVisible
+                        ? 'Ocultar barra lateral'
+                        : 'Mostrar barra lateral',
+                    onPressed: widget.onToggleSidebar,
+                    color: tokens.terminalRed,
+                    icon: Icon(
+                      widget.sidebarVisible ? Icons.menu_open : Icons.menu,
+                    ),
+                  ),
+                  const SizedBox(width: TerminalSpace.xs),
+                ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

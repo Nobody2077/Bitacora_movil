@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **366/366**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **372/372**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -93,9 +93,20 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
    - **Al instalar, comprobar siempre la huella** (`sha256sum` del
      `base.apk` instalado frente a la APK local) antes de dar un paso por
      aprobado.
-6. **☰ Barra lateral que se desliza** (ADR-006 D13): en tablet alterna
-   expandida/oculta y se recuerda; en teléfono flota encima y se cierra al
-   tocar fuera o con «atrás». Preferencia, no esquema.
+6. ~~☰ Barra lateral~~ **Hecho y aprobado el 5 de octubre de 2026** (huella
+   de la `dev` instalada verificada). 372/372. Qué hay:
+   - `TerminalApplicationHeader` lleva el botón ☰ (`sidebar-toggle`) en la
+     tablet; `_RailShell` mete barra + divisor en un `AnimatedAlign`
+     (`sidebar-slot`, `widthFactor` 1 ↔ 0) que la desliza a la izquierda y
+     la oculta del todo, en horizontal y en vertical. Movimiento reducido:
+     sin deslizar.
+   - Se recuerda en `preference.sidebar_visible` (metadatos cifrados, sin
+     esquema): `shared/adaptive/sidebar_visibility.dart`
+     (`sidebarVisibleProvider`, `SidebarVisibilityStore`).
+   - Teléfono: `Drawer` (`sidebar-drawer`) con la misma barra; se cierra al
+     tocar fuera, con «atrás» o al elegir. `_ShellSidebar` es común a los dos
+     y abre los diálogos de perfil y salida con el contexto del shell.
+   - `app_smoke_test` sustituye la preferencia con un almacén en memoria.
 7. **Tema Vino** (D13) en Ajustes → Apariencia, además del Negro. Alto
    contraste fuerza Negro; movimiento reducido quita las líneas de barrido.
    Medir antes el contraste del texto rojo sobre vino.

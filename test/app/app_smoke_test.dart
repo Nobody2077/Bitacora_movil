@@ -25,6 +25,7 @@ import 'package:bitacora_rpg_personal/features/shop/application/shop_providers.d
 import 'package:bitacora_rpg_personal/features/shop/domain/models/wish.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/app_exit.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/immersive_mode_boundary.dart';
+import 'package:bitacora_rpg_personal/shared/adaptive/sidebar_visibility.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
 import 'package:bitacora_rpg_personal/shared/device/device_battery.dart';
 import 'package:bitacora_rpg_personal/shared/sound/ui_sound.dart';
@@ -60,6 +61,142 @@ void main() {
         tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
         1,
       );
+    });
+
+    testWidgets('☰ desliza la barra lateral de la tablet y lo recuerda', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 800));
+      final _MemorySidebarStore store = _MemorySidebarStore();
+      await tester.pumpWidget(
+        _testApp(initialLocation: AppRoutes.journal, sidebarStore: store),
+      );
+      await tester.pumpAndSettle();
+      final Finder slot = find.byKey(const ValueKey<String>('sidebar-slot'));
+      expect(tester.getSize(slot).width, greaterThan(200));
+      expect(find.byTooltip('Ocultar barra lateral'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('sidebar-toggle')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      final double sliding = tester.getSize(slot).width;
+      expect(sliding, greaterThan(0));
+      expect(sliding, lessThan(249));
+      await tester.pumpAndSettle();
+
+      expect(tester.getSize(slot).width, 0);
+      expect(find.byTooltip('Mostrar barra lateral'), findsOneWidget);
+      expect(store.visible, isFalse);
+      expect(store.writes, 1);
+
+      await tester.tap(find.byKey(const Key('sidebar-toggle')));
+      await tester.pumpAndSettle();
+      expect(tester.getSize(slot).width, greaterThan(200));
+      expect(store.visible, isTrue);
+    });
+
+    testWidgets('abre con la barra oculta si así se dejó', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 800));
+      await tester.pumpWidget(
+        _testApp(
+          initialLocation: AppRoutes.journal,
+          sidebarStore: _MemorySidebarStore(visible: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .getSize(find.byKey(const ValueKey<String>('sidebar-slot')))
+            .width,
+        0,
+      );
+      expect(find.byTooltip('Mostrar barra lateral'), findsOneWidget);
+    });
+
+    testWidgets('con movimiento reducido la barra cambia sin deslizarse', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(1280, 800));
+      await tester.pumpWidget(
+        _testApp(initialLocation: AppRoutes.journal, reduceMotion: true),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('sidebar-toggle')));
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        tester
+            .getSize(find.byKey(const ValueKey<String>('sidebar-slot')))
+            .width,
+        0,
+      );
+    });
+
+    testWidgets('☰ también oculta la barra estrecha de la tablet en vertical', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(700, 1000));
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.journal));
+      await tester.pumpAndSettle();
+      final Finder slot = find.byKey(const ValueKey<String>('sidebar-slot'));
+      expect(tester.getSize(slot).width, greaterThan(0));
+
+      await tester.tap(find.byKey(const Key('sidebar-toggle')));
+      await tester.pumpAndSettle();
+
+      expect(tester.getSize(slot).width, 0);
+    });
+
+    testWidgets('en teléfono ☰ abre la barra flotante y se cierra al elegir', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(412, 915));
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.home));
+      await tester.pumpAndSettle();
+      expect(find.byType(TerminalSidebar), findsNothing);
+
+      await tester.tap(find.byType(DrawerButton));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sidebar-drawer')), findsOneWidget);
+      expect(find.byType(TerminalSidebar), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const ValueKey<String>('sidebar-destination-Misiones')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('sidebar-drawer')), findsNothing);
+      expect(
+        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+        1,
+      );
+    });
+
+    testWidgets('en teléfono la barra flotante se cierra con «atrás»', (
+      WidgetTester tester,
+    ) async {
+      _ensureResumed(tester);
+      _setSurface(tester, const Size(412, 915));
+      await tester.pumpWidget(_testApp(initialLocation: AppRoutes.home));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DrawerButton));
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('sidebar-drawer')), findsNothing);
+      expect(find.byType(NavigationBar), findsOneWidget);
     });
 
     testWidgets('usa TerminalSidebar extendida en tablet', (
@@ -488,6 +625,8 @@ Widget _testApp({
   Future<void> Function()? onAppExit,
   ImmersiveModePreferenceStore? immersiveStore,
   List<bool>? immersiveApplied,
+  SidebarVisibilityStore? sidebarStore,
+  bool reduceMotion = false,
 }) => ProviderScope(
   overrides: [
     immersiveModePreferenceStoreProvider.overrideWithValue(
@@ -515,7 +654,9 @@ Widget _testApp({
       ),
     ),
     appPreferencesProvider.overrideWith(
-      (ref) => Stream<AppPreferences>.value(AppPreferences.defaults),
+      (ref) => Stream<AppPreferences>.value(
+        AppPreferences.defaults.copyWith(reduceMotion: reduceMotion),
+      ),
     ),
     todayMissionsProvider.overrideWith(
       (ref) => Stream<List<Mission>>.value(todayMissions),
@@ -552,6 +693,9 @@ Widget _testApp({
     ),
     journalRepositoryProvider.overrideWithValue(
       const _SmokeJournalRepository(),
+    ),
+    sidebarVisibilityStoreProvider.overrideWithValue(
+      sidebarStore ?? _MemorySidebarStore(),
     ),
     // El aviso de la Tienda vigila deseos y saldo en todo el shell.
     activeWishesProvider.overrideWith(
@@ -680,5 +824,21 @@ final class _SmokeJournalRepository implements JournalRepository {
 void _ensureResumed(WidgetTester tester) {
   if (tester.binding.lifecycleState != AppLifecycleState.resumed) {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+  }
+}
+
+final class _MemorySidebarStore implements SidebarVisibilityStore {
+  _MemorySidebarStore({this.visible = true});
+
+  bool visible;
+  int writes = 0;
+
+  @override
+  Future<bool> read() async => visible;
+
+  @override
+  Future<void> write(bool value) async {
+    writes++;
+    visible = value;
   }
 }

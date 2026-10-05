@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/router/app_routes.dart';
 import '../../app/theme/app_theme_tokens.dart';
+import '../../app/theme/terminal_foundations.dart';
 import '../../core/errors/app_failure.dart';
 import '../../core/result/result.dart';
 import '../../features/access/application/access_session_controller.dart';
@@ -21,6 +22,7 @@ import '../device/device_battery.dart';
 import '../sound/ui_sound.dart';
 import 'app_breakpoints.dart';
 import 'app_exit.dart';
+import 'sidebar_visibility.dart';
 import 'terminal_application_header.dart';
 import 'terminal_sidebar.dart';
 
@@ -70,6 +72,21 @@ class _CompactShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
     appBar: AppBar(title: Text(_sectionTitle(location))),
+    // ☰ abre la barra lateral completa flotando encima; se cierra tocando
+    // fuera, con «atrás» o al elegir una sección (ADR-006 D13).
+    drawer: Drawer(
+      key: const Key('sidebar-drawer'),
+      width: 249,
+      child: Builder(
+        builder: (BuildContext drawerContext) => _ShellSidebar(
+          location: location,
+          navigationShell: navigationShell,
+          extended: true,
+          beforeNavigate: () => Navigator.of(drawerContext).pop(),
+          hostContext: context,
+        ),
+      ),
+    ),
     body: Column(
       children: <Widget>[
         Expanded(child: navigationShell),
@@ -127,6 +144,91 @@ class _RailShell extends ConsumerWidget {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
+    final bool sidebarVisible = ref.watch(sidebarVisibleProvider);
+
+    return Scaffold(
+      body: Row(
+        children: <Widget>[
+          // ☰ la desliza hacia la izquierda hasta ocultarla del todo
+          // (ADR-006 D13); con movimiento reducido cambia sin animar.
+          ClipRect(
+            child: AnimatedAlign(
+              key: const ValueKey<String>('sidebar-slot'),
+              alignment: Alignment.centerRight,
+              widthFactor: sidebarVisible ? 1 : 0,
+              duration: TerminalMotion.resolve(
+                context,
+                TerminalMotion.deliberate,
+              ),
+              curve: Curves.easeOutCubic,
+              child: IgnorePointer(
+                ignoring: !sidebarVisible,
+                child: ExcludeSemantics(
+                  excluding: !sidebarVisible,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      _ShellSidebar(
+                        location: location,
+                        navigationShell: navigationShell,
+                        extended: extended,
+                      ),
+                      VerticalDivider(
+                        key: const ValueKey<String>('sidebar-content-divider'),
+                        width: 1,
+                        color: tokens.structuralRed,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                TerminalApplicationHeader(
+                  location: location,
+                  sidebarVisible: sidebarVisible,
+                  onToggleSidebar: () =>
+                      ref.read(sidebarVisibleProvider.notifier).toggle(),
+                ),
+                Expanded(child: navigationShell),
+                const _GlobalActiveTimerBar(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// La barra lateral con sus datos, para el shell de tablet y para la barra
+/// flotante del teléfono.
+class _ShellSidebar extends ConsumerWidget {
+  const _ShellSidebar({
+    required this.location,
+    required this.navigationShell,
+    required this.extended,
+    this.beforeNavigate,
+    this.hostContext,
+  });
+
+  final String location;
+  final StatefulNavigationShell navigationShell;
+  final bool extended;
+
+  /// Cierra la barra flotante antes de navegar o abrir un diálogo.
+  final VoidCallback? beforeNavigate;
+
+  /// Contexto que sigue montado al cerrarse la barra flotante, para los
+  /// diálogos de perfil y de salida.
+  final BuildContext? hostContext;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final BuildContext dialogHost = hostContext ?? context;
     final UserProfile profile =
         ref.watch(userProfileProvider).value ??
         const UserProfile.localDefault();
@@ -147,52 +249,37 @@ class _RailShell extends ConsumerWidget {
         ? ref.watch(deviceBatteryLevelProvider).value
         : null;
 
-    return Scaffold(
-      body: Row(
-        children: <Widget>[
-          TerminalSidebar(
-            selectedIndex: _railIndex(location),
-            extended: extended,
-            displayName: profile.displayName,
-            avatarPath: profile.avatarPath,
-            globalLevel: overallProgress?.rpgLevel,
-            missionVitals: missionVitals,
-            batteryLevel: batteryLevel,
-            onProfilePressed: () => showDialog<void>(
-              context: context,
-              builder: (BuildContext context) =>
-                  UserProfileEditDialog(initialProfile: profile),
-            ),
-            onExit: () => unawaited(_confirmExit(context, ref)),
-            onSelected: (int index) {
-              if (index != _railIndex(location)) {
-                unawaited(
-                  ref.read(uiSoundServiceProvider).play(UiSound.navigation),
-                );
-              }
-              final int branch = _railBranches[index];
-              navigationShell.goBranch(
-                branch,
-                initialLocation: branch == navigationShell.currentIndex,
-              );
-            },
-          ),
-          VerticalDivider(
-            key: const ValueKey<String>('sidebar-content-divider'),
-            width: 1,
-            color: tokens.structuralRed,
-          ),
-          Expanded(
-            child: Column(
-              children: <Widget>[
-                TerminalApplicationHeader(location: location),
-                Expanded(child: navigationShell),
-                const _GlobalActiveTimerBar(),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return TerminalSidebar(
+      selectedIndex: _railIndex(location),
+      extended: extended,
+      displayName: profile.displayName,
+      avatarPath: profile.avatarPath,
+      globalLevel: overallProgress?.rpgLevel,
+      missionVitals: missionVitals,
+      batteryLevel: batteryLevel,
+      onProfilePressed: () {
+        beforeNavigate?.call();
+        showDialog<void>(
+          context: dialogHost,
+          builder: (BuildContext context) =>
+              UserProfileEditDialog(initialProfile: profile),
+        );
+      },
+      onExit: () {
+        beforeNavigate?.call();
+        unawaited(_confirmExit(dialogHost, ref));
+      },
+      onSelected: (int index) {
+        beforeNavigate?.call();
+        if (index != _railIndex(location)) {
+          unawaited(ref.read(uiSoundServiceProvider).play(UiSound.navigation));
+        }
+        final int branch = _railBranches[index];
+        navigationShell.goBranch(
+          branch,
+          initialLocation: branch == navigationShell.currentIndex,
+        );
+      },
     );
   }
 }
