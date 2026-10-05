@@ -3,19 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
+import '../../../shared/adaptive/shell_chrome.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
 import '../../contacts/application/contact_providers.dart';
 import '../../contacts/presentation/contact_pages.dart';
-import '../../economy/application/economy_providers.dart';
-import '../../economy/domain/models/economy_snapshot.dart';
-import '../../economy/presentation/economy_presentation_support.dart';
 import '../../journal/presentation/journal_timeline_page.dart';
 import '../../missions/application/mission_providers.dart';
 import '../../missions/domain/models/mission.dart';
 import '../../progress/application/progress_providers.dart';
 import '../../progress/domain/models/progress_models.dart';
 import '../../progress/domain/models/rpg_level.dart';
-import '../../shop/application/shop_providers.dart';
+import '../../shop/presentation/animated_balance.dart';
 import '../../shop/presentation/shop_pages.dart';
 import 'character_hexagon.dart';
 
@@ -106,11 +104,12 @@ class _MenuHeader extends ConsumerWidget {
       context,
     ).extension<AppThemeTokens>()!;
     final RpgLevel? level = ref.watch(overallProgressProvider).value?.rpgLevel;
-    final EconomySnapshot? economy = ref.watch(economySnapshotProvider).value;
 
     final Widget stats = Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        // ☰ de la barra lateral: esta cabecera sustituye a la de la app.
+        const SidebarToggleButton(),
         _HeaderStat(
           key: const Key('character-level'),
           value: level == null ? '--' : '${level.level}',
@@ -128,9 +127,18 @@ class _MenuHeader extends ConsumerWidget {
         ),
       ],
     );
-    final Widget money = Tooltip(
-      message: 'Saldo disponible de Economía',
-      child: _AnimatedBalance(availableMinor: economy?.availableMinor),
+    final Widget money = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const HeaderClock(),
+        const SizedBox(width: TerminalSpace.sm),
+        const HeaderSeparator(),
+        const SizedBox(width: TerminalSpace.sm),
+        Tooltip(
+          message: 'Saldo disponible de Economía',
+          child: const AnimatedBalance(),
+        ),
+      ],
     );
     final Widget tabs = _TabStrip(selected: selected, onSelected: onSelected);
 
@@ -186,120 +194,6 @@ class _MenuHeader extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// Saldo de la cabecera. Tras una compra de la Tienda baja cifra a cifra en
-/// naranja y sale «− Bs X» flotando (ADR-006 D12); con movimiento reducido
-/// cambia sin animar y con importes ocultos sigue tapado.
-class _AnimatedBalance extends ConsumerStatefulWidget {
-  const _AnimatedBalance({required this.availableMinor});
-
-  final int? availableMinor;
-
-  @override
-  ConsumerState<_AnimatedBalance> createState() => _AnimatedBalanceState();
-}
-
-class _AnimatedBalanceState extends ConsumerState<_AnimatedBalance>
-    with SingleTickerProviderStateMixin {
-  static const Duration _duration = Duration(milliseconds: 1400);
-
-  late final AnimationController _controller;
-  PurchaseFeedback? _playing;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: _duration);
-    // Si la compra se hizo con el menú fuera de pantalla, se anima al volver.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _play());
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _play() {
-    if (!mounted) return;
-    final PurchaseFeedback? feedback = ref
-        .read(purchaseFeedbackProvider.notifier)
-        .take();
-    if (feedback == null || MediaQuery.disableAnimationsOf(context)) {
-      return;
-    }
-    setState(() => _playing = feedback);
-    _controller.forward(from: 0).whenComplete(() {
-      if (mounted) setState(() => _playing = null);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ref.listen<PurchaseFeedback?>(purchaseFeedbackProvider, (
-      PurchaseFeedback? previous,
-      PurchaseFeedback? next,
-    ) {
-      if (next != null) _play();
-    });
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    final int? available = widget.availableMinor;
-    final PurchaseFeedback? playing = _playing;
-    if (available == null) {
-      return _text('Bs --', tokens.valueYellow);
-    }
-    if (playing == null) {
-      return _text(economyMoney(context, available).trim(), tokens.valueYellow);
-    }
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (BuildContext context, Widget? child) {
-        final double t = Curves.easeOutCubic.transform(_controller.value);
-        final int shown =
-            playing.balanceBeforeMinor +
-            ((available - playing.balanceBeforeMinor) * t).round();
-        final double fade = 1 - Curves.easeIn.transform(_controller.value);
-        return Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.centerRight,
-          children: <Widget>[
-            _text(economyMoney(context, shown).trim(), tokens.attentionOrange),
-            Positioned(
-              right: 0,
-              top: -6 - 26 * _controller.value,
-              child: Opacity(
-                opacity: fade.clamp(0, 1),
-                child: Text(
-                  '− ${economyMoney(context, playing.amountMinor).trim()}',
-                  key: const Key('character-balance-spent'),
-                  style: TextStyle(
-                    color: tokens.attentionOrange,
-                    fontFamily: 'JetBrains Mono',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _text(String value, Color color) => Text(
-    value,
-    key: const Key('character-balance'),
-    style: TextStyle(
-      color: color,
-      fontFamily: 'JetBrains Mono',
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-    ),
-  );
 }
 
 class _HeaderStat extends StatelessWidget {

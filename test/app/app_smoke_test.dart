@@ -435,7 +435,15 @@ void main() {
           find.byKey(const ValueKey<String>('character-tab-personaje')),
           findsOneWidget,
         );
-        expect(find.text('DATOS LOCALES · PERSONAJE'), findsOneWidget);
+        // Personaje usa su propia cabecera: sin la barra de la app, pero con
+        // un solo ☰ y una sola hora.
+        final Finder appHeader = find.byKey(
+          const ValueKey<String>('application-header-divider'),
+        );
+        expect(appHeader, findsNothing);
+        expect(find.byKey(const Key('sidebar-toggle')), findsOneWidget);
+        expect(find.byKey(const Key('header-clock')), findsOneWidget);
+        expect(find.byKey(const Key('character-balance')), findsOneWidget);
 
         await tester.tap(
           find.byKey(const ValueKey<String>('sidebar-destination-Economía')),
@@ -445,13 +453,14 @@ void main() {
           find.byKey(const ValueKey<String>('character-tab-personaje')),
           findsNothing,
         );
-        expect(find.text('DATOS LOCALES · ECONOMÍA'), findsOneWidget);
+        expect(appHeader, findsOneWidget);
+        expect(find.byKey(const Key('sidebar-toggle')), findsOneWidget);
 
         await tester.tap(
           find.byKey(const ValueKey<String>('sidebar-destination-Ajustes')),
         );
         await tester.pump(const Duration(milliseconds: 500));
-        expect(find.text('DATOS LOCALES · AJUSTES'), findsOneWidget);
+        expect(appHeader, findsOneWidget);
       },
     );
 

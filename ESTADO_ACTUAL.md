@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **405/405**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **408/408**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -124,6 +124,20 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
      texto ≥ 4,5:1 sobre negro, vino y panel sobre vino.
    - El hexágono y el cronómetro de misión activa dejaron el blanco fijo.
    - La pantalla del PIN sigue en negro y blanco (decisión del usuario).
+7b. ~~Cabecera más limpia~~ **Hecho y aprobado el 5 de octubre de 2026**
+   (fuera del ADR, pedido por el usuario; maqueta privada «Cabecera de
+   Bitácora», opción B + Personaje «FIJO»). 408/408. Qué hay:
+   - `TerminalApplicationHeader` es una franja fina: ☰ a la izquierda,
+     `HeaderClock` (24 h) y `AnimatedBalance` a la derecha. Se quitaron
+     «BITÁCORA RPG PERSONAL», «Datos locales · …», «Terminal local» y la
+     fecha.
+   - En `/character` (el menú) el shell no pone esa franja: la cabecera de
+     Personaje lleva el ☰ antes del nivel y la hora junto al saldo. El
+     nivel solo sale en Personaje.
+   - `shared/adaptive/shell_chrome.dart`: `ShellChrome` (el shell ofrece el
+     ☰), `SidebarToggleButton`, `HeaderClock`, `HeaderSeparator`. El saldo
+     animado pasó a `shop/presentation/animated_balance.dart`.
+   - Teléfono sin cambios.
 8. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
    aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
    Después, fusionar la rama en `main`.

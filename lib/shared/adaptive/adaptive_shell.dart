@@ -23,6 +23,7 @@ import '../device/device_battery.dart';
 import '../sound/ui_sound.dart';
 import 'app_breakpoints.dart';
 import 'app_exit.dart';
+import 'shell_chrome.dart';
 import 'sidebar_visibility.dart';
 import 'terminal_application_header.dart';
 import 'terminal_sidebar.dart';
@@ -191,17 +192,19 @@ class _RailShell extends ConsumerWidget {
           ),
           Expanded(
             child: TerminalBackdrop(
-              child: Column(
-                children: <Widget>[
-                  TerminalApplicationHeader(
-                    location: location,
-                    sidebarVisible: sidebarVisible,
-                    onToggleSidebar: () =>
-                        ref.read(sidebarVisibleProvider.notifier).toggle(),
-                  ),
-                  Expanded(child: navigationShell),
-                  const _GlobalActiveTimerBar(),
-                ],
+              child: ShellChrome(
+                sidebarVisible: sidebarVisible,
+                onToggleSidebar: () =>
+                    ref.read(sidebarVisibleProvider.notifier).toggle(),
+                child: Column(
+                  children: <Widget>[
+                    // El menú Personaje lleva su propia cabecera, con el ☰.
+                    if (location != AppRoutes.character)
+                      const TerminalApplicationHeader(),
+                    Expanded(child: navigationShell),
+                    const _GlobalActiveTimerBar(),
+                  ],
+                ),
               ),
             ),
           ),
