@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/router/app_routes.dart';
 import '../../app/theme/app_theme_tokens.dart';
+import '../../app/theme/terminal_backdrop.dart';
 import '../../app/theme/terminal_foundations.dart';
 import '../../core/errors/app_failure.dart';
 import '../../core/result/result.dart';
@@ -71,6 +72,7 @@ class _CompactShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
+    backgroundColor: Colors.black,
     appBar: AppBar(title: Text(_sectionTitle(location))),
     // ☰ abre la barra lateral completa flotando encima; se cierra tocando
     // fuera, con «atrás» o al elegir una sección (ADR-006 D13).
@@ -87,11 +89,13 @@ class _CompactShell extends ConsumerWidget {
         ),
       ),
     ),
-    body: Column(
-      children: <Widget>[
-        Expanded(child: navigationShell),
-        const _GlobalActiveTimerBar(),
-      ],
+    body: TerminalBackdrop(
+      child: Column(
+        children: <Widget>[
+          Expanded(child: navigationShell),
+          const _GlobalActiveTimerBar(),
+        ],
+      ),
     ),
     bottomNavigationBar: NavigationBar(
       selectedIndex: _compactIndex(location),
@@ -147,6 +151,7 @@ class _RailShell extends ConsumerWidget {
     final bool sidebarVisible = ref.watch(sidebarVisibleProvider);
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Row(
         children: <Widget>[
           // ☰ la desliza hacia la izquierda hasta ocultarla del todo
@@ -185,17 +190,19 @@ class _RailShell extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: Column(
-              children: <Widget>[
-                TerminalApplicationHeader(
-                  location: location,
-                  sidebarVisible: sidebarVisible,
-                  onToggleSidebar: () =>
-                      ref.read(sidebarVisibleProvider.notifier).toggle(),
-                ),
-                Expanded(child: navigationShell),
-                const _GlobalActiveTimerBar(),
-              ],
+            child: TerminalBackdrop(
+              child: Column(
+                children: <Widget>[
+                  TerminalApplicationHeader(
+                    location: location,
+                    sidebarVisible: sidebarVisible,
+                    onToggleSidebar: () =>
+                        ref.read(sidebarVisibleProvider.notifier).toggle(),
+                  ),
+                  Expanded(child: navigationShell),
+                  const _GlobalActiveTimerBar(),
+                ],
+              ),
             ),
           ),
         ],

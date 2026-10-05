@@ -135,7 +135,7 @@ class _MenuHeader extends ConsumerWidget {
     final Widget tabs = _TabStrip(selected: selected, onSelected: onSelected);
 
     return Material(
-      color: tokens.background,
+      type: MaterialType.transparency,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           TerminalSpace.lg,
@@ -568,6 +568,7 @@ class _AreasHexagon extends StatelessWidget {
           structuralRed: tokens.structuralRed,
           yellow: tokens.valueYellow,
           track: tokens.surfaceHigh,
+          text: tokens.textPrimary,
         ),
         if (areas.length > CharacterHexagon.maxAreas)
           Text(

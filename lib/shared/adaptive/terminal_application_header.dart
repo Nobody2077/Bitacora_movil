@@ -56,7 +56,7 @@ class _TerminalApplicationHeaderState extends State<TerminalApplicationHeader> {
       context,
     ).extension<AppThemeTokens>()!;
     return Material(
-      color: tokens.background,
+      type: MaterialType.transparency,
       child: Column(
         children: <Widget>[
           Padding(

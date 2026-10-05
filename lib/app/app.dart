@@ -33,7 +33,11 @@ class BitacoraApp extends ConsumerWidget {
       locale: const Locale('es'),
       supportedLocales: const <Locale>[Locale('es')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: AppTheme.dark(highContrast: uiPreferences.highContrast),
+      theme: AppTheme.dark(
+        highContrast: uiPreferences.highContrast,
+        wine: preferences.wineBackground,
+        cyanText: preferences.cyanText,
+      ),
       routerConfig: router,
       builder: (context, child) => AppUiPreferencesBoundary(
         preferences: uiPreferences,

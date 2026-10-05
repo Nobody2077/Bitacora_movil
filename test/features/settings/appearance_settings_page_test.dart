@@ -31,6 +31,8 @@ void main() {
     expect(find.byKey(const Key('access-accent-red')), findsOneWidget);
     expect(find.byKey(const Key('access-accent-gray')), findsOneWidget);
 
+    await tester.ensureVisible(find.byKey(const Key('high-contrast-switch')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('high-contrast-switch')));
     await tester.pumpAndSettle();
 
@@ -42,6 +44,46 @@ void main() {
           .value,
       isTrue,
     );
+  });
+
+  testWidgets('guarda fondo Vino y texto Cian', (WidgetTester tester) async {
+    final _FakeSettingsRepository repository = _FakeSettingsRepository();
+    addTearDown(repository.dispose);
+    await _pumpAppearance(tester, repository: repository);
+
+    await tester.tap(find.byKey(const Key('theme-background-wine')));
+    await tester.pumpAndSettle();
+    expect(repository.current.themeKey, AppPreferences.wineThemeKey);
+    expect(repository.current.wineBackground, isTrue);
+
+    await tester.tap(find.byKey(const Key('theme-text-cyan')));
+    await tester.pumpAndSettle();
+    expect(repository.current.cyanText, isTrue);
+
+    await tester.tap(find.byKey(const Key('theme-background-black')));
+    await tester.pumpAndSettle();
+    expect(repository.current.themeKey, AppPreferences.blackThemeKey);
+    expect(repository.saveCount, 3);
+  });
+
+  testWidgets('con alto contraste el tema no se puede cambiar y lo dice', (
+    WidgetTester tester,
+  ) async {
+    final _FakeSettingsRepository repository = _FakeSettingsRepository();
+    addTearDown(repository.dispose);
+    await _pumpAppearance(tester, repository: repository);
+    await tester.ensureVisible(find.byKey(const Key('high-contrast-switch')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('high-contrast-switch')));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('theme-background-wine')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('theme-high-contrast-note')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('theme-background-wine')));
+    await tester.pumpAndSettle();
+    expect(repository.current.wineBackground, isFalse);
+    expect(repository.saveCount, 1);
   });
 
   testWidgets('persiste amarillo para el acceso previo a la base cifrada', (

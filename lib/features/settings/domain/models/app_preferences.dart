@@ -22,10 +22,16 @@ final class AppPreferences {
       'preference.show_notification_details';
   static const String allowCameraAttachmentsMetadataKey =
       'preference.allow_camera_attachments';
+  static const String textColorMetadataKey = 'preference.text_color';
+
+  /// Fondo de Apariencia (ADR-006 D13), guardado en `theme_key`.
+  static const String blackThemeKey = 'terminal_reinforced';
+  static const String wineThemeKey = 'terminal_wine';
   static const Set<String> metadataKeys = <String>{
     allowScreenshotsMetadataKey,
     showNotificationDetailsMetadataKey,
     allowCameraAttachmentsMetadataKey,
+    textColorMetadataKey,
   };
 
   static const Set<int> supportedAutoLockMinutes = <int>{0, 1, 5, 15};
@@ -34,7 +40,7 @@ final class AppPreferences {
       .toSet();
 
   static final AppPreferences defaults = AppPreferences(
-    themeKey: 'terminal_reinforced',
+    themeKey: blackThemeKey,
     primaryColorHex: '#FF3B3B',
     largeText: false,
     reduceMotion: false,
@@ -64,6 +70,7 @@ final class AppPreferences {
     this.allowScreenshots = false,
     this.showNotificationDetails = false,
     this.allowCameraAttachments = false,
+    this.cyanText = false,
     required this.updatedAtUtc,
   });
 
@@ -80,7 +87,12 @@ final class AppPreferences {
   final bool allowScreenshots;
   final bool showNotificationDetails;
   final bool allowCameraAttachments;
+
+  /// Texto principal en el cian de los títulos en vez de blanco (D13).
+  final bool cyanText;
   final DateTime updatedAtUtc;
+
+  bool get wineBackground => themeKey == wineThemeKey;
 
   AppPreferences copyWith({
     String? themeKey,
@@ -96,6 +108,7 @@ final class AppPreferences {
     bool? allowScreenshots,
     bool? showNotificationDetails,
     bool? allowCameraAttachments,
+    bool? cyanText,
     DateTime? updatedAtUtc,
   }) => AppPreferences(
     themeKey: themeKey ?? this.themeKey,
@@ -113,6 +126,7 @@ final class AppPreferences {
         showNotificationDetails ?? this.showNotificationDetails,
     allowCameraAttachments:
         allowCameraAttachments ?? this.allowCameraAttachments,
+    cyanText: cyanText ?? this.cyanText,
     updatedAtUtc: updatedAtUtc ?? this.updatedAtUtc,
   );
 }

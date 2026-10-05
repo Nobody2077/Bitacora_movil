@@ -119,6 +119,31 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     textDisabled: textDisabled ?? this.textDisabled,
   );
 
+  /// Paneles del tema Vino: negro al 55 %, como en la maqueta, para que el
+  /// degradado se vea detrás.
+  static const Color winePanel = Color(0x8C000000);
+
+  /// Tokens según Apariencia (ADR-006 D13). Alto contraste manda: fuerza
+  /// fondo negro y texto blanco. «Cian» cambia solo el texto principal; los
+  /// grises secundarios y los colores con significado no se tocan.
+  static AppThemeTokens resolve({
+    bool highContrast = false,
+    bool wine = false,
+    bool cyanText = false,
+  }) {
+    if (highContrast) {
+      return terminalHighContrast;
+    }
+    AppThemeTokens tokens = terminal;
+    if (wine) {
+      tokens = tokens.copyWith(surfaceLow: winePanel, surfaceHigh: winePanel);
+    }
+    if (cyanText) {
+      tokens = tokens.copyWith(textPrimary: tokens.infoCyan);
+    }
+    return tokens;
+  }
+
   @override
   AppThemeTokens lerp(AppThemeTokens? other, double t) {
     if (other is! AppThemeTokens) {

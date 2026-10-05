@@ -29,6 +29,7 @@ class CharacterHexagon extends StatelessWidget {
     required this.yellow,
     required this.track,
     super.key,
+    this.text = Colors.white,
   });
 
   /// Más de ocho no caben con un tamaño legible.
@@ -41,6 +42,9 @@ class CharacterHexagon extends StatelessWidget {
   final Color structuralRed;
   final Color yellow;
   final Color track;
+
+  /// Números de nivel; sigue el color del texto elegido en Apariencia.
+  final Color text;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +65,7 @@ class CharacterHexagon extends StatelessWidget {
               structuralRed: structuralRed,
               yellow: yellow,
               track: track,
+              text: text,
             ),
           ),
         ),
@@ -78,6 +83,7 @@ class _HexagonPainter extends CustomPainter {
     required this.structuralRed,
     required this.yellow,
     required this.track,
+    required this.text,
   });
 
   final int globalLevel;
@@ -87,6 +93,7 @@ class _HexagonPainter extends CustomPainter {
   final Color structuralRed;
   final Color yellow;
   final Color track;
+  final Color text;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -129,13 +136,7 @@ class _HexagonPainter extends CustomPainter {
         ..strokeWidth = 2
         ..style = PaintingStyle.stroke,
     );
-    _text(
-      canvas,
-      '$globalLevel',
-      center + const Offset(0, -6),
-      46,
-      Colors.white,
-    );
+    _text(canvas, '$globalLevel', center + const Offset(0, -6), 46, text);
     _text(canvas, 'NIVEL', center + const Offset(0, 26), 15, cyan);
 
     final Paint areaFill = Paint()
@@ -165,7 +166,7 @@ class _HexagonPainter extends CustomPainter {
         '${area.level}',
         position + Offset(0, radius * 0.15),
         dense ? 24 : 30,
-        Colors.white,
+        text,
       );
       final double barWidth = radius * 1.1;
       final Rect bar = Rect.fromLTWH(
@@ -243,7 +244,9 @@ class _HexagonPainter extends CustomPainter {
       !_sameAreas(old.areas, areas) ||
       old.cyan != cyan ||
       old.red != red ||
-      old.yellow != yellow;
+      old.yellow != yellow ||
+      old.track != track ||
+      old.text != text;
 
   static bool _sameAreas(List<HexagonArea> a, List<HexagonArea> b) {
     for (int i = 0; i < a.length; i++) {

@@ -252,12 +252,159 @@ class _AppearanceSettingsPageState
           ),
         ),
         const SizedBox(height: TerminalSpace.lg),
+        _ThemeOptions(
+          preferences: preferences,
+          enabled: !saving && !preferences.highContrast,
+          onBackgroundChanged: (bool wine) => _save(
+            'themeKey',
+            preferences.copyWith(
+              themeKey: wine
+                  ? AppPreferences.wineThemeKey
+                  : AppPreferences.blackThemeKey,
+            ),
+          ),
+          onTextChanged: (bool cyan) =>
+              _save('cyanText', preferences.copyWith(cyanText: cyan)),
+        ),
+        const SizedBox(height: TerminalSpace.lg),
         content,
         const SizedBox(height: TerminalSpace.md),
         immersiveCard,
       ],
     );
   }
+}
+
+/// Fondo Negro/Vino y texto Blanco/Cian (ADR-006 D13). Alto contraste las
+/// anula y lo dice.
+class _ThemeOptions extends StatelessWidget {
+  const _ThemeOptions({
+    required this.preferences,
+    required this.enabled,
+    required this.onBackgroundChanged,
+    required this.onTextChanged,
+  });
+
+  final AppPreferences preferences;
+  final bool enabled;
+  final ValueChanged<bool> onBackgroundChanged;
+  final ValueChanged<bool> onTextChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return TerminalPanel(
+      padding: const EdgeInsets.all(TerminalSpace.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const TerminalSectionTitle(
+            title: 'Tema',
+            description:
+                'Fondo de las pantallas y color de las letras y números '
+                'principales.',
+          ),
+          const SizedBox(height: TerminalSpace.md),
+          _ThemeChoice<bool>(
+            label: 'Fondo',
+            selected: preferences.wineBackground,
+            enabled: enabled,
+            onChanged: onBackgroundChanged,
+            options: const <(bool, String, String)>[
+              (false, 'Negro', 'theme-background-black'),
+              (true, 'Vino', 'theme-background-wine'),
+            ],
+          ),
+          const SizedBox(height: TerminalSpace.sm),
+          _ThemeChoice<bool>(
+            label: 'Color del texto',
+            selected: preferences.cyanText,
+            enabled: enabled,
+            onChanged: onTextChanged,
+            options: const <(bool, String, String)>[
+              (false, 'Blanco', 'theme-text-white'),
+              (true, 'Cian', 'theme-text-cyan'),
+            ],
+          ),
+          if (preferences.highContrast) ...<Widget>[
+            const SizedBox(height: TerminalSpace.sm),
+            Text(
+              'Con alto contraste se usan siempre fondo negro y texto '
+              'blanco.',
+              key: const Key('theme-high-contrast-note'),
+              style: TextStyle(color: tokens.textSecondary, fontSize: 13),
+            ),
+          ] else if (preferences.wineBackground) ...<Widget>[
+            const SizedBox(height: TerminalSpace.sm),
+            Text(
+              'Vino añade un degradado y líneas de barrido; con movimiento '
+              'reducido, las líneas desaparecen.',
+              style: TextStyle(color: tokens.textSecondary, fontSize: 13),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ThemeChoice<T> extends StatelessWidget {
+  const _ThemeChoice({
+    required this.label,
+    required this.selected,
+    required this.enabled,
+    required this.onChanged,
+    required this.options,
+  });
+
+  final String label;
+  final T selected;
+  final bool enabled;
+  final ValueChanged<T> onChanged;
+
+  /// Valor, texto visible y clave de cada opción.
+  final List<(T, String, String)> options;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: TerminalSpace.md,
+    runSpacing: TerminalSpace.xs,
+    crossAxisAlignment: WrapCrossAlignment.center,
+    children: <Widget>[
+      SizedBox(width: 150, child: Text(label)),
+      SegmentedButton<T>(
+        showSelectedIcon: false,
+        // Lo elegido va en cian, como las pestañas y los modos de la app.
+        style: SegmentedButton.styleFrom(
+          foregroundColor: Theme.of(
+            context,
+          ).extension<AppThemeTokens>()!.textSecondary,
+          selectedForegroundColor: Theme.of(
+            context,
+          ).extension<AppThemeTokens>()!.infoCyan,
+          selectedBackgroundColor: Theme.of(
+            context,
+          ).extension<AppThemeTokens>()!.infoCyan.withValues(alpha: 0.15),
+          side: BorderSide(
+            color: Theme.of(context).extension<AppThemeTokens>()!.border,
+          ),
+        ),
+        segments: <ButtonSegment<T>>[
+          for (final (T value, String text, String key) in options)
+            ButtonSegment<T>(
+              value: value,
+              label: Text(text, key: Key(key)),
+            ),
+        ],
+        selected: <T>{selected},
+        onSelectionChanged: enabled
+            ? (Set<T> values) => onChanged(values.single)
+            : null,
+      ),
+    ],
+  );
 }
 
 class _AccessAccentSelector extends StatelessWidget {

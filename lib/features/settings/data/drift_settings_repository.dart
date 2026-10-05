@@ -81,6 +81,9 @@ final class DriftSettingsRepository implements SettingsRepository {
           AppPreferences.allowCameraAttachmentsMetadataKey: _encodeBool(
             preferences.allowCameraAttachments,
           ),
+          AppPreferences.textColorMetadataKey: preferences.cyanText
+              ? 'cyan'
+              : 'white',
         },
         updatedAtUtcMs: preferences.updatedAtUtc.millisecondsSinceEpoch,
       );
@@ -110,6 +113,7 @@ final class DriftSettingsRepository implements SettingsRepository {
       allowCameraAttachments: _decodeBool(
         values[AppPreferences.allowCameraAttachmentsMetadataKey],
       ),
+      cyanText: values[AppPreferences.textColorMetadataKey] == 'cyan',
     );
   }
 

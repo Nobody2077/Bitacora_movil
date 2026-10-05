@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **372/372**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **405/405**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -107,9 +107,23 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
      tocar fuera, con «atrás» o al elegir. `_ShellSidebar` es común a los dos
      y abre los diálogos de perfil y salida con el contexto del shell.
    - `app_smoke_test` sustituye la preferencia con un almacén en memoria.
-7. **Tema Vino** (D13) en Ajustes → Apariencia, además del Negro. Alto
-   contraste fuerza Negro; movimiento reducido quita las líneas de barrido.
-   Medir antes el contraste del texto rojo sobre vino.
+7. ~~Tema Vino~~ **Hecho y aprobado el 5 de octubre de 2026** (huella
+   verificada; «está muy genial»), con el **color del texto** que pidió el
+   usuario. 405/405. Qué hay:
+   - Apariencia → «Tema»: **Fondo Negro/Vino** (en `theme_key`:
+     `terminal_reinforced` / `terminal_wine`, sin esquema) y **Texto
+     Blanco/Cian** (`preference.text_color`). Alto contraste fuerza Negro y
+     Blanco y lo dice.
+   - `AppThemeTokens.resolve(highContrast, wine, cyanText)`: Cian cambia
+     solo `textPrimary` a `infoCyan`; Vino deja `surfaceLow/High` en negro
+     al 55 %. Menús, hojas y diálogos siempre opacos (`surfaceOverlay`).
+   - `app/theme/terminal_backdrop.dart`: el shell pinta el degradado
+     `#2A0E12 → #0A0405 → negro` y las líneas de barrido (no con movimiento
+     reducido); en Vino `scaffoldBackgroundColor` es transparente.
+   - Contraste medido en `test/app/theme/theme_options_test.dart`: todo
+     texto ≥ 4,5:1 sobre negro, vino y panel sobre vino.
+   - El hexágono y el cronómetro de misión activa dejaron el blanco fijo.
+   - La pantalla del PIN sigue en negro y blanco (decisión del usuario).
 8. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
    aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
    Después, fusionar la rama en `main`.

@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 
 import 'app_theme_tokens.dart';
+import 'terminal_backdrop.dart';
 import 'terminal_foundations.dart';
 
 abstract final class AppTheme {
-  static ThemeData dark({bool highContrast = false}) {
-    final AppThemeTokens tokens = highContrast
-        ? AppThemeTokens.terminalHighContrast
-        : AppThemeTokens.terminal;
+  /// [wine] y [cyanText] vienen de Apariencia (ADR-006 D13); alto contraste
+  /// los anula.
+  static ThemeData dark({
+    bool highContrast = false,
+    bool wine = false,
+    bool cyanText = false,
+  }) {
+    final AppThemeTokens tokens = AppThemeTokens.resolve(
+      highContrast: highContrast,
+      wine: wine,
+      cyanText: cyanText,
+    );
+    final bool wineBackdrop = wine && !highContrast;
     final ColorScheme colors = ColorScheme.dark(
       primary: tokens.infoCyan,
       onPrimary: tokens.background,
@@ -15,7 +25,8 @@ abstract final class AppTheme {
       onSecondary: tokens.textPrimary,
       tertiary: tokens.valueYellow,
       onTertiary: tokens.background,
-      surface: tokens.surfaceLow,
+      // Menús, hojas y diálogos siempre opacos, también en Vino.
+      surface: tokens.surfaceOverlay,
       onSurface: tokens.textPrimary,
       error: tokens.attentionOrange,
       onError: tokens.background,
@@ -25,7 +36,10 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: colors,
-      scaffoldBackgroundColor: tokens.background,
+      // En Vino, las páginas dejan ver el degradado que pinta el shell.
+      scaffoldBackgroundColor: wineBackdrop
+          ? Colors.transparent
+          : tokens.background,
       visualDensity: VisualDensity.standard,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       splashFactory: InkSparkle.splashFactory,
@@ -61,7 +75,10 @@ abstract final class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
-      extensions: <ThemeExtension<dynamic>>[tokens],
+      extensions: <ThemeExtension<dynamic>>[
+        tokens,
+        TerminalBackdropTheme(wine: wineBackdrop),
+      ],
       focusColor: tokens.borderFocused,
       dividerColor: tokens.border,
       appBarTheme: AppBarTheme(
@@ -135,8 +152,12 @@ abstract final class AppTheme {
           ),
         ),
       ),
+      drawerTheme: DrawerThemeData(backgroundColor: tokens.surfaceOverlay),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: tokens.surfaceOverlay,
+      ),
       dialogTheme: DialogThemeData(
-        backgroundColor: tokens.surfaceHigh,
+        backgroundColor: tokens.surfaceOverlay,
         shape: RoundedRectangleBorder(
           side: BorderSide(color: tokens.border),
           borderRadius: BorderRadius.circular(TerminalRadius.control),

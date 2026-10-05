@@ -232,7 +232,7 @@ class _TimerPanel extends StatelessWidget {
             missionDurationLabel(elapsedSeconds),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              color: active ? tokens.progressGreen : Colors.white,
+              color: active ? tokens.progressGreen : tokens.textPrimary,
               fontFamily: 'JetBrains Mono',
               fontWeight: FontWeight.w700,
               letterSpacing: 2,
