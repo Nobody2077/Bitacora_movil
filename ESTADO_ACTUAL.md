@@ -1,14 +1,17 @@
 # Estado actual y guía de relevo
 
 - Última revisión: **5 de octubre de 2026**
-- Versión en `pubspec.yaml`: **`1.7.0+14`** (fase 1 de ADR-006), firmada y
-  **aprobada en la tablet con datos reales** el 3 de octubre de 2026
+- Versión en `pubspec.yaml`: **`1.8.0+15`** (fase 2 de ADR-006), release
+  firmada **instalada en la tablet encima de `1.7.0+14`** el 5 de octubre de
+  2026 a las 03:16 (`firstInstallTime` intacto). **Falta que el usuario
+  confirme «datos bien».**
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
-- Rama base: `main`, abierta en el worktree
-  `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
-  rama nueva
-- Pruebas: **425/425**, `flutter analyze` limpio (rama `feat/v4-fase2`)
-- **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
+- Rama de trabajo: `feat/v4-fase2` (todo subido, último `624366c`), en la
+  carpeta principal `G:\Desarrollo\Proyectos\Bicacora_movil`. `main` sigue en
+  el worktree `G:\Desarrollo\Proyectos\bitacora-main-v3` y **aún no tiene la
+  fase 2**
+- Pruebas: **425/425**, `flutter analyze` limpio, preflight A8 verde
+- **Siguiente: cerrar la fase 2** (ver «▶ EMPEZAR AQUÍ → Para mañana»)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
 continúe sin reconstruir la historia. La historia (cada sesión, relevos viejos,
@@ -18,6 +21,28 @@ contradice esto, manda esto.
 ---
 
 ## ▶ EMPEZAR AQUÍ
+
+### Para mañana (escrito el 5 de octubre de 2026, de madrugada)
+
+1. **Preguntar al usuario si sus datos están bien en la `1.8.0`** (misiones,
+   movimientos, entradas, personajes). Comprobar con `adb` que sigue
+   `versionName=1.8.0`.
+2. Con su «datos bien»: en el worktree de `main`
+   (`bitacora-main-v3`), `git fetch` y **avance rápido de `main` a
+   `origin/feat/v4-fase2`**, `git push`. Anotar el cierre en el CHANGELOG
+   («aprobada en la tablet») y en `documentos/HISTORIAL-SESIONES.md`.
+3. **Respaldo de la llave de firma: SIGUE SIN HACER.** El usuario va a
+   conseguir un **pendrive**: cuando diga «pendrive conectado», copiar
+   `C:\Users\Usuario\.android\bitacora-rpg-release.jks` y
+   `G:\Desarrollo\Proyectos\Bicacora_movil\android\signing.properties` a
+   `<pendrive>\Bitacora-llave\` y comparar `sha256sum` de cada copia con el
+   original. Sin zip ni contraseña (es físico). 7-Zip quedó instalado el 5 de
+   octubre por si algún día quiere también copia en la nube (al comando que
+   intentó le faltaba el `&` inicial en PowerShell).
+4. Después: hablar con el usuario de la **fase 3** (Proyectos y Reputación,
+   ADR-006 D11/D14) antes de empezar nada; se revisa como se hizo con la 2.
+
+### Fase 2, paso a paso (cerrada en `dev` y en la prod)
 
 **Fase 2 de ADR-006: Tienda (lista de deseos), rehecha el 4 de octubre por
 D17.** Ciberware, Inventario y Creación quedan fuera. Cada paso empieza con
@@ -172,9 +197,12 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
    archivado); códigos decorativos `TRN_PJ_XXXXXX` (`contactDossierCode`).
    Solo lo que hay. **Sin «Aparece en»** (decisión del usuario: no es del
    juego). Teléfono: foto arriba, panel debajo.
-11. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
-   aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
-   Después, fusionar la rama en `main`.
+11. **Versión `1.8.0+15`**: preflight A8 verde; release firmada con la misma
+   llave que la instalada (certificado SHA-256 `a6092c6c…d116b8`), sin
+   `INTERNET`, APK `df285412…fcb34a`; **instalada encima de `1.7.0` el 5 de
+   octubre de 2026** desde Descargas (APK ya borrada). El usuario pidió
+   instalarla **sin esperar al respaldo** de la llave. Pendiente: su «datos
+   bien» y fusionar en `main`.
 
 Referencias: `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md` (es la spec
 de la fase; no reabrir sus decisiones) y la maqueta privada «Bitácora ·

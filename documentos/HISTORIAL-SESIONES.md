@@ -17,6 +17,28 @@ Registro cronológico y detallado de cada sesión de trabajo. Entrada nueva
 arriba. Sirve para retomar el hilo cuando se pierde el contexto de una sesión:
 qué se tocó, qué se decidió, qué quedó abierto.
 
+### 2026-10-04/05 — Fase 2 de ADR-006 completa y `1.8.0+15` en la tablet
+
+- `ESTADO_ACTUAL.md` adelgazado (2059 → ~300 líneas); la historia vino aquí.
+- **D17**: fuera Ciberware, Inventario y Creación; la fase 2 pasa a ser la
+  **Tienda = lista de deseos** (área de vida + tipo, color según saldo,
+  comprar = gasto en Economía, avisos «ya puedes comprarlo»). Esquema **v5**
+  (`area_id` en `inventory_items`), ensayado en `dev` con datos.
+- Además, pedidos por el usuario: ☰ barra lateral deslizable, tema **Vino**
+  y texto **Cian**, cabecera limpia (☰ + hora + saldo), **D18** (fuera MAPA y
+  «Bitácora» del lateral), **Diario** y **ficha de personaje** al estilo del
+  juego (maquetas privadas «Cabecera de Bitácora», «Diario de Bitácora» y
+  «Ficha de personaje»; referencia: captura del juego de Claire Russell).
+- Cada paso con mini-spec aprobada, pruebas, `dev` en la tablet y commit.
+  Lección: una vez el usuario aprobó sin haber instalado la APK; desde
+  entonces se compara la **huella** del `base.apk` instalado antes de
+  aceptar.
+- `1.8.0+15`: preflight A8 verde, release con la misma llave, instalada
+  encima de `1.7.0` en la prod (03:16). **Pendiente**: «datos bien» del
+  usuario, fusionar en `main` y el **respaldo de la llave** (pendrive).
+  7-Zip instalado (winget) para un posible respaldo en la nube.
+- 425/425 pruebas.
+
 ### 2026-10-03 — Fase 1 de ADR-006 terminada: `1.7.0+14` en la tablet y en `main`
 
 **Qué pidió el usuario.** Retomar la fase 1 donde quedó (ensayo de migración
