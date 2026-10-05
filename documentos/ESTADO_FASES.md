@@ -59,8 +59,9 @@ la migración v3 → v4 se hará sin ella con el riesgo aceptado por el usuario.
 | 4 | **Personaje, Contactos, Inventario y Tienda** | ADR-006 con decisiones de producto resueltas el 24 de septiembre de 2026; falta el esquema | Es post-MVP: no se abre antes de 1 y 3 |
 | 5 | **Copia de seguridad** (antes A6) | Decidido el 24 de septiembre de 2026 que va al final | Último bloque del post-MVP |
 
-Los cinco pasos del recorrido pendiente están en `ESTADO_ACTUAL.md`, sección
-«RELEVO», y el punto de partida de Personajes/Tienda/Inventario también.
+El recorrido de `1.4.0+8` y los relevos antiguos están en
+`documentos/HISTORIAL-SESIONES.md`, parte 2. El punto de partida vigente está
+en `ESTADO_ACTUAL.md`, «▶ EMPEZAR AQUÍ».
 
 ## Evidencia G3 — A3 completada
 
