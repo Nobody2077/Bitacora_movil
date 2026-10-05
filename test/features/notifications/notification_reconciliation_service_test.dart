@@ -421,6 +421,71 @@ void main() {
         'Hoy tienes 8 misiones.',
       );
     });
+
+    test('añade los deseos a tu alcance, solo como número', () {
+      expect(
+        NotificationReconciliationService.dailySummaryText(
+          3,
+          affordableWishes: 0,
+        ),
+        'Hoy tienes 3 misiones.',
+      );
+      expect(
+        NotificationReconciliationService.dailySummaryText(
+          0,
+          affordableWishes: 1,
+        ),
+        'Hoy no tienes misiones programadas. 1 deseo a tu alcance.',
+      );
+      expect(
+        NotificationReconciliationService.dailySummaryText(
+          1,
+          affordableWishes: 2,
+        ),
+        'Hoy tienes 1 misión. 2 deseos a tu alcance.',
+      );
+    });
+
+    test('el resumen programado incluye los deseos a tu alcance', () async {
+      await enableSummary(minutes: 6 * 60);
+      final NotificationReconciliationService withWishes =
+          NotificationReconciliationService(
+            notificationDao: notificationDao,
+            settingsDao: settingsDao,
+            reminderPreferencesRepository: reminderPreferencesRepository,
+            platform: platform,
+            nowUtc: () =>
+                DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
+            affordableWishCount: () async => 2,
+          );
+
+      await withWishes.reconcile();
+
+      final MissionNotificationRequest summary = platform.scheduledRequests
+          .singleWhere((r) => r.kind == MissionNotificationKind.dailySummary);
+      expect(summary.contentText, endsWith(' 2 deseos a tu alcance.'));
+    });
+
+    test('si contar deseos falla, el resumen de misiones sigue', () async {
+      await enableSummary(minutes: 6 * 60);
+      final NotificationReconciliationService failing =
+          NotificationReconciliationService(
+            notificationDao: notificationDao,
+            settingsDao: settingsDao,
+            reminderPreferencesRepository: reminderPreferencesRepository,
+            platform: platform,
+            nowUtc: () =>
+                DateTime.fromMillisecondsSinceEpoch(_nowMs, isUtc: true),
+            affordableWishCount: () async => throw StateError('sin base'),
+          );
+
+      final report = await failing.reconcile();
+
+      expect(report.dailySummaryScheduled, isTrue);
+      final MissionNotificationRequest summary = platform.scheduledRequests
+          .singleWhere((r) => r.kind == MissionNotificationKind.dailySummary);
+      expect(summary.contentText, isNot(contains('deseo')));
+    });
   });
   group('texto del aviso', () {
     test(

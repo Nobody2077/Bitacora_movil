@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **356/356**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **366/366**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -75,9 +75,24 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
      a `_AnimatedBalance` de la cabecera, que baja cifra a cifra en naranja
      con «− Bs X» flotando al volver a la Tienda; con movimiento reducido no
      anima.
-5. **Avisos:** mensaje en la app cuando un movimiento deja un deseo al
-   alcance y línea «N deseos a tu alcance» en el resumen diario (respeta
-   «mostrar detalles»).
+5. ~~Avisos~~ **Hecho y aprobado el 5 de octubre de 2026** («funciona
+   bien» tras verificar por huella que la `dev` instalada era la nueva: la
+   primera vez el usuario aprobó sin haberla instalado). 366/366. Qué hay:
+   - `WishAffordabilityWatcher` envuelve el shell protegido en
+     `app_router.dart`: cuando un deseo con precio **pasa** de «faltan» a
+     «te alcanza» saca «Ya puedes comprar: …» con «Ver» (abre la Tienda).
+     No avisa al abrir la app, ni de un deseo nuevo que ya alcanza, ni
+     repite. Si cambia el conjunto alcanzable, recalcula el resumen
+     (`dailySummaryRefresherProvider` → `reconcile()`).
+   - Resumen diario: `dailySummaryText(missions, affordableWishes:)` añade
+     «N deseo(s) a tu alcance», **siempre** (decisión del usuario), solo el
+     número. El recuento sale de `WishDao.countAffordable` contra el saldo
+     disponible; si falla, el resumen de misiones sigue igual.
+   - `app_smoke_test` sustituye deseos y saldo porque el vigilante vive en
+     todo el shell.
+   - **Al instalar, comprobar siempre la huella** (`sha256sum` del
+     `base.apk` instalado frente a la APK local) antes de dar un paso por
+     aprobado.
 6. **☰ Barra lateral que se desliza** (ADR-006 D13): en tablet alterna
    expandida/oculta y se recuerda; en teléfono flota encima y se cierra al
    tocar fuera o con «atrás». Preferencia, no esquema.

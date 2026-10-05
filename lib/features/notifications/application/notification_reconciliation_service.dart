@@ -42,11 +42,13 @@ final class NotificationReconciliationService {
     required ReminderPreferencesRepository reminderPreferencesRepository,
     required MissionNotificationPlatform platform,
     required DateTime Function() nowUtc,
+    Future<int> Function()? affordableWishCount,
   }) : _notificationDao = notificationDao,
        _settingsDao = settingsDao,
        _reminderPreferencesRepository = reminderPreferencesRepository,
        _platform = platform,
-       _nowUtc = nowUtc;
+       _nowUtc = nowUtc,
+       _affordableWishCount = affordableWishCount;
 
   /// Identificador de sistema fijo para el resumen diario.
   ///
@@ -59,6 +61,10 @@ final class NotificationReconciliationService {
   final ReminderPreferencesRepository _reminderPreferencesRepository;
   final MissionNotificationPlatform _platform;
   final DateTime Function() _nowUtc;
+
+  /// Deseos de la Tienda que el saldo ya alcanza (ADR-006 D17). Nulo en las
+  /// pruebas que no lo necesitan: cuenta como cero.
+  final Future<int> Function()? _affordableWishCount;
 
   /// Identificador del resumen de un día civil concreto.
   ///
@@ -305,6 +311,12 @@ final class NotificationReconciliationService {
       fromUtcMs: dayStartLocal.toUtc().millisecondsSinceEpoch,
       toUtcMs: dayEndLocal.toUtc().millisecondsSinceEpoch,
     );
+    int affordableWishes = 0;
+    try {
+      affordableWishes = await _affordableWishCount?.call() ?? 0;
+    } on Object {
+      // El resumen de misiones no depende de la Tienda.
+    }
     final String scheduleId = dailySummaryScheduleId(occurrenceUtcMs);
     final bool soundEnabled =
         settings.soundEnabled != 0 &&
@@ -315,7 +327,10 @@ final class NotificationReconciliationService {
         notifyAtUtcMs: occurrenceUtcMs,
         soundEnabled: soundEnabled,
         showDetails: false,
-        contentText: dailySummaryText(missions),
+        contentText: dailySummaryText(
+          missions,
+          affordableWishes: affordableWishes,
+        ),
         systemNotificationId: dailySummarySystemNotificationId,
         kind: MissionNotificationKind.dailySummary,
       ),
@@ -333,11 +348,20 @@ final class NotificationReconciliationService {
     return true;
   }
 
-  static String dailySummaryText(int missions) => switch (missions) {
-    <= 0 => 'Hoy no tienes misiones programadas.',
-    1 => 'Hoy tienes 1 misión.',
-    _ => 'Hoy tienes $missions misiones.',
-  };
+  /// Solo números: nunca títulos, nombres de deseos ni importes.
+  static String dailySummaryText(int missions, {int affordableWishes = 0}) {
+    final String missionText = switch (missions) {
+      <= 0 => 'Hoy no tienes misiones programadas.',
+      1 => 'Hoy tienes 1 misión.',
+      _ => 'Hoy tienes $missions misiones.',
+    };
+    final String wishText = switch (affordableWishes) {
+      <= 0 => '',
+      1 => ' 1 deseo a tu alcance.',
+      _ => ' $affordableWishes deseos a tu alcance.',
+    };
+    return '$missionText$wishText';
+  }
 
   Future<void> _cancelDailySummary() async {
     try {

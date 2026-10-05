@@ -4,6 +4,7 @@ import '../../../app/providers/persistence_providers.dart';
 import '../../../core/result/result.dart';
 import '../../economy/application/economy_providers.dart';
 import '../domain/models/wish.dart';
+import '../domain/models/wish_affordability.dart';
 import 'shop_application_service.dart';
 
 final Provider<ShopApplicationService> shopApplicationServiceProvider =
@@ -43,6 +44,30 @@ final wishProvider = StreamProvider.family<Wish?, String>(
   (Ref ref, String id) =>
       ref.watch(wishRepositoryProvider).watchById(id).map(_unwrap<Wish?>),
 );
+
+/// Para cada deseo activo **con precio**, su nombre y si el saldo disponible
+/// ya lo alcanza. Nulo mientras falte la lista o el saldo.
+final Provider<Map<String, ({String name, bool affordable})>?>
+wishAffordabilityProvider =
+    Provider<Map<String, ({String name, bool affordable})>?>((Ref ref) {
+      final List<Wish>? wishes = ref.watch(activeWishesProvider).value;
+      final int? available = ref
+          .watch(economySnapshotProvider)
+          .value
+          ?.availableMinor;
+      if (wishes == null || available == null) return null;
+      return <String, ({String name, bool affordable})>{
+        for (final Wish wish in wishes)
+          if (wish.priceMinor != null)
+            wish.id: (
+              name: wish.name,
+              affordable: WishAffordability.evaluate(
+                priceMinor: wish.priceMinor,
+                availableMinor: available,
+              ).isAffordable,
+            ),
+      };
+    });
 
 /// Una compra recién hecha, para que la cabecera del menú anime el saldo
 /// bajando en naranja (ADR-006 D12) cuando vuelva a verse.

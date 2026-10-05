@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/access/application/access_session_controller.dart';
 import '../../features/access/application/access_session_state.dart';
 import '../../features/access/presentation/protected_route_gate.dart';
+import '../../features/shop/presentation/wish_affordability_watcher.dart';
 import '../../shared/adaptive/adaptive_shell.dart';
 import '../../shared/widgets/feature_placeholder_page.dart';
 import '../config/app_environment.dart';
@@ -36,9 +37,11 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
       ..._routesFor(ref, const <AppArea>{AppArea.access}),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => ProtectedRouteGate(
-          builder: (context) => AdaptiveShell(
-            location: state.uri.path,
-            navigationShell: navigationShell,
+          builder: (context) => WishAffordabilityWatcher(
+            child: AdaptiveShell(
+              location: state.uri.path,
+              navigationShell: navigationShell,
+            ),
           ),
         ),
         branches: <StatefulShellBranch>[

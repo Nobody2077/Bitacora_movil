@@ -276,8 +276,10 @@ reminderPreferencesRepositoryProvider = Provider<ReminderPreferencesRepository>(
 
 final Provider<NotificationReconciliationService>
 notificationReconciliationServiceProvider =
-    Provider<NotificationReconciliationService>(
-      (Ref ref) => NotificationReconciliationService(
+    Provider<NotificationReconciliationService>((Ref ref) {
+      final EconomyDao economyDao = ref.watch(economyDaoProvider);
+      final WishDao wishDao = ref.watch(wishDaoProvider);
+      return NotificationReconciliationService(
         notificationDao: ref.watch(notificationDaoProvider),
         settingsDao: ref.watch(settingsDaoProvider),
         reminderPreferencesRepository: ref.watch(
@@ -285,8 +287,15 @@ notificationReconciliationServiceProvider =
         ),
         platform: ref.watch(missionNotificationPlatformProvider),
         nowUtc: () => DateTime.now().toUtc(),
-      ),
-    );
+        // ADR-006 D17: «N deseos a tu alcance» en el resumen diario.
+        affordableWishCount: () async {
+          final EconomyBalance balance = await economyDao.loadBalance();
+          return wishDao.countAffordable(
+            balance.totalMinor - balance.reservedMinor,
+          );
+        },
+      );
+    });
 
 final Provider<EconomyDao> economyDaoProvider = Provider<EconomyDao>(
   (Ref ref) => EconomyDao(ref.watch(appDatabaseProvider)),

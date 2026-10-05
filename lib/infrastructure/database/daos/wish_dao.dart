@@ -78,6 +78,24 @@ final class WishDao {
         .watch();
   }
 
+  /// Deseos activos con precio que el saldo disponible ya alcanza, para el
+  /// resumen diario (ADR-006 D17). Las metas vinculadas no cuentan.
+  Future<int> countAffordable(int availableMinor) async {
+    final Expression<int> count = _database.inventoryItems.id.count();
+    final TypedResult row =
+        await (_database.selectOnly(_database.inventoryItems)
+              ..addColumns(<Expression<Object>>[count])
+              ..where(
+                _database.inventoryItems.status.equals(wishedStatus) &
+                    _database.inventoryItems.archivedAt.isNull() &
+                    _database.inventoryItems.wishPriceMinor.isNotNull() &
+                    _database.inventoryItems.wishPriceMinor
+                        .isSmallerOrEqualValue(availableMinor),
+              ))
+            .getSingle();
+    return row.read(count) ?? 0;
+  }
+
   /// Inserta un deseo con un id generado por el cliente.
   ///
   /// Repetir la misma inserción es idempotente y devuelve la fila existente

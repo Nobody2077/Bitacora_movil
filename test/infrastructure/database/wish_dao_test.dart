@@ -119,6 +119,29 @@ void main() {
       expect(restored.archivedAt, isNull);
       expect(await wishes.watchArchived().first, isEmpty);
     });
+
+    test('cuenta solo los activos con precio que el saldo alcanza', () async {
+      await wishes.insertWish(_wish('justo', price: 40000));
+      await wishes.insertWish(_wish('barato', price: 1000));
+      await wishes.insertWish(_wish('caro', price: 40001));
+      await wishes.insertWish(_wish('sin-precio', price: null));
+      await wishes.insertWish(_wish('archivado', price: 500));
+      await wishes.archiveWish(
+        wishId: 'archivado',
+        expectedRowVersion: 1,
+        archivedAtUtcMs: _now + 1,
+      );
+      await wishes.insertWish(_wish('comprado', price: 500));
+      await wishes.purchaseWish(
+        wishId: 'comprado',
+        expectedRowVersion: 1,
+        expense: _expense('op-1', amountMinor: 500),
+      );
+
+      expect(await wishes.countAffordable(40000), 2);
+      expect(await wishes.countAffordable(999), 0);
+      expect(await wishes.countAffordable(-5), 0);
+    });
   });
 
   group('comprar', () {
@@ -253,6 +276,7 @@ InventoryItemsCompanion _wish(
   String id, {
   String name = 'Silla ergonómica',
   String priority = 'MEDIUM',
+  int? price = 40000,
 }) => InventoryItemsCompanion.insert(
   id: id,
   name: name,
@@ -262,7 +286,7 @@ InventoryItemsCompanion _wish(
   status: 'WISHED',
   areaId: const Value<String?>(DefaultSeedV1.homeAreaId),
   wishPriority: Value<String?>(priority),
-  wishPriceMinor: const Value<int?>(40000),
+  wishPriceMinor: Value<int?>(price),
   createdAt: _now,
   updatedAt: _now,
 );

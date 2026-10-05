@@ -8,6 +8,8 @@ import 'package:bitacora_rpg_personal/app/theme/immersive_mode_preference_store.
 import 'package:bitacora_rpg_personal/core/result/result.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_controller.dart';
 import 'package:bitacora_rpg_personal/features/access/application/access_session_state.dart';
+import 'package:bitacora_rpg_personal/features/economy/application/economy_providers.dart';
+import 'package:bitacora_rpg_personal/features/economy/domain/models/economy_snapshot.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_entry.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/models/journal_photo.dart';
 import 'package:bitacora_rpg_personal/features/journal/domain/repositories/journal_repository.dart';
@@ -19,6 +21,8 @@ import 'package:bitacora_rpg_personal/features/progress/application/progress_pro
 import 'package:bitacora_rpg_personal/features/progress/domain/models/progress_models.dart';
 import 'package:bitacora_rpg_personal/features/progress/domain/models/rpg_level.dart';
 import 'package:bitacora_rpg_personal/features/settings/domain/models/app_preferences.dart';
+import 'package:bitacora_rpg_personal/features/shop/application/shop_providers.dart';
+import 'package:bitacora_rpg_personal/features/shop/domain/models/wish.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/app_exit.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/immersive_mode_boundary.dart';
 import 'package:bitacora_rpg_personal/shared/adaptive/terminal_sidebar.dart';
@@ -548,6 +552,22 @@ Widget _testApp({
     ),
     journalRepositoryProvider.overrideWithValue(
       const _SmokeJournalRepository(),
+    ),
+    // El aviso de la Tienda vigila deseos y saldo en todo el shell.
+    activeWishesProvider.overrideWith(
+      (ref) => Stream<List<Wish>>.value(const <Wish>[]),
+    ),
+    economySnapshotProvider.overrideWith(
+      (ref) => Stream<EconomySnapshot>.value(
+        const EconomySnapshot(
+          totalMinor: 0,
+          reservedMinor: 0,
+          monthIncomeMinor: 0,
+          monthExpenseMinor: 0,
+          dayIncomeMinor: 0,
+          dayExpenseMinor: 0,
+        ),
+      ),
     ),
   ],
   child: const BitacoraApp(),
