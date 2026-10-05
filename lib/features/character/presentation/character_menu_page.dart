@@ -15,12 +15,14 @@ import '../../missions/domain/models/mission.dart';
 import '../../progress/application/progress_providers.dart';
 import '../../progress/domain/models/progress_models.dart';
 import '../../progress/domain/models/rpg_level.dart';
+import '../../shop/application/shop_providers.dart';
+import '../../shop/presentation/shop_pages.dart';
 import 'character_hexagon.dart';
 
-/// Pestañas del menú tipo juego, en el orden de ADR-006 D6.
+/// Pestañas del menú tipo juego (ADR-006 D6). TIENDA ocupa desde D17 el sitio
+/// de CIBERWARE e INVENTARIO, retiradas.
 enum CharacterTab {
-  ciberware('ciberware', 'Ciberware'),
-  inventario('inventario', 'Inventario'),
+  tienda('tienda', 'Tienda'),
   mapa('mapa', 'Mapa'),
   personaje('personaje', 'Personaje'),
   diario('diario', 'Diario');
@@ -38,9 +40,8 @@ enum CharacterTab {
       );
 }
 
-/// Menú Personaje (ADR-006 D6): cabecera con nivel, reputación y saldo, y las
-/// cinco pestañas. CIBERWARE e INVENTARIO llegan en la fase 2 y MAPA está
-/// aplazado.
+/// Menú Personaje (ADR-006 D6 y D17): cabecera con nivel, reputación y saldo,
+/// y las pestañas TIENDA, MAPA (aplazado), PERSONAJE y DIARIO.
 class CharacterMenuPage extends ConsumerStatefulWidget {
   const CharacterMenuPage({
     super.key,
@@ -81,20 +82,7 @@ class _CharacterMenuPageState extends ConsumerState<CharacterMenuPage> {
           child: KeyedSubtree(
             key: ValueKey<CharacterTab>(_tab),
             child: switch (_tab) {
-              CharacterTab.ciberware => const _LaterPhase(
-                title: 'Ciberware',
-                description:
-                    'La tecnología que llevas, por zona del cuerpo, sobre tu '
-                    'silueta de escáner. Llega en la fase 2.',
-                icon: Icons.memory,
-              ),
-              CharacterTab.inventario => const _LaterPhase(
-                title: 'Inventario',
-                description:
-                    'Tu ropa por zona, la mochila, la lista de deseos y la '
-                    'creación. Llega en la fase 2.',
-                icon: Icons.backpack_outlined,
-              ),
+              CharacterTab.tienda => const ShopSection(),
               CharacterTab.mapa => const _MapPostponed(),
               CharacterTab.personaje => const _CharacterSheet(),
               CharacterTab.diario => const _DiaryView(),
@@ -142,18 +130,7 @@ class _MenuHeader extends ConsumerWidget {
     );
     final Widget money = Tooltip(
       message: 'Saldo disponible de Economía',
-      child: Text(
-        economy == null
-            ? 'Bs --'
-            : economyMoney(context, economy.availableMinor).trim(),
-        key: const Key('character-balance'),
-        style: TextStyle(
-          color: tokens.valueYellow,
-          fontFamily: 'JetBrains Mono',
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
+      child: _AnimatedBalance(availableMinor: economy?.availableMinor),
     );
     final Widget tabs = _TabStrip(selected: selected, onSelected: onSelected);
 
@@ -209,6 +186,120 @@ class _MenuHeader extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Saldo de la cabecera. Tras una compra de la Tienda baja cifra a cifra en
+/// naranja y sale «− Bs X» flotando (ADR-006 D12); con movimiento reducido
+/// cambia sin animar y con importes ocultos sigue tapado.
+class _AnimatedBalance extends ConsumerStatefulWidget {
+  const _AnimatedBalance({required this.availableMinor});
+
+  final int? availableMinor;
+
+  @override
+  ConsumerState<_AnimatedBalance> createState() => _AnimatedBalanceState();
+}
+
+class _AnimatedBalanceState extends ConsumerState<_AnimatedBalance>
+    with SingleTickerProviderStateMixin {
+  static const Duration _duration = Duration(milliseconds: 1400);
+
+  late final AnimationController _controller;
+  PurchaseFeedback? _playing;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: _duration);
+    // Si la compra se hizo con el menú fuera de pantalla, se anima al volver.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _play());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _play() {
+    if (!mounted) return;
+    final PurchaseFeedback? feedback = ref
+        .read(purchaseFeedbackProvider.notifier)
+        .take();
+    if (feedback == null || MediaQuery.disableAnimationsOf(context)) {
+      return;
+    }
+    setState(() => _playing = feedback);
+    _controller.forward(from: 0).whenComplete(() {
+      if (mounted) setState(() => _playing = null);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen<PurchaseFeedback?>(purchaseFeedbackProvider, (
+      PurchaseFeedback? previous,
+      PurchaseFeedback? next,
+    ) {
+      if (next != null) _play();
+    });
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final int? available = widget.availableMinor;
+    final PurchaseFeedback? playing = _playing;
+    if (available == null) {
+      return _text('Bs --', tokens.valueYellow);
+    }
+    if (playing == null) {
+      return _text(economyMoney(context, available).trim(), tokens.valueYellow);
+    }
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, Widget? child) {
+        final double t = Curves.easeOutCubic.transform(_controller.value);
+        final int shown =
+            playing.balanceBeforeMinor +
+            ((available - playing.balanceBeforeMinor) * t).round();
+        final double fade = 1 - Curves.easeIn.transform(_controller.value);
+        return Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.centerRight,
+          children: <Widget>[
+            _text(economyMoney(context, shown).trim(), tokens.attentionOrange),
+            Positioned(
+              right: 0,
+              top: -6 - 26 * _controller.value,
+              child: Opacity(
+                opacity: fade.clamp(0, 1),
+                child: Text(
+                  '− ${economyMoney(context, playing.amountMinor).trim()}',
+                  key: const Key('character-balance-spent'),
+                  style: TextStyle(
+                    color: tokens.attentionOrange,
+                    fontFamily: 'JetBrains Mono',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _text(String value, Color color) => Text(
+    value,
+    key: const Key('character-balance'),
+    style: TextStyle(
+      color: color,
+      fontFamily: 'JetBrains Mono',
+      fontSize: 22,
+      fontWeight: FontWeight.w700,
+    ),
+  );
 }
 
 class _HeaderStat extends StatelessWidget {
@@ -319,30 +410,6 @@ class _TabStrip extends StatelessWidget {
       ),
     );
   }
-}
-
-class _LaterPhase extends StatelessWidget {
-  const _LaterPhase({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  final String title;
-  final String description;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => ListView(
-    padding: TerminalSpace.pageTablet,
-    children: <Widget>[
-      TerminalEmptyState(
-        title: '$title · fase 2',
-        description: description,
-        icon: icon,
-      ),
-    ],
-  );
 }
 
 class _MapPostponed extends StatelessWidget {

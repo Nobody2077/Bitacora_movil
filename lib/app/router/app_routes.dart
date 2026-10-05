@@ -33,6 +33,7 @@ import '../../features/recurrences/presentation/recurrence_list_page.dart';
 import '../../features/settings/presentation/appearance_settings_page.dart';
 import '../../features/settings/presentation/more_page.dart';
 import '../../features/settings/presentation/sound_settings_page.dart';
+import '../../features/shop/presentation/shop_pages.dart';
 import 'app_route_contract.dart';
 
 abstract final class AppRoutes {
@@ -356,6 +357,33 @@ abstract final class AppRoutes {
         return contactId != null
             ? ContactDetailPage(contactId: contactId)
             : null;
+      },
+    ),
+    AppRouteContract(
+      name: 'wishNew',
+      path: '/character/shop/new',
+      title: 'Añadir deseo',
+      area: AppArea.character,
+      builder: (context, state) => const WishFormPage(),
+    ),
+    AppRouteContract(
+      name: 'wishEdit',
+      path: '/character/shop/:wishId/edit',
+      title: 'Editar deseo',
+      area: AppArea.character,
+      builder: (context, state) {
+        final String? wishId = state.pathParameters['wishId'];
+        return wishId != null ? WishFormPage(wishId: wishId) : null;
+      },
+    ),
+    AppRouteContract(
+      name: 'wishDetail',
+      path: '/character/shop/:wishId',
+      title: 'Deseo',
+      area: AppArea.character,
+      builder: (context, state) {
+        final String? wishId = state.pathParameters['wishId'];
+        return wishId != null ? WishDetailPage(wishId: wishId) : null;
       },
     ),
     AppRouteContract(

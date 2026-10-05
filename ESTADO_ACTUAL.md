@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **346/346**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **356/356**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -59,15 +59,34 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
      la traducción del gasto.
    - **Fuera de este paso:** anular el gasto en Economía no devuelve el
      deseo a la lista; `wish_goal_id` sin usar.
-4. **Pantallas:** pestaña TIENDA en el lugar de CIBERWARE e INVENTARIO
-   (retiradas), lista de deseos con icono de Material, área y color según el
-   saldo con su texto, ficha y formulario, botón Comprar y lista de
-   Comprados.
+4. ~~Pantallas + animación del saldo~~ **Hecho y aprobado el 5 de octubre
+   de 2026** («funciona bien», `dev` en la tablet desde Descargas). 356/356.
+   Qué hay:
+   - Pestañas **TIENDA · MAPA · PERSONAJE · DIARIO** (`CharacterTab.tienda`;
+     `?tab=ciberware|inventario` ya no existen y abren PERSONAJE).
+   - `features/shop/presentation/`: `ShopSection` (Deseos · Comprados ·
+     Archivados y «Añadir deseo»), `WishCard` (icono Material por tipo,
+     área, prioridad, precio y estado con color **y** texto; con importes
+     ocultos la cifra sale tapada), `WishDetailPage`, `WishFormPage` y la
+     ventana de compra (precio pagado y medio de pago).
+   - Rutas `wishNew` (`/character/shop/new`), `wishDetail` y `wishEdit`:
+     64 rutas.
+   - Animación del saldo (D12): `purchaseFeedbackProvider` lleva la compra
+     a `_AnimatedBalance` de la cabecera, que baja cifra a cifra en naranja
+     con «− Bs X» flotando al volver a la Tienda; con movimiento reducido no
+     anima.
 5. **Avisos:** mensaje en la app cuando un movimiento deja un deseo al
    alcance y línea «N deseos a tu alcance» en el resumen diario (respeta
    «mostrar detalles»).
-6. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
-   aprobación del usuario. Después, fusionar la rama en `main`.
+6. **☰ Barra lateral que se desliza** (ADR-006 D13): en tablet alterna
+   expandida/oculta y se recuerda; en teléfono flota encima y se cierra al
+   tocar fuera o con «atrás». Preferencia, no esquema.
+7. **Tema Vino** (D13) en Ajustes → Apariencia, además del Negro. Alto
+   contraste fuerza Negro; movimiento reducido quita las líneas de barrido.
+   Medir antes el contraste del texto rojo sobre vino.
+8. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
+   aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
+   Después, fusionar la rama en `main`.
 
 Referencias: `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md` (es la spec
 de la fase; no reabrir sus decisiones) y la maqueta privada «Bitácora ·

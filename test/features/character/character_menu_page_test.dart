@@ -52,9 +52,7 @@ void main() {
     );
   });
 
-  testWidgets('MAPA avisa que está aplazado y las fases 2 lo dicen', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('MAPA avisa que está aplazado', (WidgetTester tester) async {
     _tabletView(tester);
     await tester.pumpWidget(_app(_ContactRepository()));
     await tester.pumpAndSettle();
@@ -62,12 +60,6 @@ void main() {
     await tester.tap(find.byKey(const ValueKey<String>('character-tab-mapa')));
     await tester.pumpAndSettle();
     expect(find.text('MAPA · APLAZADO'), findsOneWidget);
-
-    await tester.tap(
-      find.byKey(const ValueKey<String>('character-tab-ciberware')),
-    );
-    await tester.pumpAndSettle();
-    expect(find.textContaining('fase 2'), findsWidgets);
   });
 
   testWidgets('DIARIO muestra los personajes y su contador', (

@@ -44,6 +44,41 @@ final wishProvider = StreamProvider.family<Wish?, String>(
       ref.watch(wishRepositoryProvider).watchById(id).map(_unwrap<Wish?>),
 );
 
+/// Una compra recién hecha, para que la cabecera del menú anime el saldo
+/// bajando en naranja (ADR-006 D12) cuando vuelva a verse.
+final class PurchaseFeedback {
+  const PurchaseFeedback({
+    required this.amountMinor,
+    required this.balanceBeforeMinor,
+  });
+
+  final int amountMinor;
+
+  /// Saldo disponible justo antes de comprar: el punto de partida de la
+  /// animación, aunque Economía aún no haya emitido el saldo nuevo.
+  final int balanceBeforeMinor;
+}
+
+final NotifierProvider<PurchaseFeedbackController, PurchaseFeedback?>
+purchaseFeedbackProvider =
+    NotifierProvider<PurchaseFeedbackController, PurchaseFeedback?>(
+      PurchaseFeedbackController.new,
+    );
+
+class PurchaseFeedbackController extends Notifier<PurchaseFeedback?> {
+  @override
+  PurchaseFeedback? build() => null;
+
+  void announce(PurchaseFeedback feedback) => state = feedback;
+
+  /// Entrega la compra pendiente una sola vez.
+  PurchaseFeedback? take() {
+    final PurchaseFeedback? pending = state;
+    state = null;
+    return pending;
+  }
+}
+
 T _unwrap<T>(Result<T> result) => result.fold(
   onSuccess: (T value) => value,
   onFailure: (failure) => throw failure,
