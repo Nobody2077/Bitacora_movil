@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **418/418**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **425/425**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -162,11 +162,16 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
      en rojo debajo**; nombres de personajes en rojo (solo en el Diario,
      `ContactThumbnailRow.nameColor`).
    - El texto de la entrada sigue en `textPrimary` (blanco o cian).
-10. **Personajes / ficha de personaje** al estilo del juego (captura de
-   referencia del usuario: Claire Russell): foto grande a la izquierda,
-   panel de borde rojo con nombre cian, rol pequeño, descripción en rojo,
-   iconos rojos y **códigos decorativos en las esquinas** (pedidos). Mini-spec
-   pendiente tras la maqueta.
+10. ~~Ficha de personaje~~ **Hecha y aprobada el 5 de octubre de 2026**
+   (maqueta privada «Ficha de personaje», referencia: Claire Russell del
+   juego; huella verificada). 425/425. `ContactDetailPage` en
+   `contacts/presentation/contact_pages.dart`: ocupa todo el contenido con
+   «◂ CERRAR»; foto grande (o inicial) con placa «PROTOCOLO…», panel de
+   borde rojo con nombre cian, rol amarillo, descripción roja e iconos rojos
+   (editar, cámara = cambiar/quitar foto, archivar; restaurar si está
+   archivado); códigos decorativos `TRN_PJ_XXXXXX` (`contactDossierCode`).
+   Solo lo que hay. **Sin «Aparece en»** (decisión del usuario: no es del
+   juego). Teléfono: foto arriba, panel debajo.
 11. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
    aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
    Después, fusionar la rama en `main`.

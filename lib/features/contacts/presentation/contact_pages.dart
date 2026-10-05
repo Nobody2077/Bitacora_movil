@@ -7,11 +7,7 @@ import '../../../app/theme/terminal_foundations.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/result/result.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
-import '../../journal/application/journal_providers.dart';
-import '../../journal/domain/models/journal_entry.dart';
 import '../../journal/presentation/journal_presentation_support.dart';
-import '../../missions/application/mission_providers.dart';
-import '../../missions/domain/models/mission.dart';
 import '../../photos/application/entity_photo_providers.dart';
 import '../../photos/domain/entity_photo.dart';
 import '../../photos/presentation/entity_photo_actions.dart';
@@ -119,11 +115,17 @@ class _ContactGrid extends StatelessWidget {
   );
 }
 
-/// Ficha de un personaje: foto, datos, misiones y entradas donde aparece.
+/// Ficha de un personaje al estilo del juego (paso 10 de la fase 2): foto
+/// grande a la izquierda y un panel de borde rojo con el nombre en cian, el
+/// rol en amarillo y la descripción en rojo. Ocupa todo el contenido y
+/// «CERRAR» vuelve a PERSONAJES. Solo se muestra lo que el personaje tiene.
 class ContactDetailPage extends ConsumerStatefulWidget {
   const ContactDetailPage({required this.contactId, super.key});
 
   final String contactId;
+
+  /// Desde este ancho, foto y panel van uno al lado del otro.
+  static const double sideBySideFrom = 760;
 
   @override
   ConsumerState<ContactDetailPage> createState() => _ContactDetailPageState();
@@ -161,9 +163,6 @@ class _ContactDetailPageState extends ConsumerState<ContactDetailPage> {
   }
 
   Widget _buildDossier(BuildContext context, Contact contact) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
     final bool hasPhoto =
         ref
             .watch(
@@ -174,145 +173,124 @@ class _ContactDetailPageState extends ConsumerState<ContactDetailPage> {
             )
             .value !=
         null;
-    final Widget photo = EntityPhotoAvatar(
-      owner: EntityPhotoOwner.contact,
-      ownerId: contact.id,
-      fallbackLabel: contact.displayName ?? '',
-      width: 240,
-      height: 320,
-      dimmed: contact.isArchived,
-    );
-    final Widget data = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        TerminalPageHeader(
-          title: contactName(contact),
-          subtitle: contact.role ?? 'Personaje del Diario',
-        ),
-        if (contact.isArchived) ...<Widget>[
-          const SizedBox(height: TerminalSpace.sm),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TerminalBadge(
-              label: 'Archivado',
-              color: tokens.attentionOrange,
-              icon: Icons.inventory_2_outlined,
-            ),
+    final String code = contactDossierCode(contact.id);
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final bool sideBySide =
+            constraints.maxWidth >= ContactDetailPage.sideBySideFrom;
+        final double photoWidth = sideBySide
+            ? 340
+            : (constraints.maxWidth - 32).clamp(0, 420).toDouble();
+        final Widget portrait = _DossierPortrait(
+          contact: contact,
+          code: code,
+          width: photoWidth,
+        );
+        final Widget panel = _DossierPanel(
+          contact: contact,
+          code: code,
+          hasPhoto: hasPhoto,
+          working: _working,
+          onEdit: () => context.pushNamed(
+            'contactEdit',
+            pathParameters: <String, String>{'contactId': contact.id},
           ),
-        ],
-        const SizedBox(height: TerminalSpace.md),
-        if (contact.description != null)
-          Text(
-            contact.description!,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5),
-          )
-        else
-          Text(
-            'Sin descripción.',
-            style: TextStyle(color: tokens.textSecondary),
+          onPhoto: () => _photo(contact, hasPhoto),
+          onArchive: () => _archive(contact),
+          onRestore: () => _restore(contact),
+        );
+        return SingleChildScrollView(
+          padding: sideBySide
+              ? const EdgeInsets.fromLTRB(48, 40, 48, 32)
+              : TerminalSpace.pageCompact,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              if (sideBySide)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    portrait,
+                    const SizedBox(width: 36),
+                    Expanded(child: panel),
+                  ],
+                )
+              else ...<Widget>[
+                Center(child: portrait),
+                const SizedBox(height: TerminalSpace.lg),
+                panel,
+              ],
+              const SizedBox(height: TerminalSpace.lg),
+              Align(
+                alignment: Alignment.centerRight,
+                child: _CloseButton(onPressed: _close),
+              ),
+            ],
           ),
-        const SizedBox(height: TerminalSpace.md),
-        Wrap(
-          spacing: TerminalSpace.sm,
-          runSpacing: TerminalSpace.sm,
-          children: <Widget>[
-            if (!contact.isArchived) ...<Widget>[
-              TerminalPrimaryButton(
-                key: const Key('contact-edit'),
-                label: 'Editar',
-                icon: Icons.edit_outlined,
-                onPressed: _working
-                    ? null
-                    : () => context.pushNamed(
-                        'contactEdit',
-                        pathParameters: <String, String>{
-                          'contactId': contact.id,
-                        },
-                      ),
-              ),
-              TerminalOutlineButton(
-                key: const Key('contact-photo'),
-                label: hasPhoto ? 'Cambiar foto' : 'Añadir foto',
-                icon: Icons.add_a_photo_outlined,
-                onPressed: _working ? null : () => _pickPhoto(contact),
-              ),
-              if (hasPhoto)
-                TerminalOutlineButton(
-                  key: const Key('contact-photo-remove'),
-                  label: 'Quitar foto',
-                  icon: Icons.hide_image_outlined,
-                  color: tokens.textSecondary,
-                  onPressed: _working ? null : () => _removePhoto(contact),
-                ),
-              TerminalOutlineButton(
-                key: const Key('contact-archive'),
-                label: 'Eliminar',
-                icon: Icons.inventory_2_outlined,
-                color: tokens.attentionOrange,
-                onPressed: _working ? null : () => _archive(contact),
-              ),
-            ] else
-              TerminalPrimaryButton(
-                key: const Key('contact-restore'),
-                label: 'Restaurar',
-                icon: Icons.unarchive_outlined,
-                onPressed: _working ? null : () => _restore(contact),
-              ),
-          ],
-        ),
-      ],
-    );
-
-    return JournalPageFrame(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) =>
-                constraints.maxWidth < 640
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Center(child: photo),
-                      const SizedBox(height: TerminalSpace.md),
-                      data,
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      photo,
-                      const SizedBox(width: TerminalSpace.lg),
-                      Expanded(child: data),
-                    ],
-                  ),
-          ),
-          const SizedBox(height: TerminalSpace.lg),
-          _LinkedMissions(contactId: contact.id),
-          const SizedBox(height: TerminalSpace.md),
-          _LinkedEntries(contactId: contact.id),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Future<void> _pickPhoto(Contact contact) => _busy(
-    () => pickEntityPhoto(
-      context,
-      ref,
-      owner: EntityPhotoOwner.contact,
-      ownerId: contact.id,
-    ),
-  );
+  void _close() => context.canPop()
+      ? context.pop()
+      : context.goNamed(
+          'character',
+          queryParameters: const <String, String>{'tab': 'diario'},
+        );
 
-  Future<void> _removePhoto(Contact contact) => _busy(
-    () => removeEntityPhoto(
-      context,
-      ref,
-      owner: EntityPhotoOwner.contact,
-      ownerId: contact.id,
-    ),
-  );
+  /// Sin foto, la elige; con foto, ofrece cambiarla o quitarla.
+  Future<void> _photo(Contact contact, bool hasPhoto) async {
+    if (!hasPhoto) {
+      await _busy(
+        () => pickEntityPhoto(
+          context,
+          ref,
+          owner: EntityPhotoOwner.contact,
+          ownerId: contact.id,
+        ),
+      );
+      return;
+    }
+    final bool? change = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              key: const Key('contact-photo-change'),
+              leading: const Icon(Icons.add_a_photo_outlined),
+              title: const Text('Cambiar foto'),
+              onTap: () => Navigator.of(sheetContext).pop(true),
+            ),
+            ListTile(
+              key: const Key('contact-photo-remove'),
+              leading: const Icon(Icons.hide_image_outlined),
+              title: const Text('Quitar foto'),
+              onTap: () => Navigator.of(sheetContext).pop(false),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (change == null || !mounted) return;
+    await _busy(
+      () => change
+          ? pickEntityPhoto(
+              context,
+              ref,
+              owner: EntityPhotoOwner.contact,
+              ownerId: contact.id,
+            )
+          : removeEntityPhoto(
+              context,
+              ref,
+              owner: EntityPhotoOwner.contact,
+              ownerId: contact.id,
+            ),
+    );
+  }
 
   Future<void> _busy(Future<void> Function() action) async {
     setState(() => _working = true);
@@ -388,87 +366,86 @@ class _ContactDetailPageState extends ConsumerState<ContactDetailPage> {
   }
 }
 
-class _LinkedMissions extends ConsumerWidget {
-  const _LinkedMissions({required this.contactId});
-
-  final String contactId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<String>> ids = ref.watch(
-      contactMissionIdsProvider(contactId),
-    );
-    return _LinkedSection(
-      title: 'Misiones',
-      emptyMessage: 'Todavía no aparece en ninguna misión.',
-      ids: ids,
-      itemBuilder: (String id) => _MissionLink(missionId: id),
-    );
-  }
+/// Código decorativo de la ficha, sacado del identificador del personaje:
+/// «PJ_4F2A91».
+String contactDossierCode(String id) {
+  final String compact = id.replaceAll(RegExp('[^A-Za-z0-9]'), '');
+  final String head = compact.length > 6 ? compact.substring(0, 6) : compact;
+  return 'PJ_${head.toUpperCase()}';
 }
 
-class _LinkedEntries extends ConsumerWidget {
-  const _LinkedEntries({required this.contactId});
+/// Texto pequeño de los códigos decorativos, en rojo apagado.
+TextStyle _codeStyle(AppThemeTokens tokens) => TextStyle(
+  color: tokens.terminalRed.withValues(alpha: 0.7),
+  fontFamily: 'JetBrains Mono',
+  fontSize: 10,
+  letterSpacing: 0.6,
+  height: 1.35,
+);
 
-  final String contactId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<String>> ids = ref.watch(
-      contactJournalEntryIdsProvider(contactId),
-    );
-    return _LinkedSection(
-      title: 'Entradas del Diario',
-      emptyMessage: 'Todavía no aparece en ninguna entrada.',
-      ids: ids,
-      itemBuilder: (String id) => _EntryLink(entryId: id),
-    );
-  }
-}
-
-class _LinkedSection extends StatelessWidget {
-  const _LinkedSection({
-    required this.title,
-    required this.emptyMessage,
-    required this.ids,
-    required this.itemBuilder,
+class _DossierPortrait extends StatelessWidget {
+  const _DossierPortrait({
+    required this.contact,
+    required this.code,
+    required this.width,
   });
 
-  final String title;
-  final String emptyMessage;
-  final AsyncValue<List<String>> ids;
-  final Widget Function(String id) itemBuilder;
+  final Contact contact;
+  final String code;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = Theme.of(
       context,
     ).extension<AppThemeTokens>()!;
-    return TerminalPanel(
+    final DateTime created = contact.createdAtUtc.toLocal();
+    final String date =
+        '${created.day.toString().padLeft(2, '0')}.'
+        '${created.month.toString().padLeft(2, '0')}.'
+        '${(created.year % 100).toString().padLeft(2, '0')}';
+    return SizedBox(
+      width: width,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          TerminalSectionTitle(
-            title: title,
-            overline: ids.value == null ? null : '${ids.value!.length}',
+          EntityPhotoAvatar(
+            key: const Key('contact-dossier-photo'),
+            owner: EntityPhotoOwner.contact,
+            ownerId: contact.id,
+            fallbackLabel: contact.displayName ?? '',
+            width: width,
+            height: width * 4 / 3,
+            dimmed: contact.isArchived,
           ),
-          const SizedBox(height: TerminalSpace.sm),
-          ids.when(
-            data: (List<String> values) => values.isEmpty
-                ? Text(
-                    emptyMessage,
-                    style: TextStyle(color: tokens.textSecondary),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      for (final String id in values) itemBuilder(id),
-                    ],
+          const SizedBox(height: TerminalSpace.xs),
+          Container(
+            padding: const EdgeInsets.only(top: 6),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: tokens.structuralRed)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    'PROTOCOLO\nARCHIVO LOCAL\nCIFRADO',
+                    style: _codeStyle(tokens),
                   ),
-            loading: () =>
-                const TerminalInlineLoadingState(message: 'Cargando…'),
-            error: (_, _) => const TerminalInlineErrorState(
-              message: 'No se pudo leer esta lista.',
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: tokens.structuralRed),
+                  ),
+                  child: Text(code, style: _codeStyle(tokens)),
+                ),
+                const SizedBox(width: TerminalSpace.sm),
+                Text('FICHA · $date', style: _codeStyle(tokens)),
+              ],
             ),
           ),
         ],
@@ -477,49 +454,248 @@ class _LinkedSection extends StatelessWidget {
   }
 }
 
-class _MissionLink extends ConsumerWidget {
-  const _MissionLink({required this.missionId});
+class _DossierPanel extends StatelessWidget {
+  const _DossierPanel({
+    required this.contact,
+    required this.code,
+    required this.hasPhoto,
+    required this.working,
+    required this.onEdit,
+    required this.onPhoto,
+    required this.onArchive,
+    required this.onRestore,
+  });
 
-  final String missionId;
+  final Contact contact;
+  final String code;
+  final bool hasPhoto;
+  final bool working;
+  final VoidCallback onEdit;
+  final VoidCallback onPhoto;
+  final VoidCallback onArchive;
+  final VoidCallback onRestore;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final Mission? mission = ref.watch(missionDetailProvider(missionId)).value;
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.flag_outlined),
-      title: Text(mission?.title ?? '…'),
-      subtitle: mission?.location == null ? null : Text(mission!.location!),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => context.pushNamed(
-        'missionDetail',
-        pathParameters: <String, String>{'missionId': missionId},
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    final String? role = contact.role?.trim();
+    final String? description = contact.description?.trim();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                'TRN_$code',
+                key: const Key('contact-dossier-code'),
+                style: _codeStyle(tokens),
+              ),
+            ),
+            Text(
+              hasPhoto
+                  ? 'IMAGEN: FOTO_CIFRADA\nTIPO: AES-GCM · SIN EXIF'
+                  : 'IMAGEN: SIN FOTO',
+              textAlign: TextAlign.right,
+              style: _codeStyle(tokens),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Container(
+          key: const Key('contact-dossier-panel'),
+          constraints: const BoxConstraints(minHeight: 360),
+          padding: const EdgeInsets.fromLTRB(24, 22, 24, 26),
+          decoration: ShapeDecoration(
+            color: const Color(0xD108050A),
+            shape: TerminalCutCornerBorder(
+              cut: 14,
+              side: BorderSide(color: tokens.structuralRed),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      contactName(contact).toUpperCase(),
+                      key: const Key('contact-dossier-name'),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            color: tokens.infoCyan,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.2,
+                            height: 1.05,
+                          ),
+                    ),
+                  ),
+                  if (!contact.isArchived) ...<Widget>[
+                    _RedIcon(
+                      key: const Key('contact-edit'),
+                      tooltip: 'Editar',
+                      icon: Icons.edit_outlined,
+                      onPressed: working ? null : onEdit,
+                    ),
+                    _RedIcon(
+                      key: const Key('contact-photo'),
+                      tooltip: hasPhoto
+                          ? 'Cambiar o quitar foto'
+                          : 'Añadir foto',
+                      icon: Icons.add_a_photo_outlined,
+                      onPressed: working ? null : onPhoto,
+                    ),
+                    _RedIcon(
+                      key: const Key('contact-archive'),
+                      tooltip: 'Eliminar (archivar)',
+                      icon: Icons.archive_outlined,
+                      onPressed: working ? null : onArchive,
+                    ),
+                  ] else
+                    _RedIcon(
+                      key: const Key('contact-restore'),
+                      tooltip: 'Restaurar',
+                      icon: Icons.unarchive_outlined,
+                      onPressed: working ? null : onRestore,
+                    ),
+                ],
+              ),
+              if (contact.isArchived)
+                Padding(
+                  padding: const EdgeInsets.only(top: TerminalSpace.xs),
+                  child: Text(
+                    'ARCHIVADO',
+                    style: TextStyle(
+                      color: tokens.attentionOrange,
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: 12,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+              if (role != null && role.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: TerminalSpace.xs),
+                  child: Text(
+                    role.toUpperCase(),
+                    key: const Key('contact-dossier-role'),
+                    style: TextStyle(
+                      color: tokens.valueYellow,
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: 12,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+              if (description != null && description.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: TerminalSpace.md),
+                  child: SelectableText(
+                    description,
+                    key: const Key('contact-dossier-description'),
+                    style: TextStyle(
+                      color: tokens.terminalRed,
+                      fontFamily: 'Rajdhani',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 19,
+                      height: 1.55,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text('TRN_$code', style: _codeStyle(tokens)),
+        ),
+      ],
+    );
+  }
+}
+
+class _RedIcon extends StatelessWidget {
+  const _RedIcon({
+    required this.tooltip,
+    required this.icon,
+    required this.onPressed,
+    super.key,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return Padding(
+      padding: const EdgeInsets.only(left: TerminalSpace.xs),
+      child: IconButton(
+        tooltip: tooltip,
+        onPressed: onPressed,
+        color: tokens.terminalRed,
+        style: IconButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: tokens.structuralRed),
+          ),
+        ),
+        icon: Icon(icon),
       ),
     );
   }
 }
 
-class _EntryLink extends ConsumerWidget {
-  const _EntryLink({required this.entryId});
+/// «◂ CERRAR», como en el juego: vuelve a PERSONAJES.
+class _CloseButton extends StatelessWidget {
+  const _CloseButton({required this.onPressed});
 
-  final String entryId;
+  final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final JournalEntry? entry = ref
-        .watch(journalEntryDetailProvider(entryId))
-        .value;
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.menu_book_outlined),
-      title: Text(entry?.title ?? '…'),
-      subtitle: entry == null
-          ? null
-          : Text(journalDayLabel(entry.occurredAtUtc.toLocal())),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => context.pushNamed(
-        'journalDetail',
-        pathParameters: <String, String>{'entryId': entryId},
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = Theme.of(
+      context,
+    ).extension<AppThemeTokens>()!;
+    return InkWell(
+      key: const Key('contact-dossier-close'),
+      onTap: onPressed,
+      child: Padding(
+        padding: const EdgeInsets.all(TerminalSpace.xs),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+              decoration: BoxDecoration(
+                border: Border.all(color: tokens.infoCyan),
+              ),
+              child: Text(
+                '◂',
+                style: TextStyle(color: tokens.infoCyan, fontSize: 12),
+              ),
+            ),
+            const SizedBox(width: TerminalSpace.xs),
+            Text(
+              'CERRAR',
+              style: TextStyle(
+                color: tokens.terminalRed,
+                fontFamily: 'Rajdhani',
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

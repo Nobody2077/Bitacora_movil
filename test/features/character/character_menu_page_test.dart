@@ -115,10 +115,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.created.single.displayName, 'Diego');
+    // La ficha al estilo del juego: nombre y rol, sin «Aparece en».
     expect(find.text('DIEGO'), findsOneWidget);
     expect(find.text('AMIGO'), findsOneWidget);
-    expect(find.text('AÑADIR FOTO'), findsOneWidget);
-    expect(find.text('Todavía no aparece en ninguna misión.'), findsOneWidget);
+    expect(find.byKey(const Key('contact-photo')), findsOneWidget);
+    expect(find.byKey(const Key('contact-dossier-close')), findsOneWidget);
+    expect(find.textContaining('Todavía no aparece'), findsNothing);
   });
 }
 
