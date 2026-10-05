@@ -46,17 +46,18 @@ void createSchemaFromSnapshot(Database database, int version) {
   database.execute('PRAGMA user_version = $version');
 }
 
-/// Comprueba que la base quedó en v4 completa y sana tras migrar.
-Future<void> expectMigratedToV4(AppDatabase database) async {
-  expect(database.schemaVersion, 4);
+/// Comprueba que la base quedó en v5 completa y sana tras migrar: las tablas
+/// de v4 (ADR-006) y el `area_id` de `inventory_items` (D17).
+Future<void> expectMigratedToV5(AppDatabase database) async {
+  expect(database.schemaVersion, 5);
   final version = await database
       .customSelect('PRAGMA user_version')
       .getSingle();
-  expect(version.read<int>('user_version'), 4);
+  expect(version.read<int>('user_version'), 5);
   final mirror = await database.customSelect('''
     SELECT value FROM schema_metadata WHERE "key" = 'schema_version'
   ''').getSingle();
-  expect(mirror.read<String>('value'), '4');
+  expect(mirror.read<String>('value'), '5');
 
   final tables = await database.customSelect('''
     SELECT name FROM sqlite_master
@@ -78,6 +79,22 @@ Future<void> expectMigratedToV4(AppDatabase database) async {
       reason: table,
     );
   }
+
+  final itemColumns = await database
+      .customSelect('PRAGMA table_info(inventory_items)')
+      .get();
+  final areaColumn = itemColumns.singleWhere(
+    (column) => column.read<String>('name') == 'area_id',
+  );
+  expect(areaColumn.read<int>('notnull'), 0);
+  final itemForeignKeys = await database
+      .customSelect('PRAGMA foreign_key_list(inventory_items)')
+      .get();
+  final areaForeignKey = itemForeignKeys.singleWhere(
+    (key) => key.read<String>('from') == 'area_id',
+  );
+  expect(areaForeignKey.read<String>('table'), 'life_areas');
+  expect(areaForeignKey.read<String>('on_delete'), 'SET NULL');
 
   expect(
     await database.customSelect('PRAGMA foreign_key_check').get(),

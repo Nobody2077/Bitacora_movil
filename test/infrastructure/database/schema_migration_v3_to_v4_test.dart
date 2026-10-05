@@ -105,7 +105,7 @@ Map<String, List<Map<String, Object?>>> _snapshotRows(Database db) {
 }
 
 void main() {
-  test('migra v3 a v4 sin cambiar ninguna fila existente', () async {
+  test('migra v3 a v5 sin cambiar ninguna fila existente', () async {
     final Database rawDatabase = sqlite3.openInMemory();
     rawDatabase.execute('PRAGMA foreign_keys = ON');
     createSchemaFromSnapshot(rawDatabase, 3);
@@ -120,7 +120,7 @@ void main() {
       utcNowMilliseconds: () => _nowMs,
     );
     addTearDown(database.close);
-    await expectMigratedToV4(database);
+    await expectMigratedToV5(database);
 
     for (final MapEntry<String, List<Map<String, Object?>>> table
         in before.entries) {
@@ -184,7 +184,7 @@ void main() {
     );
   });
 
-  test('reabrir una base ya migrada a v4 no vuelve a migrar', () async {
+  test('reabrir una base ya migrada desde v3 no vuelve a migrar', () async {
     final Database rawDatabase = sqlite3.openInMemory();
     createSchemaFromSnapshot(rawDatabase, 3);
     _seedV3(rawDatabase);
@@ -193,7 +193,7 @@ void main() {
       NativeDatabase.opened(rawDatabase, closeUnderlyingOnClose: false),
       utcNowMilliseconds: () => _nowMs,
     );
-    await expectMigratedToV4(first);
+    await expectMigratedToV5(first);
     await first.close();
 
     final AppDatabase reopened = AppDatabase(
@@ -201,6 +201,6 @@ void main() {
       utcNowMilliseconds: () => _nowMs,
     );
     addTearDown(reopened.close);
-    await expectMigratedToV4(reopened);
+    await expectMigratedToV5(reopened);
   });
 }

@@ -14,7 +14,7 @@ final class AppDatabase extends _$AppDatabase {
   final UtcNowMilliseconds _utcNowMilliseconds;
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -25,7 +25,7 @@ final class AppDatabase extends _$AppDatabase {
       await _syncSchemaVersionMirror();
     },
     onUpgrade: (Migrator migrator, int from, int to) async {
-      if (from < 1 || to != 4 || from >= to) {
+      if (from < 1 || to != 5 || from >= to) {
         throw UnsupportedError('No schema upgrade exists for $from -> $to.');
       }
       if (from == 1) {
@@ -46,6 +46,11 @@ final class AppDatabase extends _$AppDatabase {
             await migrator.create(entity);
           }
         }
+      }
+      if (from == 4) {
+        // ADR-006 D17: el área de vida de cada deseo. Solo añade. Desde v3 o
+        // antes no hace falta: `inventory_items` se crea arriba ya con ella.
+        await migrator.addColumn(inventoryItems, inventoryItems.areaId);
       }
       await _syncSchemaVersionMirror();
     },

@@ -11,7 +11,7 @@ import 'schema_v4_expectations.dart';
 const int _nowMs = 1788000000000;
 
 void main() {
-  test('migra v2 a v4 y conserva plantillas como automáticas', () async {
+  test('migra v2 a v5 y conserva plantillas como automáticas', () async {
     final Database rawDatabase = sqlite3.openInMemory();
     _createSchemaV2(rawDatabase);
     rawDatabase.execute('''
@@ -38,10 +38,10 @@ void main() {
     final template = await (database.select(
       database.missionTemplates,
     )..where((row) => row.id.equals('legacy-template'))).getSingle();
-    expect(database.schemaVersion, 4);
+    expect(database.schemaVersion, 5);
     expect(template.availabilityMode, 'AUTOMATIC');
 
-    await expectMigratedToV4(database);
+    await expectMigratedToV5(database);
   });
 }
 

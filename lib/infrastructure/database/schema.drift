@@ -686,6 +686,7 @@ CREATE TABLE inventory_items (
   updated_at INTEGER NOT NULL,
   archived_at INTEGER,
   row_version INTEGER NOT NULL DEFAULT 1 CHECK (row_version >= 1),
+  area_id TEXT REFERENCES life_areas(id) ON DELETE SET NULL,
   CHECK ((status = 'WISHED') = (wish_priority IS NOT NULL)),
   CHECK (status <> 'WISHED' OR (origin IS NULL AND acquired_at IS NULL)),
   CHECK (status = 'WISHED' OR (origin IS NOT NULL AND acquired_at IS NOT NULL)),

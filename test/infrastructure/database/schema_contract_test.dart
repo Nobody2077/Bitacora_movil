@@ -235,6 +235,8 @@ const Set<String> _expectedForeignKeys = <String>{
   'inventory_items.purchase_transaction_id->transactions.id:RESTRICT',
   'inventory_items.parent_item_id->inventory_items.id:RESTRICT',
   'inventory_items.wish_goal_id->savings_goals.id:SET NULL',
+  // v5 (ADR-006 D17)
+  'inventory_items.area_id->life_areas.id:SET NULL',
   'item_photos.item_id->inventory_items.id:RESTRICT',
   'projects.mission_id->missions.id:SET NULL',
   'projects.result_item_id->inventory_items.id:RESTRICT',
@@ -253,7 +255,7 @@ const Set<String> _expectedForeignKeys = <String>{
 };
 
 void main() {
-  group('schema v4 catalog', () {
+  group('schema v5 catalog', () {
     late AppDatabase database;
 
     setUp(() {
@@ -318,7 +320,7 @@ void main() {
       }
     });
 
-    test('contains exactly the 43 approved foreign keys and actions', () async {
+    test('contains exactly the 44 approved foreign keys and actions', () async {
       final actual = <String>[];
 
       for (final String table in _expectedTables) {
@@ -334,7 +336,7 @@ void main() {
         }
       }
 
-      expect(actual, hasLength(43));
+      expect(actual, hasLength(44));
       expect(actual.toSet(), _expectedForeignKeys);
     });
 
@@ -344,7 +346,7 @@ void main() {
         final userVersion = await database
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(userVersion.read<int>('user_version'), 4);
+        expect(userVersion.read<int>('user_version'), 5);
 
         final metadataRows = await database.customSelect('''
         SELECT "key", value, updated_at
@@ -360,7 +362,7 @@ void main() {
         };
         expect(metadata, <String, ({String value, int updatedAt})>{
           'created_with': (value: '0.1.0+1', updatedAt: _seedTime),
-          'schema_version': (value: '4', updatedAt: _seedTime),
+          'schema_version': (value: '5', updatedAt: _seedTime),
           'seed_version': (value: '1', updatedAt: _seedTime),
         });
 
@@ -507,7 +509,7 @@ void main() {
     });
   });
 
-  test('reopening the same v4 database is idempotent', () async {
+  test('reopening the same v5 database is idempotent', () async {
     final Directory directory = await Directory.systemTemp.createTemp(
       'bitacora_g1_reopen_',
     );

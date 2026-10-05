@@ -14264,6 +14264,15 @@ class InventoryItems extends Table
     $customConstraints: 'NOT NULL DEFAULT 1 CHECK (row_version >= 1)',
     defaultValue: const CustomExpression('1'),
   );
+  static const VerificationMeta _areaIdMeta = const VerificationMeta('areaId');
+  late final GeneratedColumn<String> areaId = GeneratedColumn<String>(
+    'area_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES life_areas(id)ON DELETE SET NULL',
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -14287,6 +14296,7 @@ class InventoryItems extends Table
     updatedAt,
     archivedAt,
     rowVersion,
+    areaId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -14455,6 +14465,12 @@ class InventoryItems extends Table
         rowVersion.isAcceptableOrUnknown(data['row_version']!, _rowVersionMeta),
       );
     }
+    if (data.containsKey('area_id')) {
+      context.handle(
+        _areaIdMeta,
+        areaId.isAcceptableOrUnknown(data['area_id']!, _areaIdMeta),
+      );
+    }
     return context;
   }
 
@@ -14548,6 +14564,10 @@ class InventoryItems extends Table
         DriftSqlType.int,
         data['${effectivePrefix}row_version'],
       )!,
+      areaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}area_id'],
+      ),
     );
   }
 
@@ -14593,6 +14613,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
   final int updatedAt;
   final int? archivedAt;
   final int rowVersion;
+  final String? areaId;
   const InventoryItem({
     required this.id,
     required this.name,
@@ -14615,6 +14636,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
     required this.updatedAt,
     this.archivedAt,
     required this.rowVersion,
+    this.areaId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -14664,6 +14686,9 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
       map['archived_at'] = Variable<int>(archivedAt);
     }
     map['row_version'] = Variable<int>(rowVersion);
+    if (!nullToAbsent || areaId != null) {
+      map['area_id'] = Variable<String>(areaId);
+    }
     return map;
   }
 
@@ -14714,6 +14739,9 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
           ? const Value.absent()
           : Value(archivedAt),
       rowVersion: Value(rowVersion),
+      areaId: areaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(areaId),
     );
   }
 
@@ -14746,6 +14774,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
       updatedAt: serializer.fromJson<int>(json['updated_at']),
       archivedAt: serializer.fromJson<int?>(json['archived_at']),
       rowVersion: serializer.fromJson<int>(json['row_version']),
+      areaId: serializer.fromJson<String?>(json['area_id']),
     );
   }
   @override
@@ -14775,6 +14804,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
       'updated_at': serializer.toJson<int>(updatedAt),
       'archived_at': serializer.toJson<int?>(archivedAt),
       'row_version': serializer.toJson<int>(rowVersion),
+      'area_id': serializer.toJson<String?>(areaId),
     };
   }
 
@@ -14800,6 +14830,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
     int? updatedAt,
     Value<int?> archivedAt = const Value.absent(),
     int? rowVersion,
+    Value<String?> areaId = const Value.absent(),
   }) => InventoryItem(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -14826,6 +14857,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
     updatedAt: updatedAt ?? this.updatedAt,
     archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
     rowVersion: rowVersion ?? this.rowVersion,
+    areaId: areaId.present ? areaId.value : this.areaId,
   );
   InventoryItem copyWithCompanion(InventoryItemsCompanion data) {
     return InventoryItem(
@@ -14870,6 +14902,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
       rowVersion: data.rowVersion.present
           ? data.rowVersion.value
           : this.rowVersion,
+      areaId: data.areaId.present ? data.areaId.value : this.areaId,
     );
   }
 
@@ -14896,7 +14929,8 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('archivedAt: $archivedAt, ')
-          ..write('rowVersion: $rowVersion')
+          ..write('rowVersion: $rowVersion, ')
+          ..write('areaId: $areaId')
           ..write(')'))
         .toString();
   }
@@ -14924,6 +14958,7 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
     updatedAt,
     archivedAt,
     rowVersion,
+    areaId,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -14949,7 +14984,8 @@ class InventoryItem extends DataClass implements Insertable<InventoryItem> {
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.archivedAt == this.archivedAt &&
-          other.rowVersion == this.rowVersion);
+          other.rowVersion == this.rowVersion &&
+          other.areaId == this.areaId);
 }
 
 class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
@@ -14974,6 +15010,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
   final Value<int> updatedAt;
   final Value<int?> archivedAt;
   final Value<int> rowVersion;
+  final Value<String?> areaId;
   final Value<int> rowid;
   const InventoryItemsCompanion({
     this.id = const Value.absent(),
@@ -14997,6 +15034,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
     this.updatedAt = const Value.absent(),
     this.archivedAt = const Value.absent(),
     this.rowVersion = const Value.absent(),
+    this.areaId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   InventoryItemsCompanion.insert({
@@ -15021,6 +15059,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
     required int updatedAt,
     this.archivedAt = const Value.absent(),
     this.rowVersion = const Value.absent(),
+    this.areaId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
@@ -15051,6 +15090,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
     Expression<int>? updatedAt,
     Expression<int>? archivedAt,
     Expression<int>? rowVersion,
+    Expression<String>? areaId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -15076,6 +15116,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (archivedAt != null) 'archived_at': archivedAt,
       if (rowVersion != null) 'row_version': rowVersion,
+      if (areaId != null) 'area_id': areaId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -15102,6 +15143,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
     Value<int>? updatedAt,
     Value<int?>? archivedAt,
     Value<int>? rowVersion,
+    Value<String?>? areaId,
     Value<int>? rowid,
   }) {
     return InventoryItemsCompanion(
@@ -15127,6 +15169,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
       updatedAt: updatedAt ?? this.updatedAt,
       archivedAt: archivedAt ?? this.archivedAt,
       rowVersion: rowVersion ?? this.rowVersion,
+      areaId: areaId ?? this.areaId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -15199,6 +15242,9 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
     if (rowVersion.present) {
       map['row_version'] = Variable<int>(rowVersion.value);
     }
+    if (areaId.present) {
+      map['area_id'] = Variable<String>(areaId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -15229,6 +15275,7 @@ class InventoryItemsCompanion extends UpdateCompanion<InventoryItem> {
           ..write('updatedAt: $updatedAt, ')
           ..write('archivedAt: $archivedAt, ')
           ..write('rowVersion: $rowVersion, ')
+          ..write('areaId: $areaId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -19853,6 +19900,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
+        'life_areas',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('inventory_items', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
         'missions',
         limitUpdateKind: UpdateKind.delete,
       ),
@@ -19981,6 +20035,24 @@ final class $LifeAreasReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<InventoryItems, List<InventoryItem>>
+  _inventoryItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.inventoryItems,
+    aliasName: 'life_areas__id__inventory_items__area_id',
+  );
+
+  $InventoryItemsProcessedTableManager get inventoryItemsRefs {
+    final manager = $InventoryItemsTableManager(
+      $_db,
+      $_db.inventoryItems,
+    ).filter((f) => f.areaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_inventoryItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $LifeAreasFilterComposer extends Composer<_$AppDatabase, LifeAreas> {
@@ -20097,6 +20169,31 @@ class $LifeAreasFilterComposer extends Composer<_$AppDatabase, LifeAreas> {
           }) => $XpTransactionsFilterComposer(
             $db: $db,
             $table: $db.xpTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> inventoryItemsRefs(
+    Expression<bool> Function($InventoryItemsFilterComposer f) f,
+  ) {
+    final $InventoryItemsFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.inventoryItems,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $InventoryItemsFilterComposer(
+            $db: $db,
+            $table: $db.inventoryItems,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -20264,6 +20361,31 @@ class $LifeAreasAnnotationComposer extends Composer<_$AppDatabase, LifeAreas> {
     );
     return f(composer);
   }
+
+  Expression<T> inventoryItemsRefs<T extends Object>(
+    Expression<T> Function($InventoryItemsAnnotationComposer a) f,
+  ) {
+    final $InventoryItemsAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.inventoryItems,
+      getReferencedColumn: (t) => t.areaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $InventoryItemsAnnotationComposer(
+            $db: $db,
+            $table: $db.inventoryItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $LifeAreasTableManager
@@ -20283,6 +20405,7 @@ class $LifeAreasTableManager
             bool missionTemplatesRefs,
             bool missionsRefs,
             bool xpTransactionsRefs,
+            bool inventoryItemsRefs,
           })
         > {
   $LifeAreasTableManager(_$AppDatabase db, LifeAreas table)
@@ -20350,6 +20473,7 @@ class $LifeAreasTableManager
                 missionTemplatesRefs = false,
                 missionsRefs = false,
                 xpTransactionsRefs = false,
+                inventoryItemsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -20357,6 +20481,7 @@ class $LifeAreasTableManager
                     if (missionTemplatesRefs) db.missionTemplates,
                     if (missionsRefs) db.missions,
                     if (xpTransactionsRefs) db.xpTransactions,
+                    if (inventoryItemsRefs) db.inventoryItems,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -20414,6 +20539,26 @@ class $LifeAreasTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (inventoryItemsRefs)
+                        await $_getPrefetchedData<
+                          LifeArea,
+                          LifeAreas,
+                          InventoryItem
+                        >(
+                          currentTable: table,
+                          referencedTable: $LifeAreasReferences
+                              ._inventoryItemsRefsTable(db),
+                          managerFromTypedResult: (p0) => $LifeAreasReferences(
+                            db,
+                            table,
+                            p0,
+                          ).inventoryItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.areaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -20438,6 +20583,7 @@ typedef $LifeAreasProcessedTableManager =
         bool missionTemplatesRefs,
         bool missionsRefs,
         bool xpTransactionsRefs,
+        bool inventoryItemsRefs,
       })
     >;
 typedef $MissionTemplatesCreateCompanionBuilder =
@@ -32279,6 +32425,7 @@ typedef $InventoryItemsCreateCompanionBuilder =
       required int updatedAt,
       Value<int?> archivedAt,
       Value<int> rowVersion,
+      Value<String?> areaId,
       Value<int> rowid,
     });
 typedef $InventoryItemsUpdateCompanionBuilder =
@@ -32304,6 +32451,7 @@ typedef $InventoryItemsUpdateCompanionBuilder =
       Value<int> updatedAt,
       Value<int?> archivedAt,
       Value<int> rowVersion,
+      Value<String?> areaId,
       Value<int> rowid,
     });
 
@@ -32343,6 +32491,23 @@ final class $InventoryItemsReferences
       $_db.savingsGoals,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_wishGoalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static LifeAreas _areaIdTable(_$AppDatabase db) =>
+      db.lifeAreas.createAlias('inventory_items__area_id__life_areas__id');
+
+  $LifeAreasProcessedTableManager? get areaId {
+    final $_column = $_itemColumn<String>('area_id');
+    if ($_column == null) return null;
+    final manager = $LifeAreasTableManager(
+      $_db,
+      $_db.lifeAreas,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_areaIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -32565,6 +32730,29 @@ class $InventoryItemsFilterComposer
           }) => $SavingsGoalsFilterComposer(
             $db: $db,
             $table: $db.savingsGoals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $LifeAreasFilterComposer get areaId {
+    final $LifeAreasFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasFilterComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -32824,6 +33012,29 @@ class $InventoryItemsOrderingComposer
     );
     return composer;
   }
+
+  $LifeAreasOrderingComposer get areaId {
+    final $LifeAreasOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasOrderingComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $InventoryItemsAnnotationComposer
@@ -32954,6 +33165,29 @@ class $InventoryItemsAnnotationComposer
     return composer;
   }
 
+  $LifeAreasAnnotationComposer get areaId {
+    final $LifeAreasAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.areaId,
+      referencedTable: $db.lifeAreas,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $LifeAreasAnnotationComposer(
+            $db: $db,
+            $table: $db.lifeAreas,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<T> itemPhotosRefs<T extends Object>(
     Expression<T> Function($ItemPhotosAnnotationComposer a) f,
   ) {
@@ -33071,6 +33305,7 @@ class $InventoryItemsTableManager
           PrefetchHooks Function({
             bool purchaseTransactionId,
             bool wishGoalId,
+            bool areaId,
             bool itemPhotosRefs,
             bool projectsRefs,
             bool projectItemsRefs,
@@ -33111,6 +33346,7 @@ class $InventoryItemsTableManager
                 Value<int> updatedAt = const Value.absent(),
                 Value<int?> archivedAt = const Value.absent(),
                 Value<int> rowVersion = const Value.absent(),
+                Value<String?> areaId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => InventoryItemsCompanion(
                 id: id,
@@ -33134,6 +33370,7 @@ class $InventoryItemsTableManager
                 updatedAt: updatedAt,
                 archivedAt: archivedAt,
                 rowVersion: rowVersion,
+                areaId: areaId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -33159,6 +33396,7 @@ class $InventoryItemsTableManager
                 required int updatedAt,
                 Value<int?> archivedAt = const Value.absent(),
                 Value<int> rowVersion = const Value.absent(),
+                Value<String?> areaId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => InventoryItemsCompanion.insert(
                 id: id,
@@ -33182,6 +33420,7 @@ class $InventoryItemsTableManager
                 updatedAt: updatedAt,
                 archivedAt: archivedAt,
                 rowVersion: rowVersion,
+                areaId: areaId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -33196,6 +33435,7 @@ class $InventoryItemsTableManager
               ({
                 purchaseTransactionId = false,
                 wishGoalId = false,
+                areaId = false,
                 itemPhotosRefs = false,
                 projectsRefs = false,
                 projectItemsRefs = false,
@@ -33247,6 +33487,19 @@ class $InventoryItemsTableManager
                                         ._wishGoalIdTable(db),
                                     referencedColumn: $InventoryItemsReferences
                                         ._wishGoalIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (areaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.areaId,
+                                    referencedTable: $InventoryItemsReferences
+                                        ._areaIdTable(db),
+                                    referencedColumn: $InventoryItemsReferences
+                                        ._areaIdTable(db)
                                         .id,
                                   )
                                   as T;
@@ -33363,6 +33616,7 @@ typedef $InventoryItemsProcessedTableManager =
       PrefetchHooks Function({
         bool purchaseTransactionId,
         bool wishGoalId,
+        bool areaId,
         bool itemPhotosRefs,
         bool projectsRefs,
         bool projectItemsRefs,
