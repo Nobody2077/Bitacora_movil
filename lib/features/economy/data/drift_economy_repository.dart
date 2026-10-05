@@ -353,6 +353,11 @@ final class DriftEconomyRepository implements EconomyRepository {
             : _utc(value.reversedAt!),
       );
 
+  /// Traduce un movimiento a la fila del libro. Lo usa también la Tienda,
+  /// que escribe el gasto de una compra en su propia transacción.
+  static LedgerTransactionInput ledgerInputOf(EconomyTransaction value) =>
+      _transactionInput(value);
+
   static LedgerTransactionInput _transactionInput(EconomyTransaction value) =>
       LedgerTransactionInput(
         id: value.id,

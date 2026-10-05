@@ -34,6 +34,8 @@ import '../../features/recurrences/data/method_channel_recurrence_civil_time.dar
 import '../../features/recurrences/domain/repositories/recurrence_repository.dart';
 import '../../features/settings/data/drift_settings_repository.dart';
 import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/shop/data/drift_wish_repository.dart';
+import '../../features/shop/domain/repositories/wish_repository.dart';
 import '../../infrastructure/database/app_database.dart';
 import '../../infrastructure/database/connection/encrypted_database_connection.dart';
 import '../../infrastructure/database/daos/contact_dao.dart';
@@ -46,6 +48,7 @@ import '../../infrastructure/database/daos/notification_dao.dart';
 import '../../infrastructure/database/daos/progress_dao.dart';
 import '../../infrastructure/database/daos/recurrence_dao.dart';
 import '../../infrastructure/database/daos/settings_dao.dart';
+import '../../infrastructure/database/daos/wish_dao.dart';
 import '../../infrastructure/database/database_file_locator.dart';
 import '../../infrastructure/database/units_of_work/drift_complete_mission_unit_of_work.dart';
 import '../../infrastructure/security/database_key_store.dart';
@@ -301,6 +304,10 @@ final Provider<ContactDao> contactDaoProvider = Provider<ContactDao>(
   (Ref ref) => ContactDao(ref.watch(appDatabaseProvider)),
 );
 
+final Provider<WishDao> wishDaoProvider = Provider<WishDao>(
+  (Ref ref) => WishDao(ref.watch(appDatabaseProvider)),
+);
+
 final Provider<EntityPhotoDao> entityPhotoDaoProvider =
     Provider<EntityPhotoDao>(
       (Ref ref) => EntityPhotoDao(ref.watch(appDatabaseProvider)),
@@ -343,6 +350,11 @@ final Provider<JournalRepository> journalRepositoryProvider =
 final Provider<ContactRepository> contactRepositoryProvider =
     Provider<ContactRepository>(
       (Ref ref) => DriftContactRepository(ref.watch(contactDaoProvider)),
+    );
+
+final Provider<WishRepository> wishRepositoryProvider =
+    Provider<WishRepository>(
+      (Ref ref) => DriftWishRepository(ref.watch(wishDaoProvider)),
     );
 
 final Provider<EntityPhotoRepository> entityPhotoRepositoryProvider =

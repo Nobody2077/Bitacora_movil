@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **322/322**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **346/346**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -40,12 +40,25 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
    322/322. Ensayo en la tablet: `dev` v4 con datos → v5 desde Descargas
    (`adb install` falló otra vez), el usuario dijo «datos bien»; prod intacta
    en `1.7.0`.
-3. **Datos:** DAO/repositorio de deseos (crear, editar con `row_version`,
-   archivar; área, tipo, prioridad, precio, información y meta opcional), el
-   cálculo «al alcance» contra el saldo disponible (`availableMinor`) y la
-   unidad de trabajo **comprar un deseo** (D1/D17): `EXPENSE` en
-   `transactions` y el deseo a `OWNED` con `purchase_transaction_id`, todo o
-   nada, idempotente.
+3. ~~Datos~~ **Hecho el 5 de octubre de 2026** (mini-spec aprobada; sin
+   instalación, no hay nada que ver). 346/346. Qué hay:
+   - `WishDao` (`daos/wish_dao.dart`) sobre `inventory_items`: deseos
+     activos (prioridad alta primero), archivados y comprados; crear
+     idempotente por id, editar/archivar/restaurar con `row_version`.
+   - `purchaseWish`: en una transacción escribe el gasto con
+     `EconomyDao.writeTransaction` (idempotente por `operation_id`) y pasa
+     el deseo a `OWNED`/`PURCHASE`. Repetir la misma operación devuelve lo
+     existente; otro intento sobre un comprado o archivado se rechaza sin
+     gasto; un fallo a mitad no deja nada.
+   - `features/shop/`: `Wish` (tipo = categoría fija, da el icono; área
+     opcional), `WishAffordability` (verde ≥ 100 %, ámbar ≥ 75 %, rojo, sin
+     precio; contra `availableMinor`, sin metas), `DriftWishRepository`,
+     `ShopApplicationService` (prioridad media por defecto; la compra va a
+     Economía con categoría «Tienda» y el nombre como nota; no toca XP) y
+     `shop_providers.dart`. `DriftEconomyRepository.ledgerInputOf` expone
+     la traducción del gasto.
+   - **Fuera de este paso:** anular el gasto en Economía no devuelve el
+     deseo a la lista; `wish_goal_id` sin usar.
 4. **Pantallas:** pestaña TIENDA en el lugar de CIBERWARE e INVENTARIO
    (retiradas), lista de deseos con icono de Material, área y color según el
    saldo con su texto, ficha y formulario, botón Comprar y lista de
