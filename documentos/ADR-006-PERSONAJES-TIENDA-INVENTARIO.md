@@ -218,6 +218,45 @@ Lo ajeno no cuenta para el progreso ni para el dinero.
    sin `INTERNET` (el gate ya lo exige).
 5. **Usar un vale crea entrada en el Diario.**
 
+### D17. Fuera Ciberware, Inventario y Creación; la Tienda es la lista de deseos — RESUELTA (4 oct)
+
+Al ir a empezar la fase 2, el usuario decidió que Ciberware e Inventario no se
+veían bien y serían solo visuales, y que la tienda de recompensas tampoco la
+usaría. **Sustituye a D4, D8, D9 (recompensas y vales), D12 y a los puntos 1, 4
+y 5 de D16** en lo que se contradigan.
+
+- **Fuera:** las pestañas CIBERWARE e INVENTARIO, siluetas, avatar, barras de
+  capacidad y resiliencia, equipar por zona, mochila, fotos de objetos,
+  `flutter_svg`, la biblioteca de iconos externa, componentes, conversión,
+  recompensas y vales. Sus tablas y columnas (`body_zone`, `is_equipped`,
+  `item_photos`, `craft_*`, `reward_*`) **se quedan sin usar**: borrarlas
+  exigiría otra migración y no molestan.
+- **TIENDA = lista de deseos.** Ocupa en el menú Personaje el sitio de las dos
+  pestañas retiradas. Cada deseo es una fila de `inventory_items` con
+  `status = 'WISHED'`: nombre, información (texto en `description`, **sin
+  imagen**), prioridad, precio orientativo y meta de ahorro opcional.
+- **Clasificación doble (respuesta 1a):** el **área de vida** (Estudios, Salud,
+  Proyectos, Hogar, Personal… las de `life_areas`) dice *para qué*; la
+  categoría de objeto existente dice *qué es* y da el icono. Los iconos salen
+  de los **Material Icons que ya trae Flutter**: no se añade dependencia.
+- **Color según el saldo disponible (respuesta 2a):** verde si el saldo
+  disponible alcanza el precio, ámbar si falta poco, rojo si falta mucho. El
+  umbral es una constante de código que fija la mini-spec. **Siempre con
+  texto** («Te alcanza», «Faltan Bs 120»).
+- **«Ya puedes comprarlo» (respuesta 3a y 3c):** aviso dentro de la app cuando
+  un movimiento hace que un deseo pase a estar al alcance, y una línea en el
+  resumen diario existente («N deseos a tu alcance»), que respeta «mostrar
+  detalles». Sin notificación propia nueva.
+- **Comprar un deseo (respuesta 4a):** un solo paso que registra el `EXPENSE`
+  en `transactions` y pasa el deseo a `OWNED` con `origin = 'PURCHASE'` y su
+  `purchase_transaction_id`, todo o nada, idempotente (D1 sigue en pie: no se
+  gasta XP). Queda una lista de **Comprados**.
+- **Migración v5, solo aditiva:** `area_id` opcional en `inventory_items`
+  (FK a `life_areas`, `ON DELETE SET NULL`). Como v4, **sin copia de
+  seguridad**, con el riesgo aceptado por el usuario el 4 de octubre al elegir
+  la respuesta 1a, y con sus pruebas de migración y el ensayo `dev` en la
+  tablet antes de tocar la prod.
+
 ## Esquema v4
 
 Una sola migración, con todo lo anterior (decisión propuesta 2 de la versión
@@ -614,13 +653,15 @@ La migración entra entera en la fase 1, aunque cada pantalla llegue después.
    pruebas, el menú con sus cinco pestañas (MAPA en «aplazado»), el hexágono,
    personajes con foto y vínculos con misiones y entradas, ubicación y foto
    en misiones, tarjeta de misión con foto y personajes.
-2. **Inventario, Ciberware y + Compra**: siluetas, barras, mochila, iconos,
-   compra con animación.
-3. **Lista de deseos, Proyectos y Reputación**: deseos sueltos y agrupados,
-   proyectos Armar y Reunir con dueños de cada elemento, progreso y
-   dificultad económica, vínculo con la misión.
-4. **Creación**: componentes, conversión, recompensas (también sobre deseos y
-   proyectos), vales y su entrada en el Diario.
+2. **Tienda (lista de deseos)**, rehecha el 4 de octubre por D17: migración
+   v5 (`area_id`), deseos con área, tipo, prioridad y precio, color según el
+   saldo, aviso «ya puedes comprarlo» en la app y en el resumen diario,
+   comprar un deseo (gasto + comprado) y lista de Comprados. Se retiran las
+   pestañas CIBERWARE e INVENTARIO.
+3. **Proyectos y Reputación**: proyectos Armar y Reunir con dueños de cada
+   elemento, progreso y dificultad económica, vínculo con la misión. Se
+   revisan con el usuario antes de empezar, como la fase 2.
+4. ~~**Creación**~~: **retirada por D17** (4 de octubre).
 5. Después del bloque: ☰ y tema Vino pueden ir en cualquier fase porque no
    tocan el esquema. **Copia de seguridad** sigue siendo el último bloque
    (D2).

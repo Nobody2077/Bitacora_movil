@@ -8,7 +8,7 @@
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
 - Pruebas: **320/320**, `flutter analyze` limpio
-- **Siguiente: fase 2 de ADR-006** (Inventario, Ciberware y + Compra)
+- **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
 continúe sin reconstruir la historia. La historia (cada sesión, relevos viejos,
@@ -19,7 +19,8 @@ contradice esto, manda esto.
 
 ## ▶ EMPEZAR AQUÍ
 
-**Fase 2 de ADR-006: Inventario, Ciberware y + Compra.** Cada paso empieza con
+**Fase 2 de ADR-006: Tienda (lista de deseos), rehecha el 4 de octubre por
+D17.** Ciberware, Inventario y Creación quedan fuera. Cada paso empieza con
 una **mini-spec de 5–10 líneas** (qué hace, qué no, cómo se prueba, cuándo se
 da por bueno) que el usuario aprueba **antes** de programar. Después:
 pruebas, `dev` en la tablet, aprobación del usuario y commit.
@@ -29,28 +30,29 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
    tablet**. Crear la rama `feat/v4-fase2` desde `main`.
 1. Preguntar al usuario si ya respaldó la llave de firma (ver «Pendientes del
    usuario»).
-2. **Dependencias (D16):** `flutter_svg` y una biblioteca de iconos MIT
-   (Tabler o Phosphor). Antes de añadir cada una: editor verificado, licencia,
-   permisos del manifiesto fusionado y APK sin `INTERNET`.
-3. **Datos:** DAO/repositorio de `inventory_items` (estados, categoría y zona
-   fijas, equipar con zona), foto de objeto (`item_photos`; añadir `item` a
-   `PhotoOwnerKind`/`EntityPhotoOwner`) y la unidad de trabajo de **compra**
-   (D1/D12): gasto `EXPENSE` en `transactions` **y** objeto en el inventario,
-   todo o nada, idempotente por `operation_id`.
-4. **Pantallas:**
-   - CIBERWARE: silueta `escaner_corporal.svg` del usuario (en
-     `G:\Usuario\Downloadss\`), puntos por zona y línea de escaneo.
-   - INVENTARIO: ropa por zona, avatar fijo con las prendas como iconos,
-     mochila.
-   - Barras laterales de capacidad y resiliencia (D8, solo avisan).
-   - Botón **+ Compra** en la cabecera, con el saldo bajando en naranja (D12;
-     sin animar con movimiento reducido, enmascarado con importes ocultos).
-5. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
+2. **Migración v5:** `area_id` opcional en `inventory_items` (FK a
+   `life_areas`, `ON DELETE SET NULL`). Snapshot v5 con el procedimiento
+   controlado, pruebas v1/v2/v3/v4 → v5 y ensayo `dev` en la tablet (v4 con
+   datos → v5) antes de tocar la prod. Sin dependencias nuevas.
+3. **Datos:** DAO/repositorio de deseos (crear, editar con `row_version`,
+   archivar; área, tipo, prioridad, precio, información y meta opcional), el
+   cálculo «al alcance» contra el saldo disponible (`availableMinor`) y la
+   unidad de trabajo **comprar un deseo** (D1/D17): `EXPENSE` en
+   `transactions` y el deseo a `OWNED` con `purchase_transaction_id`, todo o
+   nada, idempotente.
+4. **Pantallas:** pestaña TIENDA en el lugar de CIBERWARE e INVENTARIO
+   (retiradas), lista de deseos con icono de Material, área y color según el
+   saldo con su texto, ficha y formulario, botón Comprar y lista de
+   Comprados.
+5. **Avisos:** mensaje en la app cuando un movimiento deja un deseo al
+   alcance y línea «N deseos a tu alcance» en el resumen diario (respeta
+   «mostrar detalles»).
+6. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
    aprobación del usuario. Después, fusionar la rama en `main`.
 
 Referencias: `documentos/ADR-006-PERSONAJES-TIENDA-INVENTARIO.md` (es la spec
 de la fase; no reabrir sus decisiones) y la maqueta privada «Bitácora ·
-Personaje» v5 (solo orientativa).
+Personaje» v5 (solo orientativa; lo que contradiga a D17 no vale).
 
 ### Instalar en la tablet
 
