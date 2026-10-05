@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../domain/models/journal_entry.dart';
 
@@ -109,3 +110,24 @@ void goToDiary(BuildContext context) => context.goNamed(
   'character',
   queryParameters: const <String, String>{'tab': 'diario'},
 );
+
+/// Qué tipo de entrada es, como lo dice el Diario (ADR-006 D18).
+String journalEntryKindLabel(JournalOrigin value) => switch (value) {
+  JournalOrigin.mission => 'Misión',
+  JournalOrigin.transaction => 'Movimiento',
+  JournalOrigin.manual => 'Entrada libre',
+  JournalOrigin.system => 'Reflexión diaria',
+};
+
+Color journalMoodColor(AppThemeTokens tokens, JournalMood? mood) =>
+    switch (mood) {
+      JournalMood.happy => tokens.valueYellow,
+      JournalMood.motivated => tokens.progressGreen,
+      JournalMood.focused => tokens.progressGreen,
+      JournalMood.calm => tokens.infoCyan,
+      JournalMood.normal => tokens.infoCyan,
+      JournalMood.anxious => tokens.attentionOrange,
+      JournalMood.sad => tokens.structuralRed,
+      JournalMood.tired => tokens.attentionOrange,
+      null => tokens.textDisabled,
+    };

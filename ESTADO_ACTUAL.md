@@ -7,7 +7,7 @@
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **408/408**, `flutter analyze` limpio (rama `feat/v4-fase2`)
+- Pruebas: **418/418**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -144,14 +144,29 @@ pruebas, `dev` en la tablet, aprobación del usuario y commit.
    `/journal…` marcan Personaje); «Volver al Diario» (`goToDiary`) en lugar
    de `goNamed('journal')`; en teléfono el tercer botón es «Personaje» y
    salió de «Más». Captura `sidebar_modular_battery` regenerada.
-9. **Diario nuevo** (D18, maqueta privada «Diario de Bitácora», mini-spec
-   aprobada): tablet en dos columnas — lista continua por fechas con
-   resumen por día, filtros TODAS · MISIONES · LIBRES · MOVIMIENTOS e iconos
-   (buscar, archivo, cierre, nueva) a la izquierda; entrada abierta a la
-   derecha con título rojo, ◆ objetivos de su misión, texto, ánimo, fotos,
-   personajes, editar y archivar. 100 primeras + «Cargar más». Teléfono:
-   lista y entrada a pantalla completa.
-10. **Personajes** con el mismo patrón (lista y ficha en dos columnas).
+9. ~~Diario nuevo~~ **Hecho y aprobado el 5 de octubre de 2026** (maqueta
+   privada «Diario de Bitácora»; huella verificada). 418/418. Qué hay:
+   - `journal/presentation/journal_diary_view.dart` (`JournalDiaryView`):
+     tablet ≥ 840 px en dos columnas — lista continua agrupada por fecha
+     (HOY/AYER/«03 OCT», resumen «N entradas · ánimo»), filas con «!» misión
+     / «$» movimiento / «·» libre, título cian; filtros TODAS · MISIONES ·
+     LIBRES · MOVIMIENTOS; iconos buscar, archivo, cierre del día y +; la
+     entrada elegida (la más reciente por defecto) a la derecha. 100 + «Cargar
+     más» (`journalTimelineProvider(limit)`). Teléfono: lista y
+     `journalDetail` a pantalla completa.
+   - `journal_entry_view.dart` (`JournalEntryView`), también en
+     `JournalEntryDetailPage`: título rojo; iconos editar, cámara (añadir
+     foto) y archivar **en rojo**; **solo se muestra lo que hay** (texto,
+     ánimo, fotos, personajes); recuadro «OBJETIVOS» solo si existen, en
+     cian (cumplidos tachados) con ◆ amarillo; **descripción de la misión
+     en rojo debajo**; nombres de personajes en rojo (solo en el Diario,
+     `ContactThumbnailRow.nameColor`).
+   - El texto de la entrada sigue en `textPrimary` (blanco o cian).
+10. **Personajes / ficha de personaje** al estilo del juego (captura de
+   referencia del usuario: Claire Russell): foto grande a la izquierda,
+   panel de borde rojo con nombre cian, rol pequeño, descripción en rojo,
+   iconos rojos y **códigos decorativos en las esquinas** (pedidos). Mini-spec
+   pendiente tras la maqueta.
 11. Versión `1.8.0`, APK release, instalación **encima** en la tablet y
    aprobación del usuario. **Antes, el respaldo de la llave (paso 1).**
    Después, fusionar la rama en `main`.

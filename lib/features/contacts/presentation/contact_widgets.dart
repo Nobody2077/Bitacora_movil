@@ -21,10 +21,14 @@ class ContactThumbnailRow extends StatelessWidget {
     required this.contacts,
     super.key,
     this.size = 56,
+    this.nameColor,
   });
 
   final List<Contact> contacts;
   final double size;
+
+  /// Color del nombre; cian si falta. El Diario los pone en rojo.
+  final Color? nameColor;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +67,10 @@ class ContactThumbnailRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: tokens.infoCyan, fontSize: 12),
+                      style: TextStyle(
+                        color: nameColor ?? tokens.infoCyan,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),

@@ -5,9 +5,7 @@ import '../../../app/theme/app_theme_tokens.dart';
 import '../../../app/theme/terminal_foundations.dart';
 import '../../../shared/adaptive/shell_chrome.dart';
 import '../../../shared/widgets/terminal/terminal_widgets.dart';
-import '../../contacts/application/contact_providers.dart';
-import '../../contacts/presentation/contact_pages.dart';
-import '../../journal/presentation/journal_timeline_page.dart';
+import '../../journal/presentation/journal_diary_view.dart';
 import '../../missions/application/mission_providers.dart';
 import '../../missions/domain/models/mission.dart';
 import '../../progress/application/progress_providers.dart';
@@ -81,7 +79,7 @@ class _CharacterMenuPageState extends ConsumerState<CharacterMenuPage> {
             child: switch (_tab) {
               CharacterTab.tienda => const ShopSection(),
               CharacterTab.personaje => const _CharacterSheet(),
-              CharacterTab.diario => const _DiaryView(),
+              CharacterTab.diario => const JournalDiaryView(),
             },
           ),
         ),
@@ -565,107 +563,6 @@ class _PanelRow extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// DIARIO = la Bitácora con otro nombre (ADR-006 D7), más los personajes.
-class _DiaryView extends ConsumerStatefulWidget {
-  const _DiaryView();
-
-  @override
-  ConsumerState<_DiaryView> createState() => _DiaryViewState();
-}
-
-class _DiaryViewState extends ConsumerState<_DiaryView> {
-  bool _showContacts = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    final int? contactCount = ref.watch(activeContactsProvider).value?.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            TerminalSpace.lg,
-            TerminalSpace.md,
-            TerminalSpace.lg,
-            0,
-          ),
-          child: Wrap(
-            spacing: TerminalSpace.xs,
-            children: <Widget>[
-              _ModeButton(
-                key: const Key('diary-mode-entries'),
-                label: 'ENTRADAS',
-                selected: !_showContacts,
-                color: tokens.infoCyan,
-                onPressed: () => setState(() => _showContacts = false),
-              ),
-              _ModeButton(
-                key: const Key('diary-mode-contacts'),
-                label: contactCount == null
-                    ? 'PERSONAJES'
-                    : 'PERSONAJES · $contactCount',
-                selected: _showContacts,
-                color: tokens.infoCyan,
-                onPressed: () => setState(() => _showContacts = true),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: _showContacts
-              ? ListView(
-                  padding: TerminalSpace.pageTablet,
-                  children: const <Widget>[ContactsSection()],
-                )
-              : const JournalTimelinePage(title: 'Diario'),
-        ),
-      ],
-    );
-  }
-}
-
-class _ModeButton extends StatelessWidget {
-  const _ModeButton({
-    required this.label,
-    required this.selected,
-    required this.color,
-    required this.onPressed,
-    super.key,
-  });
-
-  final String label;
-  final bool selected;
-  final Color color;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = Theme.of(
-      context,
-    ).extension<AppThemeTokens>()!;
-    return Semantics(
-      selected: selected,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: selected ? color : tokens.textSecondary,
-          side: BorderSide(color: selected ? color : tokens.border),
-          minimumSize: const Size(48, 44),
-          textStyle: const TextStyle(
-            fontFamily: 'JetBrains Mono',
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        child: Text(label),
       ),
     );
   }

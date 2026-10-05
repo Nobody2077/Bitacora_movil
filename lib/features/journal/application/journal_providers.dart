@@ -90,6 +90,24 @@ final journalEntriesProvider =
           );
     });
 
+/// Todas las entradas activas, de la más reciente a la más antigua, hasta
+/// [limit] (Diario, ADR-006 D18). «Cargar más» pide un límite mayor.
+final journalTimelineProvider = StreamProvider.family<List<JournalEntry>, int>(
+  (Ref ref, int limit) => ref
+      .watch(journalRepositoryProvider)
+      .watchRecent(
+        startUtc: DateTime.utc(1970),
+        endUtc: DateTime.utc(2200),
+        limit: limit,
+      )
+      .map(
+        (Result<List<JournalEntry>> result) => result.fold(
+          onSuccess: (List<JournalEntry> entries) => entries,
+          onFailure: (failure) => throw failure,
+        ),
+      ),
+);
+
 final journalEntryDetailProvider = FutureProvider.family<JournalEntry?, String>(
   (Ref ref, String id) async {
     final Result<JournalEntry?> result = await ref
