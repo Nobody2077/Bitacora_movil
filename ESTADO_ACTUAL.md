@@ -1,13 +1,13 @@
 # Estado actual y guía de relevo
 
-- Última revisión: **4 de octubre de 2026**
+- Última revisión: **5 de octubre de 2026**
 - Versión en `pubspec.yaml`: **`1.7.0+14`** (fase 1 de ADR-006), firmada y
   **aprobada en la tablet con datos reales** el 3 de octubre de 2026
 - Repositorio: [`Nobody2077/Bitacora_movil`](https://github.com/Nobody2077/Bitacora_movil)
 - Rama base: `main`, abierta en el worktree
   `G:\Desarrollo\Proyectos\bitacora-main-v3`. Cada fase sale de `main` en una
   rama nueva
-- Pruebas: **320/320**, `flutter analyze` limpio
+- Pruebas: **322/322**, `flutter analyze` limpio (rama `feat/v4-fase2`)
 - **Siguiente: fase 2 de ADR-006**, la Tienda (lista de deseos; ver D17)
 
 Este documento guarda **solo lo vigente**, para que Claude Code u otro agente
@@ -25,15 +25,21 @@ una **mini-spec de 5–10 líneas** (qué hace, qué no, cómo se prueba, cuánd
 da por bueno) que el usuario aprueba **antes** de programar. Después:
 pruebas, `dev` en la tablet, aprobación del usuario y commit.
 
-0. Comprobar: `git status -sb` limpio y al día en el worktree de `main`,
-   `flutter analyze` y `flutter test` (320/320) **en el PC, nunca contra la
-   tablet**. Crear la rama `feat/v4-fase2` desde `main`.
-1. Preguntar al usuario si ya respaldó la llave de firma (ver «Pendientes del
-   usuario»).
-2. **Migración v5:** `area_id` opcional en `inventory_items` (FK a
-   `life_areas`, `ON DELETE SET NULL`). Snapshot v5 con el procedimiento
-   controlado, pruebas v1/v2/v3/v4 → v5 y ensayo `dev` en la tablet (v4 con
-   datos → v5) antes de tocar la prod. Sin dependencias nuevas.
+0. ~~Rama y comprobaciones~~ **Hecho el 4 de octubre de 2026**: la rama
+   `feat/v4-fase2` vive en la carpeta principal
+   `G:\Desarrollo\Proyectos\Bicacora_movil` (el worktree de `main` sigue en
+   `main`).
+1. **Llave de firma: SIN RESPALDO** (verificado el 4 de octubre: solo está en
+   el PC; ninguna copia en la tablet). El usuario no encuentra su pendrive y
+   lo pospuso. **Obligatorio antes de instalar `1.8.0` en la prod**: dos
+   copias (pendrive conectado al PC y nube con zip cifrado), comprobando la
+   huella SHA-256 de cada una.
+2. ~~Migración v5~~ **Hecho y aprobado el 5 de octubre de 2026**
+   (`d66ac0a`): `area_id` opcional en `inventory_items` (FK a `life_areas`,
+   `ON DELETE SET NULL`), snapshot `drift_schema_v5.json`, prueba v4 → v5.
+   322/322. Ensayo en la tablet: `dev` v4 con datos → v5 desde Descargas
+   (`adb install` falló otra vez), el usuario dijo «datos bien»; prod intacta
+   en `1.7.0`.
 3. **Datos:** DAO/repositorio de deseos (crear, editar con `row_version`,
    archivar; área, tipo, prioridad, precio, información y meta opcional), el
    cálculo «al alcance» contra el saldo disponible (`availableMinor`) y la
